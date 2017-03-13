@@ -13,6 +13,7 @@ SET(BASICTCTCHK_SRC
 
 # create shared library --------------------------------------------------------
 ADD_LIBRARY(basictctchk_shared SHARED ${BASICTCTCHK_SRC})
+ADD_DEPENDENCIES(basictctchk_shared abs_shared)
 
 SET_TARGET_PROPERTIES(basictctchk_shared PROPERTIES
                         OUTPUT_NAME BasicTicketCheck

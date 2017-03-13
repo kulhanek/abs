@@ -24,6 +24,7 @@ SET(BASICJOBTYPES_SRC
 
 # create shared library --------------------------------------------------------
 ADD_LIBRARY(basicjobtypes_shared SHARED ${BASICJOBTYPES_SRC})
+ADD_DEPENDENCIES(basicjobtypes_shared abs_shared)
 
 SET_TARGET_PROPERTIES(basicjobtypes_shared PROPERTIES
                         OUTPUT_NAME BasicJobTypes

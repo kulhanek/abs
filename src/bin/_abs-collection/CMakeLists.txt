@@ -10,6 +10,7 @@ SET(COLLECTION_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(_abs-collection ${COLLECTION_SRC})
+ADD_DEPENDENCIES(_abs-collection abs_shared)
 
 TARGET_LINK_LIBRARIES(_abs-collection ${ABS_LIBS})
 

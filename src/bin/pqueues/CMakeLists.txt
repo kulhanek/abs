@@ -10,6 +10,7 @@ SET(QUEUES_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(pqueues ${QUEUES_SRC})
+ADD_DEPENDENCIES(pqueues abs_shared)
 
 TARGET_LINK_LIBRARIES(pqueues ${ABS_LIBS})
 

@@ -46,6 +46,8 @@ SET(ABS_SRC
 # create shared library --------------------------------------------------------
 ADD_DEFINITIONS(-DABS_BUILDING_DLL)
 ADD_LIBRARY(abs_shared SHARED ${ABS_SRC})
+ADD_DEPENDENCIES(abs_shared plusula_shared)
+
 SET_TARGET_PROPERTIES(abs_shared PROPERTIES
                         OUTPUT_NAME abs
                         CLEAN_DIRECT_OUTPUT 1

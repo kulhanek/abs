@@ -10,6 +10,7 @@ SET(INFO_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(pinfo ${INFO_SRC})
+ADD_DEPENDENCIES(pinfo abs_shared)
 
 TARGET_LINK_LIBRARIES(pinfo ${ABS_LIBS})
 

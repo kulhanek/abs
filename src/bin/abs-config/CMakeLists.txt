@@ -10,6 +10,7 @@ SET(PROG_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(abs-config ${PROG_SRC})
+ADD_DEPENDENCIES(abs-config abs_shared)
 
 TARGET_LINK_LIBRARIES(abs-config ${ABS_LIBS})
 

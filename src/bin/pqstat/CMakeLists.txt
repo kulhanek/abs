@@ -10,6 +10,7 @@ SET(QSTAT_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(pqstat ${QSTAT_SRC})
+ADD_DEPENDENCIES(pqstat abs_shared)
 
 TARGET_LINK_LIBRARIES(pqstat ${ABS_LIBS})
 

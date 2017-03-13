@@ -10,6 +10,7 @@ SET(SANITIZE_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(psanitize ${SANITIZE_SRC})
+ADD_DEPENDENCIES(psanitize abs_shared)
 
 TARGET_LINK_LIBRARIES(psanitize ${ABS_LIBS})
 

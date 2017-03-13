@@ -10,6 +10,7 @@ SET(SYNC_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(_abs-sync ${SYNC_SRC})
+ADD_DEPENDENCIES(_abs-sync abs_shared)
 
 TARGET_LINK_LIBRARIES(_abs-sync ${ABS_LIBS})
 

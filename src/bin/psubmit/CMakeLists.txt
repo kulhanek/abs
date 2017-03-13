@@ -10,6 +10,7 @@ SET(SUBMIT_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(psubmit ${SUBMIT_SRC})
+ADD_DEPENDENCIES(psubmit abs_shared)
 
 TARGET_LINK_LIBRARIES(psubmit ${ABS_LIBS})
 

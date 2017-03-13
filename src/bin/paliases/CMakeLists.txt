@@ -10,6 +10,7 @@ SET(ALIASES_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(paliases ${ALIASES_SRC})
+ADD_DEPENDENCIES(paliases abs_shared)
 
 TARGET_LINK_LIBRARIES(paliases ${ABS_LIBS})
 

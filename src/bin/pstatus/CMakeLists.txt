@@ -10,6 +10,7 @@ SET(STATUS_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(pstatus ${STATUS_SRC})
+ADD_DEPENDENCIES(pstatus abs_shared)
 
 TARGET_LINK_LIBRARIES(pstatus ${ABS_LIBS})
 
