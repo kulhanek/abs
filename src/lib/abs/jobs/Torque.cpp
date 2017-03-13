@@ -628,7 +628,7 @@ bool CTorque::SubmitJob(CJob& job)
     }
 
     variables << ",INF_SITE_ID=" << GlobalConfig.GetActiveSiteID();
-    variables << ",INF_ABS_VERSION=" << GlobalConfig.GetABSModuleVersion();
+    variables << ",INF_LibBuildVersion_ABS=" << GlobalConfig.GetABSModuleVersion();
     variables << ",INF_UGROUP=" << job.GetUserGroup();
     variables << ",INF_UMASK=" << job.GetUMask();
 

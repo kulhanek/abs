@@ -28,7 +28,7 @@ ADD_LIBRARY(basicjobtypes_shared SHARED ${BASICJOBTYPES_SRC})
 SET_TARGET_PROPERTIES(basicjobtypes_shared PROPERTIES
                         OUTPUT_NAME BasicJobTypes
                         CLEAN_DIRECT_OUTPUT 1
-                        VERSION ${ABS_VERSION})
+                        VERSION ${LibBuildVersion_ABS})
 
 TARGET_LINK_LIBRARIES(basicjobtypes_shared ${ABS_LIBS})
 

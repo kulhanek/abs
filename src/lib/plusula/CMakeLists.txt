@@ -27,7 +27,7 @@ TARGET_LINK_LIBRARIES(plusula_shared
 SET_TARGET_PROPERTIES(plusula_shared PROPERTIES
                 OUTPUT_NAME plusula
                 CLEAN_DIRECT_OUTPUT 1
-                VERSION ${ABS_VERSION}
+                VERSION ${LibBuildVersion_ABS}
                 )
 
 INSTALL(TARGETS

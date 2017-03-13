@@ -49,7 +49,7 @@ ADD_LIBRARY(abs_shared SHARED ${ABS_SRC})
 SET_TARGET_PROPERTIES(abs_shared PROPERTIES
                         OUTPUT_NAME abs
                         CLEAN_DIRECT_OUTPUT 1
-                        VERSION ${ABS_VERSION})
+                        VERSION ${LibBuildVersion_ABS})
 INSTALL(TARGETS
             abs_shared
         LIBRARY DESTINATION

@@ -19,7 +19,7 @@ SET(TRY_QT_LIB ON CACHE BOOL "Should the QT lib be used?")
 # ==============================================================================
 
 # define project name ----------------------------
-SET(ABS_VERSION 2.0.x)
+SET(LibBuildVersion_ABS 3.0.x)
 
 # what languages we use --------------------------
 ENABLE_LANGUAGE(CXX)

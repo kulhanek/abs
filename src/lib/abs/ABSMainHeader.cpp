@@ -24,8 +24,8 @@
 
 //------------------------------------------------------------------------------
 
-const char* LibBuildVersion_ABS     = ABS_VERSION " [Infinity]";
-const char* LibBuildVersion_ABS_Web = ABS_VERSION;
+const char* LibBuildVersion_ABS     = "3.x.SVNVERSION (DATE) [ABS]";
+const char* LibBuildVersion_ABS_Web = "3.x.SVNVERSION (DATE)";
 
 //==============================================================================
 //------------------------------------------------------------------------------
