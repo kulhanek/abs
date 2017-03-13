@@ -1,0 +1,2 @@
+flex --prefix=yynode -o NodeMask.yy.c NodeMask.l
+bison --name-prefix=yynode -d -b NodeMask NodeMask.y

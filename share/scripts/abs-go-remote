@@ -1,0 +1,63 @@
+#!/bin/bash
+# ==============================================================================
+# ABS
+# (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# ==============================================================================
+
+INF_SITE_ID=$INF_GO_SITE_ID
+INF_WORK_DIR=$INF_GO_WORK_DIR
+INF_SITE_EMODS=$INF_GO_EXPORTED_MODULES_1
+INF_JOB_EMODS=$INF_GO_EXPORTED_MODULES_2
+INF_UMASK=$INF_GO_UMASK
+
+# activate bash profile
+# if [ -f /etc/profile ]; then . /etc/profile; fi
+if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi
+
+if [ -z "$AMS_ROOT" ]; then
+    source /software/ncbr/softmods/6.0/etc/boot/bashrc.ams
+    AMS_ALTERNATIVE_BOOT="YES"
+fi
+
+# set user umask
+umask "0$INF_GO_UMASK"
+
+site activate $INF_SITE_ID 2> /dev/null
+if [ $? -ne 0 ]; then
+    echo " ERROR: Site ($INF_SITE_ID) cannot be activated!"
+    echo
+    exit 1
+fi
+
+if [ "$AMS_ALTERNATIVE_BOOT" == "YES" ]; then
+    echo ">>> NOTE: Infinity has been booted using alternative approach,"
+    echo "          please report this to the site support: $AMS_SITE_SUPPORT"
+    echo "          (Include the whole output beggining by the pgo command!)"
+    echo ""
+    echo "          In alternative mode, some functionality might be limited!"
+    echo ""
+fi
+
+cd $INF_WORK_DIR 2> /dev/null
+if [ $? -ne 0 ]; then
+    echo " ERROR: Job working directory ($INF_WORK_DIR) is not accesible!"
+    echo
+    exit 1
+fi
+if [ -n "$INF_SITE_EMODS" ]; then
+    amsmodule add `echo "$INF_SITE_EMODS" | tr "%" " "` &> /dev/null;
+fi
+if [ -n "$INF_JOB_EMODS" ]; then
+    amsmodule add `echo "$INF_JOB_EMODS" | tr "%" " "` &> /dev/null;
+fi
+echo "> Site and job exported modules were recovered."
+echo ""
+exec bash -
+

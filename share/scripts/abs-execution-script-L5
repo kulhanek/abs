@@ -1,0 +1,133 @@
+#!/bin/bash
+# =============================================================================
+# ABS
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# =============================================================================
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L5.1: Data in the working directory ..."
+echo "# ------------------------------------------------------------------------------"
+echo "User identity ..."
+echo "UID   : `id`"
+echo "Umask : `umask`"
+echo
+
+ls -l
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L5.2: Syncing data [$INF_SYNC_MODE] ..."
+echo "# ------------------------------------------------------------------------------"
+
+# do not copy info file
+echo "${INF_WHOLE_NAME}.info" > $TMPDIR/${_TNAME_}.excluded
+
+echo " Final exclusion list:"
+cat $TMPDIR/${_TNAME_}.excluded | awk '{ printf("   %s\n",$0); }'
+echo ""
+
+# setup rsync options
+if [ "$INF_FS_TYPE" == "inconsistent" ]; then
+    RSYNC_OPTS="--no-g"
+fi
+
+case $INF_SYNC_MODE in
+    sync )
+        echo " Data from the main node are only copied ..."
+
+        if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
+            echo " Copy mode     : remote rsync"
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            rsync -av $RSYNC_OPTS -e "ssh -o \"StrictHostKeyChecking=no\"" --exclude-from="$TMPDIR/${_TNAME_}.excluded" \
+                  "$INF_WORK_DIR/" "$INF_JOB_MACHINE:$INF_JOB_PATH/$INF_OUTPUT_SUFFIX/"
+
+            if [ $? -ne 0 ]; then
+                echo "" >&2
+                echo " ERROR: Unable to copy the job data from the main computational" >&2
+                echo "        node to the input job directory!" >&2
+                echo "" >&2
+                exit 1
+            fi
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        else
+            echo " Copy mode     : local rsync"
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            rsync -av $RSYNC_OPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" "$INF_WORK_DIR/" \
+                  "$INF_JOB_PATH/$INF_OUTPUT_SUFFIX/"
+
+            if [ $? -ne 0 ]; then
+                echo "" >&2
+                echo " ERROR: Unable to copy the job data from the main computational" >&2
+                echo "        node to the input job directory!" >&2
+                echo "" >&2
+                exit 1
+            fi
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        fi
+    ;;
+    jobdir )
+        echo " The job will was executed in the input job directory, no data are copied back ..."
+    ;;
+esac
+
+rm -f $TMPDIR/${_TNAME_}.excluded
+
+echo " Success."
+
+# -----------------------------------------------------------------------------
+
+echo ""
+echo " Write job end info ..."
+
+$ABS_ROOT/sbin/abs-update-infofile stop
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to update job status in the job info file!" >&2
+    echo "" >&2
+    exit 1
+fi
+
+if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+    echo " Local update ..."
+    if [ "$INF_SYNC_MODE" != "jobdir" ]; then
+        cp "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+    fi
+else
+    echo " Remote update ..."
+    /usr/bin/scp -o "StrictHostKeyChecking=no" \
+        "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_MACHINE:$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+fi
+
+echo " Date = `date`"
+echo " Success."
+
+# notify user about the job end
+case $INF_JOB_NAME in
+    cli )
+        ;;
+    gui )
+        ;;
+    * )
+        # notify user if requested
+        if [ -n "$INF_EMAIL" ]; then
+            echo "E-mail notification: $INF_EMAIL"
+            pinfo | mail -s "[INFINITY] Job $INF_JOB_ID was finished" "$INF_EMAIL"
+        fi
+        ;;
+esac
+
+# write simple statistics into stat database -----------------------------------
+
+# FIXME
+
+# ------------------------------------------------------------------------------
+
+exit 0

@@ -1,0 +1,106 @@
+#!/bin/bash
+# ==============================================================================
+# ABS
+# (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# ==============================================================================
+#
+# required input
+# INF_SYNC_MAIN_NODE
+# INF_SYNC_WORK_DIR
+# INF_SYNC_JOB_PATH
+# INF_SYNC_JOB_MACHINE
+
+#===============================================================================
+#-------------------------------------------------------------------------------
+#===============================================================================
+
+echo "List of files in working directory:"
+echo "========================================================"
+ssh $INF_SYNC_MAIN_NODE "cd $INF_SYNC_WORK_DIR; if [ \$? -ne 0 ]; then echo; exit 1; fi; \ls -l *"
+
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+
+echo ""
+if [ "$INF_SYNC_ALL" == "YES" ]; then
+    echo -n "All files will be synchronized by rsync "
+    if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
+        echo "from job working directory ..."
+        rsync -av --exclude "___JOB_IS_RUNNING___" "$INF_SYNC_WORK_DIR/" "$INF_SYNC_JOB_MACHINE:$INF_SYNC_JOB_PATH/" 2>&1 | awk '{ printf("   %s\n",$0); }'
+        if [ $? -ne 0 ]; then
+            echo ""
+            echo " ERROR: Unable to copy all files!"
+            echo ""
+            exit 1
+        fi
+    else
+        echo "from job input directory ..."
+        rsync -av --exclude "___JOB_IS_RUNNING___" "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$INF_SYNC_JOB_PATH/" 2>&1 | awk '{ printf("   %s\n",$0); }'
+        if [ $? -ne 0 ]; then
+            echo ""
+            echo " ERROR: Unable to copy all files!"
+            echo ""
+            exit 1
+        fi
+    fi
+    echo "Done."
+    echo ""
+    exit 0
+fi
+
+if [ $# -gt 0 ]; then
+    echo "List of files were specified from the command line."
+    COUNT=1
+    FILES=""
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -h|--help|-v|--verbose|--version)
+                # skip
+            ;;
+            *)
+                FILES="$FILES $1"
+            ;;
+        esac
+        shift
+    done
+    echo ">$FILES"
+else
+    echo "Please specify files to be synchronized (separated by spaces)..."
+    echo -n "> "
+    read FILES
+fi
+
+if [ "$FILES" == "" ]; then
+    echo ""
+    echo " ERROR: No files were specified ..."
+    echo ""
+    exit 1
+fi
+
+echo ""
+
+for SFILE in $FILES; do
+    echo -n "Copying file '$SFILE' by scp ... "
+    if [ "$SFILE" == "___JOB_IS_RUNNING___" ]; then
+        echo "Skipped."
+    else
+        /usr/bin/scp -r $INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE $INF_SYNC_JOB_MACHINE:$INF_SYNC_JOB_PATH > /dev/null
+        if [ $? -ne 0 ]; then
+            echo ""
+            echo " ERROR: Unable to copy the file!"
+            echo ""
+            exit 1
+        fi
+        echo "Done."
+    fi
+done
+
+echo ""

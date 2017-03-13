@@ -1,0 +1,73 @@
+#!/usr/bin/env infinity-env
+# ------------------------------------------------------------------------------
+# this wrapper finalize all ijobs associated with the main job
+# ------------------------------------------------------------------------------
+
+# required environment - not completed
+INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
+INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
+
+# get number of ijobs
+NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
+if [ $? -ne 0 ]; then
+    echo ""
+    echo " >>> ERROR: Unable to get number of ijobs!"
+    echo ""
+    exit 1
+fi
+
+for((ID=1;ID<=$NIJOBS;ID++)); do
+    INF_IJOB_ID="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" id`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get id of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+
+    echo
+    echo " >>> IJOB: $INF_IJOB_ID"
+
+    INF_IJOB_MAIN_NODE="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" mainnode`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get mainnode of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_IJOB_WORK_DIR="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" workdir`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get workdir of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_IJOB_NODEFILE="$INF_WORK_DIR/${INF_IJOB_ID}.nodes"
+    if ! [ -f "$INF_IJOB_NODEFILE" ]; then
+        echo ""
+        echo " >>> ERROR: ijob node file ($INF_IJOB_NODEFILE) does not exist!"
+        echo ""
+        exit 1
+    fi
+
+    case $INF_SYNC_MODE in
+        sync )
+            echo "     Sync mode: $INF_SYNC_MODE, removing working directories on ijob nodes ..."
+            for NODE_NAME in `cat $INF_IJOB_NODEFILE | sort -u`; do
+                echo ""
+                echo "     >>> $NODE_NAME:$INF_IJOB_WORK_DIR"
+                ssh -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; rm -rf $INF_IJOB_WORK_DIR" | awk '{ printf("     %s\n",$0); }'
+            done
+            ;;
+        jobdir | nosync )
+            echo "     Sync mode: $INF_SYNC_MODE, no directories will be removed ..."
+            echo ""
+            echo "     >>> $INF_IJOB_MAIN_NODE:INF_IJOB_WORK_DIR"
+            timeout 30 df -h | awk '{ printf("     %s\n",$0); }'
+            if [ $? -ne 0 ]; then
+                echo ">>> WARNING: df command was not completed due to error or timeout."
+            fi
+            ;;
+    esac
+done
+

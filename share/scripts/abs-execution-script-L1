@@ -1,0 +1,136 @@
+#!/bin/bash
+# ==============================================================================
+# ABS
+# (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# ==============================================================================
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L1: Restore job environment ..."
+echo "# ------------------------------------------------------------------------------"
+echo "User identity ..."
+echo "UID   : `id`"
+echo "Umask : `umask`"
+echo
+
+echo " Current directory  : `pwd` (Not used in restore process.)"
+
+# get name of temporary directory
+export TMPDIR=`$ABS_ROOT/sbin/abs-get-setup-item INF_TMP_DIR`
+
+if [ $? -ne 0 ]; then
+    return 1
+fi
+
+export INF_WHOLE_NAME="${INF_JOB_NAME}${INF_JOB_NAME_SUFFIX}"
+
+# ------------------------------------------------------------------------------
+# is job directory on remote machine?
+INF_REMOTE_JOBDIR="YES"
+if [ -d "$INF_JOB_PATH" ]; then
+    # compare keys
+    grep "$INF_JOB_KEY" "$INF_JOB_PATH/${INF_WHOLE_NAME}.infkey" &> /dev/null
+    if [ $? -eq 0 ]; then
+        INF_REMOTE_JOBDIR="NO"
+        echo " Info               : the job dir is local and keys match."
+    else
+        echo " Info               : the job dir is local but keys do not match."
+    fi
+fi
+
+echo " Remote job dir     : $INF_REMOTE_JOBDIR"
+export INF_REMOTE_JOBDIR
+
+# ------------------------------------------------------------------------------
+# copy job info to temporary directory
+export _TNAME_="$$.$USER"
+
+if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+    cp "$INF_JOB_PATH/${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
+else
+    /usr/bin/scp -o "StrictHostKeyChecking=no" \
+        "$INF_JOB_MACHINE:$INF_JOB_PATH/${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
+fi
+
+if [ $? -ne 0 ]; then
+    echo ""  >&2
+    echo " ERROR: Unable to get the job info file!"  >&2
+    echo "        Source machine: '$INF_JOB_MACHINE'"  >&2
+    echo "        Source file   : '$INF_JOB_PATH/${INF_WHOLE_NAME}.info'"  >&2
+    echo "        Dest file     : '$TMPDIR/${_TNAME_}.info'" >&2
+    echo "" >&2
+    return 1
+fi
+
+# ------------------------------------------------------------------------------
+# restore job shell environment
+ABS_EXIT_CODE=0
+
+EVAL_STRING=`$ABS_ROOT/sbin/abs-restore-env "$TMPDIR/${_TNAME_}.info"`
+
+eval $EVAL_STRING
+
+if [ $? -ne 0 ] || [ $ABS_EXIT_CODE != "0" ]; then
+    rm -f "$TMPDIR/${_TNAME_}.info"
+    return 1
+fi
+
+# ------------------------------------------------------------------------------
+# AMS/ABS co-operation
+
+export AMS_NCPU=$INF_NCPU
+export AMS_NGPU=$INF_NGPU
+export AMS_NNODE=$INF_NNODE
+export INF_NODEFILE=$PBS_NODEFILE
+export AMS_NODEFILE=$INF_NODEFILE
+
+# ------------------------------------------------------------------------------
+# determine INF_MAX_WALLTIME from the job stat
+export INF_MAX_WALLTIME=`pqstat -j $INF_JOB_ID | grep Resource_List.walltime | awk '{print $3;}' | tr ":" " " | awk '{ print $1*3600 + $2*60 + $3;}'`
+
+# ------------------------------------------------------------------------------
+# restore exported modules
+
+if [ "$INF_EXPORTED_MODULES" != "" ]; then
+    echo " Exported modules   : $INF_EXPORTED_MODULES"
+else
+    echo " Exported modules   : -none-"
+fi
+
+INF_EXPORTED_MODULES=`echo $INF_EXPORTED_MODULES | sed -e 's/|/ /g'`
+
+if [ "$INF_EXPORTED_MODULES" != "" ]; then
+    amsmodule --reexported add $INF_EXPORTED_MODULES
+else
+    echo ""
+fi
+
+if [ "$INF_JOB_MACHINE" != "$INF_SURROGATE_MACHINE" ]; then
+    echo "INFO: overriding INF_JOB_MACHINE by INF_SURROGATE_MACHINE"
+    INF_JOB_MACHINE="$INF_SURROGATE_MACHINE"
+fi
+
+# ------------------------------------------------------------------------------
+# list environment
+
+echo " Variable                       Value "
+echo "------------------------------ --------------------------------------------------"
+set | grep ^INF_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^AMS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^PBS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^TORQUE_ | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+
+# ------------------------------------------------------------------------------
+
+return 0
+
+
+
+

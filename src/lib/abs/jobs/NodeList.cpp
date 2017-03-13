@@ -1,0 +1,934 @@
+// =============================================================================
+// ABS - Advanced Batch System
+// -----------------------------------------------------------------------------
+//    Copyright (C) 2011      Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
+//
+//     This program is free software; you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation; either version 2 of the License, or
+//     (at your option) any later version.
+//
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+//
+//     You should have received a copy of the GNU General Public License along
+//     with this program; if not, write to the Free Software Foundation, Inc.,
+//     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+// =============================================================================
+
+#include <NodeList.hpp>
+#include <SimpleIterator.hpp>
+#include <iomanip>
+#include <TorqueConfig.hpp>
+#include <XMLElement.hpp>
+#include <fnmatch.h>
+#include <cctype>
+#include <string.h>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <CommonParser.hpp>
+#include <ErrorSystem.hpp>
+#include <fnmatch.h>
+#include <GlobalConfig.hpp>
+
+//------------------------------------------------------------------------------
+
+using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
+
+//------------------------------------------------------------------------------
+
+CNodeList NodeList;
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+CNodeList::CNodeList(void)
+{
+
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+void CNodeList::PrintInfos(std::ostream& sout)
+{
+    CTerminal   term;
+    int ncolumns = term.GetNumberOfColumns();
+
+    list<CNodeGroupPtr>::iterator git = NodeGroups.begin();
+    list<CNodeGroupPtr>::iterator get = NodeGroups.end();
+
+    while( git != get ){
+        CNodeGroupPtr p_group = *git;
+
+        sout << endl;
+        sout << "# Group : " << p_group->GroupName << endl;
+        sout << "# ---------------------------------------------------------------------------------------------" << endl;
+        set<string>::iterator pit = p_group->CommonProps.begin();
+        set<string>::iterator pet = p_group->CommonProps.end();
+
+        bool first = true;
+        bool leading = true;
+        int  len = 0;
+        while( pit != pet ){
+            if( len >= 80 ){
+                len = 0;
+                first = true;
+                sout << endl;
+            }
+            if( first && leading ){
+                sout << "# Common properties:";
+                len += 20;
+                first = false;
+                leading = false;
+            }
+            if( first ){
+                sout << "#";
+                len += 1;
+                first = false;
+            }
+            sout << " " << *pit;
+            len += (*pit).size() + 1;
+            pit++;
+        }
+        if( first == false ) sout << endl;
+        if( p_group->CommonProps.size() > 0 ){
+        sout << "# ---------------------------------------------------------------------------------------------" << endl;
+        }
+        sout << "#          Node Name     NN CPUs/MC Free GPUs Free     State            Extra properties       " << endl;
+        sout << "# ------------------------- ------- ---- ---- ---- -------------------- -----------------------" << endl;
+
+        if( HWDatabase.size() > 0 ) sout << endl;
+
+        list<CNodePtr>::iterator it = p_group->SortedNodes.begin();
+        list<CNodePtr>::iterator et = p_group->SortedNodes.end();
+
+        int tot_cpus = 0;
+        int free_cpus = 0;
+        int tot_gpus = 0;
+        int free_gpus = 0;
+        int nnodes = 0;
+
+        string prev_hwspec;
+
+        while( it != et ){
+            CNodePtr p_node = *it;
+            if( HWDatabase.size() > 0 ){
+                string hwspec = HWDatabase[string(p_node->GetName())];
+                if( it == p_group->SortedNodes.begin() ) prev_hwspec = hwspec;
+                if( (! prev_hwspec.empty()) && (hwspec != prev_hwspec) ) {
+                    sout << "   <yellow>" << prev_hwspec << "</yellow>" << endl;
+                    sout << endl;
+                    prev_hwspec = hwspec;
+                }
+            }
+            p_node->PrintLineInfo(sout,p_group->CommonProps,ncolumns);
+
+            tot_cpus += p_node->GetNumOfCPUs();
+            free_cpus += p_node->GetNumOfFreeCPUs();
+            tot_gpus += p_node->GetNumOfGPUs();
+            free_gpus += p_node->GetNumOfFreeGPUs();
+            nnodes++;
+            it++;
+        }
+
+        if( ! prev_hwspec.empty() ) {
+            sout << "   <yellow>" << prev_hwspec << "</yellow>" << endl;
+            sout << endl;
+        }
+
+        sout << "# ---------------------------------------------------------------------------------------------" << endl;
+        sout << "# Total number of nodes: " << right << setw(5) << nnodes << endl;
+        sout << "# Total number of CPUs : " << right << setw(5) << tot_cpus;
+        sout << "    Total number of GPUs : " << right << setw(5) << tot_gpus << endl;
+        sout << "# Free CPUs            : " << right << setw(5) << free_cpus;
+        sout << "    Free GPUs            : " << right << setw(5) << free_gpus << endl;
+
+        git++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::PrintStatistics(std::ostream& sout)
+{
+    if( (NodeGroups.size() == 1) && (UniqueProps.size() == 0) ){
+        return;
+    }
+
+    int tot_cpus = 0;
+    int free_cpus = 0;
+    int tot_gpus = 0;
+    int free_gpus = 0;
+    int nnodes = 0;
+
+    set<CNodePtr>::iterator it = ReasonableNodes.begin();
+    set<CNodePtr>::iterator et = ReasonableNodes.end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        tot_cpus += p_node->GetNumOfCPUs();
+        free_cpus += p_node->GetNumOfFreeCPUs();
+        tot_gpus += p_node->GetNumOfGPUs();
+        free_gpus += p_node->GetNumOfFreeGPUs();
+        nnodes++;
+        it++;
+    }
+
+    // print list of unique properties
+    if( UniqueProps.size() > 0 ){
+        sout << endl;
+        sout << "# All properties" << endl;
+        sout << "# ---------------------------------------------------------------------------------------------" << endl;
+
+        set<string>::iterator pit = UniqueProps.begin();
+        set<string>::iterator pet = UniqueProps.end();
+
+        bool first = true;
+        int  len = 0;
+        while( pit != pet ){
+            if( len >= 80 ){
+                len = 0;
+                first = true;
+                sout << endl;
+            }
+            if( first ){
+                sout << "#";
+                len += 1;
+                first = false;
+            }
+            sout << " " << *pit;
+            len += (*pit).size() + 1;
+            pit++;
+        }
+        if( first == false ) sout << endl;
+    }
+
+    sout << "# ---------------------------------------------------------------------------------------------" << endl;
+    sout << "# Total number of nodes: " << right << setw(5) << nnodes << endl;
+    sout << "# Total number of CPUs : " << right << setw(5) << tot_cpus;
+    sout << "    Total number of GPUs : " << right << setw(5) << tot_gpus << endl;
+    sout << "# Free CPUs            : " << right << setw(5) << free_cpus;
+    sout << "    Free GPUs            : " << right << setw(5) << free_gpus << endl;
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::PrintNames(std::ostream& sout)
+{
+    list<CNodeGroupPtr>::iterator git = NodeGroups.begin();
+    list<CNodeGroupPtr>::iterator get = NodeGroups.end();
+
+    while( git != get ){
+        CNodeGroupPtr p_group = *git;
+
+        list<CNodePtr>::iterator it = p_group->SortedNodes.begin();
+        list<CNodePtr>::iterator et = p_group->SortedNodes.end();
+
+        while( it != et ){
+            CNodePtr p_node = *it;
+            sout << p_node->GetName() << endl;
+            it++;
+        }
+
+        git++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::PrintNodeGroupNames(std::ostream& sout)
+{
+    sout << endl;
+    sout << "# Node group name" << endl;
+    sout << "# --------------------------------------" << endl;
+    CXMLElement* p_ele = TorqueConfig.GetNodeGroupConfig();
+    if( p_ele != NULL ){
+        CXMLElement* p_gele = p_ele->GetFirstChildElement("group");
+        while( p_gele != NULL ){
+            CSmallString gname;
+            p_gele->GetAttribute("name",gname);
+            sout << gname << endl;
+            p_gele = p_gele->GetNextSiblingElement("group");
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::PrepareNodeGroups(void)
+{
+    CXMLElement* p_ele = TorqueConfig.GetNodeGroupConfig();
+    if( p_ele == NULL ){
+        // all nodes into one big group
+        CNodeGroupPtr p_group = CNodeGroupPtr(new CNodeGroup);
+        p_group->GroupName = "all nodes";
+
+        list<CNodePtr>::iterator it = begin();
+        list<CNodePtr>::iterator ie = end();
+        while( it != ie ){
+            p_group->insert(*it);
+            it++;
+        }
+        NodeGroups.push_back(p_group);
+    } else {
+        CXMLElement* p_gele = p_ele->GetFirstChildElement("group");
+        while( p_gele != NULL ){
+            CSmallString gname;
+            p_gele->GetAttribute("name",gname);
+
+            CNodeGroupPtr p_group = CNodeGroupPtr(new CNodeGroup);
+            p_group->GroupName = gname;
+
+            list<CNodePtr>::iterator it = begin();
+            list<CNodePtr>::iterator ie = end();
+            while( it != ie ){
+                CNodePtr p_node = *it;
+
+                CXMLElement* p_filter = p_gele->GetFirstChildElement("filter");
+                while( p_filter != NULL ){
+                    CSmallString filter;
+                    p_filter->GetAttribute("name",filter);
+
+                    if( fnmatch(filter,p_node->GetName(),0) == 0 ){
+                        p_group->insert(p_node);
+                    }
+
+                    p_filter = p_filter->GetNextSiblingElement("filter");
+                }
+
+                it++;
+            }
+            if( p_group->size() > 0 ) {
+                NodeGroups.push_back(p_group);
+            }
+            p_gele = p_gele->GetNextSiblingElement("group");
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::PrepareSingleNodeGroup(void)
+{
+    // all nodes into one big group
+    CNodeGroupPtr p_group = CNodeGroupPtr(new CNodeGroup);
+    p_group->GroupName = "all nodes";
+
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator ie = end();
+    while( it != ie ){
+        p_group->insert(*it);
+        it++;
+    }
+    NodeGroups.push_back(p_group);
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::FinalizeNodeGroups(void)
+{
+    ReasonableNodes.clear();
+    UniqueProps.clear();
+
+    // post process groups
+    list<CNodeGroupPtr>::iterator git = NodeGroups.begin();
+    list<CNodeGroupPtr>::iterator get = NodeGroups.end();
+
+    while( git != get ){
+        CNodeGroupPtr p_group = *git;
+        p_group->MakeSortedNodeList();
+        p_group->GenerateCommonProperties();
+        ReasonableNodes.insert(p_group->begin(),p_group->end());
+        git++;
+    }
+
+    set<CNodePtr>::iterator rit = ReasonableNodes.begin();
+    set<CNodePtr>::iterator ret = ReasonableNodes.end();
+
+    while( rit != ret ){
+        CNodePtr p_node = *rit;
+        UniqueProps.insert(p_node->GetPropertyList().begin(),p_node->GetPropertyList().end());
+        rit++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::KeepNodesThatHaveProperty(const std::vector<std::string>& props)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator et = end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        if( p_node->HasAnyProperties(props) == false ){
+            it = erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::KeepNodesByMask(struct SExpression* p_mask)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator et = end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        if( IsNodeSelected(p_node,p_mask) == false ){
+            it = erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+bool CNodeList::IsNodeSelected(CNodePtr p_node,struct SExpression* p_expr)
+{
+    if(p_expr->Selection != NULL) {
+        return( IsNodeSelected(p_node,p_expr->Selection) );
+    } else {
+        bool left;
+        bool right;
+        switch(p_expr->Operator) {
+            case O_AND:
+                left = IsNodeSelected(p_node,p_expr->LeftExpression);
+                right = IsNodeSelected(p_node,p_expr->RightExpression);
+                return( left && right );
+            case O_OR:
+                left = IsNodeSelected(p_node,p_expr->LeftExpression);
+                right = IsNodeSelected(p_node,p_expr->RightExpression);
+                return( left || right );
+            case O_NOT:
+                right = IsNodeSelected(p_node,p_expr->RightExpression);
+                return( ! right );
+
+            default:
+                ES_ERROR("<- unknown operator");
+                return(false);
+        };
+    }
+}
+
+//------------------------------------------------------------------------------
+
+bool CNodeList::IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel)
+{
+    switch(p_sel->Type){
+        case T_NCPUS:
+            switch(p_sel->Operator){
+                case O_LT:
+                    return( p_node->GetNumOfCPUs() < p_sel->IValue );
+                case O_LE:
+                    return( p_node->GetNumOfCPUs() <= p_sel->IValue );
+                case O_GT:
+                    return( p_node->GetNumOfCPUs() > p_sel->IValue );
+                case O_GE:
+                    return( p_node->GetNumOfCPUs() >= p_sel->IValue );
+                case O_EQ:
+                    return( p_node->GetNumOfCPUs() == p_sel->IValue );
+                case O_NE:
+                    return( p_node->GetNumOfCPUs() != p_sel->IValue );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
+        case T_NFREECPUS:
+            switch(p_sel->Operator){
+                case O_LT:
+                    return( p_node->GetNumOfFreeCPUs() < p_sel->IValue );
+                case O_LE:
+                    return( p_node->GetNumOfFreeCPUs() <= p_sel->IValue );
+                case O_GT:
+                    return( p_node->GetNumOfFreeCPUs() > p_sel->IValue );
+                case O_GE:
+                    return( p_node->GetNumOfFreeCPUs() >= p_sel->IValue );
+                case O_EQ:
+                    return( p_node->GetNumOfFreeCPUs() == p_sel->IValue );
+                case O_NE:
+                    return( p_node->GetNumOfFreeCPUs() != p_sel->IValue );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
+        case T_NGPUS:
+            switch(p_sel->Operator){
+                case O_LT:
+                    return( p_node->GetNumOfGPUs() < p_sel->IValue );
+                case O_LE:
+                    return( p_node->GetNumOfGPUs() <= p_sel->IValue );
+                case O_GT:
+                    return( p_node->GetNumOfGPUs() > p_sel->IValue );
+                case O_GE:
+                    return( p_node->GetNumOfGPUs() >= p_sel->IValue );
+                case O_EQ:
+                    return( p_node->GetNumOfGPUs() == p_sel->IValue );
+                case O_NE:
+                    return( p_node->GetNumOfGPUs() != p_sel->IValue );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
+        case T_NFREEGPUS:
+            switch(p_sel->Operator){
+                case O_LT:
+                    return( p_node->GetNumOfFreeGPUs() < p_sel->IValue );
+                case O_LE:
+                    return( p_node->GetNumOfFreeGPUs() <= p_sel->IValue );
+                case O_GT:
+                    return( p_node->GetNumOfFreeGPUs() > p_sel->IValue );
+                case O_GE:
+                    return( p_node->GetNumOfFreeGPUs() >= p_sel->IValue );
+                case O_EQ:
+                    return( p_node->GetNumOfFreeGPUs() == p_sel->IValue );
+                case O_NE:
+                    return( p_node->GetNumOfFreeGPUs() != p_sel->IValue );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
+        case T_NAME:
+            switch(p_sel->Operator){
+                case O_EQ:
+                    return( fnmatch(p_sel->SValue,p_node->GetName(),0) == 0 );
+                case O_NE:
+                    return( fnmatch(p_sel->SValue,p_node->GetName(),0) != 0 );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
+        case T_PROPS:{
+                std::vector<std::string>::const_iterator it = p_node->GetPropertyList().begin();
+                std::vector<std::string>::const_iterator ie = p_node->GetPropertyList().end();
+                bool ok = false;
+                while( it != ie ){
+                    if( fnmatch(p_sel->SValue,(*it).c_str(),0) == 0 ){
+                        ok = true;
+                        break;
+                    }
+                    it++;
+                }
+                switch(p_sel->Operator){
+                    case O_EQ:
+                        return( ok );
+                    case O_NE:
+                        return( ! ok );
+                    default:
+                        ES_ERROR("<- unknown selection operator");
+                        return(false);
+                }
+            }
+        case T_STATE:{
+                std::vector<std::string> slist = p_node->GetStateList();
+                std::vector<std::string>::const_iterator it = slist.begin();
+                std::vector<std::string>::const_iterator ie = slist.end();
+                bool ok = false;
+                while( it != ie ){
+                    if( fnmatch(p_sel->SValue,(*it).c_str(),0) == 0 ){
+                        ok = true;
+                        break;
+                    }
+                    it++;
+                }
+                switch(p_sel->Operator){
+                    case O_EQ:
+                        return( ok );
+                    case O_NE:
+                        return( ! ok );
+                    default:
+                        ES_ERROR("<- unknown selection operator");
+                        return(false);
+                }
+            }
+        default:
+            ES_ERROR("<- unsupported selector");
+            return(false);
+    }
+
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::RemoveNodesWithoutProps(void)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator et = end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        if( p_node->GetPropertyList().size() == 0 ){
+            it = erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::RemoveDownNodes(void)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator et = end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        if( p_node->IsDown() == true ){
+            it = erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::KeepNodeGroups(const CSmallString& groups)
+{
+    string sgroups = string(groups);
+    set<string> lgroups;
+    split(lgroups,sgroups,is_any_of(","));
+
+    list<CNodeGroupPtr>::iterator it = NodeGroups.begin();
+    list<CNodeGroupPtr>::iterator et = NodeGroups.end();
+
+    while( it != et ){
+        CNodeGroupPtr p_group = *it;
+        if( lgroups.find(p_group->GroupName) == lgroups.end() ){
+            it = NodeGroups.erase(it);
+        } else {
+            it++;
+        }
+    }
+
+}
+
+//------------------------------------------------------------------------------
+
+const CNodePtr CNodeList::FindNode(const CSmallString& name)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator et = end();
+
+    while( it != et ){
+        if( (*it)->GetName() == name ) return(*it);
+        it++;
+    }
+
+    return(CNodePtr());
+}
+
+//------------------------------------------------------------------------------
+
+const CNodePtr CNodeList::FindNode(const CSmallString& name,const CQueuePtr& p_queue)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator et = end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        if( p_node->GetName() == name ){
+            if( p_queue == NULL ) return(p_node);
+            if( p_queue->GetRequiredProperty() == NULL ) return(p_node);
+            if( p_node->HasProperty(string(p_queue->GetRequiredProperty())) == true ) return(p_node);
+            return(CNodePtr());
+        }
+        it++;
+    }
+
+    return(CNodePtr());
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+bool CNodeGroup::CompareNamesA(const CNodePtr& p_left,const CNodePtr& p_right)
+{
+    if( p_left->IsNUMANode() && p_right->IsNUMANode() ){
+        if( p_left->GetNUMACoreName() == p_right->GetNUMACoreName() ){
+            return( p_left->GetNUMAID() < p_right->GetNUMAID() );
+        }
+    }
+
+    std::string lfull = string(p_left->GetNUMACoreName());
+    std::string rfull = string(p_right->GetNUMACoreName());
+
+    // the rest
+    std::string lname;
+    std::string ldomain;
+
+    unsigned int dpos = lfull.find(".");
+    if( dpos == string::npos ){
+        lname = lfull;
+    } else {
+        lname = lfull.substr(0,dpos);
+        ldomain = lfull.substr(dpos+1);
+    }
+
+    CSmallString lrname;
+    CSmallString lnode;
+    CSmallString lvdom;
+
+    int mode = 0;
+    for(unsigned int i=0; i < lname.size(); i++){
+        if( (mode == 0) && (isdigit(lname[i]) == true) ){
+            mode = 1;
+        }
+        if( (mode == 1) && (lname[i] == '-') ){
+            mode = 2;
+            continue;
+        }
+        if( (mode == 1) && (isdigit(lname[i]) == false) ){
+            break;
+        }
+        if( (mode == 2) && (isdigit(lname[i]) == true) ){
+            mode = 3;
+        }
+        if( (mode == 3) && (isdigit(lname[i]) == false ) ){
+            break;
+        }
+        switch(mode){
+            case 0:
+                lrname << lname[i];
+                break;
+            case 1:
+                lnode << lname[i];
+                break;
+            case 3:
+                lvdom << lname[i];
+                break;
+            default:
+                break;
+        }
+    }
+
+//    cout << lname << " " << lrname << " " << lnode << " " << lvdom << " " << ldomain <<  endl;
+
+    std::string rname;
+    std::string rdomain;
+
+    dpos = rfull.find(".");
+    if( dpos == string::npos ){
+        rname = rfull;
+    } else {
+        rname = rfull.substr(0,dpos);
+        rdomain = rfull.substr(dpos+1);
+    }
+
+    CSmallString rrname;
+    CSmallString rnode;
+    CSmallString rvdom;
+
+    mode = 0;
+    for(unsigned int i=0; i < rname.size(); i++){
+        if( (mode == 0) && (isdigit(rname[i]) == true) ){
+            mode = 1;
+        }
+        if( (mode == 1) && (rname[i] == '-') ){
+            mode = 2;
+            continue;
+        }
+        if( (mode == 1) && (isdigit(rname[i]) == false) ){
+            break;
+        }
+        if( (mode == 2) && (isdigit(rname[i]) == true) ){
+            mode = 3;
+        }
+        if( (mode == 3) && (isdigit(rname[i]) == false ) ){
+            break;
+        }
+        switch(mode){
+            case 0:
+                rrname << rname[i];
+                break;
+            case 1:
+                rnode << rname[i];
+                break;
+            case 3:
+                rvdom << rname[i];
+                break;
+            default:
+                break;
+        }
+    }
+
+//    cout << rname << " " << rrname << " " << rnode << " " << rvdom << " " << rdomain <<  endl;
+
+    if( ldomain < rdomain ) return(true);
+    if( string(lrname) < string(rrname) ) return(true);
+
+    if( string(lrname) == string(rrname) ){
+        if( lvdom.ToInt() < rvdom.ToInt() ) return(true);
+        if( lvdom.ToInt() == rvdom.ToInt() ) {
+            if( lnode.ToInt() < rnode.ToInt() ) return(true);
+        }
+    }
+    return(false);
+}
+
+//------------------------------------------------------------------------------
+
+bool CNodeGroup::CompareNamesB(const CNodePtr& p_left,const CNodePtr& p_right)
+{
+    string s1 = string(p_left->GetName());
+    string s2 = string(p_right->GetName());
+
+    string n1 = s1;
+    string n2 = s2;
+    int    i1 = 0;
+    int    i2 = 0;
+
+    std::size_t found = s1.find_first_of("0123456789");
+    if( (found != string::npos) && (found > 0) ){
+        n1 = s1.substr(0,found);
+        stringstream str(s1.substr(found));
+        str >> i1;
+    }
+
+    found = s2.find_first_of("0123456789");
+    if( (found != string::npos) && (found > 0) ){
+        n2 = s2.substr(0,found);
+        stringstream str(s2.substr(found));
+        str >> i2;
+    }
+
+    if( n1 == n2 ){
+        return( i1 <= i2 );
+    }
+
+    return( n1 <= n2 );
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeGroup::MakeSortedNodeList(void)
+{
+    // copy items
+    SortedNodes.insert(SortedNodes.end(),begin(),end());
+
+    switch(TorqueConfig.GetTorqueMode()){
+        case ETM_TORQUE:
+        case ETM_TORQUE_METAVO:
+            SortedNodes.sort(CompareNamesA);
+        break;
+        case ETM_PBSPRO:
+            SortedNodes.sort(CompareNamesB);
+        break;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeGroup::GenerateCommonProperties(void)
+{
+    // generate common properties
+    list<CNodePtr>::iterator it = SortedNodes.begin();
+    list<CNodePtr>::iterator et = SortedNodes.end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        CommonProps.insert(p_node->GetPropertyList().begin(),p_node->GetPropertyList().end());
+        it++;
+    }
+
+    // what should be removed
+    set<string>::iterator pit = CommonProps.begin();
+    set<string>::iterator pet = CommonProps.end();
+    set<string>           remove;
+
+    while( pit != pet ){
+        list<CNodePtr>::iterator it = SortedNodes.begin();
+        list<CNodePtr>::iterator et = SortedNodes.end();
+
+        while( it != et ){
+            CNodePtr p_node = *it;
+            if( ! p_node->HasProperty(*pit) ){
+                remove.insert(*pit);
+            }
+            it++;
+        }
+        pit++;
+    }
+
+    // remove properties
+    set<string>::iterator rit = remove.begin();
+    set<string>::iterator rie = remove.end();
+
+    while( rit != rie ){
+        CommonProps.erase(*rit);
+        rit++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::MergeNUMANodes(void)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator et = end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        if( p_node->IsNUMANode() ){
+            list<CNodePtr>::iterator nit = it;
+            nit++;
+            while( nit != et ){
+                CNodePtr p_snode = *nit;
+                if( p_node->GetNUMACoreName() == p_snode->GetNUMACoreName() ){
+                    p_node->MergeWithNUMANode(p_snode);
+                    nit = erase(nit);
+                } else {
+                    break;
+                }
+            }
+        }
+        it++;
+    }
+
+    it = begin();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        if( p_node->IsNUMANode() ){
+            p_node->RemoveNUMATag();
+        }
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::LoadHWDatabase(void)
+{
+    CFileName      db_name;
+    db_name = GlobalConfig.GetABSRootDir() / "etc" / "sites" / GlobalConfig.GetActiveSiteID() / "nodes.hw";
+
+    ifstream ifs(db_name);
+    if( ! ifs ) return; // no data
+
+    string line;
+    while( getline(ifs,line) ){
+        vector<string>  items;
+        split(items,line,is_any_of("\t"));
+        if( items.size() == 2 ) HWDatabase[items[0]] = items[1];
+    }
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+

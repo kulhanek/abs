@@ -1,0 +1,185 @@
+#!/bin/bash
+# ==============================================================================
+# Infinity
+# (c) 2011, Petr Kulhanek, kulhanek@chemi.muni.cz
+# ==============================================================================
+
+# initialize wrapper functions -------------------------------------------------
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# pgo - go to the job input or working directory
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+pgo(){
+    ABS_EXIT_CODE=1
+    unset INF_GO_MAIN_NODE
+    unset INF_GO_INPUT_MACHINE
+    unset INF_GO_INPUT_DIR
+    unset INF_GO_JOB_NAME
+    unset INF_GO_JOB_KEY
+    unset INF_GO_UGROUP
+    unset INF_GO_UMASK
+
+    eval `_abs-go $*`
+    if [ "$ABS_EXIT_CODE" -ne 0 ]; then
+        return "$ABS_EXIT_CODE"
+    fi
+
+    source $ABS_ROOT/share/scripts/abs-go
+    ABS_EXIT_CODE=$?
+
+    unset INF_GO_MAIN_NODE
+    unset INF_GO_INPUT_MACHINE
+    unset INF_GO_INPUT_DIR
+    unset INF_GO_JOB_NAME
+    unset INF_GO_JOB_KEY
+    unset INF_GO_UGROUP
+    unset INF_GO_UMASK
+
+    return "$ABS_EXIT_CODE"
+}
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# pkill - terminate or kill the job
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+pkill(){
+    ABS_EXIT_CODE=1
+    unset INF_KILL_MAIN_NODE
+    unset INF_KILL_WORK_DIR
+    unset INF_KILL_JOB_NAME
+    unset INF_KILL_JOB_KEY
+
+    eval `_abs-kill $*`
+    if [ "$ABS_EXIT_CODE" -ne 0 ]; then
+        return "$ABS_EXIT_CODE"
+    fi
+
+    $ABS_ROOT/share/scripts/abs-kill
+    ABS_EXIT_CODE=$?
+
+    unset INF_KILL_MAIN_NODE
+    unset INF_KILL_WORK_DIR
+    unset INF_KILL_JOB_NAME
+    unset INF_KILL_JOB_KEY
+
+    return "$ABS_EXIT_CODE"
+}
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# psync - synchronize the job
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+psync(){
+    ABS_EXIT_CODE=1
+    unset INF_SYNC_MAIN_NODE
+    unset INF_SYNC_WORK_DIR
+    unset INF_SYNC_JOB_PATH
+    unset INF_SYNC_JOB_MACHINE
+    unset INF_SYNC_ALL
+
+    eval `_abs-sync $*`
+    if [ "$ABS_EXIT_CODE" -ne 0 ]; then
+        return "$ABS_EXIT_CODE"
+    fi
+
+    $ABS_ROOT/share/scripts/abs-sync $*
+    ABS_EXIT_CODE=$?
+
+    unset INF_SYNC_MAIN_NODE
+    unset INF_SYNC_WORK_DIR
+    unset INF_SYNC_JOB_PATH
+    unset INF_SYNC_JOB_MACHINE
+    unset INF_SYNC_ALL
+
+    return "$ABS_EXIT_CODE"
+}
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# pcollection - collection manipulation utility
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+pcollection(){
+    ABS_EXIT_CODE=1
+
+    eval `_abs-collection $*`
+    if [ "$ABS_EXIT_CODE" -ne 0 ]; then
+        return "$ABS_EXIT_CODE"
+    fi
+
+    return 0
+}
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# pconfirmsubmit - temporarily change setup for submit confirmation
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+pconfirmsubmit()
+{
+    if [ "$1" == "" ]; then
+        unset INF_CONFIRM_SUBMIT
+        echo ""
+        echo " Confirmation of job submission is now ruled by user setup."
+        echo ""
+    else
+        if [ "$1" == "YES" ] || [ "$1" == "NO" ]; then
+            INF_CONFIRM_SUBMIT=$1
+            export INF_CONFIRM_SUBMIT
+            echo ""
+            echo " Confirmation of job submission is temporarily changed !"
+            echo " Confirm submit setup value: $INF_CONFIRM_SUBMIT"
+            echo ""
+        else
+            echo "" >&2
+            echo "ERROR: Illegal value of argument !" >&2
+            echo "       Syntax: pconfirmsubmit [YES/NO]" >&2
+            echo "" >&2
+        fi
+    fi
+}
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# pignoreruntimefiles - disable check for runtime files in input dir.
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+pignoreruntimefiles()
+{
+    if [ "$1" == "" ]; then
+        unset INF_IGNORE_RUNTIME_FILES
+        echo ""
+        echo " Check for presence of runtime files is now ruled by user setup."
+        echo ""
+    else
+        if [ "$1" == "YES" ] || [ "$1" == "NO" ]; then
+            INF_IGNORE_RUNTIME_FILES=$1
+            export INF_IGNORE_RUNTIME_FILES
+            echo ""
+            echo " Check for presence of runtime files is temporarily changed !"
+            echo " Runtime files check setup: $INF_IGNORE_RUNTIME_FILES"
+            echo ""
+        else
+            echo "" >&2
+            echo "ERROR: Illegal value of argument !" >&2
+            echo "       Syntax: pignoreruntimefiles [YES/NO]" >&2
+            echo "" >&2
+        fi
+    fi
+}
+
+# try to export them -----------------------------------------------------------
+
+export -f pgo
+export -f pkill
+export -f psync
+export -f pcollection
+export -f pconfirmsubmit
+export -f pignoreruntimefiles
+
+# name completion --------------------------------------------------------------
+
+# software ---------------------------------------
+complete -o nospace -C _abs-cgen psubmit
+complete -o nospace -C _abs-cgen pcollection
+
+
+

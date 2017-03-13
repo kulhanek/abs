@@ -1,0 +1,5 @@
+<!-- BasicTicketCheck Plugin Setup -->
+<PLUGIN name="BasicTicketCheck"
+        uuid="{BASIC_TICKET_CHECK:992ee2c3-c72e-428b-be40-dd98c67c1ec6}">
+    <!-- some local setup will be here -->
+</PLUGIN> 

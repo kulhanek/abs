@@ -1,0 +1,100 @@
+#!/usr/bin/env infinity-env
+# ------------------------------------------------------------------------------
+# this wrapper launch all ijobs associated with the main job and waits until they
+# are finished
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# =============================================================================="
+echo "# infinity-ijobs-launch started at `date`"
+echo "# =============================================================================="
+
+# are we on main node?
+if [ "`hostname -f`" != "${INF_MAIN_NODE}" ]; then
+    echo ""
+    echo " >>> ERROR: This script can be run only on the main computational node!"
+    echo "            Main node : ${INF_MAIN_NODE}"
+    echo "            Hostname  : `hostname -f`"
+    echo ""
+    exit 1
+fi
+
+# we need access to main info file
+INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
+if ! [ -f "$INF_INFOFILE" ]; then
+    echo ""
+    echo " >>> ERROR: Main job info file ($INF_INFOFILE) does not exist!"
+    echo ""
+    exit 1
+fi
+
+# get number of ijobs
+NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
+if [ $? -ne 0 ]; then
+    echo ""
+    echo " >>> ERROR: Unable to get number of ijobs!"
+    echo ""
+    exit 1
+fi
+
+if [ "$NIJOBS" -le 0 ]; then
+    echo ""
+    echo " >>> ERROR: No ijobs detected in the main job!"
+    echo ""
+    exit 1
+fi
+
+echo
+echo "# Number of ijobs : $NIJOBS"
+echo
+
+for((ID=1;ID<=$NIJOBS;ID++)); do
+    INF_IJOB_ID="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" id`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get id of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+
+    echo " >>> IJOB: $INF_IJOB_ID"
+
+    INF_IJOB_MAIN_NODE="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" mainnode`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get mainnode of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_IJOB_WORK_DIR="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" workdir`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get workdir of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_IJOB_NAME="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" name`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get name of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_TECH_OUTPUT="$INF_WORK_DIR/${INF_IJOB_ID}.infout"
+
+    echo "     Script name      : $INF_IJOB_NAME"
+    echo "     Technical output : ${INF_TECH_OUTPUT}"
+    echo "     === $INF_IJOB_MAIN_NODE:$INF_IJOB_WORK_DIR ==="
+
+    ssh -o "StrictHostKeyChecking=no" $INF_IJOB_MAIN_NODE "$ABS_ROOT/share/scripts/abs-execution-ijob \"$INF_BOOT_SCRIPT\" \"$INF_SITE_ID\" \"$AMS_SITE_SUPPORT\" \"$INF_EXPORTED_MODULES\" \"$INF_ABS_VERSION\" \"$INF_IJOB_WORK_DIR\" \"$INF_IJOB_NAME\"" &> ${INF_TECH_OUTPUT} &
+
+    echo
+done
+
+echo "Waiting for all ijobs ..."
+wait
+
+echo
+echo "# =============================================================================="
+echo "# infinity-ijobs-prepare finished at `date`"
+echo "# =============================================================================="

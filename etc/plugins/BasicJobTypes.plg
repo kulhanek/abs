@@ -1,0 +1,58 @@
+<!-- BasicTicketCheck Plugin Setup -->
+<PLUGIN name="BasicJobTypes"
+        uuid="{BASIC_JOB_TYPES:8bf36762-3df2-4e11-92a1-194f0aca04b7}">
+    <!-- some local setup will be here -->
+    <OBJECT uuid="{GAUSSIAN_JOB_TYPE:f8e7aa03-4c20-4d38-88d8-3e6dd9171430}">
+        <CONFIG key="_mode"   value="implicit"/>
+        <CONFIG key="_type"   value="gaussian"/>
+        <CONFIG key="_module" value="gaussian"/>
+        <!-- versions to executable translation -->
+        <CONFIG key="03.E1" value="g03"/>
+        <CONFIG key="09.A2" value="g09"/>
+        <CONFIG key="09.C1" value="g09"/>
+        <CONFIG key="09.D1" value="g09"/>
+        <CONFIG key="09.E1" value="g09"/>
+        <CONFIG key="16.A3" value="g16"/>
+    </OBJECT>
+    <OBJECT uuid="{NWCHEM_JOB_TYPE:481e8667-8de2-498e-a6e1-ad9f427f537a}">
+        <CONFIG key="_mode"   value="implicit"/>
+        <CONFIG key="_type"   value="nwchem"/>
+        <CONFIG key="_module" value="nwchem"/>
+    </OBJECT>
+    <OBJECT uuid="{TURBOMOLE_JOB_TYPE:6ac8291a-4788-47dc-ae8b-67294fb117a4}">
+        <CONFIG key="_mode"   value="implicit"/>
+        <CONFIG key="_type"   value="turbomole"/>
+    </OBJECT>
+    <OBJECT uuid="{PRECYCLE_JOB_TYPE:2b87fa99-9fbd-4ddb-9994-7c22ac9fd6d9}">
+        <CONFIG key="_mode"   value="explicit"/>
+        <CONFIG key="_type"   value="precycle"/>
+    </OBJECT>
+    <OBJECT uuid="{PEQUI_JOB_TYPE:8b5067e4-ff5b-4308-90e3-e34f05b40fdb}">
+        <CONFIG key="_mode"   value="explicit"/>
+        <CONFIG key="_type"   value="pequi"/>
+    </OBJECT>
+    <OBJECT uuid="{PRECYCLE_CPMD_JOB_TYPE:0d0f2ef4-c8de-42fb-b52b-58b6b1e41f4a}">
+        <CONFIG key="_mode"   value="explicit"/>
+        <CONFIG key="_type"   value="precycleCPMD"/>
+    </OBJECT>
+    <OBJECT uuid="{ICOLLECTION_JOB_TYPE:a8aa8420-1b82-46f9-a5eb-26b4f8fa27b9}">
+        <CONFIG key="_mode"   value="explicit"/>
+        <CONFIG key="_type"   value="icollection"/>
+    </OBJECT>
+    <OBJECT uuid="{STM_SERVER_JOB_TYPE:00381034-1773-4b3f-aa63-a6dcd2567cd4}">
+        <CONFIG key="_mode"   value="explicit"/>
+        <CONFIG key="_type"   value="stm-server"/>
+    </OBJECT>
+    <OBJECT uuid="{STM_CLIENT_JOB_TYPE:beaa2a32-bd5f-44c3-8249-524a02ca0cc5}">
+        <CONFIG key="_mode"   value="explicit"/>
+        <CONFIG key="_type"   value="stm-client"/>
+    </OBJECT>
+    <OBJECT uuid="{LOOP_JOB_TYPE:184000a2-3573-4a3a-a1fd-dcdf61641a83}">
+        <CONFIG key="_mode"   value="explicit"/>
+        <CONFIG key="_type"   value="loop"/>
+    </OBJECT>
+    <OBJECT uuid="{MULTIWFN_JOB_TYPE:c1779cd7-4a82-4f91-a4ac-fac8e2f815a7}">
+        <CONFIG key="_mode"   value="explicit"/>
+        <CONFIG key="_type"   value="multiwfn"/>
+    </OBJECT>
+</PLUGIN> 

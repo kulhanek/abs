@@ -1,0 +1,2 @@
+flex --prefix=yyjob -o JobMask.yy.c JobMask.l
+bison --name-prefix=yyjob -d -b JobMask JobMask.y

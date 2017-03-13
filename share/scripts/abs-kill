@@ -1,0 +1,55 @@
+#!/bin/bash
+# ==============================================================================
+# ABS
+# (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# ==============================================================================
+#
+# required input
+# INF_KILL_JOB_NAME
+# INF_KILL_JOB_KEY
+# INF_KILL_MAIN_NODE
+# INF_KILL_WORK_DIR
+
+# soft kill mode - do we have all data?
+
+case "$INF_KILL_JOB_NAME" in
+    cli )
+        if [ -n "$INF_KILL_MAIN_NODE" ] && [ -n "$INF_KILL_JOB_KEY" ]; then
+            echo ""
+            echo "Terminating the job CLI terminal ..."
+            ssh -t "$INF_KILL_MAIN_NODE" screen -d -r "T$INF_KILL_JOB_KEY -X quit"
+            echo ""
+        fi
+        ;;
+    gui )
+        # not implemented
+        ;;
+    * )
+        if [ -z "$INF_KILL_MAIN_NODE" ] || [ -z "$INF_KILL_WORK_DIR" ]; then
+            exit 0
+        fi
+
+        # send TERM signal to user script
+        echo ""
+        echo "Sending TERM signal to "$INF_KILL_MAIN_NODE:$INF_KILL_WORK_DIR" ..."
+        ssh $INF_KILL_MAIN_NODE "cd $INF_KILL_WORK_DIR; \
+                if ! [ -f ___JOB_IS_RUNNING___ ]; then \
+                   echo \"\"; \
+                   echo \"ERROR: The user script has not been started or it has already been terminated!\"; \
+                   echo \"\"; exit 1;
+                fi; \
+                echo \">>> Process ID: \`cat ___JOB_IS_RUNNING___\`\"; \
+                STDOUT=\`find -name '*.stdout'\`; \
+                echo \">>> TERMINATED ON USER REQUEST \`date\`\" >> \$STDOUT; \
+                kill -TERM \`cat ___JOB_IS_RUNNING___\`; \
+                exit 0;"
+        echo ""
+        ;;
+esac

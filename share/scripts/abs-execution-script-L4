@@ -1,0 +1,134 @@
+#!/bin/bash
+# =============================================================================
+# ABS
+# (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2008, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# =============================================================================
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L4.1: Machine hardware info ..."
+echo "# ------------------------------------------------------------------------------"
+echo "User identity ..."
+echo "UID   : `id`"
+echo "Umask : `umask`"
+echo
+
+echo "# CPU info"
+echo "# ============================================================================="
+awk '{ if( NF == 0 ) exit; print $0; }'  /proc/cpuinfo
+
+if [ $INF_NGPU -gt 0 ]; then
+    echo ""
+    echo "# GPU info"
+    echo "# ============================================================================="
+    type nvidia-smi &> /dev/null
+    if [ $? -eq 0 ]; then
+        nvidia-smi
+    fi
+fi
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L4.2: Start job ..."
+echo "# ------------------------------------------------------------------------------"
+echo ""
+
+# metacentrum hack for non-meta sites
+if [ -z "$SCRATCHDIR" ]; then
+    export SCRATCHDIR="$INF_WORK_DIR"
+fi
+
+# ------------------------------------------------
+
+case $INF_JOB_NAME in
+    cli )
+        echo "Starting CLI terminal ..."
+        # disable termcap capabilities
+        export SCREENCAP=""
+        # start screen terminal and detach from it
+        screen -D -m -S "T$INF_JOB_KEY" -c $ABS_ROOT/share/scripts/screenrc &
+        SCREEN_PID=$!
+
+        # catch signals to properly terminate screen session
+        trap "kill $SCREEN_PID; exit" SIGINT SIGTERM
+
+        # setup terminal
+        sleep 10  # wait for terminal initialization
+        screen -S "T$INF_JOB_KEY" -p 0 -X backtick 100 1 1 pinfo --terminal
+        screen -S "T$INF_JOB_KEY" -p 0 -X caption string '%100`'
+        screen -S "T$INF_JOB_KEY" -p 0 -X logfile "${INF_WHOLE_NAME}.stdout"
+        screen -S "T$INF_JOB_KEY" -p 0 -X log on
+        screen -S "T$INF_JOB_KEY" -p 0 -X caption always
+
+        $ABS_ROOT/sbin/abs-update-infofile tready
+
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " ERROR: Unable to update job status in the job info file!" >&2
+            echo "" >&2
+            return 1
+        fi
+
+        if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+            if [ "$INF_SYNC_MODE" != "jobdir" ]; then
+                cp "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+            fi
+        else
+            /usr/bin/scp -o "StrictHostKeyChecking=no" \
+                "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_MACHINE:$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+        fi
+
+        # notify user if requested
+        if [ -n "$INF_EMAIL" ]; then
+            echo "E-mail notification: $INF_EMAIL"
+            pinfo | mail -s "[INFINITY] CLI job $INF_JOB_ID was started" "$INF_EMAIL"
+        fi
+
+        # wait for screen termination
+        wait
+        export INF_JOB_EXIT_CODE=$?
+        if [ $INF_JOB_EXIT_CODE -gt 128 ]; then
+            # signal received
+            exit 1  # immediatelly exit
+        fi
+        echo "CLI terminal was terminated."
+
+        ;;
+    gui )
+        echo ">>> ERROR: gui interactive mode is not currently supported!"
+        export INF_JOB_EXIT_CODE=1
+        ;;
+    * )
+        chmod u+x $INF_JOB_NAME
+
+        echo "======================== Begining of script execution =========================="
+        echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        echo " Started at    : `date`"
+        echo " Script name   : $INF_JOB_NAME"
+        echo " Script output : ${INF_WHOLE_NAME}.stdout"
+
+        # this is used by pkill command to softly kill the job
+        ./$INF_JOB_NAME &> ${INF_WHOLE_NAME}.stdout &
+        MY_PID=$!
+        echo "$MY_PID" > ___JOB_IS_RUNNING___ # PID of the process
+        wait $MY_PID
+        export INF_JOB_EXIT_CODE=$?
+        rm -f ___JOB_IS_RUNNING___
+
+        echo " Finished at   : `date`"
+        echo " Exit code     : $INF_JOB_EXIT_CODE"
+        echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        echo "=========================== End of script execution ============================"
+        ;;
+esac
+
+# ------------------------------------------------------------------------------
+
+return 0

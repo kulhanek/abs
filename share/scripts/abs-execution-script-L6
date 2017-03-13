@@ -1,0 +1,137 @@
+#!/bin/bash
+# =============================================================================
+# ABS
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# =============================================================================
+
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L6.1: Full job info from the batch system ..."
+echo "# ------------------------------------------------------------------------------"
+echo "User identity ..."
+echo "UID   : `id`"
+echo "Umask : `umask`"
+echo
+
+pqstat -j "$INF_JOB_ID"
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L6.2: Clean up ijobs nodes [$INF_SYNC_MODE] if any ..."
+echo "# ------------------------------------------------------------------------------"
+
+# get number of ijobs
+INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
+NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
+if [ $? -eq 0 ]; then
+    echo "# Number of ijobs : $NIJOBS"
+    if [ "$NIJOBS" -gt 0 ]; then
+        $ABS_ROOT/share/scripts/abs-execution-script-L6-ijobs
+    fi
+fi
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L6.3: Clean up nodes [$INF_SYNC_MODE] ..."
+echo "# ------------------------------------------------------------------------------"
+# switch to HOME directory because next commands can remove current directory
+
+cd
+
+CLEAN_DIR="`$ABS_ROOT/sbin/abs-get-scratch-dir --type clean $INF_SCRATCH_TYPE`"
+if [ $? -ne -0 ]; then
+    echo ""
+    echo " >>> ERROR: Unable to get clean scratch dir!"
+    echo ""
+    exit 1
+fi
+INF_CLEAN_DIR="`eval echo "$CLEAN_DIR"`"
+
+case $INF_SYNC_MODE in
+    sync )
+        echo " Sync mode: $INF_SYNC_MODE, removing working directories on nodes ..."
+        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME:$INF_CLEAN_DIR ---"
+            ssh -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; rm -rf $INF_CLEAN_DIR"
+        done
+        ;;
+    jobdir | nosync )
+        echo " Sync mode: $INF_SYNC_MODE, no directories will be removed ..."
+        echo ""
+        echo ">>> $INF_MAIN_NODE ------------------------------"
+        timeout 30 df -h
+        if [ $? -ne 0 ]; then
+            echo ">>> WARNING: df command was not completed due to error or timeout."
+        fi
+        ;;
+    esac
+
+IPC_SCRIPT="$ABS_ROOT/share/scripts/abs-cleanipcs"
+if [ -f "$IPC_SCRIPT" ]; then
+    echo ""
+    echo " Cleaning IPC stuff on nodes:"
+    for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+        echo "      $NODE_NAME"
+        ssh -o "StrictHostKeyChecking=no" $NODE_NAME "$IPC_SCRIPT"
+    done
+    echo " Success."
+fi
+
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L6.4: Current node utilizations ..."
+echo "# ------------------------------------------------------------------------------"
+
+case $INF_SYNC_MODE in
+    jobdir | sync | nosync )
+        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME ----------------------------------"
+            ssh -o "StrictHostKeyChecking=no" $NODE_NAME "top -b -n 1"
+        done
+    ;;
+esac
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L6.5: Current node kernel states ..."
+echo "# ------------------------------------------------------------------------------"
+
+case $INF_SYNC_MODE in
+    jobdir | sync | nosync )
+        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME ----------------------------------"
+            ssh -o "StrictHostKeyChecking=no" $NODE_NAME "uname -a; dmesg -T | tail -1000"
+        done
+    ;;
+esac
+
+# ------------------------------------------------------------------------------
+
+# delete placebo PBS_NODEFILE and PBS_GPUFILE
+
+if [ -n "$PBS_NODEFILE_REMOVE" ]; then
+    rm -f $PBS_NODEFILE
+fi
+
+if [ -n "$PBS_GPUFILE_REMOVE" ]; then
+    rm -f $PBS_GPUFILE
+fi
+
+# ------------------------------------------------------------------------------
+
+exit 0
+
+

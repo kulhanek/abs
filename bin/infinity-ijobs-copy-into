@@ -1,0 +1,98 @@
+#!/usr/bin/env infinity-env
+# ------------------------------------------------------------------------------
+# this wrapper prepare all ijobs associated with the main job
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# =============================================================================="
+echo "# infinity-ijobs-copy-into started at `date`"
+echo "# =============================================================================="
+
+# are we on main node?
+if [ "`hostname -f`" != "${INF_MAIN_NODE}" ]; then
+    echo ""
+    echo " >>> ERROR: This script can be run only on the main computational node!"
+    echo "            Main node : ${INF_MAIN_NODE}"
+    echo "            Hostname  : `hostname -f`"
+    echo ""
+    exit 1
+fi
+
+# we need access to main info file
+INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
+if ! [ -f "$INF_INFOFILE" ]; then
+    echo ""
+    echo " >>> ERROR: Main job info file ($INF_INFOFILE) does not exist!"
+    echo ""
+    exit 1
+fi
+
+# get number of ijobs
+NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
+if [ $? -ne 0 ]; then
+    echo ""
+    echo " >>> ERROR: Unable to get number of ijobs!"
+    echo ""
+    exit 1
+fi
+
+if [ "$NIJOBS" -le 0 ]; then
+    echo ""
+    echo " >>> ERROR: No ijobs detected in the main job!"
+    echo ""
+    exit 1
+fi
+
+echo
+echo "# Number of ijobs : $NIJOBS"
+echo "# Source files    : $*"
+echo
+
+# copy files into directory
+for((ID=1;ID<=$NIJOBS;ID++)); do
+
+    # get ijob ID
+    INF_IJOB_ID=`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" id`
+    if [ $? -ne -0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get jobid for ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    echo " >>> IJOB: $INF_IJOB_ID"
+
+    INF_IJOB_MAIN_NODE="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" mainnode`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get mainnode of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_IJOB_WORK_DIR="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" workdir`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get workdir of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+
+    echo    "     Master node              : $INF_IJOB_MAIN_NODE"
+    echo    "     Working directory        : $INF_IJOB_WORK_DIR"
+    echo -n "     Copy mode                : remote scp .... "
+
+    scp -r -p -o "StrictHostKeyChecking=no" $* "$INF_IJOB_MAIN_NODE:$INF_IJOB_WORK_DIR/" 2>&1
+    if [ $? -ne 0 ]; then
+        echo "" >&2
+        echo " ERROR: Unable to copy the specified data to the ijob main computational node!" >&2
+        echo "" >&2
+        exit 1
+    fi
+
+    echo "done successfully."
+
+    echo ""
+done
+
+echo "# =============================================================================="
+echo "# infinity-ijobs-copy-into finished at `date`"
+echo "# =============================================================================="

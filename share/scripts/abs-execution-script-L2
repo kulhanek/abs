@@ -1,0 +1,261 @@
+#!/bin/bash
+# =============================================================================
+# ABS
+# (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.1: Resources files ..."
+echo "# ------------------------------------------------------------------------------"
+echo "User identity ..."
+echo "UID   : `id`"
+echo "Umask : `umask`"
+echo
+
+
+# we need PBS_NODEFILE if it does not exist we create placebo with hostname
+# this happen on condor queue systems or when pstart is used
+
+if ! [ -f "$PBS_NODEFILE" ]; then
+    PBS_NODEFILE=$TMPDIR/pbs_nodes_placebo.${_TNAME_}
+    export PBS_NODEFILE_REMOVE=1
+    export PBS_NODEFILE
+    for((I=0;I<$INF_NCPU;I++)); do
+        hostname -f >> "$PBS_NODEFILE"
+    done
+fi
+
+echo ""
+echo "# PBS_NODEFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "# File: $PBS_NODEFILE"
+cat "$PBS_NODEFILE"
+
+# ------------------------------------------------------------------------------
+
+if [ "$INF_NGPU" -gt 0 ]; then
+    if ! [ -f "$PBS_GPUFILE" ]; then
+        PBS_GPUFILE=$TMPDIR/pbs_gpus_placebo.${_TNAME_}
+        export PBS_GPUFILE_REMOVE=1
+        export PBS_GPUFILE
+        cat "$PBS_NODEFILE" > "$PBS_GPUFILE"
+
+        # MetaCentrum
+        # do we have /usr/sbin/list_cache?
+        # FIXME - this is correct only for single node configuration
+        if [ -f "/usr/sbin/list_cache" ]; then
+            /usr/sbin/list_cache $PBS_SERVER gpu_allocation | grep "$INF_JOB_ID" | awk '{ print $1;}' | awk -F '/' '{ print $3;}' | \
+                                 tr --delete [[:alpha:]] | awk -v host="$HOSTNAME" '{ printf("%s-gpu%d\n",host,$1); }' >> "$PBS_GPUFILE"
+        else
+            for((I=0;I<$INF_NGPU;I++)); do
+                echo "`hostname -f`-gpu$I" >> "$PBS_GPUFILE"
+            done
+        fi
+    fi
+    echo ""
+    echo "# PBS_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "# File: $PBS_GPUFILE"
+    cat "$PBS_GPUFILE"
+    # generate CUDA_VISIBLE_DEVICES if not defined
+    if [ -z "$CUDA_VISIBLE_DEVICES" ]; then
+        CUDA_VISIBLE_DEVICES=`cat "$PBS_GPUFILE" | sed -e 's/-gpu/ /g' | awk '{ if( NF == 2 ) { if( i > 0 ) printf(","); printf("%d",$2); i++; } }'`
+    fi
+    echo "# Cuda visible devices: $CUDA_VISIBLE_DEVICES"
+    export CUDA_VISIBLE_DEVICES
+fi
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.2: Prepare working directory ..."
+echo "# ------------------------------------------------------------------------------"
+echo " Sync mode          : $INF_SYNC_MODE"
+export INF_MAIN_NODE=`hostname -f`
+echo " Main node          : $INF_MAIN_NODE"
+echo " Job ID             : $INF_JOB_ID"
+echo " Scratch type       : $INF_SCRATCH_TYPE"
+
+# ------------------------------------------------------------------------------
+# set working directory
+
+case $INF_SYNC_MODE in
+    jobdir)
+        INF_WORK_DIR=$INF_JOB_PATH
+        if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
+            echo "" >&2
+            echo " ERROR: The job input directory must be available locally on the computational node" >&2
+            echo "        if the 'jobdir' synchronization mode is used!" >&2
+            echo "" >&2
+            return 1
+        fi
+    ;;
+    sync | nosync )
+        SCRATCH_DIR="`$ABS_ROOT/sbin/abs-get-scratch-dir --type main $INF_SCRATCH_TYPE`"
+        echo " Scratch dir        : $SCRATCH_DIR"
+        if [ $? -ne -0 ]; then
+            return 1
+        fi
+        INF_WORK_DIR="`eval echo "$SCRATCH_DIR"`"
+    ;;
+esac
+
+echo " Working directory  : $INF_WORK_DIR"
+echo ""
+
+# ------------------------------------------------------------------------------
+# create working directories if necessary
+
+case $INF_SYNC_MODE in
+    jobdir)
+        echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
+        timeout 30 df -h
+        if [ $? -ne 0 ]; then
+            echo ">>> WARNING: df command was not completed due to error or timeout."
+        fi
+    ;;
+    sync | nosync )
+        echo " Create working directories on nodes:"
+        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
+            ssh -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; mkdir -p $INF_WORK_DIR"
+
+            if [ $? -ne 0 ]; then
+                echo "" >&2
+                echo " ERROR: Unable to create the working directory on the specified node!" >&2
+                echo "" >&2
+                return 1
+            fi
+        done
+    ;;
+esac
+
+export INF_WORK_DIR
+
+# ------------------------------------------------------------------------------
+# go to working directory
+echo ""
+echo " Changing current directory to working directory ..."
+cd $INF_WORK_DIR
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to change the current directory to the working directory." >&2
+    echo "" >&2
+    return 1
+fi
+echo " Success."
+
+# ------------------------------------------------------------------------------
+# create sorted node file
+INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
+export INF_NODEFILE
+AMS_NODEFILE=$INF_NODEFILE
+export AMS_NODEFILE
+
+$ABS_ROOT/sbin/abs-sort-nodes $PBS_NODEFILE $INF_MAIN_NODE > $INF_NODEFILE
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to sort computational nodes!" >&2
+    echo "" >&2
+    return 1
+fi
+
+if [ "`cat $INF_NODEFILE | wc -l`" -ne "$INF_NCPU" ]; then
+    echo "" >&2
+    echo " ERROR: The number of lines in the node file differs from the number of requested CPUs." >&2
+    echo "" >&2
+    return 1
+fi
+
+if [ "$INF_NGPU" -gt 0 ]; then
+    INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
+    export INF_GPUFILE
+    AMS_GPUFILE=$INF_GPUFILE
+    export AMS_GPUFILE
+    cat $PBS_GPUFILE > $INF_GPUFILE
+fi
+
+# ------------------------------------------------------------------------------
+# move info file to working directory
+
+mv "$TMPDIR/${_TNAME_}.info" "$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to move the job info file into the working directory!" >&2
+    echo "" >&2
+    return 1
+fi
+
+# ------------------------------------------------------------------------------
+# update info file
+
+echo ""
+echo " Write job start info ..."
+
+$ABS_ROOT/sbin/abs-update-infofile start
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to update job status in the job info file!" >&2
+    echo "" >&2
+    return 1
+fi
+
+if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+    if [ "$INF_SYNC_MODE" != "jobdir" ]; then
+        cp "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+    fi
+else
+    /usr/bin/scp -o "StrictHostKeyChecking=no" \
+        "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_MACHINE:$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+fi
+
+echo " Date = `date`"
+echo " Success."
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.3: Current node utilizations ..."
+echo "# ------------------------------------------------------------------------------"
+
+case $INF_SYNC_MODE in
+    jobdir | sync | nosync )
+        for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME ----------------------------------"
+            ssh -o "StrictHostKeyChecking=no" $NODE_NAME "top -b -n 1"
+        done
+    ;;
+esac
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.4: Current NUMA settings on the master node ..."
+echo "# ------------------------------------------------------------------------------"
+
+type numactl &> /dev/null
+
+if [ $? -eq 0 ]; then
+    numactl --show
+else
+    echo ">>> INFO: numactl command not available ... skipping"
+fi
+
+# ------------------------------------------------------------------------------
+
+return 0
+
+
+
+
+

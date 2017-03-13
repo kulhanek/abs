@@ -1,0 +1,173 @@
+#!/bin/bash
+# ==============================================================================
+# ABS
+# (c) 2013, Petr Kulhanek, kulhanek@chemi.muni.cz
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# mark this job as INFINITY job, this is used by module-add-stat
+export _INFINITY_JOB_="_INFINITY_JOB_"
+
+# header -----------------------------------------------------------------------
+
+_DATE=`date`
+
+echo
+echo "################################################################################"
+echo "#                         *** INFINITY IJOB ***                                #"
+echo "#                                                                              #"
+echo "###                    Beggining of script execution                        ####"
+echo "#                                                                              #"
+echo "# # Date: `printf %-67s \"$_DATE\"`# #"
+echo "#                                                                              #"
+echo "################################################################################"
+echo
+
+export INF_BOOT_SCRIPT=$1
+export INF_SITE_ID=$2
+export AMS_SITE_SUPPORT=$3
+export INF_EXPORTED_MODULES=$4
+export INF_ABS_VERSION=$5
+export INF_IJOB_WORK_DIR=$6
+export INF_IJOB_NAME=$7
+
+echo " Initial job information:"
+echo "--------------------------------------------------------------------------------"
+echo " IJob name            : $INF_IJOB_NAME"
+echo " IJob work directory  : $INF_IJOB_WORK_DIR"
+echo "--------------------------------------------------------------------------------"
+echo " Hostname             : `hostname -f`"
+echo " Site support         : $AMS_SITE_SUPPORT"
+echo " Site ID              : $INF_SITE_ID"
+echo " ABS module version   : $INF_ABS_VERSION"
+echo " AMS boot script      : $INF_BOOT_SCRIPT"
+echo "--------------------------------------------------------------------------------"
+echo ""
+
+# ------------------------------------------------------------------------------
+# boot AMS
+
+if [ -f "$INF_BOOT_SCRIPT" ]; then
+    # boot AMS system
+    source $INF_BOOT_SCRIPT
+fi
+
+echo "$ site -v activate $INF_SITE_ID"
+
+site -v activate $INF_SITE_ID
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to activate site ($INF_SITE_ID)!" >&2
+    echo "        Please send contents of this file to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
+fi
+
+# destroy ams host cache
+echo "$ ams-host --nocache"
+
+ams-host --nocache
+
+echo "$ module --system add abs:$INF_ABS_VERSION"
+
+# here we should use the same version as it was used for job submision
+module --system add abs:$INF_ABS_VERSION
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to add 'abs:$INF_MODULE_VERS' module!" >&2
+    echo "        Please send contents of this file to the site support: $AMS_SITE_SUPPORT" >&2
+
+    echo "" >&2
+    exit 1
+fi
+
+# ------------------------------------------------------------------------------
+# AMS/ABS co-operation
+
+echo " AMS environment:"
+echo "--------------------------------------------------------------------------------"
+
+export AMS_NODEFILE="$INF_IJOB_WORK_DIR/${INF_IJOB_NAME}.nodes"
+export INF_NODEFILE=$AMS_NODEFILE
+export AMS_NCPU=`cat $INF_NODEFILE | wc --lines`
+export AMS_NGPU=0
+export AMS_NNODE=`cat $INF_NODEFILE | sort -u | wc --lines`
+export INF_NCPU=$AMS_NCPU
+export INF_NGPU=$AMS_NGPU
+export INF_NNODE=$AMS_NNODE
+
+echo " Number of CPUs    : $AMS_NCPU"
+echo " Number of nodes   : $AMS_NNODE"
+echo " Node file         : $AMS_NODEFILE"
+
+# ------------------------------------------------------------------------------
+# restore exported modules
+
+if [ "$INF_EXPORTED_MODULES" != "" ]; then
+    echo " Exported modules  : $INF_EXPORTED_MODULES"
+else
+    echo " Exported modules  : -none-"
+fi
+
+INF_EXPORTED_MODULES=`echo $INF_EXPORTED_MODULES | sed -e 's/|/ /g'`
+
+if [ "$INF_EXPORTED_MODULES" != "" ]; then
+    module --reexported add $INF_EXPORTED_MODULES
+else
+    echo ""
+fi
+
+# ------------------------------------------------------------------------------
+# init working directory
+
+cd $INF_IJOB_WORK_DIR
+export INF_WORK_DIR=$INF_IJOB_WORK_DIR
+export INF_JOB_NAME=$INF_IJOB_NAME
+
+# ------------------------------------------------------------------------------
+# list environment
+
+echo ""
+echo " Variable                       Value "
+echo "------------------------------ --------------------------------------------------"
+set | grep ^INF_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^AMS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^PBS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^TORQUE_ | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+
+
+echo ""
+echo "======================== Begining of script execution =========================="
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo " Started at        : `date`"
+echo " Script name       : $INF_JOB_NAME"
+echo " Script output     : ${INF_JOB_NAME}.stdout"
+echo " Working directory : $INF_WORK_DIR"
+
+chmod u+x $INF_JOB_NAME
+./$INF_JOB_NAME &> ${INF_JOB_NAME}.stdout
+export INF_JOB_EXIT_CODE=$?
+
+echo " Finished at       : `date`"
+echo " Exit code         : $INF_JOB_EXIT_CODE"
+echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "=========================== End of script execution ============================"
+
+
+# ------------------------------------------------------------------------------
+
+_DATE=`date`
+
+echo
+echo "################################################################################"
+echo "#                                                                              #"
+echo "# # Date: `printf %-67s \"$_DATE\"`# #"
+echo "#                                                                              #"
+echo "###                        End of script execution                          ####"
+echo "#                                                                              #"
+echo "################################################################################"
+echo
+
+

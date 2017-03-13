@@ -1,0 +1,135 @@
+#!/usr/bin/env infinity-env
+# ------------------------------------------------------------------------------
+# this wrapper finalize all ijobs associated with the main job
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# =============================================================================="
+echo "# infinity-ijobs-finalize started at `date`"
+echo "# =============================================================================="
+
+# are we on main node?
+if [ "`hostname -f`" != "${INF_MAIN_NODE}" ]; then
+    echo ""
+    echo " >>> ERROR: This script can be run only on the main computational node!"
+    echo "            Main node : ${INF_MAIN_NODE}"
+    echo "            Hostname  : `hostname -f`"
+    echo ""
+    exit 1
+fi
+
+# we need access to main info file
+INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
+if ! [ -f "$INF_INFOFILE" ]; then
+    echo ""
+    echo " >>> ERROR: Main job info file ($INF_INFOFILE) does not exist!"
+    echo ""
+    exit 1
+fi
+
+# get number of ijobs
+NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
+if [ $? -ne 0 ]; then
+    echo ""
+    echo " >>> ERROR: Unable to get number of ijobs!"
+    echo ""
+    exit 1
+fi
+
+if [ "$NIJOBS" -le 0 ]; then
+    echo ""
+    echo " >>> ERROR: No ijobs detected in the main job!"
+    echo ""
+    exit 1
+fi
+
+echo
+echo "# Number of ijobs : $NIJOBS"
+echo
+
+for((ID=1;ID<=$NIJOBS;ID++)); do
+    INF_IJOB_ID="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" id`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get id of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+
+    echo " >>> IJOB: $INF_IJOB_ID"
+
+    INF_IJOB_MAIN_NODE="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" mainnode`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get mainnode of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_IJOB_WORK_DIR="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" workdir`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get workdir of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_IJOB_NAME="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" name`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get name of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    INF_IJOB_PATH="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" path`"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get path of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+
+    case $INF_SYNC_MODE in
+        sync )
+            echo "     Data from the main node are only copied ..."
+
+            if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
+                echo "     Copy mode     : remote rsync"
+                echo "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+                ssh -o "StrictHostKeyChecking=no" $INF_IJOB_MAIN_NODE \
+                    "rsync -av --no-g -e \"ssh -o \"StrictHostKeyChecking=no\"\" \"$INF_IJOB_WORK_DIR/\" \"$INF_JOB_MACHINE:$INF_JOB_PATH/$INF_IJOB_PATH/\""  2>&1 | awk '{ printf("     %s\n",$0); }'
+
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " ERROR: Unable to copy the ijob data from the main computational" >&2
+                    echo "        node to the input ijob directory!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+                echo "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            else
+                echo "     Copy mode     : local rsync"
+                echo "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+                rsync -av --no-g "$INF_IJOB_MAIN_NODE:$INF_IJOB_WORK_DIR/" "$INF_JOB_PATH/$INF_IJOB_PATH/"  2>&1 | awk '{ printf("     %s\n",$0); }'
+
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " ERROR: Unable to copy the ijob data from the main computational" >&2
+                    echo "        node to the input ijob directory!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+                echo "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            fi
+        ;;
+        jobdir )
+            echo " The job will was executed in the input job directory, no data are copied back ..."
+        ;;
+    esac
+
+
+    echo
+done
+
+echo
+echo "# =============================================================================="
+echo "# infinity-ijobs-finalize finished at `date`"
+echo "# =============================================================================="

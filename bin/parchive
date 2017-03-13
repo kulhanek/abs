@@ -1,0 +1,218 @@
+#!/bin/bash
+
+# ------------------------------------------------------------------------------
+
+function archive_runtime_files() {
+    if [ $# -ne 3 ]; then
+        echo "ERROR: Three arguments are required for 'runtime' mode!"
+        echo "       parchive runtime <start> <current> <format>"
+        return 1
+    fi
+
+    INF_START=$1
+    INF_CURRENT=$2
+    INF_FORMAT=$3
+
+    if [ "$INF_START" -eq "$INF_CURRENT" ]; then
+        echo "NOTE: the first run - no runtime files are archived"
+        return 0
+    fi
+    # rename files
+    OLD="$INF_JOB_NAME#"`printf "%03d" "$(($INF_CURRENT-1))"`
+    NEW=`printf "$INF_FORMAT" "$(($INF_CURRENT-1))"`
+
+    if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+        echo "Data transfer: local mode ..."
+        echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
+        echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
+        echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
+        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes"
+
+        cd $INF_JOB_PATH
+        if [ $? -ne 0 ]; then exit 1; fi
+        mv "${OLD}.info" "$INF_ARCHIVE_DIR/${NEW}.info"
+        mv "${OLD}.stdout" "$INF_ARCHIVE_DIR/${NEW}.stdout"
+        mv "${OLD}.infout" "$INF_ARCHIVE_DIR/${NEW}.infout"
+        rm -f "${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes"
+    else
+        echo "Data transfer: remote mode ..."
+        echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
+        echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
+        echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
+        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes"
+
+        ssh $INF_JOB_MACHINE \
+            "cd $INF_JOB_PATH; \
+            if [ $? -ne 0 ]; then exit 1; fi; \
+            mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
+            mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
+            mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
+            rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\""
+    fi
+}
+
+# ------------------------------------------------------------------------------
+
+function get_data_from_archive() {
+
+    if [ $# -eq 0 ]; then
+        echo "ERROR: No files to get from the archive!"
+        return 1
+    fi
+
+    FILES=""
+    while [ $# -ne 0 ]; do
+        FILES="$FILES $INF_JOB_PATH/$INF_ARCHIVE_DIR/$1"
+        shift
+    done
+
+    if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+        echo "Data transfer: local mode ..."
+        rsync -av $FILES "$PWD/"
+    else
+        echo "Data transfer: remote mode ..."
+        rsync -av -e "ssh -o \"StrictHostKeyChecking=no\"" $FILES "$PWD/"
+    fi
+
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo ">>> ERROR: Unable to get specified data from the archive!"
+        echo ""
+        exit 1
+    fi
+}
+
+# ------------------------------------------------------------------------------
+
+function write_to_archive() {
+
+    if [ $# -eq 0 ]; then
+        echo "ERROR: No files to write to the archive!"
+        return 1
+    fi
+
+    if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+        echo "Data transfer: local mode ..."
+        rsync -av $* "$INF_JOB_PATH/$INF_ARCHIVE_DIR/"
+    else
+        echo "Data transfer: remote mode ..."
+        rsync -av -e "ssh -o \"StrictHostKeyChecking=no\"" $* "$INF_JOB_MACHINE:$INF_JOB_PATH/$INF_ARCHIVE_DIR/"
+    fi
+
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo ">>> ERROR: Unable to copy specified data to the archive!"
+        echo ""
+        exit 1
+    fi
+}
+
+# ------------------------------------------------------------------------------
+
+function move_to_archive() {
+
+    if [ $# -eq 0 ]; then
+        echo ""
+        echo ">>> ERROR: No files to move to the archive!"
+        echo ""
+        return 1
+    fi
+
+    # write data to the archive
+    write_to_archive $*
+    if [ $? -ne 0 ]; then return 1; fi
+
+    # remove files
+    rm -f $*
+}
+
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# parchive - manipulation with the job data archive"
+echo "# ------------------------------------------------------------------------------"
+
+case $1 in
+    runtime | get | write | move )
+        INF_MODE=$1
+        ;;
+    * )
+        echo ""
+        echo ">>> ERROR: Unsupported action: $1"
+        echo "           Supported action: runtime | get | write | move"
+        echo "              parchive runtime <start> <current> <format>"
+        echo "              parchive get   <file1> [file2] ..."
+        echo "              parchive write <file1> [file2] ..."
+        echo "              parchive move  <file1> [file2] ..."
+        echo ""
+        exit 1
+        ;;
+esac
+
+# remove the first argument from the stack
+shift
+
+# check input ------------------------------------------------------------------
+if [ -z "$INF_ARCHIVE_DIR" ]; then
+    echo "ERROR: INF_ARCHIVE_DIR variable is not defined!"
+    exit 1
+fi
+
+if [ -z "$INF_REMOTE_JOBDIR" ]; then
+    echo "ERROR: INF_REMOTE_JOBDIR variable is not defined!"
+    exit 1
+fi
+
+if [ -z "$INF_JOB_PATH" ]; then
+    echo "ERROR: INF_JOB_PATH variable is not defined!"
+    exit 1
+fi
+
+if [ -z "$INF_JOB_MACHINE" ]; then
+    echo "ERROR: INF_JOB_MACHINE variable is not defined!"
+    exit 1
+fi
+
+if [ -z "$INF_JOB_NAME" ]; then
+    echo "ERROR: INF_JOB_NAME variable is not defined!"
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    echo "ERROR: No files are specified for archiving!"
+    exit 1
+fi
+
+echo "Job name            : $INF_JOB_NAME"
+echo "Job input directory : $INF_JOB_PATH"
+echo "Job input machine   : $INF_JOB_MACHINE"
+echo "Archive directory   : $INF_ARCHIVE_DIR"
+echo "Remote mode         : $INF_REMOTE_JOBDIR"
+echo "Requested action    : $INF_MODE"
+echo "Arguments           : $*"
+echo ""
+
+# ------------------------------------------------------------------------------
+
+case $INF_MODE in
+    runtime )
+        archive_runtime_files $*
+        ;;
+    get )
+        get_data_from_archive $*
+        ;;
+    write )
+        write_to_archive $*
+        ;;
+    move )
+        move_to_archive $*
+        ;;
+esac
+
+EXIT_CODE=$?
+
+echo "# ------------------------------------------------------------------------------"
+echo ""
+
+exit $EXIT_CODE

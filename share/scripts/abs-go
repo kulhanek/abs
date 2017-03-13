@@ -1,0 +1,63 @@
+#!/bin/bash
+# ==============================================================================
+# ABS
+# (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# ==============================================================================
+
+# this is inline script
+case "$INF_GO_JOB_NAME" in
+    cli )
+        if [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
+            ssh -t -X "$INF_GO_MAIN_NODE" screen -d -r "T$INF_GO_JOB_KEY"
+            echo ""
+        fi
+        return 0
+        ;;
+    gui )
+        # not implemented
+        ;;
+    * )
+        # go to working directory
+        if [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_WORK_DIR" ] && [ -n "$INF_GO_SITE_ID" ] \
+           && [ -n "$INF_GO_UGROUP" ] && [ -n "$INF_GO_UMASK" ] ; then
+            ssh -t -X $INF_GO_MAIN_NODE \
+                      INF_GO_SITE_ID="$INF_GO_SITE_ID" \
+                      INF_GO_WORK_DIR="$INF_GO_WORK_DIR" \
+                      INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \
+                      INF_GO_EXPORTED_MODULES_2="`echo $INF_GO_EXPORTED_MODULES | tr "|" "%"`" \
+                      INF_GO_UMASK="$INF_GO_UMASK" \
+                      sg "$INF_GO_UGROUP" -c "$ABS_ROOT/share/scripts/abs-go-remote"
+            return $?
+        fi
+
+        # go to input directory
+        if [ -z "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_INPUT_MACHINE" ] && [ -n "$INF_GO_INPUT_DIR" ]; then
+            if [ "$INF_GO_INPUT_MACHINE" != "$HOSTNAME" ]; then
+                echo ""
+                echo " WARNING: The job input directory is located on remote computer."
+                echo "          Job input dir: $INF_GO_INPUT_MACHINE:$INF_GO_INPUT_DIR"
+                echo "          Hostname     : $HOSTNAME"
+            fi
+            if ! [ -d "$INF_GO_INPUT_DIR" ]; then
+                echo ""
+                echo " ERROR: The job input directory does not exist on this host!"
+                echo "        $INF_GO_INPUT_DIR"
+                echo ""
+                return 1
+            fi
+            cd "$INF_GO_INPUT_DIR"
+            echo ""
+            echo " INFO: The current directory was set to:"
+            echo "       $INF_GO_INPUT_DIR"
+            echo ""
+            return 0
+        fi
+        ;;
+esac

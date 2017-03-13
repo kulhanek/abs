@@ -1,0 +1,248 @@
+#!/usr/bin/env infinity-env
+# ------------------------------------------------------------------------------
+# this wrapper prepare all ijobs associated with the main job
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# =============================================================================="
+echo "# infinity-ijobs-prepare started at `date`"
+echo "# =============================================================================="
+
+# are we on main node?
+if [ "`hostname -f`" != "${INF_MAIN_NODE}" ]; then
+    echo ""
+    echo " >>> ERROR: This script can be run only on the main computational node!"
+    echo "            Main node : ${INF_MAIN_NODE}"
+    echo "            Hostname  : `hostname -f`"
+    echo ""
+    exit 1
+fi
+
+# we need access to main info file
+INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
+if ! [ -f "$INF_INFOFILE" ]; then
+    echo ""
+    echo " >>> ERROR: Main job info file ($INF_INFOFILE) does not exist!"
+    echo ""
+    exit 1
+fi
+
+INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
+if ! [ -f "$INF_NODEFILE" ]; then
+    echo ""
+    echo " >>> ERROR: Main node file ($INF_NODEFILE) does not exist!"
+    echo ""
+    exit 1
+fi
+
+# get number of ijobs
+NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
+if [ $? -ne 0 ]; then
+    echo ""
+    echo " >>> ERROR: Unable to get number of ijobs!"
+    echo ""
+    exit 1
+fi
+
+if [ "$NIJOBS" -le 0 ]; then
+    echo ""
+    echo " >>> ERROR: No ijobs detected in the main job!"
+    echo ""
+    exit 1
+fi
+
+echo
+echo "# Number of ijobs : $NIJOBS"
+echo
+
+# prepare working directories
+NCPU=1
+for((ID=1;ID<=$NIJOBS;ID++)); do
+
+    # generate ijob ID
+    INF_IJOB_ID="`printf ijob%03d $ID`"
+    echo " >>> IJOB: $INF_IJOB_ID"
+
+    # set working directory, master node, and node file ------------------------
+    INF_IJOB_PATH=`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" path`
+    if [ $? -ne -0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get path for ijob $ID!"
+        echo ""
+        exit 1
+    fi
+
+    INF_IJOB_NAME=`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" name`
+    if [ $? -ne -0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get name for ijob $ID!"
+        echo ""
+        exit 1
+    fi
+
+    case $INF_SYNC_MODE in
+        jobdir)
+            INF_IJOB_WORK_DIR="$INF_JOB_PATH/$INF_IJOB_PATH"
+            if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
+                echo "" >&2
+                echo " ERROR: The job input directory must be available locally on the computational node" >&2
+                echo "        if the 'jobdir' synchronization mode is used!" >&2
+                echo "" >&2
+                return 1
+            fi
+        ;;
+        sync | nosync )
+            SCRATCH_DIR="`$ABS_ROOT/sbin/abs-get-scratch-dir --type ijob $INF_SCRATCH_TYPE`"
+            if [ $? -ne -0 ]; then
+                echo ""
+                echo " >>> ERROR: Unable to get ijob scratch dir!"
+                echo ""
+                exit 1
+            fi
+            echo "     Scratch dir definition   : $SCRATCH_DIR"
+            INF_IJOB_WORK_DIR="`eval echo "$SCRATCH_DIR"`"
+        ;;
+    esac
+
+    echo "     Working directory        : $INF_IJOB_WORK_DIR"
+    INF_IJOB_MAIN_NODE=`head -$NCPU $INF_NODEFILE | tail -1`
+    RNCPU=`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" ncpus`
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to get number of cpus for ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    echo "     Requested number of CPUs : $RNCPU"
+    echo "     Master node              : $INF_IJOB_MAIN_NODE"
+
+    # create temporary node file
+    INF_IJOB_NODEFILE="$INF_WORK_DIR/${INF_IJOB_ID}.nodes"
+    tail -n +$NCPU $INF_NODEFILE | head -$RNCPU > $INF_IJOB_NODEFILE
+
+    echo "     Assigned nodes           : `cat $INF_IJOB_NODEFILE | \
+         awk 'BEGIN { ncpus = 0; nnodes = 0; } { if( NR == 1 ) last = $1; if( last != $1 ){ nnodes++; printme(); last = $1; ncpus = 1;} else { ncpus++; } } END { printme(); } function printme() { if( nnodes == 1) printf("                                "); printf("%s % 3d\n",last,ncpus);}'`"
+    # update info file ---------------------------------------------------------
+    $ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" id --set "$INF_IJOB_ID"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to set ID of ijob $ID!"
+        echo ""
+        exit 1
+    fi
+    $ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" mainnode --set "$INF_IJOB_MAIN_NODE"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to set main node $INF_INODE_MAIN_NODE for ijob $INF_ID!"
+        echo ""
+        exit 1
+    fi
+    $ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" workdir --set "$INF_IJOB_WORK_DIR"
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo " >>> ERROR: Unable to set main node $INF_INODE_MAIN_NODE for ijob $INF_ID!"
+        echo ""
+        exit 1
+    fi
+
+    # create working directory -------------------------------------------------
+    case $INF_SYNC_MODE in
+        jobdir)
+            echo ""
+            echo "     === $INF_IJOB_MAIN_NODE:$INF_IJOB_WORK_DIR ==="
+            timeout 30 df -h | awk '{ printf("     %s\n",$0); }'
+            if [ $? -ne 0 ]; then
+                echo ">>> WARNING: df command was not completed due to error or timeout."
+            fi
+        ;;
+        sync | nosync )
+            echo ""
+            echo "     Create working directories on ijob nodes ..."
+            for NODE_NAME in `cat $INF_IJOB_NODEFILE | sort -u`; do
+                echo "     === $NODE_NAME:$INF_IJOB_WORK_DIR ==="
+                ssh -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h | awk '{ printf(\"     %s\n\",\$0); }'; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; mkdir -p $INF_IJOB_WORK_DIR"
+
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " ERROR: Unable to create the working directory on the specified node!" >&2
+                    echo "" >&2
+                    return 1
+                fi
+            done
+        ;;
+    esac
+
+    # synchronize data ---------------------------------------------------------
+    case $INF_SYNC_MODE in
+        sync | nosync )
+            if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
+                echo ""
+                echo "     Copy mode     : remote rsync"
+                echo "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+                ssh -o "StrictHostKeyChecking=no" $INF_IJOB_MAIN_NODE \
+                    "rsync -av --no-g  \"$INF_JOB_MACHINE:$INF_JOB_PATH/$INF_IJOB_PATH/\" \"$INF_IJOB_WORK_DIR/\"" 2>&1 | awk '{ printf("     %s\n",$0); }'
+
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+
+                scp -o "StrictHostKeyChecking=no" "$INF_IJOB_NODEFILE" "$INF_IJOB_MAIN_NODE:$INF_IJOB_WORK_DIR/${INF_IJOB_NAME}.nodes" 2>&1 | awk '{ printf("     %s\n",$0); }'
+
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+
+                echo "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            else
+                echo ""
+                echo "     Copy mode     : local rsync"
+                echo "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+                rsync -av --no-g  "$INF_JOB_PATH/$INF_IJOB_PATH/" "$INF_IJOB_MAIN_NODE:$INF_IJOB_WORK_DIR/" 2>&1 | awk '{ printf("     %s\n",$0); }'
+
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " ERROR: Unable to copy the input job data to theijob main computational node!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+
+                scp -o "StrictHostKeyChecking=no" "$INF_IJOB_NODEFILE" "$INF_IJOB_MAIN_NODE:$INF_IJOB_WORK_DIR/${INF_IJOB_NAME}.nodes" 2>&1 | awk '{ printf("     %s\n",$0); }'
+
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+
+                echo "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            fi
+        ;;
+        jobdir )
+            echo "   The job will be executed in the input ijob directory, no data are copied ..."
+        ;;
+    esac
+
+    echo ""
+    NCPU=$(($NCPU + $RNCPU))
+done
+
+# update info file on UI -------------------------------------------------------
+if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+    if [ "$INF_SYNC_MODE" != "jobdir" ]; then
+        cp "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+    fi
+else
+    scp -o "StrictHostKeyChecking=no" \
+        "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_MACHINE:$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+fi
+
+echo "# =============================================================================="
+echo "# infinity-ijobs-prepare finished at `date`"
+echo "# =============================================================================="
