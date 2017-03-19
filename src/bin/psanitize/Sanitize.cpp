@@ -22,11 +22,9 @@
 #include "Sanitize.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <PluginDatabase.hpp>
-#include <GlobalConfig.hpp>
-#include <Torque.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 #include <Shell.hpp>
+#include <BatchSystems.hpp>
 
 using namespace std;
 
@@ -79,26 +77,20 @@ int CSanitize::Init(int argc,char* argv[])
 bool CSanitize::Run(void)
 {    
     // init all subsystems
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
-        return(false);
-    }
-
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
     vout << low;
 
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
 
-    if( Torque.Init() == false ){
+    if( BatchSystems.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
@@ -163,9 +155,6 @@ bool CSanitize::Run(void)
 
 bool CSanitize::Finalize(void)
 {
-    // unload plugins
-    PluginDatabase.UnloadPlugins();
-
     CSmallTimeAndDate dt;
     dt.GetActualTimeAndDate();
 

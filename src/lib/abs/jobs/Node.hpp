@@ -22,12 +22,12 @@
 // =============================================================================
 
 #include <ABSMainHeader.hpp>
+#include <SmallString.hpp>
+#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <list>
 #include <set>
 #include <iostream>
-#include <SmallString.hpp>
-#include <boost/shared_ptr.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -45,22 +45,13 @@ public:
 
 // methods ---------------------------------------------------------------------
     /// init node with torque information
-    bool Init(struct batch_status* p_node);
+//    bool Init(struct batch_status* p_node);
 
     /// print line info about the node
     void PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops,int ncolumns);
 
     /// get node name
     const CSmallString& GetName(void) const;
-
-    /// get core name of NUMA node
-    const CSmallString GetNUMACoreName(void) const;
-
-    /// is it numa node?
-    bool IsNUMANode(void) const;
-
-    /// get nume node number
-    int  GetNUMAID(void) const;
 
     /// get number of CPUs
     int GetNumOfCPUs(void) const;
@@ -73,12 +64,6 @@ public:
 
     /// return number of free GPUs
     int GetNumOfFreeGPUs(void) const;
-
-    /// merge NUMA node
-    void MergeWithNUMANode(CNodePtr p_node);
-
-    /// remove NUMA tag
-    void RemoveNUMATag(void);
 
     /// get property list
     const std::vector<std::string>& GetPropertyList(void) const;

@@ -29,7 +29,7 @@ ADD_DEPENDENCIES(basicjobtypes_shared abs_shared)
 SET_TARGET_PROPERTIES(basicjobtypes_shared PROPERTIES
                         OUTPUT_NAME BasicJobTypes
                         CLEAN_DIRECT_OUTPUT 1
-                        VERSION ${LibBuildVersion_ABS})
+                        VERSION ${ABS_VERSION})
 
 TARGET_LINK_LIBRARIES(basicjobtypes_shared ${ABS_LIBS})
 

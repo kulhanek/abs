@@ -12,14 +12,13 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8 FATAL_ERROR)
 SET(BUILD_LEVEL "ALL" CACHE STRING "Determine build level (supported levels: ALL, CLIENT, SERVERS).")
 SET(LIBS_STATIC OFF CACHE BOOL "Should the static version of hipoly library be built?")
 SET(LIBS_SHARED ON CACHE BOOL "Should the dynamic version of hipoly library be built?")
-SET(TRY_QT_LIB ON CACHE BOOL "Should the QT lib be used?")
 
 # ==============================================================================
 # project setup ----------------------------------------------------------------
 # ==============================================================================
 
 # define project name ----------------------------
-SET(LibBuildVersion_ABS 3.0.x)
+SET(ABS_VERSION 3.0.x)
 
 # what languages we use --------------------------
 ENABLE_LANGUAGE(CXX)
@@ -40,33 +39,6 @@ ENDIF(NOT DEVELOPMENT_ROOT)
 # external libraries -----------------------------------------------------------
 # ==============================================================================
 
-# try to find threads ----------------------------
-FIND_PACKAGE(Threads)
-
-IF(CMAKE_USE_PTHREADS_INIT)
-    SET(HAVE_PTHREAD_H 1)
-    ADD_DEFINITIONS(-DHAVE_PTHREAD_H)
-ELSE(CMAKE_USE_PTHREADS_INIT)
-    IF(CMAKE_USE_WIN32_THREADS_INIT)
-        SET(HAVE_WIN32_THREADS_H 1)
-        ADD_DEFINITIONS(-DHAVE_WIN32_THREADS_H)
-    ENDIF(CMAKE_USE_WIN32_THREADS_INIT)
-ENDIF(CMAKE_USE_PTHREADS_INIT)
-
-# interaction with Qt4 ---------------------------
-IF(TRY_QT_LIB)
-    FIND_PACKAGE(Qt4)
-    IF(QT4_FOUND)
-        INCLUDE(${QT_USE_FILE})
-        SET(HAVE_QT4 1)
-        ADD_DEFINITIONS(-DHAVE_QT4)
-    ENDIF(QT4_FOUND)
-ENDIF(TRY_QT_LIB)
-
-SET(SYSTEM_LIBS ${QT_LIBRARIES}
-                ${CMAKE_THREAD_LIBS_INIT}
-                )
-
 # HIPOLY -----------------------------------------
 SET(HIPOLY_ROOT ${DEVELOPMENT_ROOT}/projects/hipoly/1.0)
 INCLUDE_DIRECTORIES(${HIPOLY_ROOT}/src/lib/hipoly SYSTEM)
@@ -84,16 +56,42 @@ INCLUDE_DIRECTORIES(${HIPOLY_ROOT}/src/lib/hipoly/xml SYSTEM)
 LINK_DIRECTORIES(${HIPOLY_ROOT}/lib)
 SET(HIPOLY_LIB_NAME hipoly)
 
+# W3TK -------------------------------------------
+SET(W3TK_ROOT ${DEVELOPMENT_ROOT}/projects/w3tk/1.0)
+INCLUDE_DIRECTORIES(${W3TK_ROOT}/src/lib/w3tk SYSTEM)
+INCLUDE_DIRECTORIES(${W3TK_ROOT}/src/lib/w3tk/fastcgi SYSTEM)
+INCLUDE_DIRECTORIES(${W3TK_ROOT}/src/lib/w3tk/template SYSTEM)
+LINK_DIRECTORIES(${W3TK_ROOT}/lib)
+SET(W3TK_LIB_NAME w3tk)
+
+# AMS -----------------------------------------
+SET(AMS_ROOT ${DEVELOPMENT_ROOT}/projects/ams/8.0)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/system SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/soft SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/torque SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/cuda SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/srv SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/torque SYSTEM)
+LINK_DIRECTORIES(${AMS_ROOT}/lib)
+SET(AMS_LIB_NAME ams)
+
 # boost ---------------------------------------
 SET(BOOST_ROOT ${DEVELOPMENT_ROOT}/thirdparty/boost/1.59.0)
 INCLUDE_DIRECTORIES(${BOOST_ROOT} SYSTEM)
 
 # all libs ---------------------------------------
-SET(ABS_LIBS
-        abs
+SET(ABS_EXT_LIBS
         plusula
+        ${AMS_LIB_NAME}
+        ${W3TK_LIB_NAME}
         ${HIPOLY_LIB_NAME}
         ${SYSTEM_LIBS}
+        )
+
+SET(ABS_LIBS
+        abs
+        ${ABS_EXT_LIBS}
         )
 
 # architecture -----------------------------------

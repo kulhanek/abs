@@ -18,7 +18,7 @@ ADD_DEPENDENCIES(basictctchk_shared abs_shared)
 SET_TARGET_PROPERTIES(basictctchk_shared PROPERTIES
                         OUTPUT_NAME BasicTicketCheck
                         CLEAN_DIRECT_OUTPUT 1
-                        VERSION ${LibBuildVersion_ABS})
+                        VERSION ${ABS_VERSION})
 
 TARGET_LINK_LIBRARIES(basictctchk_shared ${ABS_LIBS})
 

@@ -25,7 +25,7 @@
 #include <PluginDatabase.hpp>
 #include <GlobalConfig.hpp>
 #include <Torque.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 #include <ShellProcessor.hpp>
 #include <FileSystem.hpp>
 
@@ -84,8 +84,8 @@ int CInfoGo::Init(int argc,char* argv[])
 bool CInfoGo::Run(void)
 {
     // init all subsystems
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
@@ -97,7 +97,7 @@ bool CInfoGo::Run(void)
 
     vout << low;    
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         vout << endl;        
         ES_TRACE_ERROR("user does not have valid ticket");
         ExitCode = 1;

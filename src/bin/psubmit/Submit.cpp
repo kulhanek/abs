@@ -83,8 +83,8 @@ int CSubmit::Init(int argc,char* argv[])
 bool CSubmit::Run(void)
 {
     // init all subsystems
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
@@ -97,7 +97,7 @@ bool CSubmit::Run(void)
     vout << medium;
 
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
@@ -184,7 +184,7 @@ bool CSubmit::SubmitJobFull(void)
     if( Options.GetNumberOfProgArgs() >= 4 ) sm = Options.GetProgArg(3);
 
     if( Job->SetArguments(qa,jn,rs,sm) == false ) return(false);
-    if( Job->CheckRuntimeFiles(vout,TorqueConfig,Options.GetOptIgnoreRuntimeFiles()) == false ){
+    if( Job->CheckRuntimeFiles(vout,ABSConfig,Options.GetOptIgnoreRuntimeFiles()) == false ){
         CJobList jobs;
         jobs.InitByInfoFiles(".",false);
         if( jobs.GetNumberOfJobs() > 0 ){
@@ -299,7 +299,7 @@ bool CSubmit::SubmitJobHeader(void)
     // set output number
     if( Job->SetOutputNumber(vout,1) == false ) return(false);
 
-    if( Job->CheckRuntimeFiles(vout,TorqueConfig,Options.GetOptIgnoreRuntimeFiles()) == false ){
+    if( Job->CheckRuntimeFiles(vout,ABSConfig,Options.GetOptIgnoreRuntimeFiles()) == false ){
         CJobList jobs;
         jobs.InitByInfoFiles(".",false);
         if( jobs.GetNumberOfJobs() > 0 ){

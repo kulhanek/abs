@@ -46,7 +46,6 @@ public:
     void GenerateCommonProperties(void);
 
     /// compare node names
-    static bool CompareNamesA(const CNodePtr& left,const CNodePtr& right);
     static bool CompareNamesB(const CNodePtr& left,const CNodePtr& right);
 };
 
@@ -103,12 +102,6 @@ public:
 
     /// remove down
     void RemoveDownNodes(void);
-
-    /// merge NUMA nodes
-    void MergeNUMANodes(void);
-
-    /// init HW database of node specification
-    void LoadHWDatabase(void);
 
 // section of private data -----------------------------------------------------
 private:

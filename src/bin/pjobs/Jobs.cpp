@@ -22,9 +22,9 @@
 #include "Jobs.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <GlobalConfig.hpp>
-#include <PluginDatabase.hpp>
+#include <ABSConfig.hpp>
 #include <CommonParser.hpp>
+#include <BatchSystems.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -78,21 +78,14 @@ int CJobs::Init(int argc,char* argv[])
 bool CJobs::Run(void)
 {
     // init all subsystems
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
-        return(false);
-    }
-
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
     vout << low;
     vout << "#" << endl;
-    vout << "# Site name     : " << GlobalConfig.GetActiveSiteName() << endl;
-    vout << "# Torque server : " << TorqueConfig.GetServerName() << endl;
+    ABSConfig.PrintBatchServerInfo(vout);
     if( Options.IsOptSearchSet() ){
         std::string str = string(Options.GetOptSearch());
         boost::replace_all(str,"<","<<");
@@ -102,13 +95,13 @@ bool CJobs::Run(void)
     vout << endl;
 
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
 
     // we need ticket here
-    if( Torque.Init() == false ){
+    if( BatchSystems.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
@@ -118,17 +111,14 @@ bool CJobs::Run(void)
         User.SetUserName(Options.GetOptUser());
     }
 
-    if( User.InitUser() == false ){
-        ES_ERROR("unable to init user");
-        return(false);
-    }
+    User.InitUser();
 
     vout << high;
     User.PrintUserInfo(vout);
     vout << endl;
     vout << low;
 
-    if( Torque.GetUserJobs(Jobs,User.GetName()) == false ){
+    if( BatchSystems.GetUserJobs(Jobs,User.GetName()) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }

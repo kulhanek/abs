@@ -22,12 +22,10 @@
 #include "Queues.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <GlobalConfig.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 #include <User.hpp>
-#include <Torque.hpp>
 #include <QueueList.hpp>
-#include <PluginDatabase.hpp>
+#include <BatchSystems.hpp>
 
 using namespace std;
 
@@ -80,52 +78,41 @@ int CQueues::Init(int argc,char* argv[])
 bool CQueues::Run(void)
 {
     // init all subsystems
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
-
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
-        return(false);
-    }
-
     vout << low;
     vout << "#" << endl;
-    vout << "# Site name     : " << GlobalConfig.GetActiveSiteName() << endl;
-    vout << "# Torque server : " << TorqueConfig.GetServerName() << endl;
+    ABSConfig.PrintBatchServerInfo(vout);
     vout << "#" << endl;
 
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         vout << endl;
         return(false);
     }
 
-    if( Torque.Init() == false ){
+    if( BatchSystems.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
 
     if( Options.GetOptTechnical() ){
         vout << endl;
-        Torque.PrintQueues(vout);
+        BatchSystems.PrintQueues(vout);
         return(true);
     }
 
-    if( User.InitUser() == false ){
-        ES_ERROR("unable to init user");
-        return(false);
-    }
+    User.InitUser();
 
     vout << high;
     User.PrintUserInfo(vout);
     vout << endl;
     vout << low;
 
-    if( Torque.GetQueues(QueueList) == false ){
+    if( BatchSystems.GetQueues() == false ){
         ES_ERROR("unable to get queues");
         return(false);
     }
@@ -148,9 +135,6 @@ bool CQueues::Run(void)
 
 bool CQueues::Finalize(void)
 {
-    // unload plugins
-    PluginDatabase.UnloadPlugins();
-
     CSmallTimeAndDate dt;
     dt.GetActualTimeAndDate();
 

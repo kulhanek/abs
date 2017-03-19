@@ -24,13 +24,13 @@
 #include <ABSMainHeader.hpp>
 #include <XMLDocument.hpp>
 #include <iostream>
-#include <TorqueConfig.hpp>
 #include <QueueList.hpp>
 #include <AliasList.hpp>
 #include <SmallTimeAndDate.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
 #include <JobType.hpp>
+#include <FileName.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -102,7 +102,7 @@ public:
     bool SetOutputNumber(std::ostream& sout,int i);
 
     /// 1.3) check for runtime files
-    bool CheckRuntimeFiles(std::ostream& sout,CTorqueConfig& config,bool ignore);
+    bool CheckRuntimeFiles(std::ostream& sout,bool ignore);
 
     /// 1.4) job input
     ERetStatus JobInput(std::ostream& sout);
@@ -437,6 +437,7 @@ private:
     void PrintJobInfoCompactOld(std::ostream& sout,bool includepath);
 
     // job status --------------------------------------------------------------
+    CSmallString                        BatchServerName;
     EJobStatus                          BatchJobStatus;
     CSmallString                        BatchJobComment;
     std::map<std::string,std::string>   BatchVariables;

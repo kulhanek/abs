@@ -25,8 +25,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
-#include <pbs_ifl.h>
-#include <TorqueAttr.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -51,6 +49,13 @@ CResourceList::~CResourceList(void)
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
+
+void CResourceList::SetBatchServerName(const CSmallString& name)
+{
+    // FIXME
+}
+
+//------------------------------------------------------------------------------
 
 void CResourceList::Parse(const CSmallString& resources)
 {
@@ -343,24 +348,25 @@ bool CResourceList::GetWallTime(CSmallTime& time) const
     return(true);
 }
 
-//------------------------------------------------------------------------------
+// FIXME
+////------------------------------------------------------------------------------
 
-void CResourceList::GetTorqueResources(struct attropl* &p_prev)
-{
-    std::list<CResourceValuePtr>::iterator     it = begin();
-    std::list<CResourceValuePtr>::iterator     ie = end();
+//void CResourceList::GetTorqueResources(struct attropl* &p_prev)
+//{
+//    std::list<CResourceValuePtr>::iterator     it = begin();
+//    std::list<CResourceValuePtr>::iterator     ie = end();
 
-    while( it != ie ){
-        CResourceValuePtr p_res = (*it);
-        if( p_res->IsHelperToken() ) {
-            it++;       // skip helper tokens
-            continue;
-        }
+//    while( it != ie ){
+//        CResourceValuePtr p_res = (*it);
+//        if( p_res->IsHelperToken() ) {
+//            it++;       // skip helper tokens
+//            continue;
+//        }
 
-        set_attribute(p_prev,ATTR_l,p_res->Name,p_res->Value);
-        it++;
-    }
-}
+//        set_attribute(p_prev,ATTR_l,p_res->Name,p_res->Value);
+//        it++;
+//    }
+//}
 
 //------------------------------------------------------------------------------
 

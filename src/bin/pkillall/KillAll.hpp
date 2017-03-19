@@ -24,9 +24,8 @@
 #include "KillAllOptions.hpp"
 #include <VerboseStr.hpp>
 #include <TerminalStr.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 #include <User.hpp>
-#include <Torque.hpp>
 #include <JobList.hpp>
 
 // -----------------------------------------------------------------------------

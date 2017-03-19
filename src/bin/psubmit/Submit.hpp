@@ -24,7 +24,7 @@
 #include "SubmitOptions.hpp"
 #include <VerboseStr.hpp>
 #include <TerminalStr.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 #include <Torque.hpp>
 #include <Job.hpp>
 

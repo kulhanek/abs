@@ -22,7 +22,6 @@
 #include <NodeList.hpp>
 #include <SimpleIterator.hpp>
 #include <iomanip>
-#include <TorqueConfig.hpp>
 #include <XMLElement.hpp>
 #include <fnmatch.h>
 #include <cctype>
@@ -32,7 +31,7 @@
 #include <CommonParser.hpp>
 #include <ErrorSystem.hpp>
 #include <fnmatch.h>
-#include <GlobalConfig.hpp>
+#include <ABSConfig.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -249,7 +248,7 @@ void CNodeList::PrintNodeGroupNames(std::ostream& sout)
     sout << endl;
     sout << "# Node group name" << endl;
     sout << "# --------------------------------------" << endl;
-    CXMLElement* p_ele = TorqueConfig.GetNodeGroupConfig();
+    CXMLElement* p_ele = ABSConfig.GetNodeGroupConfig();
     if( p_ele != NULL ){
         CXMLElement* p_gele = p_ele->GetFirstChildElement("group");
         while( p_gele != NULL ){
@@ -265,7 +264,7 @@ void CNodeList::PrintNodeGroupNames(std::ostream& sout)
 
 void CNodeList::PrepareNodeGroups(void)
 {
-    CXMLElement* p_ele = TorqueConfig.GetNodeGroupConfig();
+    CXMLElement* p_ele = ABSConfig.GetNodeGroupConfig();
     if( p_ele == NULL ){
         // all nodes into one big group
         CNodeGroupPtr p_group = CNodeGroupPtr(new CNodeGroup);
@@ -656,132 +655,6 @@ const CNodePtr CNodeList::FindNode(const CSmallString& name,const CQueuePtr& p_q
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CNodeGroup::CompareNamesA(const CNodePtr& p_left,const CNodePtr& p_right)
-{
-    if( p_left->IsNUMANode() && p_right->IsNUMANode() ){
-        if( p_left->GetNUMACoreName() == p_right->GetNUMACoreName() ){
-            return( p_left->GetNUMAID() < p_right->GetNUMAID() );
-        }
-    }
-
-    std::string lfull = string(p_left->GetNUMACoreName());
-    std::string rfull = string(p_right->GetNUMACoreName());
-
-    // the rest
-    std::string lname;
-    std::string ldomain;
-
-    unsigned int dpos = lfull.find(".");
-    if( dpos == string::npos ){
-        lname = lfull;
-    } else {
-        lname = lfull.substr(0,dpos);
-        ldomain = lfull.substr(dpos+1);
-    }
-
-    CSmallString lrname;
-    CSmallString lnode;
-    CSmallString lvdom;
-
-    int mode = 0;
-    for(unsigned int i=0; i < lname.size(); i++){
-        if( (mode == 0) && (isdigit(lname[i]) == true) ){
-            mode = 1;
-        }
-        if( (mode == 1) && (lname[i] == '-') ){
-            mode = 2;
-            continue;
-        }
-        if( (mode == 1) && (isdigit(lname[i]) == false) ){
-            break;
-        }
-        if( (mode == 2) && (isdigit(lname[i]) == true) ){
-            mode = 3;
-        }
-        if( (mode == 3) && (isdigit(lname[i]) == false ) ){
-            break;
-        }
-        switch(mode){
-            case 0:
-                lrname << lname[i];
-                break;
-            case 1:
-                lnode << lname[i];
-                break;
-            case 3:
-                lvdom << lname[i];
-                break;
-            default:
-                break;
-        }
-    }
-
-//    cout << lname << " " << lrname << " " << lnode << " " << lvdom << " " << ldomain <<  endl;
-
-    std::string rname;
-    std::string rdomain;
-
-    dpos = rfull.find(".");
-    if( dpos == string::npos ){
-        rname = rfull;
-    } else {
-        rname = rfull.substr(0,dpos);
-        rdomain = rfull.substr(dpos+1);
-    }
-
-    CSmallString rrname;
-    CSmallString rnode;
-    CSmallString rvdom;
-
-    mode = 0;
-    for(unsigned int i=0; i < rname.size(); i++){
-        if( (mode == 0) && (isdigit(rname[i]) == true) ){
-            mode = 1;
-        }
-        if( (mode == 1) && (rname[i] == '-') ){
-            mode = 2;
-            continue;
-        }
-        if( (mode == 1) && (isdigit(rname[i]) == false) ){
-            break;
-        }
-        if( (mode == 2) && (isdigit(rname[i]) == true) ){
-            mode = 3;
-        }
-        if( (mode == 3) && (isdigit(rname[i]) == false ) ){
-            break;
-        }
-        switch(mode){
-            case 0:
-                rrname << rname[i];
-                break;
-            case 1:
-                rnode << rname[i];
-                break;
-            case 3:
-                rvdom << rname[i];
-                break;
-            default:
-                break;
-        }
-    }
-
-//    cout << rname << " " << rrname << " " << rnode << " " << rvdom << " " << rdomain <<  endl;
-
-    if( ldomain < rdomain ) return(true);
-    if( string(lrname) < string(rrname) ) return(true);
-
-    if( string(lrname) == string(rrname) ){
-        if( lvdom.ToInt() < rvdom.ToInt() ) return(true);
-        if( lvdom.ToInt() == rvdom.ToInt() ) {
-            if( lnode.ToInt() < rnode.ToInt() ) return(true);
-        }
-    }
-    return(false);
-}
-
-//------------------------------------------------------------------------------
-
 bool CNodeGroup::CompareNamesB(const CNodePtr& p_left,const CNodePtr& p_right)
 {
     string s1 = string(p_left->GetName());
@@ -819,16 +692,8 @@ void CNodeGroup::MakeSortedNodeList(void)
 {
     // copy items
     SortedNodes.insert(SortedNodes.end(),begin(),end());
-
-    switch(TorqueConfig.GetTorqueMode()){
-        case ETM_TORQUE:
-        case ETM_TORQUE_METAVO:
-            SortedNodes.sort(CompareNamesA);
-        break;
-        case ETM_PBSPRO:
-            SortedNodes.sort(CompareNamesB);
-        break;
-    }
+    // and sort them
+    SortedNodes.sort(CompareNamesB);
 }
 
 //------------------------------------------------------------------------------
@@ -871,60 +736,6 @@ void CNodeGroup::GenerateCommonProperties(void)
     while( rit != rie ){
         CommonProps.erase(*rit);
         rit++;
-    }
-}
-
-//------------------------------------------------------------------------------
-
-void CNodeList::MergeNUMANodes(void)
-{
-    list<CNodePtr>::iterator it = begin();
-    list<CNodePtr>::iterator et = end();
-
-    while( it != et ){
-        CNodePtr p_node = *it;
-        if( p_node->IsNUMANode() ){
-            list<CNodePtr>::iterator nit = it;
-            nit++;
-            while( nit != et ){
-                CNodePtr p_snode = *nit;
-                if( p_node->GetNUMACoreName() == p_snode->GetNUMACoreName() ){
-                    p_node->MergeWithNUMANode(p_snode);
-                    nit = erase(nit);
-                } else {
-                    break;
-                }
-            }
-        }
-        it++;
-    }
-
-    it = begin();
-
-    while( it != et ){
-        CNodePtr p_node = *it;
-        if( p_node->IsNUMANode() ){
-            p_node->RemoveNUMATag();
-        }
-        it++;
-    }
-}
-
-//------------------------------------------------------------------------------
-
-void CNodeList::LoadHWDatabase(void)
-{
-    CFileName      db_name;
-    db_name = GlobalConfig.GetABSRootDir() / "etc" / "sites" / GlobalConfig.GetActiveSiteID() / "nodes.hw";
-
-    ifstream ifs(db_name);
-    if( ! ifs ) return; // no data
-
-    string line;
-    while( getline(ifs,line) ){
-        vector<string>  items;
-        split(items,line,is_any_of("\t"));
-        if( items.size() == 2 ) HWDatabase[items[0]] = items[1];
     }
 }
 

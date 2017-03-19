@@ -29,7 +29,7 @@
 #include <XMLPrinter.hpp>
 #include <NodeList.hpp>
 #include <string.h>
-#include <GlobalConfig.hpp>
+#include <ABSConfig.hpp>
 #include <XMLParser.hpp>
 #include <AliasList.hpp>
 #include <Utils.hpp>
@@ -42,14 +42,13 @@
 #include <PluginObject.hpp>
 #include <CategoryUUID.hpp>
 #include <JobType.hpp>
-#include <TorqueAttr.hpp>
-#include <pbs_ifl.h>
 #include <iostream>
 #include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <Torque.hpp>
+#include <AMSGlobalConfig.hpp>
+#include <BatchSystems.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -193,8 +192,8 @@ void CJob::CreateHeader(void)
     version = "INFINITY_INFO_v_2_0";
 
     p_header->SetAttribute("version",version);
-    p_header->SetAttribute("site",GlobalConfig.GetActiveSiteID());
-    p_header->SetAttribute("server",TorqueConfig.GetServerName());
+    p_header->SetAttribute("site",AMSGlobalConfig.GetActiveSiteID());
+    p_header->SetAttribute("server",BatchServerName);
 }
 
 //------------------------------------------------------------------------------
@@ -258,7 +257,7 @@ bool CJob::SetOutputNumber(std::ostream& sout,int number)
 
 //------------------------------------------------------------------------------
 
-bool CJob::CheckRuntimeFiles(std::ostream& sout,CTorqueConfig& config,bool ignore)
+bool CJob::CheckRuntimeFiles(std::ostream& sout,bool ignore)
 {
     bool            runtime_files = false;
     CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.infkey;___JOB_IS_RUNNING___";
@@ -282,7 +281,7 @@ bool CJob::CheckRuntimeFiles(std::ostream& sout,CTorqueConfig& config,bool ignor
     CSmallString var;
     var = CShell::GetSystemVariable("INF_IGNORE_RUNTIME_FILES");
     if( var == NULL ){
-        config.GetUserConfigItem("INF_IGNORE_RUNTIME_FILES",var);
+        ABSConfig.GetUserConfigItem("INF_IGNORE_RUNTIME_FILES",var);
     }
 
     if( (var == "YES") || (ignore == true) ){
@@ -390,7 +389,7 @@ ERetStatus CJob::JobInput(std::ostream& sout)
     }
 
     SetItem("basic/jobinput","INF_JOB_TITLE",title);
-    SetItem("basic/modules","INF_EXPORTED_MODULES",GlobalConfig.GetExportedModules());
+    SetItem("basic/modules","INF_EXPORTED_MODULES",AMSGlobalConfig.GetExportedModules());
 
     // unique job key
     SetItem("basic/jobinput","INF_JOB_KEY",CUtils::GenerateUUID());
@@ -435,7 +434,7 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
         dest = items[0];
     }
     if( (host == "local") || (host == "localhost") ){
-        host = GlobalConfig.GetHostName();
+        host = ABSConfig.GetHostName();
     }
 
     // decode user resources
@@ -463,7 +462,7 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
             dest = items[0];
         }
         if( (host == "local") || (host == "localhost") ){
-            host = GlobalConfig.GetHostName();
+            host = ABSConfig.GetHostName();
         }
 
         // merge other setup
@@ -480,7 +479,7 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
     // add default resources
     CResourceList default_res;
     CSmallString  sdef_res;
-    if( TorqueConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
+    if( ABSConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
         default_res.Parse(sdef_res);
         if( default_res.TestResources(sout) == false ){
             ES_ERROR("default resources are invalid");
@@ -519,102 +518,103 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
         nnodes = 1;
     }
 
-    // generate nodes resources
-    CSmallString rnodes;
-    switch( TorqueConfig.GetTorqueMode() ){
-        case ETM_TORQUE:{
-            if( host == NULL ){
-                rnodes << nnodes;
-            } else {
-                if( nnodes > 1 ){
-                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
-                    sout << endl;
-                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-                    return(false);
-                }
-                rnodes << host;
-            }
-            if( ncpus <= mcpuspernode ) {
-                rnodes << ":ppn=" << ncpus;
-            } else {
-                rnodes << ":ppn=" << mcpuspernode;
-            }
-            if( ngpus > 0 ){
-                rnodes << ":" << "gpus=" << ngpus;
-            }
-            CSmallString props;
-            props = res.GetResourceValue("props");
-            if( props != NULL ){
-                rnodes << ":" << props;
-            }
-        }
-        res.AddResourceToBegin("nodes",rnodes);
-        break;
-        case ETM_TORQUE_METAVO: {
-            if( host == NULL ){
-                rnodes << nnodes;
-            } else {
-                if( nnodes > 1 ){
-                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
-                    sout << endl;
-                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-                    return(false);
-                }
-                rnodes << host;
-            }
-            if( ncpus <= mcpuspernode ) {
-                rnodes << ":ppn=" << ncpus;
-            } else {
-                rnodes << ":ppn=" << mcpuspernode;
-            }
-            if( ngpus > 0 ){
-                rnodes << ":" << "gpu=" << ngpus;
-            }
-            CSmallString props;
-            props = res.GetResourceValue("props");
-            if( props != NULL ){
-                rnodes << ":" << props;
-            }
-        }
-        res.AddResourceToBegin("nodes",rnodes);
-        break;
-        case ETM_PBSPRO: {
-            if( host == NULL ){
-                rnodes << nnodes;
-            } else {
-                if( nnodes > 1 ){
-                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
-                    sout << endl;
-                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-                    return(false);
-                }
-                rnodes << host;
-            }
-            if( ncpus <= mcpuspernode ) {
-                rnodes << ":ncpus=" << ncpus << ":mpiprocs=" << ncpus;
-            } else {
-                rnodes << ":ncpus=" << mcpuspernode << ":mpiprocs=" << mcpuspernode;
-            }
-            if( ngpus > 0 ){
-                // FIXME
-            }
-            // special resources
-            if( res.GetResource("cpu_freq") != NULL ) {
-                rnodes << ":cpu_freq=" << res.GetResourceValue("cpu_freq");
-            }
-            if( res.GetResource("host") != NULL ) {
-                rnodes << ":host=" << res.GetResourceValue("host");
-            }
-// properties are not supported by PBSPro
+    // FIXME
+//    // generate nodes resources
+//    CSmallString rnodes;
+//    switch( ABSConfig.GetTorqueMode() ){
+//        case ETM_TORQUE:{
+//            if( host == NULL ){
+//                rnodes << nnodes;
+//            } else {
+//                if( nnodes > 1 ){
+//                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
+//                    sout << endl;
+//                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
+//                    return(false);
+//                }
+//                rnodes << host;
+//            }
+//            if( ncpus <= mcpuspernode ) {
+//                rnodes << ":ppn=" << ncpus;
+//            } else {
+//                rnodes << ":ppn=" << mcpuspernode;
+//            }
+//            if( ngpus > 0 ){
+//                rnodes << ":" << "gpus=" << ngpus;
+//            }
 //            CSmallString props;
 //            props = res.GetResourceValue("props");
 //            if( props != NULL ){
 //                rnodes << ":" << props;
 //            }
-        }
-        res.AddResourceToBegin("select",rnodes);        
-        break;
-    }
+//        }
+//        res.AddResourceToBegin("nodes",rnodes);
+//        break;
+//        case ETM_TORQUE_METAVO: {
+//            if( host == NULL ){
+//                rnodes << nnodes;
+//            } else {
+//                if( nnodes > 1 ){
+//                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
+//                    sout << endl;
+//                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
+//                    return(false);
+//                }
+//                rnodes << host;
+//            }
+//            if( ncpus <= mcpuspernode ) {
+//                rnodes << ":ppn=" << ncpus;
+//            } else {
+//                rnodes << ":ppn=" << mcpuspernode;
+//            }
+//            if( ngpus > 0 ){
+//                rnodes << ":" << "gpu=" << ngpus;
+//            }
+//            CSmallString props;
+//            props = res.GetResourceValue("props");
+//            if( props != NULL ){
+//                rnodes << ":" << props;
+//            }
+//        }
+//        res.AddResourceToBegin("nodes",rnodes);
+//        break;
+//        case ETM_PBSPRO: {
+//            if( host == NULL ){
+//                rnodes << nnodes;
+//            } else {
+//                if( nnodes > 1 ){
+//                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
+//                    sout << endl;
+//                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
+//                    return(false);
+//                }
+//                rnodes << host;
+//            }
+//            if( ncpus <= mcpuspernode ) {
+//                rnodes << ":ncpus=" << ncpus << ":mpiprocs=" << ncpus;
+//            } else {
+//                rnodes << ":ncpus=" << mcpuspernode << ":mpiprocs=" << mcpuspernode;
+//            }
+//            if( ngpus > 0 ){
+//                // FIXME
+//            }
+//            // special resources
+//            if( res.GetResource("cpu_freq") != NULL ) {
+//                rnodes << ":cpu_freq=" << res.GetResourceValue("cpu_freq");
+//            }
+//            if( res.GetResource("host") != NULL ) {
+//                rnodes << ":host=" << res.GetResourceValue("host");
+//            }
+//// properties are not supported by PBSPro
+////            CSmallString props;
+////            props = res.GetResourceValue("props");
+////            if( props != NULL ){
+////                rnodes << ":" << props;
+////            }
+//        }
+//        res.AddResourceToBegin("select",rnodes);
+//        break;
+//    }
 
     CSmallString tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX",true);
     if( (sync == "jobdir") && (tmp != NULL) ){
@@ -627,10 +627,11 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
     // finalize resources
     res.Finalize();
 
+    // FIXME
     CSmallString scratch_type = res.GetResourceValue("scratch_type");
-    if( scratch_type == NULL ){
-        scratch_type = TorqueConfig.GetDefaultScratchType();
-    }
+//    if( scratch_type == NULL ){
+//        scratch_type = ABSConfig.GetDefaultScratchType();
+//    }
 
     CSmallString umask = res.GetResourceValue("umask");
     if( umask == NULL ){
@@ -656,26 +657,27 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
     }
 
     // decode surrogate machine
+    // FIXME
     CSmallString surrogate = res.GetResourceValue("surrogate");
-    if( (surrogate == "localhost") || (surrogate == NULL) ) {
-        surrogate  = GetItem("basic/jobinput","INF_JOB_MACHINE");
-    } else if ( surrogate == "auto" ) {
-        surrogate = TorqueConfig.GetSurrogateMachine(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"));
-        if( surrogate == NULL ){
-            ES_TRACE_ERROR("unable to get surrogate machine");
-            sout << endl;
-            sout << "<b><red> ERROR: Unable to determine the surrogate machine for " << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" <<  GetItem("basic/jobinput","INF_JOB_PATH") << "!</red></b>" << endl;
-            sout << "<b><red>        Perhaps, your are trying to submit the job from the unsupported machine or job input directory.</red></b>" << endl;
-            return(false);
-        }
-        // transform group
-        CSmallString orig_group = ugroup;
-        if( TorqueConfig.GetSurrogateGroup(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"),ugroup,ugroup_realm) == true ){
-            ugroup_orig = orig_group;
-        }
-    } else {
-        // keep surrogate value as surrogate machine name
-    }
+//    if( (surrogate == "localhost") || (surrogate == NULL) ) {
+//        surrogate  = GetItem("basic/jobinput","INF_JOB_MACHINE");
+//    } else if ( surrogate == "auto" ) {
+//        surrogate = ABSConfig.GetSurrogateMachine(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"));
+//        if( surrogate == NULL ){
+//            ES_TRACE_ERROR("unable to get surrogate machine");
+//            sout << endl;
+//            sout << "<b><red> ERROR: Unable to determine the surrogate machine for " << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" <<  GetItem("basic/jobinput","INF_JOB_PATH") << "!</red></b>" << endl;
+//            sout << "<b><red>        Perhaps, your are trying to submit the job from the unsupported machine or job input directory.</red></b>" << endl;
+//            return(false);
+//        }
+//        // transform group
+//        CSmallString orig_group = ugroup;
+//        if( ABSConfig.GetSurrogateGroup(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"),ugroup,ugroup_realm) == true ){
+//            ugroup_orig = orig_group;
+//        }
+//    } else {
+//        // keep surrogate value as surrogate machine name
+//    }
 
     if( surrogate != GetItem("basic/jobinput","INF_JOB_MACHINE") ){
         SetItem("specific/resources","INF_FS_TYPE","consistent");
@@ -729,7 +731,7 @@ bool CJob::DecodeStartResources(std::ostream& sout)
         dest = items[0];
     }
     if( (host == "local") || (host == "localhost") ){
-        host = GlobalConfig.GetHostName();
+        host = ABSConfig.GetHostName();
     }
 
     // decode user resources
@@ -757,7 +759,7 @@ bool CJob::DecodeStartResources(std::ostream& sout)
             dest = items[0];
         }
         if( (host == "local") || (host == "localhost") ){
-            host = GlobalConfig.GetHostName();
+            host = ABSConfig.GetHostName();
         }
 
         // merge other setup
@@ -774,7 +776,7 @@ bool CJob::DecodeStartResources(std::ostream& sout)
     // add default resources
     CResourceList default_res;
     CSmallString  sdef_res;
-    if( TorqueConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
+    if( ABSConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
         default_res.Parse(sdef_res);
         if( default_res.TestResources(sout) == false ){
             ES_ERROR("default resources are invalid");
@@ -925,7 +927,7 @@ bool CJob::ShouldSubmitJob(std::ostream& sout,bool assume_yes)
     CSmallString var;
     var = CShell::GetSystemVariable("INF_CONFIRM_SUBMIT");
     if( var == NULL ){
-        TorqueConfig.GetUserConfigItem("INF_CONFIRM_SUBMIT",var);
+        ABSConfig.GetUserConfigItem("INF_CONFIRM_SUBMIT",var);
     }
     var.ToUpperCase();
     if( var == "NO" ) return(true);
@@ -957,7 +959,7 @@ bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
 
     // copy execution script to job directory
     CFileName infex_script;
-    infex_script = GlobalConfig.GetABSRootDir() / "share" / "scripts" / "abs-execution-script-L0";
+    infex_script = ABSConfig.GetABSRootDir() / "share" / "scripts" / "abs-execution-script-L0";
 
     if( CFileSystem::CopyFile(infex_script,job_script,true) == false ){
         ES_ERROR("unable to copy startup script to the job directory");
@@ -996,7 +998,7 @@ bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
 
     if( GetItem("basic/collection","INF_COLLECTION_NAME",true) == NULL ) {
         // submit job to torque
-        if( Torque.SubmitJob(*this) == false ){
+        if( BatchSystems.SubmitJob(*this) == false ){
             if( ! siblings ){
                 sout << "<b><red>Job was NOT submited to the Torque server!</red></b>" << endl;
                 sout << "  > Reason: " << GetLastError() << endl;
@@ -1082,7 +1084,7 @@ bool CJob::ResubmitJob(void)
     CFileSystem::SetCurrentDir(GetJobPath());
 
     // submit job to torque
-    if( Torque.SubmitJob(*this) == false ){
+    if( BatchSystems.SubmitJob(*this) == false ){
         ES_TRACE_ERROR("unable to resubmit job to torque");
         BatchJobComment = GetLastError();
         CFileSystem::SetCurrentDir(curr_dir);
@@ -1269,11 +1271,11 @@ bool CJob::KillJob(bool force)
         CSmallString id = GetItem("submit/job","INF_JOB_ID",true);
         if( id == NULL ){
             id = GetItem("batch/job","INF_JOB_ID",true);
-            id += "." + TorqueConfig.GetServerName();
+            id += "." + BatchServerName;
         }
-        if( Torque.KillJobByID(id) == false ){
+        if( BatchSystems.KillJobByID(id) == false ){
             CSmallString error;
-            error << "unable to kill job (" << Torque.GetLastErrorMsg() << ")";
+            error << "unable to kill job (" << BatchSystems.GetLastErrorMsg() << ")";
             ES_ERROR(error);
             return(false);
         }
@@ -1281,7 +1283,7 @@ bool CJob::KillJob(bool force)
     }
 
     // normal termination
-    if( GetSiteID() != GlobalConfig.GetActiveSiteID() ){
+    if( GetSiteID() != AMSGlobalConfig.GetActiveSiteID() ){
         // job was run under different site
         ES_TRACE_ERROR("job runs under different site");
         return(false);
@@ -1291,9 +1293,9 @@ bool CJob::KillJob(bool force)
         case EJS_SUBMITTED:
         case EJS_RUNNING:
             // try to kill job
-            if( Torque.KillJob(*this) == false ){
+            if( BatchSystems.KillJob(*this) == false ){
                 CSmallString error;
-                error << "unable to kill job (" << Torque.GetLastErrorMsg() << ")";
+                error << "unable to kill job (" << BatchSystems.GetLastErrorMsg() << ")";
                 ES_ERROR(error);
                 return(false);
             }
@@ -1313,7 +1315,7 @@ bool CJob::KillJob(bool force)
 
 bool CJob::UpdateJobStatus(void)
 {
-    if( GetSiteID() != GlobalConfig.GetActiveSiteID() ){
+    if( GetSiteID() != AMSGlobalConfig.GetActiveSiteID() ){
         // job was run under different site
         ES_TRACE_ERROR("job runs under different site");
         return(true);
@@ -1331,7 +1333,7 @@ bool CJob::UpdateJobStatus(void)
 
     // get job status and reason
 
-    if( Torque.GetJobStatus(*this) == false ){
+    if( BatchSystems.GetJobStatus(*this) == false ){
         ES_ERROR("unable to update job status");
         return(false);
     }
@@ -1378,7 +1380,7 @@ const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& s
     CSmallString outpath = inpath;
 
     string inrules;
-    inrules = TorqueConfig.GetSystemConfigItem("INF_JOB_PATH_CHECK");
+    inrules = ABSConfig.GetSystemConfigItem("INF_JOB_PATH_CHECK");
 
     if( ! inrules.empty() ){
         // try to remove specified prefixies until success
@@ -2066,7 +2068,7 @@ const CSmallString CJob::GetUserGroupWithRealm(void)
 
 bool CJob::IsJobDirLocal(bool no_deep)
 {
-    if( GetItem("basic/jobinput","INF_JOB_MACHINE",false) == GlobalConfig.GetHostName() ){
+    if( GetItem("basic/jobinput","INF_JOB_MACHINE",false) == ABSConfig.GetHostName() ){
         return(true);
     }
     if( no_deep ) return(false); // no deep checking
@@ -3663,7 +3665,7 @@ EJobStatus CJob::GetJobStatus(void)
         return(EJS_INCONSISTENT);
     }
 
-    if( GetSiteID() != GlobalConfig.GetActiveSiteID() ){
+    if( GetSiteID() != AMSGlobalConfig.GetActiveSiteID() ){
         switch( GetJobInfoStatus() ){
             case EJS_SUBMITTED:
                 BatchJobComment = "the job was submitted to batch system of different site";
@@ -3792,7 +3794,7 @@ bool CJob::SaveJobKey(void)
 
 //------------------------------------------------------------------------------
 
-bool CJob::Init(struct batch_status* p_job)
+/*bool CJob::Init(struct batch_status* p_job)
 {
     if( p_job == NULL ){
         ES_ERROR("p_job is NULL");
@@ -3950,7 +3952,7 @@ bool CJob::Init(struct batch_status* p_job)
     int nnodes = 0;
     int ncpus = 0;
     int ngpus = 0;
-    switch( TorqueConfig.GetTorqueMode() ){
+    switch( ABSConfig.GetTorqueMode() ){
         case ETM_TORQUE:
         case ETM_TORQUE_METAVO:
             get_attribute(p_job->attribs,ATTR_JOB_RESOURCE_LIST,RESOURCES_NODES,tmp);
@@ -4007,7 +4009,7 @@ bool CJob::Init(struct batch_status* p_job)
                     str >> lncpus;
                 }
             }
-            switch( TorqueConfig.GetTorqueMode() ){
+            switch( ABSConfig.GetTorqueMode() ){
                 case ETM_TORQUE:
                     if( (*rit).find("gpus=") == 0 ){
                         vector<string> ritems;
@@ -4059,7 +4061,7 @@ bool CJob::Init(struct batch_status* p_job)
         SetItem("batch/job","INF_SUBMIT_TIME",tmp);
     }
     tmp = NULL;
-    switch( TorqueConfig.GetTorqueMode() ){
+    switch( ABSConfig.GetTorqueMode() ){
         case ETM_TORQUE:
         case ETM_TORQUE_METAVO:
             get_attribute(p_job->attribs,ATTR_JOB_START_TIME,NULL,tmp);
@@ -4082,7 +4084,7 @@ bool CJob::Init(struct batch_status* p_job)
     }
 
     return(result);
-}
+} */
 
 //------------------------------------------------------------------------------
 

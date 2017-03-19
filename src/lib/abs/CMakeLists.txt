@@ -6,20 +6,13 @@
 SET(ABS_SRC
         ABSMainHeader.cpp
     # system -------------------------------------
-        system/GlobalConfig.cpp
-        system/User.cpp
-        system/Shell.cpp
-        system/ShellProcessor.cpp
-        system/Completion.cpp
+        system/ABSConfig.cpp
+    #    system/ABSCompletion.cpp
         system/CategoryUUID.cpp
         system/TicketChecker.cpp
         system/JobType.cpp
-
-    # software -----------------------------------
-        soft/AmsUUID.cpp
-        soft/Site.cpp
-        soft/Utils.cpp
-        soft/Cache.cpp
+        system/BatchClient.cpp
+        system/BatchSystems.cpp
 
     # jobs ---------------------------------------
         jobs/search/nodes/NodeMask.tab.c
@@ -28,7 +21,6 @@ SET(ABS_SRC
         jobs/search/jobs/JobMask.yy.c
         jobs/search/CommonParser.cpp
 
-        jobs/TorqueConfig.cpp
         jobs/ResourceValue.cpp
         jobs/ResourceList.cpp
         jobs/Alias.cpp
@@ -39,19 +31,21 @@ SET(ABS_SRC
         jobs/NodeList.cpp
         jobs/Queue.cpp
         jobs/QueueList.cpp
-        jobs/TorqueAttr.cpp
-        jobs/Torque.cpp
         )
 
 # create shared library --------------------------------------------------------
 ADD_DEFINITIONS(-DABS_BUILDING_DLL)
+
 ADD_LIBRARY(abs_shared SHARED ${ABS_SRC})
 ADD_DEPENDENCIES(abs_shared plusula_shared)
 
 SET_TARGET_PROPERTIES(abs_shared PROPERTIES
                         OUTPUT_NAME abs
                         CLEAN_DIRECT_OUTPUT 1
-                        VERSION ${LibBuildVersion_ABS})
+                        VERSION ${ABS_VERSION})
+
+TARGET_LINK_LIBRARIES(abs_shared ${ABS_EXT_LIBS})
+
 INSTALL(TARGETS
             abs_shared
         LIBRARY DESTINATION

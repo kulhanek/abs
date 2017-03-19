@@ -19,7 +19,7 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <Completion.hpp>
+#include <ABSCompletion.hpp>
 #include <ctype.h>
 #include <ErrorSystem.hpp>
 #include <XMLParser.hpp>
@@ -30,8 +30,8 @@
 #include <DirectoryEnum.hpp>
 #include <string.h>
 #include <PluginDatabase.hpp>
-#include <TorqueConfig.hpp>
-#include <GlobalConfig.hpp>
+#include <ABSConfig.hpp>
+#include <ABSConfig.hpp>
 #include <User.hpp>
 #include <Torque.hpp>
 #include <QueueList.hpp>
@@ -40,13 +40,13 @@
 
 //------------------------------------------------------------------------------
 
-CCompletion Completion;
+CABSCompletion Completion;
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CCompletion::CCompletion(void)
+CABSCompletion::CABSCompletion(void)
 {
     CGenPosition = 0;
     CWord = 0;
@@ -56,7 +56,7 @@ CCompletion::CCompletion(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CCompletion::InitCompletion(void)
+bool CABSCompletion::InitCompletion(void)
 {
     // get completion data --------------------------
     CommandLine = CShell::GetSystemVariable("COMP_LINE");
@@ -88,7 +88,7 @@ bool CCompletion::InitCompletion(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CCompletion::GetSuggestions(void)
+bool CABSCompletion::GetSuggestions(void)
 {
     // if any option then do not provide any suggestion
     if( AnyOption() == true ) return(true);
@@ -142,7 +142,7 @@ bool CCompletion::GetSuggestions(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CCompletion::AddSuggestions(const CSmallString& list)
+bool CABSCompletion::AddSuggestions(const CSmallString& list)
 {
     CSmallString tmp = list;
     char* p_saveptr = NULL;
@@ -159,7 +159,7 @@ bool CCompletion::AddSuggestions(const CSmallString& list)
 
 //------------------------------------------------------------------------------
 
-CSmallString CCompletion::GetCommand(void)
+CSmallString CABSCompletion::GetCommand(void)
 {
     if( Words.size() >= 1 ) return(Words[0]);
     return("");
@@ -167,7 +167,7 @@ CSmallString CCompletion::GetCommand(void)
 
 //------------------------------------------------------------------------------
 
-CSmallString CCompletion::GetAction(void)
+CSmallString CABSCompletion::GetAction(void)
 {
     if( Words.size() >= 2 ) return(Words[1]);
     return("");
@@ -175,22 +175,22 @@ CSmallString CCompletion::GetAction(void)
 
 //------------------------------------------------------------------------------
 
-bool CCompletion::AddQueueSuggestions(void)
+bool CABSCompletion::AddQueueSuggestions(void)
 {
     // init all subsystems
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_TRACE_ERROR("unable to load torque config");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_TRACE_ERROR("unable to load ABSConfig config");
         return(false);
     }
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
+    PluginDatabase.SetPluginPath(ABSConfig.GetPluginsDir());
+    if( PluginDatabase.LoadPlugins(ABSConfig.GetPluginsConfigDir()) == false ){
         ES_TRACE_ERROR("unable to load plugins");
         return(false);
     }
 
     // check if user has valid ticket
     std::stringstream vout;
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         PluginDatabase.UnloadPlugins();
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
@@ -236,7 +236,7 @@ bool CCompletion::AddQueueSuggestions(void)
 
 //------------------------------------------------------------------------------
 
-bool CCompletion::AddAliasSuggestions(void)
+bool CABSCompletion::AddAliasSuggestions(void)
 {
     if( AliasList.LoadConfig() == false ){
         ES_TRACE_ERROR("unable to load aliases");
@@ -250,7 +250,7 @@ bool CCompletion::AddAliasSuggestions(void)
 
 //------------------------------------------------------------------------------
 
-bool CCompletion::AddJobScriptSuggestions(void)
+bool CABSCompletion::AddJobScriptSuggestions(void)
 {
     // list all files in the current directory
     CDirectoryEnum dir_enum(".");
@@ -274,7 +274,7 @@ bool CCompletion::AddJobScriptSuggestions(void)
 
 //------------------------------------------------------------------------------
 
-bool CCompletion::AddCollectionSuggestions(void)
+bool CABSCompletion::AddCollectionSuggestions(void)
 {
     // list all files in the current directory
     CDirectoryEnum dir_enum(".");
@@ -294,7 +294,7 @@ bool CCompletion::AddCollectionSuggestions(void)
 
 //------------------------------------------------------------------------------
 
-bool CCompletion::AnyOption(void)
+bool CABSCompletion::AnyOption(void)
 {
     for(unsigned int i=0; i < Words.size(); i++) {
         // all words are non-empty (due to usage of strtok)
@@ -305,7 +305,7 @@ bool CCompletion::AnyOption(void)
 
 //------------------------------------------------------------------------------
 
-bool CCompletion::FilterSuggestions(void)
+bool CABSCompletion::FilterSuggestions(void)
 {
     // build filter ---------------------------------
     CSmallString filter;
@@ -329,7 +329,7 @@ bool CCompletion::FilterSuggestions(void)
 
 //------------------------------------------------------------------------------
 
-bool CCompletion::PrintSuggestions(void)
+bool CABSCompletion::PrintSuggestions(void)
 {
     // count number of suggestions
     int scount = 0;

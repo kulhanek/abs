@@ -1,6 +1,7 @@
 // =============================================================================
 //  ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017      Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2012      Petr Kulhanek, kulhanek@chemi.muni.cz
 //
 //     This program is free software; you can redistribute it and/or modify
@@ -29,5 +30,9 @@ CExtUUID TICKET_CHECKER_CAT(
 CExtUUID JOB_TYPE_CAT(
     "{JOB_TYPE_CAT:efc267c6-ab06-4a7a-abe9-144440523b1b}",
     "Job Type");
+
+CExtUUID BATCH_CLIENT_CAT(
+    "{BATCH_CLIENT_CAT:c919d56f-b5d6-4ee9-8a65-5700cc3e4209}",
+    "Batch Client");
 
 // -----------------------------------------------------------------------------

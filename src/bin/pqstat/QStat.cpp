@@ -22,8 +22,8 @@
 #include "QStat.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <GlobalConfig.hpp>
-#include <PluginDatabase.hpp>
+#include <ABSConfig.hpp>
+#include <BatchSystems.hpp>
 #include <CommonParser.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
@@ -78,21 +78,14 @@ int CQStat::Init(int argc,char* argv[])
 bool CQStat::Run(void)
 {
     // init all subsystems
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
-        return(false);
-    }
-
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
     vout << low;
     vout << "#" << endl;
-    vout << "# Site name     : " << GlobalConfig.GetActiveSiteName() << endl;
-    vout << "# Torque server : " << TorqueConfig.GetServerName() << endl;
+    ABSConfig.PrintBatchServerInfo(vout);
     if( Options.IsOptSearchSet() ){
         std::string str = string(Options.GetOptSearch());
         boost::replace_all(str,"<","<<");
@@ -102,31 +95,28 @@ bool CQStat::Run(void)
     vout << endl;
 
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
 
-    if( Torque.Init() == false ){
+    if( BatchSystems.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
 
     if( Options.GetOptTechnical() ){
-        Torque.PrintJobs(vout);
+        BatchSystems.PrintJobs(vout);
         return(true);
     }
 
     if( Options.IsOptJobSet() ){
         // only single node info
-        Torque.PrintJob(vout,Options.GetOptJob());
+        BatchSystems.PrintJob(vout,Options.GetOptJob());
         return(true);
     }
 
-    if( User.InitUser() == false ){
-        ES_ERROR("unable to init user");
-        return(false);
-    }
+    User.InitUser();
 
     vout << high;
     User.PrintUserInfo(vout);
@@ -134,12 +124,12 @@ bool CQStat::Run(void)
     vout << low;
 
     if( Options.IsOptQueueSet() ){
-        if( Torque.GetQueueJobs(Jobs,Options.GetOptQueue()) == false ){
+        if( BatchSystems.GetQueueJobs(Jobs,Options.GetOptQueue()) == false ){
             ES_ERROR("unable to get queue jobs");
             return(false);
         }
     } else {
-        if( Torque.GetAllJobs(Jobs) == false ){
+        if( BatchSystems.GetAllJobs(Jobs) == false ){
             ES_ERROR("unable to get all jobs");
             return(false);
         }

@@ -1,10 +1,9 @@
-#ifndef ShellH
-#define ShellH
+#ifndef PBSProMainHeaderH
+#define PBSProMainHeaderH
 // =============================================================================
-//  ABS - Advanced Batch System
+// ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2011      Petr Kulhanek, kulhanek@chemi.muni.cz
-//    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2012 Petr Kulhanek (kulhanek@chemi.muni.cz)
 //
 //     This program is free software; you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -22,34 +21,35 @@
 // =============================================================================
 
 #include <ABSMainHeader.hpp>
-#include <SmallString.hpp>
 
 //------------------------------------------------------------------------------
 
-class ABS_PACKAGE CShell {
-public:
-    //! return value of variable with 'name' from system
-    static const CSmallString GetSystemVariable(const CSmallString& name);
+#if defined _WIN32 || defined __CYGWIN__
+#ifdef BASICTCTCHK_BUILDING_DLL
+#ifdef __GNUC__
+#define BASICTCTCHK_DLL_PUBLIC __attribute__((dllexport))
+#else
+#define BASICTCTCHK_DLL_PUBLIC __declspec(dllexport)
+#endif
+#else
+#ifdef __GNUC__
+#define BASICTCTCHK_DLL_PUBLIC __attribute__((dllimport))
+#else
+#define BASICTCTCHK_DLL_PUBLIC __declspec(dllimport)
+#endif
+#define BASICTCTCHK_DLL_LOCAL
+#endif
+#else
+#if __GNUC__ >= 4
+#define BASICTCTCHK_DLL_PUBLIC __attribute__ ((visibility("default")))
+#define BASICTCTCHK_DLL_LOCAL  __attribute__ ((visibility("hidden")))
+#else
+#define BASICTCTCHK_DLL_PUBLIC
+#define BASICTCTCHK_DLL_LOCAL
+#endif
+#endif
 
-    /// set variable with 'name' to 'value'
-    static bool SetSystemVariable(const CSmallString& name,const CSmallString& value);
-
-    //! remove value from list of values separated by delimiter
-    static const CSmallString RemoveValue(const CSmallString& variable_list,
-            const CSmallString& variable,
-            const CSmallString& delimiter);
-
-    //! append value to list of values separated by delimiter
-    static const CSmallString AppendValue(const CSmallString& value_list,
-            const CSmallString& value,
-            const CSmallString& delimiter);
-
-    //! prepend value to list of values separated by delimiter
-    static const CSmallString PrependValue(const CSmallString& value_list,
-            const CSmallString& value,
-            const CSmallString& delimiter);
-
-};
+#define BASICTCTCHK_PACKAGE BASICTCTCHK_DLL_PUBLIC
 
 //------------------------------------------------------------------------------
 

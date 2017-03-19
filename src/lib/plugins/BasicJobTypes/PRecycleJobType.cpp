@@ -26,12 +26,12 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
-#include <GlobalConfig.hpp>
 #include <boost/format.hpp>
 #include <FileName.hpp>
 #include <iomanip>
 #include <Cache.hpp>
 #include <Utils.hpp>
+#include <AMSGlobalConfig.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -324,14 +324,14 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     if( p_mod == NULL ){
         sout << endl;
         sout << "<b><red> ERROR: The specified MD engine module (" << mname;
-        sout << ") is not available for the active site (" << GlobalConfig.GetActiveSiteName() << ")!</red></b>" << endl;
+        sout << ") is not available for the active site (" << AMSGlobalConfig.GetActiveSiteName() << ")!</red></b>" << endl;
         return(ERS_FAILED);
     }
     if( mver != NULL ){
         if( Cache.CheckModuleVersion(p_mod,mver) == false ){
             sout << endl;
             sout << "<b><red> ERROR: The specified MD engine module (" << mname << ":" << mver;
-            sout << ") is not available for the active site (" << GlobalConfig.GetActiveSiteName() << ")!</red></b>" << endl;
+            sout << ") is not available for the active site (" << AMSGlobalConfig.GetActiveSiteName() << ")!</red></b>" << endl;
             return(ERS_FAILED);
         }
     }

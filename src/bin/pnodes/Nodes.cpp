@@ -22,13 +22,11 @@
 #include "Nodes.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <TorqueConfig.hpp>
-#include <Torque.hpp>
+#include <ABSConfig.hpp>
 #include <NodeList.hpp>
-#include <PluginDatabase.hpp>
-#include <GlobalConfig.hpp>
 #include <QueueList.hpp>
 #include <CommonParser.hpp>
+#include <BatchSystems.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -82,22 +80,15 @@ int CNodes::Init(int argc,char* argv[])
 bool CNodes::Run(void)
 {
     // init all subsystems
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
-        return(false);
-    }
-
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
     vout << low;
     if( Options.GetOptPrintNames() == false ){
         vout << "#" << endl;
-        vout << "# Site name     : " << GlobalConfig.GetActiveSiteName() << endl;
-        vout << "# Torque server : " << TorqueConfig.GetServerName() << endl;
+        ABSConfig.PrintBatchServerInfo(vout);
         if( Options.IsOptSearchSet() ){
             std::string str = string(Options.GetOptSearch());
             boost::replace_all(str,"<","<<");
@@ -107,32 +98,29 @@ bool CNodes::Run(void)
     }
 
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
 
-    if( Torque.Init() == false ){
+    if( BatchSystems.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
 
     if( Options.GetOptTechnical() ){
         vout << endl;
-        Torque.PrintNodes(vout);
+        BatchSystems.PrintNodes(vout);
         return(true);
     }
 
     if( Options.IsOptNodeSet() ){
         // only single node info
-        Torque.PrintNode(vout,Options.GetOptNode());
+        BatchSystems.PrintNode(vout,Options.GetOptNode());
         return(true);
     }
 
-    if( User.InitUser() == false ){
-        ES_ERROR("unable to init user");
-        return(false);
-    }
+    User.InitUser();
 
     vout << high;
     User.PrintUserInfo(vout);
@@ -144,13 +132,13 @@ bool CNodes::Run(void)
         return(true);
     }
 
-    if( Torque.GetNodes(NodeList) == false ){
+    if( BatchSystems.GetNodes() == false ){
         ES_ERROR("unable to load nodes");
         return(false);
     }
 
     if( Options.GetOptKeepAll() == false ) {
-        if( Torque.GetQueues(QueueList) == false ){
+        if( BatchSystems.GetQueues() == false ){
             ES_ERROR("unable to get queues");
             return(false);
         }
@@ -164,26 +152,15 @@ bool CNodes::Run(void)
         QueueList.RemoveInaccesibleQueues(User);
         QueueList.RemoveNonexecutiveQueues();
 
-        switch(TorqueConfig.GetTorqueMode()){
-            case ETM_TORQUE:
-            case ETM_TORQUE_METAVO:
+        // FIXME
                 // again but for queues accessible to user only
                 QueueList.GetRequiredProperties(qprops);
 
                 // remove unwanted nodes
                 NodeList.KeepNodesThatHaveProperty(qprops);
                 NodeList.RemoveNodesWithoutProps();
-            break;
-            case ETM_PBSPRO:
-                // FIX ME
-            break;
-        }
 
         NodeList.RemoveDownNodes();
-    }
-
-    if( Options.GetOptKeepNUMA() == false ){
-        NodeList.MergeNUMANodes();
     }
 
     if( Options.IsOptSearchSet() ){
@@ -213,10 +190,6 @@ bool CNodes::Run(void)
     NodeList.FinalizeNodeGroups();
 
     if( Options.GetOptPrintNames() == false ){
-        if( Options.GetOptPrintHW () ){
-            NodeList.LoadHWDatabase();
-        }
-
         // list individual nodes
         NodeList.PrintInfos(vout);
 
@@ -233,9 +206,6 @@ bool CNodes::Run(void)
 
 void CNodes::Finalize(void)
 {
-    // unload plugins
-    PluginDatabase.UnloadPlugins();
-
     CSmallTimeAndDate dt;
     dt.GetActualTimeAndDate();
 

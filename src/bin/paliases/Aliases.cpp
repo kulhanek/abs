@@ -22,13 +22,12 @@
 #include "Aliases.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <GlobalConfig.hpp>
+#include <ABSConfig.hpp>
 #include <QueueList.hpp>
-#include <TorqueConfig.hpp>
-#include <Torque.hpp>
 #include <AliasList.hpp>
-#include <PluginDatabase.hpp>
 #include <NodeList.hpp>
+#include <AMSGlobalConfig.hpp>
+#include <BatchSystems.hpp>
 
 using namespace std;
 
@@ -101,15 +100,14 @@ bool CAliases::Run(void)
 
 bool CAliases::ListAliases(void)
 {
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
     vout << low;
     vout << "#" << endl;
-    vout << "# Site name     : " << GlobalConfig.GetActiveSiteName() << endl;
-    vout << "# Torque server : " << TorqueConfig.GetServerName() << endl;
+    ABSConfig.PrintBatchServerInfo(vout);
     vout << "#" << endl;
     vout << endl;
 
@@ -129,32 +127,23 @@ bool CAliases::ListAliases(void)
 
 bool CAliases::AddAlias(void)
 {
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
-        return(false);
-    }
-
-    if( TorqueConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load torque config");
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
 
-    if( Torque.Init() == false ){
-        ES_ERROR("unable to init torque");
+    if( BatchSystems.Init() == false ){
+        ES_ERROR("unable to init batch servers");
         return(false);
     }
 
-    if( User.InitUser() == false ){
-        ES_ERROR("unable to init current user");
-        return(false);
-    }
+    User.InitUser();
 
     if( AliasList.LoadConfig() == false ){
         ES_ERROR("unable to load aliases");
@@ -172,7 +161,7 @@ bool CAliases::AddAlias(void)
         }
     }
 
-    if( Torque.GetQueues(QueueList) == false ){
+    if( BatchSystems.GetQueues() == false ){
         ES_ERROR("unable to get list of queues");
         return(false);
     }
@@ -183,7 +172,7 @@ bool CAliases::AddAlias(void)
     QueueList.RemoveNonexecutiveQueues();
     QueueList.SortByName();
 
-    if( Torque.GetNodes(NodeList) == false ){
+    if( BatchSystems.GetNodes() == false ){
         ES_ERROR("unable to load nodes");
         return(false);
     }

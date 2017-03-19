@@ -26,7 +26,7 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
-#include <GlobalConfig.hpp>
+#include <AMSGlobalConfig.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <fstream>
@@ -106,7 +106,7 @@ ERetStatus CNWChemJobType::DetectJobType(CJob& job,bool& detected,std::ostream& 
     }
 
     // is nwchem module loaded?
-    if( GlobalConfig.IsModuleActive(nmodule) == false ){
+    if( AMSGlobalConfig.IsModuleActive(nmodule) == false ){
         sout << endl;
         sout << "<b><red> ERROR: The nwchem job was detected but none nwchem module is active!</red></b>" << endl;
         sout << "<b><red>        Type 'module add nwchem' and resubmit the job.</red></b>" << endl;

@@ -21,16 +21,14 @@
 
 #include <Alias.hpp>
 #include <ErrorSystem.hpp>
-#include <pbs_ifl.h>
 #include <iomanip>
-#include <TorqueAttr.hpp>
 #include <XMLElement.hpp>
 #include <QueueList.hpp>
-#include <TorqueConfig.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <GlobalConfig.hpp>
 #include <NodeList.hpp>
+#include <ABSConfig.hpp>
+#include <BatchSystems.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -68,19 +66,16 @@ bool CAlias::TestAlias(std::ostream& sout)
     bool result = true;
 
     CSmallString dest = Destination;
-    CSmallString host;
-    // override destination
+    CSmallString srv;
+    // queue[@srv]
     string          sdest = string(Destination);
     vector<string>  items;
     split(items,sdest,is_any_of("@"));
     if( items.size() > 1 ){
-        host = items[0];
-        dest = items[1];
+        dest = items[0];
+        srv = items[1];
     } else if( items.size() == 1 ) {
         dest = items[0];
-    }
-    if( (host == "local") || (host == "localhost") ){
-        host = GlobalConfig.GetHostName();
     }
 
     // does queue exist?
@@ -92,38 +87,24 @@ bool CAlias::TestAlias(std::ostream& sout)
         result = false;
     }
 
-    // test if node is available and is suitable for given queue
-    if( host != NULL ){
-        if( NodeList.FindNode(host) == NULL ){
+    // test if srv is allowed
+    if( srv != NULL ){
+        if( ABSConfig.IsServerAvailable(srv) == false ){
             if( result == true ) sout << endl;
-            sout << "<b><red> ERROR: The '" << host << "' node does not exist!</red></b>" << endl;
+            sout << "<b><red> ERROR: The '" << srv << "' batch server is not supported in this site!</red></b>" << endl;
             result = false;
-        }
-        if( result == true ){
-            if( NodeList.FindNode(host,p_queue) == NULL ){
-                if( result == true ) sout << endl;
-                sout << "<b><red> ERROR: The '" << host << "' node does not have required propery of  '" << dest << "' queue!</red></b>" << endl;
-                result = false;
-            }
         }
     }
 
     // is sync mode supported?
-    CSmallString allowed_sync_modes="sync";
-    TorqueConfig.GetSystemConfigItem("INF_SUPPORTED_SYNCMODES",allowed_sync_modes);
-
-    vector<string>  sync_modes;
-    string sl = string(allowed_sync_modes);
-    split(sync_modes,sl,is_any_of(":"));
-
-    if( find(sync_modes.begin(),sync_modes.end(),string(SyncMode)) == sync_modes.end() ){
-        ES_TRACE_ERROR("syncmode is not supported");
+    if( ABSConfig.IsSyncModeSupported(SyncMode) == false ){
         if( result == true ) sout << endl;
         sout << "<b><red> ERROR: The '" << SyncMode << "' syncmode is not supported on the active site!</red></b>" << endl;
         result = false;
     }
 
     // are all resources valid?
+    Resources.SetBatchServerName(srv);
     Resources.TestResources(sout,result);
 
     return(result);

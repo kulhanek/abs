@@ -62,11 +62,9 @@ class CNodesOptions : public CSimpleOptions {
         CSO_OPT(CSmallString,Search)
         CSO_OPT(bool,DoNotGroup)
         CSO_OPT(bool,PrintGroups)
-        CSO_OPT(bool,KeepNUMA)
         CSO_OPT(bool,KeepAll)   
         CSO_OPT(bool,Technical)
         CSO_OPT(bool,PrintNames)
-        CSO_OPT(bool,PrintHW)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -120,15 +118,6 @@ class CNodesOptions : public CSimpleOptions {
                     "print defined node groups")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    KeepNUMA,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    0,                           /* short option name */
-                    "numa",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "do not merge NUMA nodes")   /* option description */
-        //----------------------------------------------------------------------
-        CSO_MAP_OPT(bool,                           /* option type */
                     KeepAll,                        /* option name */
                     false,                          /* default value */
                     false,                          /* is option mandatory */
@@ -154,15 +143,6 @@ class CNodesOptions : public CSimpleOptions {
                     "names",                      /* long option name */
                     NULL,                           /* parametr name */
                     "print only node names")   /* option description */
-        //----------------------------------------------------------------------
-        CSO_MAP_OPT(bool,                           /* option type */
-                    PrintHW,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    0,                           /* short option name */
-                    "hw",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "print HW specification of nodes if available")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */

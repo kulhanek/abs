@@ -1,10 +1,7 @@
-#ifndef CategoryUUIDH
-#define CategoryUUIDH
 // =============================================================================
-//  ABS - Advanced Batch System
+// ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2017      Petr Kulhanek, kulhanek@chemi.muni.cz
-//    Copyright (C) 2012      Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2012 Petr Kulhanek (kulhanek@chemi.muni.cz)
 //
 //     This program is free software; you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -21,15 +18,30 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <ABSMainHeader.hpp>
-#include <ExtUUID.hpp>
+#include "PBSProMainHeader.hpp"
 
-// -----------------------------------------------------------------------------
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
 
-extern ABS_PACKAGE CExtUUID TICKET_CHECKER_CAT;
-extern ABS_PACKAGE CExtUUID JOB_TYPE_CAT;
-extern ABS_PACKAGE CExtUUID BATCH_CLIENT_CAT;
+#if defined _WIN32 || defined __CYGWIN__
 
-// -----------------------------------------------------------------------------
+#include <windows.h>
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+    return(TRUE);
+}
+
+//==============================================================================
+#else
+//==============================================================================
+
+// nothing
 
 #endif
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+

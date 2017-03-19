@@ -28,7 +28,7 @@
 #include <Shell.hpp>
 #include <FileSystem.hpp>
 #include <ErrorSystem.hpp>
-#include <GlobalConfig.hpp>
+#include <ABSConfig.hpp>
 
 using namespace std;
 
@@ -74,7 +74,7 @@ bool CAliasList::LoadSystemConfig(void)
 {
     CFileName      config_name;
 
-    config_name = GlobalConfig.GetSystemSiteConfigDir();
+    config_name = ABSConfig.GetSystemSiteConfigDir();
 
     if( CFileSystem::IsFile(config_name) == false ){
         CSmallString warning;
@@ -105,7 +105,7 @@ bool CAliasList::LoadSystemConfig(void)
 bool CAliasList::LoadUserConfig(void)
 {
     CFileName      config_name;
-    config_name = GlobalConfig.GetUserSiteConfigDir() / "aliases.xml";
+    config_name = ABSConfig.GetUserSiteConfigDir() / "aliases.xml";
 
     // is file?
     if( CFileSystem::IsFile(config_name) == false ){
@@ -135,7 +135,7 @@ bool CAliasList::LoadUserConfig(void)
 bool CAliasList::SaveUserConfig(void)
 {
     CFileName      config_name;
-    config_name = GlobalConfig.GetUserSiteConfigDir() / "aliases.xml";
+    config_name = ABSConfig.GetUserSiteConfigDir() / "aliases.xml";
 
     CXMLDocument    xml_doc;
 

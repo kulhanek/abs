@@ -1,0 +1,8 @@
+<!-- PBSPro Plugin Setup -->
+<PLUGIN name="PBSPro"
+        uuid="{PBSPRO:4774704a-0272-4d92-b651-67aa6692a271}">
+    <!-- some local setup will be here -->
+    <OBJECT uuid="{PBSPRO_CLIENT:}">
+        <CONFIG key="libname"   value=""/>
+    </OBJECT>
+</PLUGIN> 

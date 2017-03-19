@@ -1,0 +1,533 @@
+// =============================================================================
+//  AMS - Advanced Module System
+// -----------------------------------------------------------------------------
+//     Copyright (C) 2012 Petr Kulhanek (kulhanek@chemi.muni.cz)
+//    Copyright (C) 2011      Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
+//
+//     This program is free software; you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation; either version 2 of the License, or
+//     (at your option) any later version.
+//
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//     GNU General Public License for more details.
+//
+//     You should have received a copy of the GNU General Public License along
+//     with this program; if not, write to the Free Software Foundation, Inc.,
+//     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+// =============================================================================
+
+#include <ABSConfig.hpp>
+#include <AMSGlobalConfig.hpp>
+#include <XMLParser.hpp>
+#include <XMLPrinter.hpp>
+#include <ErrorSystem.hpp>
+#include <XMLElement.hpp>
+#include <Shell.hpp>
+#include <Utils.hpp>
+#include <string.h>
+#include <vector>
+#include <FileSystem.hpp>
+#include <Site.hpp>
+#include <AMSGlobalConfig.hpp>
+#include <TicketChecker.hpp>
+#include <PluginDatabase.hpp>
+#include <XMLIterator.hpp>
+
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+
+//------------------------------------------------------------------------------
+
+using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
+
+//------------------------------------------------------------------------------
+
+CABSConfig ABSConfig;
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+CABSConfig::CABSConfig(void)
+{
+    // must be here
+    ABSRoot         = CShell::GetSystemVariable("ABS_ROOT");
+    HostName        = CShell::GetSystemVariable("HOSTNAME");
+}
+
+//------------------------------------------------------------------------------
+
+CABSConfig::~CABSConfig(void)
+{
+    // unload plugins
+    PluginDatabase.UnloadPlugins();
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+bool CABSConfig::LoadConfig(void)
+{
+    bool result;
+    result  = LoadSystemConfig();
+    result &= LoadUserConfig();
+    return(result);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::LoadSystemConfig(void)
+{
+    CFileName      config_name;
+
+    // load infinity config
+    config_name = GetABSRootDir() / "etc" / "sites" / AMSGlobalConfig.GetActiveSiteID() / "torque.xml";
+
+    CXMLParser xml_parser;
+    xml_parser.SetOutputXMLNode(&SystemConfig);
+
+    // load system setup ---------------------------
+    if( xml_parser.Parse(config_name) == false ){
+        ES_ERROR("unable to load Infinity system config");
+        return(false);
+    }
+
+    // init plugin subsystem
+    PluginDatabase.SetPluginPath(GetPluginsDir());
+    if( PluginDatabase.LoadPlugins(GetPluginsConfigDir()) == false ){
+        ES_ERROR("unable to load plugins");
+        return(false);
+    }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::LoadSystemConfig(const CSmallString& site_sid)
+{
+    CFileName      config_name;
+
+    // load infinity config
+    config_name = GetABSRootDir() / "etc" / "sites" / site_sid / "torque.xml";
+
+    CXMLParser xml_parser;
+    xml_parser.SetOutputXMLNode(&SystemConfig);
+
+    // load system setup ---------------------------
+    if( xml_parser.Parse(config_name) == false ){
+        ES_ERROR("unable to load Infinity system config");
+        return(false);
+    }
+
+    return(true);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+bool CABSConfig::LoadUserConfig(void)
+{
+    CFileName      config_name;
+    config_name = GetUserSiteConfigDir() / "torque.xml";
+
+    // is file?
+    if( CFileSystem::IsFile(config_name) == false ){
+        CSmallString warning;
+        warning << "user config dir '" << config_name << "' does not exist";
+        ES_WARNING(warning);
+
+        UserConfig.GetChildElementByPath("infinity",true);
+        return(true);
+    }
+
+    CXMLParser xml_parser;
+    xml_parser.SetOutputXMLNode(&UserConfig);
+
+    // load system setup ---------------------------
+    if( xml_parser.Parse(config_name) == false ){
+        ES_ERROR("unable to load Infinity user config");
+        return(false);
+    }
+
+    UserConfig.GetChildElementByPath("torque",true);
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::SaveUserConfig(void)
+{
+    CFileName      config_name;
+    config_name =  GetUserSiteConfigDir() / "torque.xml";
+
+    CXMLPrinter xml_printer;
+    xml_printer.SetPrintedXMLNode(&UserConfig);
+
+    // load system setup ---------------------------
+    if( xml_printer.Print(config_name) == false ){
+        ES_ERROR("unable to save Infinity user config");
+        return(false);
+    }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::RemoveUserConfig(void)
+{
+    UserConfig.RemoveAllChildNodes();
+    UserConfig.GetChildElementByPath("torque/config",true);
+    return(true);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+const CSmallString CABSConfig::GetABSModuleVersion(void)
+{
+    CSmallString version;
+    AMSGlobalConfig.GetActiveModuleVersion("abs",version);
+    return( version );
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+const CFileName CABSConfig::GetABSRootDir(void)
+{
+    return( CShell::GetSystemVariable("ABS_ROOT") );
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString& CABSConfig::GetHostName(void)
+{
+    return(HostName);
+}
+
+//------------------------------------------------------------------------------
+
+const CFileName CABSConfig::GetSystemSiteConfigDir(void)
+{
+    CFileName      config_name;
+    CSmallString   ams_site;
+
+    ams_site = AMSGlobalConfig.GetActiveSiteID();
+    config_name = GetABSRootDir() / "etc" / "sites" / ams_site / "aliases.xml";
+
+    return(config_name);
+}
+
+//------------------------------------------------------------------------------
+
+const CFileName CABSConfig::GetPluginsConfigDir(void)
+{
+    CFileName dir;
+    dir = GetABSRootDir() / "etc" / "plugins";
+    return(dir);
+}
+
+//------------------------------------------------------------------------------
+
+const CFileName CABSConfig::GetPluginsDir(void)
+{
+    CFileName dir;
+    dir = GetABSRootDir() / "lib";
+    return(dir);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+const CFileName CABSConfig::GetUserSiteConfigDir(void)
+{
+    return( GetUserConfigDir(AMSGlobalConfig.GetActiveSiteID()) );
+}
+
+//------------------------------------------------------------------------------
+
+const CFileName CABSConfig::GetUserGlobalConfigDir(void)
+{
+    return( GetUserConfigDir("") );
+}
+
+//------------------------------------------------------------------------------
+
+const CFileName CABSConfig::GetUserConfigDir(const CFileName& sub_dir)
+{
+    CFileName user_config_dir;
+    user_config_dir = CShell::GetSystemVariable("ABS_USER_CONFIG_DIR");
+
+    if( user_config_dir == NULL ) {
+        user_config_dir = CShell::GetSystemVariable("HOME");
+        user_config_dir = user_config_dir / ".abs" ;
+    }
+
+    if( sub_dir != NULL ) user_config_dir = user_config_dir / sub_dir;
+
+    // is file?
+    if( CFileSystem::IsFile(user_config_dir) == true ) {
+        CSmallString error;
+        error << "user config dir '" << user_config_dir << "' is a file";
+        ES_ERROR(error);
+        return("");
+    }
+
+    if( CFileSystem::IsDirectory(user_config_dir) == false ) {
+        // create directory
+        if( CFileSystem::CreateDir(user_config_dir) == false ) {
+            CSmallString error;
+            error << "unable to create user config dir '" << user_config_dir << "'";
+            ES_ERROR(error);
+            return("");
+        }
+    }
+
+    return(user_config_dir);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+bool CABSConfig::GetSystemConfigItem(const CSmallString& item_name,
+                                        CSmallString& item_value)
+{
+    CXMLElement*    p_ele = SystemConfig.GetChildElementByPath("torque");
+    return( GetSystemConfigItem(p_ele,item_name,item_value) );
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CABSConfig::GetSystemConfigItem(const CSmallString& item_name)
+{
+    CSmallString out;
+    GetSystemConfigItem(item_name,out);
+    return(out);
+}
+
+
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
+                                          CSmallString& item_value)
+{
+    bool system;
+    return( GetUserConfigItem(item_name,item_value,system) );
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
+                                      CSmallString& item_value,bool& system)
+{
+    CXMLElement*    p_ele = UserConfig.GetChildElementByPath("torque");
+    CXMLIterator    I(p_ele);
+    CXMLElement*    p_sele;
+
+    system = false;
+    item_value = NULL;
+
+    while( (p_sele = I.GetNextChildElement("item")) != NULL ){
+        CSmallString    name;
+        p_sele->GetAttribute("name",name);
+        if( name == item_name ){
+            p_sele->GetAttribute("value",item_value);
+            system = false;
+            return(true);
+            }
+    }
+
+    if( GetSystemConfigItem(item_name,item_value) == true ){
+        system = true;
+        return(true);
+    }
+
+    CSmallString error;
+    error << "unable to find user config item '" << item_name << "'";
+    ES_ERROR(error);
+
+    return(false);
+}
+
+//------------------------------------------------------------------------------
+
+void CABSConfig::SetUserConfigItem(const CSmallString& item_name,
+                                      const CSmallString& item_value)
+{
+    CXMLElement*    p_ele = UserConfig.GetChildElementByPath("torque",true);
+    CXMLIterator    I(p_ele);
+    CXMLElement*    p_sele;
+
+    while( (p_sele = I.GetNextChildElement("item")) != NULL ){
+        CSmallString    name;
+        p_sele->GetAttribute("name",name);
+        if( name == item_name ) break;
+    }
+
+    if( p_sele == NULL ){
+        p_sele = p_ele->CreateChildElement("item");
+    }
+
+    p_sele->SetAttribute("name",item_name);
+    p_sele->SetAttribute("value",item_value);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::GetSystemConfigItem(CXMLElement* p_root, const CSmallString& item_name,
+                                        CSmallString& item_value)
+{
+    CXMLIterator    I(p_root);
+    CXMLElement*    p_sele;
+
+    while( (p_sele = I.GetNextChildElement("item")) != NULL ){
+        CSmallString    name;
+        p_sele->GetAttribute("name",name);
+        if( name == item_name ){
+            p_sele->GetAttribute("value",item_value);
+            return(true);
+            }
+    }
+
+    CSmallString error;
+    error << "unable to find system config item '" << item_name << "'";
+    ES_ERROR(error);
+    return(false);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::GetSystemConfigItem(const CUUID& pobject, const CSmallString& item_name,
+                                        CSmallString& item_value)
+{
+    CXMLElement*    p_ele = SystemConfig.GetChildElementByPath("torque/plugins");
+    CXMLIterator    I(p_ele);
+    CXMLElement*    p_sele;
+
+    while( (p_sele = I.GetNextChildElement("plugin")) != NULL ){
+        CSmallString    name;
+        p_sele->GetAttribute("name",name);
+        CExtUUID plugin_uuid(name);
+        if( plugin_uuid == pobject ){
+                return( GetSystemConfigItem(p_sele,item_name,item_value) );
+        }
+    }
+
+    CSmallString error;
+    error << "unable to find system config item '" << item_name << "' for plugin '" << pobject.GetStringForm() << "'";
+    ES_ERROR(error);
+
+    return(false);
+
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CABSConfig::GetSystemConfigItem(const CUUID& pobject, const CSmallString& item_name)
+{
+    CSmallString item_value;
+    GetSystemConfigItem(pobject,item_name,item_value);
+    return(item_value);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+void CABSConfig::PrintBatchServerInfo(std::ostream& vout)
+{
+    // FIXME
+    vout << "#" << endl;
+    vout << "# Site name     : " << AMSGlobalConfig.GetActiveSiteName() << endl;
+   // vout << "# Batch  server : " << ABSConfig.GetServerName() << endl;
+    vout << "#" << endl;
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::IsSyncModeSupported(const CSmallString& name)
+{
+    // FIXME
+//    CSmallString allowed_sync_modes="sync";
+//    ABSConfig.GetSystemConfigItem("INF_SUPPORTED_SYNCMODES",allowed_sync_modes);
+
+//    vector<string>  sync_modes;
+//    string sl = string(allowed_sync_modes);
+//    split(sync_modes,sl,is_any_of(":"));
+
+//    if( find(sync_modes.begin(),sync_modes.end(),string(SyncMode)) == sync_modes.end() ){
+
+//    }
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::IsServerAvailable(const CSmallString& srv)
+{
+    // FIXME
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+CXMLElement* CABSConfig::GetNodeGroupConfig(void)
+{
+    // FIXME
+    return( SystemConfig.GetChildElementByPath("torque/nodes") );
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::IsUserTicketValid(std::ostream& sout)
+{
+    CSmallString ticket_validator;
+
+    if( GetSystemConfigItem("INF_CHECK_TICKET",ticket_validator) == false ){
+        // no ticket validator is requested
+        return(true);
+    }
+
+    // create validator
+    CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(ticket_validator));
+    if( p_obj == NULL ){
+        ES_ERROR("unable to create checker object");
+        return(false);
+    }
+
+    CTicketChecker* p_chk = dynamic_cast<CTicketChecker*>(p_obj);
+    if( p_chk == NULL ){
+        delete p_obj;
+        ES_ERROR("object is not of correct type");
+        return(false);
+    }
+
+    // validate ticket
+    bool result = p_chk->IsTicketValid(sout);
+
+    // destroy object
+    delete p_chk;
+
+    return(result);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+

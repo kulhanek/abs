@@ -41,6 +41,9 @@ public:
         ~CResourceList(void);
 
 // executive methods -----------------------------------------------------------
+    /// set server name
+    void SetBatchServerName(const CSmallString& name);
+
     /// parse resources string, do not check for errors
     void Parse(const CSmallString& resources);
 

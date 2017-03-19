@@ -28,10 +28,10 @@
 
 //------------------------------------------------------------------------------
 
-class ABS_PACKAGE CCompletion {
+class ABS_PACKAGE CABSCompletion {
 public:
     // constructor and destructors ------------------------------------------------
-    CCompletion(void);
+    CABSCompletion(void);
 
     // input methods --------------------------------------------------------------
     //! load completion configuration file and command line
@@ -82,7 +82,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-extern  CCompletion Completion;
+extern  CABSCompletion Completion;
 
 //------------------------------------------------------------------------------
 

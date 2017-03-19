@@ -22,7 +22,7 @@
 #include "GetConfig.hpp"
 #include <ErrorSystem.hpp>
 #include <TerminalStr.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -54,12 +54,12 @@ int CGetConfig::Init(int argc,char* argv[])
 bool CGetConfig::Run(void)
 {
     // load system and optionaly user configuration
-    if( TorqueConfig.LoadSystemConfig() == false ){
+    if( ABSConfig.LoadSystemConfig() == false ){
         ES_ERROR("unable to load system config");
         return(false);
     }
     if( Options.GetOptUser() == true ){
-        if( TorqueConfig.LoadUserConfig() == false ){
+        if( ABSConfig.LoadUserConfig() == false ){
             ES_WARNING("unable to load user config");
             }
     }
@@ -70,14 +70,14 @@ bool CGetConfig::Run(void)
     // print configuration item
     if( Options.GetOptUser() == true ){
         // first try user config item
-        if( TorqueConfig.GetUserConfigItem(Options.GetArgConfigItem(),value) == true ){
+        if( ABSConfig.GetUserConfigItem(Options.GetArgConfigItem(),value) == true ){
             found = true;
         } else {
             ES_WARNING("unable to get user config");
         }
     }
     if( found == false ){
-        if( TorqueConfig.GetSystemConfigItem(Options.GetArgConfigItem(),value) == false ){
+        if( ABSConfig.GetSystemConfigItem(Options.GetArgConfigItem(),value) == false ){
             ES_ERROR("unable to get system config");
             return(false);
             }

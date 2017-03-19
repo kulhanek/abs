@@ -22,7 +22,7 @@
 #include "GetScratchDir.hpp"
 #include <ErrorSystem.hpp>
 #include <TerminalStr.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -54,12 +54,12 @@ int CGetScratchDir::Init(int argc,char* argv[])
 bool CGetScratchDir::Run(void)
 {
     // load system and optionaly user configuration
-    if( TorqueConfig.LoadSystemConfig() == false ){
+    if( ABSConfig.LoadSystemConfig() == false ){
         ES_ERROR("unable to load system config");
         return(false);
     }
 
-    CSmallString value = TorqueConfig.GetScratchDir(Options.GetArgScratchType(),Options.GetOptMode());
+    CSmallString value = ABSConfig.GetScratchDir(Options.GetArgScratchType(),Options.GetOptMode());
     std::cout << value;
 
     return(true);

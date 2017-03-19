@@ -24,7 +24,6 @@
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <iomanip>
-#include <TorqueConfig.hpp>
 #include <User.hpp>
 #include <sys/stat.h>
 #include <FileSystem.hpp>
@@ -79,12 +78,13 @@ bool CResourceValue::IsHelperToken(void)
 
 void CResourceValue::Finalize(std::map<std::string,std::string>& variables)
 {
-    if( Name == "scratch_type" ){
-        bool pass = false;
-        TorqueConfig.TestScratchType(Value,pass);
-        HelperValue = ! pass;
-        return;
-    }
+//    FIXME
+//    if( Name == "scratch_type" ){
+//        bool pass = false;
+//        ABSConfig.TestScratchType(Value,pass);
+//        HelperValue = ! pass;
+//        return;
+//    }
     // resource variables
     if( Name == "numa" && Value == "on" ){
         variables["INF_NUMA"] = "ON";
@@ -173,20 +173,23 @@ void CResourceValue::TestValue(std::ostream& sout,bool& rstatus)
         found = true;
     }
 
-    if( found == true ){
-        if( TorqueConfig.TestResourceTokens(Name) == false ){
-            if( rstatus == true ) sout << endl;
-            sout << "<b><red> ERROR: Resource token '" << Name << "' is recognized but not allowed on this site!</red></b>" << endl;
-            sout << "<b><red>        Allowed tokens: ";
-            TorqueConfig.PrintAllowedResTokens(sout);
-            sout << "!</red></b>" << endl;
-            rstatus = false;
-        }
-    } else {
-        if( rstatus == true ) sout << endl;
-        sout << "<b><red> ERROR: Unsupported resource '" << Name << "'!</red></b>" << endl;
-        rstatus = false;
-    }
+// FIXME
+//    if( found == true ){
+//        if( ABSConfig.TestResourceTokens(Name) == false ){
+//            if( rstatus == true ) sout << endl;
+//            sout << "<b><red> ERROR: Resource token '" << Name << "' is recognized but not allowed on this site!</red></b>" << endl;
+//            sout << "<b><red>        Allowed tokens: ";
+//            ABSConfig.PrintAllowedResTokens(sout);
+//            sout << "!</red></b>" << endl;
+//            rstatus = false;
+//        }
+//    } else {
+//        if( rstatus == true ) sout << endl;
+//        sout << "<b><red> ERROR: Unsupported resource '" << Name << "'!</red></b>" << endl;
+//        rstatus = false;
+//    }
+// FIXME
+    rstatus = found;
 }
 
 //------------------------------------------------------------------------------
@@ -562,15 +565,17 @@ bool CResourceValue::TestPlace(std::ostream& sout,bool& rstatus)
 bool CResourceValue::TestScratchType(std::ostream& sout,bool& rstatus)
 {
     bool pass = false;
-    if( TorqueConfig.TestScratchType(Value,pass) == false ){
-        if( rstatus == true ) sout << endl;
-        sout << "<b><red> ERROR: Illegal scratch type (scratch_type) specification!" << endl;
-        sout <<         "        Allowed values: ";
-        TorqueConfig.PrintAllowedScratchTypes(sout);
-        sout << "!</red></b>" << endl;
-        rstatus = false;
-        return(false);
-    }
+
+// FIXME
+//    if( ABSConfig.TestScratchType(Value,pass) == false ){
+//        if( rstatus == true ) sout << endl;
+//        sout << "<b><red> ERROR: Illegal scratch type (scratch_type) specification!" << endl;
+//        sout <<         "        Allowed values: ";
+//        ABSConfig.PrintAllowedScratchTypes(sout);
+//        sout << "!</red></b>" << endl;
+//        rstatus = false;
+//        return(false);
+//    }
 
     HelperValue = ! pass;
 

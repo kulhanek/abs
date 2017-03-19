@@ -24,7 +24,7 @@
 #include <FileName.hpp>
 #include <fstream>
 #include <Shell.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -68,7 +68,7 @@ CSSHTicketChecker::CSSHTicketChecker(void)
 bool CSSHTicketChecker::IsTicketValid(std::ostream& sout)
 {
     CSmallString public_key_name = "id_rsa.pub";
-    TorqueConfig.GetSystemConfigItem(SSHTicketCheckerID,"INF_PUB_KEY_NAME",public_key_name);
+    ABSConfig.GetSystemConfigItem(SSHTicketCheckerID,"INF_PUB_KEY_NAME",public_key_name);
 
     // get full paths
     CFileName authorized_keys_name;

@@ -21,9 +21,7 @@
 
 #include <Queue.hpp>
 #include <ErrorSystem.hpp>
-#include <pbs_ifl.h>
 #include <iomanip>
-#include <TorqueAttr.hpp>
 
 using namespace std;
 
@@ -48,7 +46,7 @@ CQueue::CQueue(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CQueue::Init(struct batch_status* p_queue)
+/*bool CQueue::Init(struct batch_status* p_queue)
 {
     if( p_queue == NULL ){
         ES_ERROR("p_queue is NULL");
@@ -100,7 +98,7 @@ bool CQueue::Init(struct batch_status* p_queue)
     }
 
     return(result);
-}
+}*/
 
 //==============================================================================
 //------------------------------------------------------------------------------

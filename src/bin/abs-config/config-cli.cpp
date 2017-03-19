@@ -26,7 +26,7 @@
 #include <Shell.hpp>
 #include <ctype.h>
 #include <GlobalConfig.hpp>
-#include <TorqueConfig.hpp>
+#include <ABSConfig.hpp>
 #include <Site.hpp>
 #include <AliasList.hpp>
 #include <PluginDatabase.hpp>
@@ -70,7 +70,7 @@ void SetEmailStart(void);
 void SetIgnoreRuntimeFiles(void);
 void SetRerunableJobs(void);
 void SetConfirmSubmit(void);
-void RestoreSystemTorqueConfig(void);
+void RestoreSystemABSConfig(void);
 
 // ----------------------------------------------
 
@@ -151,15 +151,15 @@ bool Run(void)
         return(false);
     }
 
-    if( TorqueConfig.LoadConfig() == false ){
-        ES_ERROR("unable to load torque config");
+    if( ABSConfig.LoadConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
 
     CTerminalStr vout;
 
     // check if user has valid ticket
-    if( TorqueConfig.IsUserTicketValid(vout) == false ){
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
@@ -281,7 +281,7 @@ void MainMenu(void)
             bool result = true;
             ErrorSystem.RemoveAllErrors();
             if( TorqueSetupChanged ){
-                result &= TorqueConfig.SaveUserConfig();
+                result &= ABSConfig.SaveUserConfig();
             }
             if( AliasSetupChanged ){
                 result &= AliasList.SaveUserConfig();
@@ -343,7 +343,7 @@ bool QuitProgram(void)
             bool result = true;
             ErrorSystem.RemoveAllErrors();
             if( TorqueSetupChanged ){
-                result &= TorqueConfig.SaveUserConfig();
+                result &= ABSConfig.SaveUserConfig();
             }
             if( AliasSetupChanged ){
                 result &= AliasList.SaveUserConfig();
@@ -417,27 +417,27 @@ void PrintTorqueMenu(void)
  CSmallString     tmp;
  bool            system;
  char             syschar;
- TorqueConfig.GetUserConfigItem("INF_CONFIRM_SUBMIT",tmp,system);
+ ABSConfig.GetUserConfigItem("INF_CONFIRM_SUBMIT",tmp,system);
  if( system == true ) syschar = '*'; else syschar = ' ';
  printf(" 1. Confirm submit ......................  %s %c\n",(const char*)tmp,syschar);
 
- TorqueConfig.GetUserConfigItem("INF_RERUNABLE_JOBS",tmp,system);
+ ABSConfig.GetUserConfigItem("INF_RERUNABLE_JOBS",tmp,system);
  if( system == true ) syschar = '*'; else syschar = ' ';
  printf(" 2. Rerunable jobs ......................  %s %c\n",(const char*)tmp,syschar);
 
- TorqueConfig.GetUserConfigItem("INF_IGNORE_RUNTIME_FILES",tmp,system);
+ ABSConfig.GetUserConfigItem("INF_IGNORE_RUNTIME_FILES",tmp,system);
  if( system == true ) syschar = '*'; else syschar = ' ';
  printf(" 3. Ignore runtime files ................  %s %c\n",(const char*)tmp,syschar);
 
- TorqueConfig.GetUserConfigItem("INF_START_EMAIL",tmp,system);
+ ABSConfig.GetUserConfigItem("INF_START_EMAIL",tmp,system);
  if( system == true ) syschar = '*'; else syschar = ' ';
  printf(" 4. Send e-mail when job is started .....  %s %c\n",(const char*)tmp,syschar);
 
- TorqueConfig.GetUserConfigItem("INF_STOP_EMAIL",tmp,system);
+ ABSConfig.GetUserConfigItem("INF_STOP_EMAIL",tmp,system);
  if( system == true ) syschar = '*'; else syschar = ' ';
  printf(" 5. Send e-mail when job is finished ....  %s %c\n",(const char*)tmp,syschar);
 
- TorqueConfig.GetUserConfigItem("INF_ABORT_EMAIL",tmp,system);
+ ABSConfig.GetUserConfigItem("INF_ABORT_EMAIL",tmp,system);
  if( system == true ) syschar = '*'; else syschar = ' ';
  printf(" 6. Send e-mail when job is aborted .....  %s %c\n",(const char*)tmp,syschar);
  printf("------------------------------------------------------------\n");
@@ -485,7 +485,7 @@ void TorqueMenu(void)
                 PrintTorqueMenu();
                 break;
             case 'o':
-                RestoreSystemTorqueConfig();
+                RestoreSystemABSConfig();
                 PrintTorqueMenu();
                 break;
 
@@ -515,11 +515,11 @@ void SetConfirmSubmit(void)
 
  switch(result){
     case 0:
-        TorqueConfig.SetUserConfigItem("INF_CONFIRM_SUBMIT","NO");
+        ABSConfig.SetUserConfigItem("INF_CONFIRM_SUBMIT","NO");
         TorqueSetupChanged = true;
         break;
     case 1:
-        TorqueConfig.SetUserConfigItem("INF_CONFIRM_SUBMIT","YES");
+        ABSConfig.SetUserConfigItem("INF_CONFIRM_SUBMIT","YES");
         TorqueSetupChanged = true;
         break;
     case -1:
@@ -536,11 +536,11 @@ void SetRerunableJobs(void)
 
  switch(result){
     case 0:
-        TorqueConfig.SetUserConfigItem("INF_RERUNABLE_JOBS","NO");
+        ABSConfig.SetUserConfigItem("INF_RERUNABLE_JOBS","NO");
         TorqueSetupChanged = true;
         break;
     case 1:
-        TorqueConfig.SetUserConfigItem("INF_RERUNABLE_JOBS","YES");
+        ABSConfig.SetUserConfigItem("INF_RERUNABLE_JOBS","YES");
         TorqueSetupChanged = true;
         break;
     case -1:
@@ -557,11 +557,11 @@ void SetIgnoreRuntimeFiles(void)
 
  switch(result){
     case 0:
-        TorqueConfig.SetUserConfigItem("INF_IGNORE_RUNTIME_FILES","NO");
+        ABSConfig.SetUserConfigItem("INF_IGNORE_RUNTIME_FILES","NO");
         TorqueSetupChanged = true;
         break;
     case 1:
-        TorqueConfig.SetUserConfigItem("INF_IGNORE_RUNTIME_FILES","YES");
+        ABSConfig.SetUserConfigItem("INF_IGNORE_RUNTIME_FILES","YES");
         TorqueSetupChanged = true;
         break;
     case -1:
@@ -578,11 +578,11 @@ void SetEmailStart(void)
 
  switch(result){
     case 0:
-        TorqueConfig.SetUserConfigItem("INF_START_EMAIL","NO");
+        ABSConfig.SetUserConfigItem("INF_START_EMAIL","NO");
         TorqueSetupChanged = true;
         break;
     case 1:
-        TorqueConfig.SetUserConfigItem("INF_START_EMAIL","YES");
+        ABSConfig.SetUserConfigItem("INF_START_EMAIL","YES");
         TorqueSetupChanged = true;
         break;
     case -1:
@@ -599,11 +599,11 @@ void SetEmailStop(void)
 
  switch(result){
     case 0:
-        TorqueConfig.SetUserConfigItem("INF_STOP_EMAIL","NO");
+        ABSConfig.SetUserConfigItem("INF_STOP_EMAIL","NO");
         TorqueSetupChanged = true;
         break;
     case 1:
-        TorqueConfig.SetUserConfigItem("INF_STOP_EMAIL","YES");
+        ABSConfig.SetUserConfigItem("INF_STOP_EMAIL","YES");
         TorqueSetupChanged = true;
         break;
     case -1:
@@ -620,11 +620,11 @@ void SetEmailAbort(void)
 
  switch(result){
     case 0:
-        TorqueConfig.SetUserConfigItem("INF_ABORT_EMAIL","NO");
+        ABSConfig.SetUserConfigItem("INF_ABORT_EMAIL","NO");
         TorqueSetupChanged = true;
         break;
     case 1:
-        TorqueConfig.SetUserConfigItem("INF_ABORT_EMAIL","YES");
+        ABSConfig.SetUserConfigItem("INF_ABORT_EMAIL","YES");
         TorqueSetupChanged = true;
         break;
     case -1:
@@ -635,7 +635,7 @@ void SetEmailAbort(void)
 
 //-----------------------------------------------------------------------------
 
-void RestoreSystemTorqueConfig(void)
+void RestoreSystemABSConfig(void)
 {
  int result = Question("Do you want to restore system setup for pbs driver");
 
@@ -643,7 +643,7 @@ void RestoreSystemTorqueConfig(void)
     case 0:
         break;
     case 1:
-        TorqueConfig.RemoveUserConfig();
+        ABSConfig.RemoveUserConfig();
         TorqueSetupChanged = true;
         break;
     case -1:
@@ -747,11 +747,11 @@ void CreateOrModifyAlias(void)
 
     printf("\n");
     printf("##### Allowed synchronization modes ...\n ");
-    TorqueConfig.PrintAllowedSyncModes(tout);
+    ABSConfig.PrintAllowedSyncModes(tout);
 
     printf("\n");
     printf("##### Allowed resource tokens ...\n ");
-    TorqueConfig.PrintAllowedResTokens(tout);
+    ABSConfig.PrintAllowedResTokens(tout);
     printf("\n\n");
     printf(" Multiple resources: resource1=value1,resource2=value2,...\n");
 

@@ -26,7 +26,6 @@
 #include <iomanip>
 #include <ErrorSystem.hpp>
 #include <UUID.hpp>
-#include <GlobalConfig.hpp>
 #include <XMLPrinter.hpp>
 #include <XMLElement.hpp>
 #include <XMLParser.hpp>
@@ -36,6 +35,8 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <Shell.hpp>
+#include <AMSGlobalConfig.hpp>
+#include <ABSConfig.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -955,15 +956,15 @@ bool CJobList::CreateCollection(const CSmallString& name,std::ostream& sout)
         return(false);
     }
 
-    CollectionHost = GlobalConfig.GetHostName();
+    CollectionHost = ABSConfig.GetHostName();
     CollectionPath = cpath;
     CollectionName = cname;
     CUUID coll_id;
     coll_id.CreateUUID();
     CollectionID = coll_id.GetStringForm();
     CollectionLastChange.GetActualTimeAndDate();
-    CollectionSiteName = GlobalConfig.GetActiveSiteName();
-    CollectionSiteID = GlobalConfig.GetActiveSiteID();
+    CollectionSiteName = AMSGlobalConfig.GetActiveSiteName();
+    CollectionSiteID = AMSGlobalConfig.GetActiveSiteID();
 
     return(true);
 }
@@ -1246,8 +1247,8 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
     sout << "# Collection name : " << CollectionName << endl;
     sout << "# Collection path : " << CollectionHost << ":" << CollectionPath << endl;
     sout << "# Collection site : " << CollectionSiteName;
-    if( GlobalConfig.GetActiveSiteName() != CollectionSiteName ){
-        sout << " <red>(Active site: " << GlobalConfig.GetActiveSiteName() << ")</red>";
+    if( AMSGlobalConfig.GetActiveSiteName() != CollectionSiteName ){
+        sout << " <red>(Active site: " << AMSGlobalConfig.GetActiveSiteName() << ")</red>";
     }
     sout << endl;
     sout << "# Collection ID   : " << CollectionID << endl;

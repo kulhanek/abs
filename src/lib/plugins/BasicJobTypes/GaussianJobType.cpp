@@ -26,7 +26,7 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
-#include <GlobalConfig.hpp>
+#include <AMSGlobalConfig.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <fstream>
@@ -106,14 +106,15 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     }
 
     // is gaussian module loaded?
-    if( GlobalConfig.IsModuleActive(gmodule) == false ){
+    if( AMSGlobalConfig.IsModuleActive(gmodule) == false ){
         sout << endl;
         sout << "<b><red> ERROR: The gaussian job was detected but none gaussian module is active!</red></b>" << endl;
         sout << "<b><red>        Type 'module add gaussian' and resubmit the job.</red></b>" << endl;
         return(ERS_FAILED);
     }
 
-    CSmallString gmodver = GlobalConfig.GetActiveModuleVersion(gmodule);
+    CSmallString gmodver;
+    AMSGlobalConfig.GetActiveModuleVersion(gmodule,gmodver);
     CSmallString gexec;
     if( PluginDatabase.FindObjectConfigValue(GaussianJobTypeID,gmodver,gexec) == false ){
         CSmallString error;

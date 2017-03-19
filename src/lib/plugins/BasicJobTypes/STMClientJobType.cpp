@@ -26,7 +26,6 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
-#include <GlobalConfig.hpp>
 #include <boost/format.hpp>
 #include <FileName.hpp>
 #include <iomanip>
