@@ -297,22 +297,22 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 
 bool CPBSProServer::GetQueues(CQueueList& queues)
 {
-    struct batch_status* p_queues = pbs_statque(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_queue_attrs = pbs_statque(ServerID,NULL,NULL,NULL);
 
     bool result = true;
-    while( p_queues != NULL ){
+    while( p_queue_attrs != NULL ){
         CPBSProQueue* p_queue = new CPBSProQueue();
-        if( p_queue->Init(ShortName, p_queues) == false ){
+        if( p_queue->Init(ShortName, p_queue_attrs) == false ){
             ES_ERROR("unable to init queue");
             result = false;
         } else {
             CQueuePtr queue(p_queue);
             queues.push_back(queue);
         }
-        p_queues = p_queues->next;
+        p_queue_attrs = p_queue_attrs->next;
     }
 
-    if( p_queues ) pbs_statfree(p_queues);
+    if( p_queue_attrs ) pbs_statfree(p_queue_attrs);
 
     return(result);
 }
@@ -321,21 +321,22 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
 
 bool CPBSProServer::GetNodes(CNodeList& nodes)
 {
-    struct batch_status* p_nodes = pbs_statnode(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_node_attrs = pbs_statnode(ServerID,NULL,NULL,NULL);
 
     bool result = true;
-    while( p_nodes != NULL ){
-        CNodePtr p_node(new CNode);
-        // FIXME
-//        if( p_node->Init(p_nodes) == false ){
-//            ES_ERROR("unable to init node");
-//            result = false;
-//        }
-        nodes.push_back(p_node);
-        p_nodes = p_nodes->next;
+    while( p_node_attrs != NULL ){
+        CPBSProNode* p_node = new CPBSProNode;
+        if( p_node->Init(p_node_attrs) == false ){
+            ES_ERROR("unable to init node");
+            result = false;
+        } else {
+            CNodePtr node(p_node);
+            nodes.push_back(node);
+        }
+        p_node_attrs = p_node_attrs->next;
     }
 
-    if( p_nodes ) pbs_statfree(p_nodes);
+    if( p_node_attrs ) pbs_statfree(p_node_attrs);
 
     return(result);
 }
