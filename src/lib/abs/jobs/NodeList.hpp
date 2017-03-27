@@ -112,7 +112,7 @@ private:
     // helper methods
     bool IsNodeSelected(CNodePtr p_node,struct SExpression* p_expr);
     bool IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel);
-    void AutoGroups(void);
+    void AutoGroups(unsigned int minsize);
     void PrepareNodeGroups(CXMLElement* p_ele);
 };
 

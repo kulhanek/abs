@@ -265,7 +265,7 @@ void CNodeList::PrepareNodeGroups(void)
         int  minsize = 3;
         p_ele->GetAttribute("minsize",minsize);
         if( autogroup ){
-            AutoGroups();
+            AutoGroups(minsize);
         }
         PrepareNodeGroups(p_ele);
     }
@@ -315,15 +315,21 @@ void CNodeList::PrepareNodeGroups(CXMLElement* p_ele)
 
 //------------------------------------------------------------------------------
 
-void CNodeList::AutoGroups(void)
+void CNodeList::AutoGroups(unsigned int minsize)
 {
-    list<CNodePtr>::iterator it = begin();
-    list<CNodePtr>::iterator ie = end();
+    // make copy of nodes
+    list<CNodePtr> lnodes;
+    copy(begin(),end(),lnodes.begin());
 
-    CNodeGroupPtr p_group;
+    list<CNodePtr>::iterator it = lnodes.begin();
+    list<CNodePtr>::iterator ie = lnodes.end();
+
+    CNodeGroupPtr p_common_group = CNodeGroupPtr(new CNodeGroup);
+    p_common_group->GroupName = "mismatch";
 
     while( it != ie ){
         CNodePtr p_node = *it;
+        lnodes.remove(p_node);
 
         std::string s1 = string(p_node->GetName());
         std::string n1 = s1;
@@ -332,22 +338,31 @@ void CNodeList::AutoGroups(void)
             n1 = s1.substr(0,found);
         }
 
-        if( (p_group == NULL) || fnmatch(p_group->GroupName.c_str(),n1.c_str(),0) != 0 ){
-            if( (p_group != NULL ) && (p_group->size() > 0) ) {
-                NodeGroups.push_back(p_group);
+        CNodeGroupPtr p_group = CNodeGroupPtr(new CNodeGroup);
+        p_group->GroupName = n1;
+        CSmallString filter = n1;
+        filter += "*";
+
+        list<CNodePtr>::iterator git = it;
+        list<CNodePtr>::iterator gie = lnodes.end();
+
+        while( git != gie ){
+            CNodePtr p_gnode = *git;
+            if( fnmatch(filter,p_gnode->GetName(),0) == 0 ){
+                p_group->insert(p_gnode);
+                lnodes.remove(p_gnode);
             }
-            p_group = CNodeGroupPtr(new CNodeGroup);
-            p_group->GroupName = n1;
+            gie++;
         }
-        p_group->insert(p_node);
+        if( p_group->size() >= minsize ) {
+            NodeGroups.push_back(p_group);
+        } else {
+            p_common_group->insert(p_group->begin(),p_group->end());
+        }
 
-        it++;
+        // start over
+        it = begin();
     }
-
-    if( (p_group != NULL ) && (p_group->size() > 0) ) {
-        NodeGroups.push_back(p_group);
-    }
-
 }
 
 //------------------------------------------------------------------------------
