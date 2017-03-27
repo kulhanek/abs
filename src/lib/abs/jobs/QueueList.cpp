@@ -113,7 +113,11 @@ void CQueueList::RemoveNonexecutiveQueues(void)
 
 bool CQueueList::SortCompName(const CQueuePtr& p_left,const CQueuePtr& p_right)
 {
-    return( strcmp(p_left->GetName(),p_right->GetName()) < 0 );
+    if( p_left->ShortServerName == p_right->ShortServerName  ){
+        return( strcmp(p_left->Name,p_right->Name) < 0 );
+    } else {
+       return( strcmp(p_left->ShortServerName,p_right->ShortServerName) < 0 );
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -168,7 +172,6 @@ void CQueueList::PrintRouteDestinationInfos(CQueuePtr& p_mqueue, std::ostream& s
     while( it != et ){
         CQueuePtr p_queue = *it;
         if( (p_queue->RouteQueue == p_mqueue->Name) && (p_queue->ShortServerName == p_mqueue->ShortServerName) ){
-            sout << "->";
             p_queue->PrintLineInfo(sout);
         }
         it++;

@@ -113,10 +113,14 @@ void CQueue::PrintLineInfo(std::ostream& sout)
     }
 
     sout << right;
-    sout << " " << setw(3) << ShortServerName;
+    sout << " " << setw(4) << ShortServerName;
 
     sout << left;
-    sout << setw(17) << Name;
+    if( RouteQueue == NULL ){
+        sout << setw(17) << Name;
+    } else {
+        sout << "-> " << setw(14) << Name;
+    }
 
     sout << right;
     sout << " " << setw(5) << Priority;
