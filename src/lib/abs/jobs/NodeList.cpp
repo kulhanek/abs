@@ -331,8 +331,9 @@ void CNodeList::AutoGroups(unsigned int minsize)
         CNodePtr p_node = *it;
         it++;
 
-        std::string s1 = string(p_node->GetName());
-        std::string n1 = s1;
+        std::string     s1 = string(p_node->GetName());
+        CSmallString    shortname = p_node->GetShortServerName();
+        std::string     n1 = s1;
         std::size_t found = s1.find_first_of("0123456789");
         if( (found != string::npos) && (found > 0) ){
             n1 = s1.substr(0,found);
@@ -355,7 +356,7 @@ void CNodeList::AutoGroups(unsigned int minsize)
         while( git != gie ){
             CNodePtr p_gnode = *git;
             git++;
-            if( fnmatch(filter,p_gnode->GetName(),0) == 0 ){
+            if( (p_gnode->GetShortServerName() == shortname) && (fnmatch(filter,p_gnode->GetName(),0) == 0) ){
                 p_group->insert(p_gnode);
                 lnodes.remove(p_gnode);
             }
@@ -368,6 +369,11 @@ void CNodeList::AutoGroups(unsigned int minsize)
 
         // start over
         it = lnodes.begin();
+    }
+
+    // insert common group
+    if( p_common_group->size() > 0 ) {
+        NodeGroups.push_front(p_common_group);
     }
 }
 
