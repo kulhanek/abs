@@ -81,22 +81,22 @@ const std::string CNode::GetNiceSize(int size)
     stringstream str;
     char         unit;
 
-    if( size < 1024 ){
+    if( size > 1024 ){
         unit = 'K';
     }
-    if( size < 1024 ){
+    if( size > 1024 ){
         unit = 'M';
         size /= 1024;
     }
-    if( size < 1024 ){
+    if( size > 1024 ){
         unit = 'G';
         size /= 1024;
     }
-    if( size < 1024 ){
+    if( size > 1024 ){
         unit = 'T';
         size /= 1024;
     }
-    if( size < 1024 ){
+    if( size > 1024 ){
         unit = 'P';
         size /= 1024;
     }
@@ -131,6 +131,9 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
         sout << "<blue>";
     }
     sout << " " << setw(3) << NCPUs-AssignedCPUs;
+// ------------------
+    sout << "/" << setw(3) << NCPUs;
+// ------------------
     if( AssignedCPUs == 0 ){
         sout << "</green></b>";
     } else if (NCPUs != AssignedCPUs){
@@ -139,25 +142,24 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
         sout << "</blue>";
     }
 // ------------------
-    sout << "/" << setw(3) << NCPUs;
-// ------------------
-    if( AssignedGPUs == 0 ){
+    if( (AssignedGPUs == 0) && (NGPUs > 0) ){
         sout << "<b><green>";
     } else if (NGPUs != AssignedGPUs){
         sout << "<green>";
-    } else {
+    } else if(NGPUs > 0) {
         sout << "<blue>";
     }
     sout << " " << setw(2) << NGPUs-AssignedGPUs;
-    if( AssignedGPUs == 0 ){
+// ------------------
+    sout << "/" << setw(2) << NGPUs;
+// ------------------
+    if( (AssignedGPUs == 0) && (NGPUs > 0) ){
         sout << "</green></b>";
     } else if (NGPUs != AssignedGPUs){
         sout << "</green>";
-    } else {
+    } else if(NGPUs > 0) {
         sout << "</blue>";
     }
-// ------------------
-    sout << "/" << setw(2) << NGPUs;
 // ------------------
 
     sout << " " << setw(5) << GetNiceSize(Memory-AssignedMemory);
