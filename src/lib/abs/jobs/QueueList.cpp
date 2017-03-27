@@ -193,8 +193,11 @@ void CQueueList::MapRouteQueues(void)
             std::vector<std::string>::iterator qet = queues.end();
 
             while( qit != qet ){
-
-                qet++;
+                CQueuePtr p_dqueue = FindQueue(p_queue->ShortServerName,*qit);
+                if( p_dqueue ){
+                    p_dqueue->RouteQueue = p_queue->Name;
+                }
+                qit++;
             }
         }
         it++;
