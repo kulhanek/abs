@@ -62,7 +62,6 @@ struct attrl* FindAttr(struct attrl* p_list,const char* p_name,const char* p_res
 #define ATTR_QUEUE_TOTAL_JOBS           "total_jobs"
 #define ATTR_QUEUE_STARTED              "started"
 #define ATTR_QUEUE_ENABLED              "enabled"
-#define ATTR_QUEUE_REQUIRED_PROPERTY    "required_property"
 #define ATTR_QUEUE_RESOURCES_MAX        "resources_max"
 #define ATTR_QUEUE_STATE_COUNT          "state_count"
 #define ATTR_QUEUE_ROUTE_DESTINATIONS   "route_destinations"

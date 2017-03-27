@@ -48,21 +48,24 @@ bool CPBSProQueue::Init(struct batch_status* p_queue)
     }
 
     Name = p_queue->name;
-    CSmallString count;
 
     // get attributes
     bool result = true;
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_TYPE,NULL,Type);
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_STARTED,NULL,Started);
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_ENABLED,NULL,Enabled);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_PRIORITY,NULL,Priority);
+
+    // optional
+    get_attribute(p_queue->attribs,ATTR_QUEUE_PRIORITY,NULL,Priority);
+
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_TOTAL_JOBS,NULL,TotalJobs);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_STATE_COUNT,NULL,count);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_REQUIRED_PROPERTY,NULL,RequiredProperty);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_MAX_RUNNING,NULL,MaxRunning);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_MAX_USER_RUNNING,NULL,MaxUserRunning);
+
+//    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_MAX_RUNNING,NULL,MaxRunning);
+//    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_MAX_USER_RUNNING,NULL,MaxUserRunning);
+
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_RESOURCES_MAX,RESOURCES_PROCS,MaxCPUs);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_RESOURCES_MAX,RESOURCES_WALLTIME,MaxWallTime);    
+    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_RESOURCES_MAX,RESOURCES_WALLTIME,MaxWallTime);
+
     bool acl_enabled;
     //---------------------
     acl_enabled = false;
@@ -83,7 +86,10 @@ bool CPBSProQueue::Init(struct batch_status* p_queue)
     //---------------------
     // parse state count
     int n = 0;
-    sscanf(count,"Transit:%d Queued:%d Held:%d Waiting:%d Running:%d Exiting:%d",&n,&QueuedJobs,&n,&n,&RunningJobs,&n);
+    CSmallString count;
+    if( get_attribute(p_queue->attribs,ATTR_QUEUE_STATE_COUNT,NULL,count) == true ){
+        sscanf(count,"Transit:%d Queued:%d Held:%d Waiting:%d Running:%d Exiting:%d Begun:%d",&n,&QueuedJobs,&n,&n,&RunningJobs,&n,&n);
+    }
 
     if( result ){
         CSmallString error;
