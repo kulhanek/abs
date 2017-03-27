@@ -302,7 +302,7 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
     bool result = true;
     while( p_queues != NULL ){
         CPBSProQueue* p_queue = new CPBSProQueue();
-        if( p_queue->Init(p_queues) == false ){
+        if( p_queue->Init(ShortName, p_queues) == false ){
             ES_ERROR("unable to init queue");
             result = false;
         } else {

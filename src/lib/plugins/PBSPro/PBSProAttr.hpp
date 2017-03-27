@@ -51,21 +51,6 @@ struct attrl* FindAttr(struct attrl* p_list,const char* p_name,const char* p_res
 
 // -----------------------------------------------------------------------------
 
-#define ATTR_QUEUE_TYPE                 "queue_type"
-#define ATTR_QUEUE_PRIORITY             "Priority"
-#define ATTR_QUEUE_ACL_USER_ENABLED     "acl_user_enable"
-#define ATTR_QUEUE_ACL_USERS            "acl_users"
-#define ATTR_QUEUE_ACL_GROUP_ENABLED    "acl_group_enable"
-#define ATTR_QUEUE_ACL_GROUPS           "acl_groups"
-#define ATTR_QUEUE_MAX_RUNNING          "max_running"
-#define ATTR_QUEUE_MAX_USER_RUNNING     "max_user_run"
-#define ATTR_QUEUE_TOTAL_JOBS           "total_jobs"
-#define ATTR_QUEUE_STARTED              "started"
-#define ATTR_QUEUE_ENABLED              "enabled"
-#define ATTR_QUEUE_RESOURCES_MAX        "resources_max"
-#define ATTR_QUEUE_STATE_COUNT          "state_count"
-#define ATTR_QUEUE_ROUTE_DESTINATIONS   "route_destinations"
-
 #define ATTR_NODE_STATE                 "state"
 #define ATTR_NODE_NP                    "np"
 #define ATTR_NODE_JOBS                  "jobs"
