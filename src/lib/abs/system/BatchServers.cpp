@@ -227,7 +227,7 @@ bool CBatchServers::GetNodes(void)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::GetAllJobs(CJobList& jobs)
+bool CBatchServers::GetAllJobs(CJobList& jobs,bool finished)
 {
     // init servers if not done already
     if( size() == 0 ) InitAll();
@@ -239,7 +239,7 @@ bool CBatchServers::GetAllJobs(CJobList& jobs)
     bool result = true;
     while( it != ie ){
         CBatchServerPtr srv_ptr = *it;
-        result &= srv_ptr->GetAllJobs(JobList);
+        result &= srv_ptr->GetAllJobs(JobList,finished);
         it++;
     }
     return(result);
@@ -247,14 +247,14 @@ bool CBatchServers::GetAllJobs(CJobList& jobs)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
+bool CBatchServers::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::GetUserJobs(CJobList& jobs,const CSmallString& user)
+bool CBatchServers::GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished)
 {
     return(false);
 }

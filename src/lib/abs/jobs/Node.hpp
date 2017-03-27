@@ -44,14 +44,14 @@ public:
         CNode(void);
 
 // methods ---------------------------------------------------------------------
-    /// init node with torque information
-//    bool Init(struct batch_status* p_node);
-
     /// print line info about the node
     void PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops,int ncolumns);
 
     /// get node name
     const CSmallString& GetName(void) const;
+
+    //! get short server name
+    const CSmallString GetShortServerName(void);
 
     /// get number of CPUs
     int GetNumOfCPUs(void) const;
@@ -68,6 +68,9 @@ public:
     /// get property list
     const std::vector<std::string>& GetPropertyList(void) const;
 
+    /// get all properties
+    const std::vector<std::string>& GetAllProps(void) const;
+
     /// has node given property
     bool HasProperty(const std::string& prop);
 
@@ -76,6 +79,12 @@ public:
 
     /// has node any of given properties
     bool HasAnyProperties(const std::vector<std::string>& props);
+
+    /// has node any of given properties
+    bool IsInAnyQueueWithServer(const std::vector<std::string>& qlist);
+
+    /// has node any of given properties
+    bool IsInQueueWithServer(const std::string& queue);
 
     /// get extra properties
     const std::set<std::string> GetExtraProperties(const std::set<std::string>& props);
@@ -91,18 +100,36 @@ public:
 
 // section of private data -----------------------------------------------------
 protected:
+    CSmallString                ShortServerName;
+
     CSmallString                Name;
+    CSmallString                MOM;
+
     int                         NCPUs;
-    int                         FreeCPUs;
+    int                         AssignedCPUs;
+
     int                         NGPUs;
-    int                         FreeGPUs;
-    int                         MaxCPUsPerNode; // for merged NUMA nodes
+    int                         AssignedGPUs;
+
+    int                         Memory;
+    int                         AssignedMemory;
+
+    int                         ScratchLocal;
+    int                         ScratchShared;
+    int                         ScratchSSD;
+
     CSmallString                State;
+    CSmallString                Type;
+
     CSmallString                Jobs;
     std::vector<std::string>    JobList;
+
     CSmallString                Properties;
     std::vector<std::string>    PropList;
-    CSmallString                Type;
+    std::vector<std::string>    AllPropList;
+
+    CSmallString                Queues;
+    std::vector<std::string>    QueueList;
 };
 
 // -----------------------------------------------------------------------------

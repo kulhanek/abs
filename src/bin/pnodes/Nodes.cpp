@@ -138,8 +138,8 @@ bool CNodes::Run(void)
             return(false);
         }
 
-        // get list of required properties by any queue
-        vector<string>  qprops;
+        // get list of queues
+        std::vector<std::string>  qlist;
 
         // keep only queue accessible to the user
         QueueList.RemoveDisabledQueues();
@@ -147,14 +147,11 @@ bool CNodes::Run(void)
         QueueList.RemoveInaccesibleQueues(User);
         QueueList.RemoveNonexecutiveQueues();
 
-        // FIXME
-                // again but for queues accessible to user only
-                //QueueList.GetRequiredProperties(qprops);
+        // get list of queues - queue.server
+        QueueList.GetQueuesWithServer(qlist);
 
-                // remove unwanted nodes
-                NodeList.KeepNodesThatHaveProperty(qprops);
-                NodeList.RemoveNodesWithoutProps();
-
+        // remove unwanted nodes
+        NodeList.KeepNodesByQueuesWithServer(qlist);
         NodeList.RemoveDownNodes();
     }
 

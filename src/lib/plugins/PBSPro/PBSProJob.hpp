@@ -1,5 +1,5 @@
-#ifndef KillAllH
-#define KillAllH
+#ifndef PBSProJobH
+#define PBSProJobH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -21,35 +21,21 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include "KillAllOptions.hpp"
-#include <VerboseStr.hpp>
-#include <TerminalStr.hpp>
-#include <ABSConfig.hpp>
-#include <User.hpp>
-#include <JobList.hpp>
+#include <ABSMainHeader.hpp>
+#include <Job.hpp>
 
 // -----------------------------------------------------------------------------
 
-class CKillAll{
+/// PBSPro queue
+
+class ABS_PACKAGE CPBSProJob : public CJob {
 public:
-// constructor ----------------------------------------------------------------
-        CKillAll(void);
+// constructor -----------------------------------------------------------------
+        CPBSProJob(void);
 
-// main methods ---------------------------------------------------------------
-    //! init options
-    int Init(int argc,char* argv[]);
-
-    //! main part of program
-    bool Run(void);
-
-    //! finalize program
-    void Finalize(void);
-
-// section of private data ----------------------------------------------------
-private:
-    CKillAllOptions Options;
-    CTerminalStr    Console;
-    CVerboseStr     vout;
+// methods ---------------------------------------------------------------------
+    //! init queue with torque information
+    bool Init(const CSmallString& short_srv_name,struct batch_status* p_job);
 };
 
 // -----------------------------------------------------------------------------

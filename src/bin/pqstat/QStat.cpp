@@ -119,20 +119,15 @@ bool CQStat::Run(void)
     vout << low;
 
     if( Options.IsOptQueueSet() ){
-        if( BatchServers.GetQueueJobs(Jobs,Options.GetOptQueue()) == false ){
+        if( BatchServers.GetQueueJobs(JobList,Options.GetOptQueue(),Options.GetOptKeepCompleted()) == false ){
             ES_ERROR("unable to get queue jobs");
             return(false);
         }
     } else {
-        if( BatchServers.GetAllJobs(Jobs) == false ){
+        if( BatchServers.GetAllJobs(JobList,Options.GetOptKeepCompleted()) == false ){
             ES_ERROR("unable to get all jobs");
             return(false);
         }
-    }
-
-    // filter jobs
-    if( ! Options.GetOptKeepCompleted() ){
-        Jobs.RemoveCompletedJobs();
     }
 
     if( Options.IsOptSearchSet() ){
@@ -143,17 +138,17 @@ bool CQStat::Run(void)
             ES_ERROR("unable to set search expression");
             return(false);
         }
-        Jobs.KeepJobsByMask(get_expression_tree());
+        JobList.KeepJobsByMask(get_expression_tree());
         //print_expression_tree(get_expression_tree());
         free_mask_tree();
     }
 
     // print info about jobs
-    Jobs.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
+    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
 
     // print batch stat
     vout << endl;
-    Jobs.PrintBatchInfoStat(vout);
+    JobList.PrintBatchInfoStat(vout);
 
     return(true);
 }

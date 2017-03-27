@@ -68,7 +68,8 @@ void CNodeList::PrintInfos(std::ostream& sout)
         CNodeGroupPtr p_group = *git;
 
         sout << endl;
-        sout << "# Group : " << p_group->GroupName << endl;
+        sout << "# Node Group   : " << p_group->GroupName << endl;
+        sout << "# Batch Server : " << p_group->BatchServer << endl;
         sout << "# ---------------------------------------------------------------------------------------------" << endl;
         set<string>::iterator pit = p_group->CommonProps.begin();
         set<string>::iterator pet = p_group->CommonProps.end();
@@ -101,10 +102,8 @@ void CNodeList::PrintInfos(std::ostream& sout)
         if( p_group->CommonProps.size() > 0 ){
         sout << "# ---------------------------------------------------------------------------------------------" << endl;
         }
-        sout << "#          Node Name     NN CPUs/MC Free GPUs Free     State            Extra properties       " << endl;
-        sout << "# ------------------------- ------- ---- ---- ---- -------------------- -----------------------" << endl;
-
-        if( HWDatabase.size() > 0 ) sout << endl;
+        sout << "# ST  Node name     CPUs   GPUs    Memory   Local Share  SSD  Extra properties                 " << endl;
+        sout << "# -- ------------ ---/--- --/-- -----/----- ----- ----- ----- ---------------------------------" << endl;
 
         list<CNodePtr>::iterator it = p_group->SortedNodes.begin();
         list<CNodePtr>::iterator et = p_group->SortedNodes.end();
@@ -115,19 +114,8 @@ void CNodeList::PrintInfos(std::ostream& sout)
         int free_gpus = 0;
         int nnodes = 0;
 
-        string prev_hwspec;
-
         while( it != et ){
             CNodePtr p_node = *it;
-            if( HWDatabase.size() > 0 ){
-                string hwspec = HWDatabase[string(p_node->GetName())];
-                if( it == p_group->SortedNodes.begin() ) prev_hwspec = hwspec;
-                if( (! prev_hwspec.empty()) && (hwspec != prev_hwspec) ) {
-                    sout << "   <yellow>" << prev_hwspec << "</yellow>" << endl;
-                    sout << endl;
-                    prev_hwspec = hwspec;
-                }
-            }
             p_node->PrintLineInfo(sout,p_group->CommonProps,ncolumns);
 
             tot_cpus += p_node->GetNumOfCPUs();
@@ -136,11 +124,6 @@ void CNodeList::PrintInfos(std::ostream& sout)
             free_gpus += p_node->GetNumOfFreeGPUs();
             nnodes++;
             it++;
-        }
-
-        if( ! prev_hwspec.empty() ) {
-            sout << "   <yellow>" << prev_hwspec << "</yellow>" << endl;
-            sout << endl;
         }
 
         sout << "# ---------------------------------------------------------------------------------------------" << endl;
@@ -158,7 +141,7 @@ void CNodeList::PrintInfos(std::ostream& sout)
 
 void CNodeList::PrintStatistics(std::ostream& sout)
 {
-    if( (NodeGroups.size() == 1) && (UniqueProps.size() == 0) ){
+    if( (NodeGroups.size() == 1) && (AllProps.size() == 0) ){
         return;
     }
 
@@ -182,13 +165,13 @@ void CNodeList::PrintStatistics(std::ostream& sout)
     }
 
     // print list of unique properties
-    if( UniqueProps.size() > 0 ){
+    if( AllProps.size() > 0 ){
         sout << endl;
         sout << "# All properties" << endl;
         sout << "# ---------------------------------------------------------------------------------------------" << endl;
 
-        set<string>::iterator pit = UniqueProps.begin();
-        set<string>::iterator pet = UniqueProps.end();
+        set<string>::iterator pit = AllProps.begin();
+        set<string>::iterator pet = AllProps.end();
 
         bool first = true;
         int  len = 0;
@@ -335,7 +318,7 @@ void CNodeList::PrepareSingleNodeGroup(void)
 void CNodeList::FinalizeNodeGroups(void)
 {
     ReasonableNodes.clear();
-    UniqueProps.clear();
+    AllProps.clear();
 
     // post process groups
     list<CNodeGroupPtr>::iterator git = NodeGroups.begin();
@@ -354,21 +337,21 @@ void CNodeList::FinalizeNodeGroups(void)
 
     while( rit != ret ){
         CNodePtr p_node = *rit;
-        UniqueProps.insert(p_node->GetPropertyList().begin(),p_node->GetPropertyList().end());
+        AllProps.insert(p_node->GetAllProps().begin(),p_node->GetAllProps().end());
         rit++;
     }
 }
 
 //------------------------------------------------------------------------------
 
-void CNodeList::KeepNodesThatHaveProperty(const std::vector<std::string>& props)
+void CNodeList::KeepNodesByQueuesWithServer(const std::vector<std::string>& qlist)
 {
     list<CNodePtr>::iterator it = begin();
     list<CNodePtr>::iterator et = end();
 
     while( it != et ){
         CNodePtr p_node = *it;
-        if( p_node->HasAnyProperties(props) == false ){
+        if( p_node->IsInAnyQueueWithServer(qlist) == false ){
             it = erase(it);
         } else {
             it++;

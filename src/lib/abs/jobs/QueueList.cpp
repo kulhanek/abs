@@ -113,10 +113,10 @@ void CQueueList::RemoveNonexecutiveQueues(void)
 
 bool CQueueList::SortCompName(const CQueuePtr& p_left,const CQueuePtr& p_right)
 {
-    if( p_left->ShortServerName == p_right->ShortServerName  ){
-        return( strcmp(p_left->Name,p_right->Name) < 0 );
+    if( p_left->GetShortServerName() == p_right->GetShortServerName()  ){
+        return( strcmp(p_left->GetName(),p_right->GetName()) < 0 );
     } else {
-       return( strcmp(p_left->ShortServerName,p_right->ShortServerName) < 0 );
+       return( strcmp(p_left->GetShortServerName(),p_right->GetShortServerName()) < 0 );
     }
 }
 
@@ -147,7 +147,7 @@ void CQueueList::PrintInfos(std::ostream& sout)
         if( p_queue->IsRouteDestination() == false ){
             p_queue->PrintLineInfo(sout);
         }
-        if( p_queue->IsRoute() ){
+        if( p_queue->IsRouteQueue() ){
             PrintRouteDestinationInfos(p_queue,sout);
         }
         it++;
@@ -171,7 +171,8 @@ void CQueueList::PrintRouteDestinationInfos(CQueuePtr& p_mqueue, std::ostream& s
 
     while( it != et ){
         CQueuePtr p_queue = *it;
-        if( (p_queue->RouteQueue == p_mqueue->Name) && (p_queue->ShortServerName == p_mqueue->ShortServerName) ){
+        if( (p_queue->GetRouteQueueName() == p_mqueue->GetName()) &&
+            (p_queue->GetShortServerName() == p_mqueue->GetShortServerName()) ){
             p_queue->PrintLineInfo(sout);
         }
         it++;
@@ -187,8 +188,8 @@ void CQueueList::MapRouteQueues(void)
 
     while( it != et ){
         CQueuePtr p_queue = *it;
-        if( p_queue->IsRoute() ){
-            std::string sdest(p_queue->RouteDestinations);
+        if( p_queue->IsRouteQueue() ){
+            std::string sdest(p_queue->GetRouteDestinations());
             std::vector<std::string> queues;
             split(queues,sdest,is_any_of(","));
 
@@ -196,13 +197,31 @@ void CQueueList::MapRouteQueues(void)
             std::vector<std::string>::iterator qet = queues.end();
 
             while( qit != qet ){
-                CQueuePtr p_dqueue = FindQueue(p_queue->ShortServerName,*qit);
+                CQueuePtr p_dqueue = FindQueue(p_queue->GetShortServerName(),*qit);
                 if( p_dqueue ){
-                    p_dqueue->RouteQueue = p_queue->Name;
+                    p_dqueue->SetRouteQueueName(p_queue->GetName());
                 }
                 qit++;
             }
         }
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CQueueList::GetQueuesWithServer(std::vector<std::string>& qlist)
+{
+    std::list<CQueuePtr>::iterator it = begin();
+    std::list<CQueuePtr>::iterator et = end();
+
+    while( it != et ){
+        CQueuePtr    p_queue = *it;
+
+        CSmallString queue;
+        queue << p_queue->GetName() << "." << p_queue->GetShortServerName();
+        qlist.push_back(string(queue));
+
         it++;
     }
 }
@@ -230,7 +249,7 @@ const CQueuePtr CQueueList::FindQueue(const CSmallString& server,const CSmallStr
     std::list<CQueuePtr>::iterator et = end();
 
     while( it != et ){
-        if( ((*it)->GetName() == name) && ((*it)->ShortServerName == server) ) return(*it);
+        if( ((*it)->GetName() == name) && ((*it)->GetShortServerName() == server) ) return(*it);
         it++;
     }
 

@@ -55,6 +55,9 @@ public:
     //! get queues suggestions
     void GetQueuesSuggestions(std::vector<CSmallString>& suggestions);
 
+    //! get list of queue with server (queue.server)
+    void GetQueuesWithServer(std::vector<std::string>& qlist);
+
     //! find queue
     const CQueuePtr FindQueue(const CSmallString& name);
 

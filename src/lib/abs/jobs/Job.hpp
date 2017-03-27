@@ -377,7 +377,7 @@ public:
     static CFileName GetJobInputPath(void);
 
 // section of private data -----------------------------------------------------
-private:
+protected:
     bool        InfoFileLoaded;
 
     /// list nodes

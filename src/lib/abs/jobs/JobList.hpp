@@ -111,9 +111,6 @@ public:
     /// keep only jobs of given user
     void KeepUserJobs(const CSmallString& name);
 
-    /// remove completed jobs
-    void RemoveCompletedJobs(void);
-
     /// keep only completed jobs
     void KeepOnlyCompletedJobs(void);
 

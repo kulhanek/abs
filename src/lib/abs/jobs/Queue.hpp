@@ -44,29 +44,41 @@ public:
         CQueue(void);
 
 // information methods ---------------------------------------------------------
+    //! get name
+    const CSmallString& GetName(void) const;
+
+    //! get type
+    const CSmallString& GetType(void) const;
+
+    //! get short server name
+    const CSmallString GetShortServerName(void);
+
     //! is started?
     bool IsStarted(void) const;
 
     //! is enabled?
     bool IsEnabled(void) const;
 
-    //! is route
-    bool IsRoute(void) const;
+    //! is route queue
+    bool IsRouteQueue(void) const;
+
+    //! get route destinations
+    const CSmallString GetRouteDestinations(void) const;
 
     //! is route destination
     bool IsRouteDestination(void) const;
+
+    //! get name of route queue
+    const CSmallString GetRouteQueueName(void) const;
+
+    //! get name of route queue
+    void SetRouteQueueName(const CSmallString& name);
 
     //! print line info about the queue
     void PrintLineInfo(std::ostream& sout);
 
     //! is queue allowed for the user
     bool IsAllowed(CUser& user) const;
-
-    //! get name
-    const CSmallString& GetName(void) const;
-
-    //! get type
-    const CSmallString& GetType(void) const;
 
     //! get walltime
     const CSmallTime& GetMaxWallTime(void) const;
@@ -94,8 +106,6 @@ protected:
 
     std::vector<CSmallString>   ACLUsers;
     std::vector<CSmallString>   ACLGroups;
-
-    friend class CQueueList;
 };
 
 // -----------------------------------------------------------------------------

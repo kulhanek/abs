@@ -343,7 +343,7 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::GetAllJobs(CJobList& jobs)
+bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
 {
 // it does not work in PBSPro
 //    struct attrl* p_first = NULL;
@@ -386,7 +386,7 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
+bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished)
 {
 // it does not work in PBSPro
 //    struct attrl* p_first = NULL;
@@ -429,7 +429,7 @@ bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user)
+bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished)
 {
     struct attropl* p_first = NULL;
     set_attribute(p_first,ATTR_USER_LIST,NULL,user,EQ);

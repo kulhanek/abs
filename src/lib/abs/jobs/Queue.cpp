@@ -44,6 +44,13 @@ CQueue::CQueue(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
+const CSmallString CQueue::GetShortServerName(void)
+{
+    return(ShortServerName);
+}
+
+//------------------------------------------------------------------------------
+
 bool CQueue::IsStarted(void) const
 {
     return(Started);
@@ -58,9 +65,16 @@ bool CQueue::IsEnabled(void) const
 
 //------------------------------------------------------------------------------
 
-bool CQueue::IsRoute(void) const
+bool CQueue::IsRouteQueue(void) const
 {
     return( RouteDestinations != NULL );
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CQueue::GetRouteDestinations(void) const
+{
+    return(RouteDestinations);
 }
 
 //------------------------------------------------------------------------------
@@ -68,6 +82,20 @@ bool CQueue::IsRoute(void) const
 bool CQueue::IsRouteDestination(void) const
 {
     return( RouteQueue != NULL );
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CQueue::GetRouteQueueName(void) const
+{
+    return(RouteQueue);
+}
+
+//------------------------------------------------------------------------------
+
+void CQueue::SetRouteQueueName(const CSmallString& name)
+{
+    RouteQueue = name;
 }
 
 //------------------------------------------------------------------------------
@@ -98,7 +126,7 @@ bool CQueue::IsAllowed(CUser& user) const
 
     // check groups
     for(unsigned int i = 0; i < ACLGroups.size(); i++){
-        if( user.IsInGroup(ACLGroups[i]) ) return(true);
+        if( user.IsInPosixGroup(ACLGroups[i]) ) return(true);
     }
 
     return(false);

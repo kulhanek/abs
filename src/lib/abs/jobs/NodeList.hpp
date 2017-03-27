@@ -36,6 +36,7 @@
 class ABS_PACKAGE CNodeGroup : public std::set<CNodePtr> {
 public:
     std::string             GroupName;
+    std::string             BatchServer;
     std::set<std::string>   CommonProps;
     std::list<CNodePtr>     SortedNodes;
 
@@ -92,7 +93,7 @@ public:
     void FinalizeNodeGroups(void);
 
     /// keep only those nodes that has at least one of properties
-    void KeepNodesThatHaveProperty(const std::vector<std::string>& props);
+    void KeepNodesByQueuesWithServer(const std::vector<std::string>& qlist);
 
     /// keep nodes by mask
     void KeepNodesByMask(struct SExpression* p_mask);
@@ -107,8 +108,7 @@ public:
 private:
     std::list<CNodeGroupPtr>            NodeGroups;
     std::set<CNodePtr>                  ReasonableNodes;
-    std::set<std::string>               UniqueProps;
-    std::map<std::string,std::string>   HWDatabase;
+    std::set<std::string>               AllProps;
 
     // helper methods
     bool IsNodeSelected(CNodePtr p_node,struct SExpression* p_expr);

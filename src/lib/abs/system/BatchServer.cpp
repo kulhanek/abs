@@ -81,7 +81,7 @@ bool CBatchServer::GetNodes(CNodeList& nodes)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::GetAllJobs(CJobList& jobs)
+bool CBatchServer::GetAllJobs(CJobList& jobs,bool finished)
 {
     return(false);
 }

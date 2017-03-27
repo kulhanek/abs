@@ -107,12 +107,12 @@ bool CKillAll::Run(void)
     vout << endl;
     vout << low;
 
-    if( BatchServers.GetUserJobs(Jobs,User.GetName()) == false ){
+    if( BatchServers.GetUserJobs(JobList,User.GetName(),false) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }
 
-    Jobs.KeepOnlyLiveJobs();
+    JobList.KeepOnlyLiveJobs();
 
     // filter jobs
     if( Options.IsOptSearchSet() ){
@@ -123,19 +123,19 @@ bool CKillAll::Run(void)
             ES_ERROR("unable to set search expression");
             return(false);
         }
-        Jobs.KeepJobsByMask(get_expression_tree());
+        JobList.KeepJobsByMask(get_expression_tree());
         //print_expression_tree(get_expression_tree());
         free_mask_tree();
     }
 
     // print info about jobs
-    Jobs.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
+    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
 
     // print batch stat
     vout << endl;
-    Jobs.PrintBatchInfoStat(vout);
+    JobList.PrintBatchInfoStat(vout);
 
-    if( Jobs.GetNumberOfJobs() == 0 ){
+    if( JobList.GetNumberOfJobs() == 0 ){
         vout << endl;
         vout << "<b><red> ERROR: No submitted or running jobs were found!</red></b>" << endl;
         return(false);
@@ -160,13 +160,13 @@ bool CKillAll::Run(void)
     }
 
     // load info files
-    Jobs.LoadAllInfoFiles();
+    JobList.LoadAllInfoFiles();
 
     // kill all jobs
-    Jobs.KillAllJobsWithInfo(vout,Options.GetOptForce());
+    JobList.KillAllJobsWithInfo(vout,Options.GetOptForce());
 
     // save info files
-    Jobs.SaveAllInfoFiles();
+    JobList.SaveAllInfoFiles();
 
     return(true);
 }

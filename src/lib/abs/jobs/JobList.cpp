@@ -192,28 +192,6 @@ void CJobList::KeepUserJobs(const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-void CJobList::RemoveCompletedJobs(void)
-{
-    list<CJobPtr>::iterator it = begin();
-    list<CJobPtr>::iterator ie = end();
-
-    while( it != ie ){
-        CJobPtr p_job = *it;
-        switch( p_job->GetJobBatchStatus() ){
-            case EJS_FINISHED:
-                // delete
-                it = erase(it);
-                continue;
-            default:
-                // keep
-                it++;
-                continue;
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-
 void CJobList::KeepOnlyCompletedJobs(void)
 {
     list<CJobPtr>::iterator it = begin();

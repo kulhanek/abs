@@ -50,7 +50,6 @@ private:
     CQStatOptions   Options;
     CTerminalStr    Console;
     CVerboseStr     vout;
-    CJobList        Jobs;
 };
 
 // -----------------------------------------------------------------------------

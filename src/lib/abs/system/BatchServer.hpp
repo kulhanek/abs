@@ -67,7 +67,7 @@ public:
     virtual bool GetNodes(CNodeList& nodes);
 
     //! init all job list
-    virtual bool GetAllJobs(CJobList& jobs);
+    virtual bool GetAllJobs(CJobList& jobs,bool finished);
 
     //! get queue jobs
     virtual bool GetQueueJobs(CJobList& jobs,const CSmallString& queue_name);

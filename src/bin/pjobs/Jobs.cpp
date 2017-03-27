@@ -112,7 +112,7 @@ bool CJobs::Run(void)
     vout << endl;
     vout << low;
 
-    if( BatchServers.GetUserJobs(JobList,User.GetName()) == false ){
+    if( BatchServers.GetUserJobs(JobList,User.GetName(),Options.GetOptKeepCompleted() | Options.GetOptFinished()) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }
@@ -120,11 +120,6 @@ bool CJobs::Run(void)
     if( Options.GetOptFinished() ) {
         JobList.KeepOnlyCompletedJobs();
         JobList.SortByFinishDateAndTime();
-    } else {
-        // filter jobs
-        if( ! Options.GetOptKeepCompleted() ){
-            JobList.RemoveCompletedJobs();
-        }
     }
 
     if( Options.IsOptSearchSet() ){
