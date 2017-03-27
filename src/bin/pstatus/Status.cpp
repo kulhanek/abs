@@ -22,7 +22,7 @@
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
 #include <ABSConfig.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 
 using namespace std;
 
@@ -88,7 +88,7 @@ bool CStatus::Run(void)
         return(false);
     }
 
-    if( BatchSystems.Init() == false ){
+    if( BatchServers.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }

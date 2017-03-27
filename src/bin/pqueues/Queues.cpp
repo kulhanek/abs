@@ -25,7 +25,7 @@
 #include <ABSConfig.hpp>
 #include <User.hpp>
 #include <QueueList.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 
 using namespace std;
 
@@ -84,7 +84,7 @@ bool CQueues::Run(void)
     }
     vout << low;
     vout << "#" << endl;
-    ABSConfig.PrintBatchServerInfo(vout);
+    BatchServers.PrintServerOverview(vout);
     vout << "#" << endl;
 
     // check if user has valid ticket
@@ -94,14 +94,14 @@ bool CQueues::Run(void)
         return(false);
     }
 
-    if( BatchSystems.Init() == false ){
+    if( BatchServers.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
 
     if( Options.GetOptTechnical() ){
         vout << endl;
-        BatchSystems.PrintQueues(vout);
+        BatchServers.PrintQueues(vout);
         return(true);
     }
 
@@ -112,7 +112,7 @@ bool CQueues::Run(void)
     vout << endl;
     vout << low;
 
-    if( BatchSystems.GetQueues() == false ){
+    if( BatchServers.GetQueues() == false ){
         ES_ERROR("unable to get queues");
         return(false);
     }

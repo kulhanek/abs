@@ -51,7 +51,7 @@ public:
     /// add new alias
     bool AddAlias(std::ostream& sout,
                   const CSmallString& name,const CSmallString& queue,
-                  const CSmallString& sync,const CSmallString& resources);
+                  const CSmallString& resources);
 
     /// remove the alias
     void RemoveAlias(const CSmallString& name);

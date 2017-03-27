@@ -20,82 +20,104 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 #include <Job.hpp>
 #include <JobList.hpp>
+#include <AMSGlobalConfig.hpp>
 
 //------------------------------------------------------------------------------
 
-CBatchSystems BatchSystems;
+using namespace std;
+
+//------------------------------------------------------------------------------
+
+CBatchServers BatchServers;
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CBatchSystems::CBatchSystems(void)
+CBatchServers::CBatchServers(void)
 {
 }
 
 //------------------------------------------------------------------------------
 
-CBatchSystems::~CBatchSystems()
+CBatchServers::~CBatchServers()
 {
+}
+
+//------------------------------------------------------------------------------
+
+bool CBatchServers::Init(void)
+{
+    return(false);
 }
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchSystems::Init(void)
+bool CBatchServers::IsServerAvailable(const CSmallString& name)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::GetQueues(void)
+void CBatchServers::PrintServerOverview(std::ostream& vout)
+{
+    vout << "# Site name     : " << AMSGlobalConfig.GetActiveSiteName() << endl;
+   // vout << "# Torque server : " << GetServerName() << endl;
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+bool CBatchServers::GetQueues(void)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::GetNodes(void)
+bool CBatchServers::GetNodes(void)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::GetAllJobs(CJobList& jobs)
+bool CBatchServers::GetAllJobs(CJobList& jobs)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
+bool CBatchServers::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::GetUserJobs(CJobList& jobs,const CSmallString& user)
+bool CBatchServers::GetUserJobs(CJobList& jobs,const CSmallString& user)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::GetJob(CJobList& jobs,const CSmallString& jobid)
+bool CBatchServers::GetJob(CJobList& jobs,const CSmallString& jobid)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-const CJobPtr CBatchSystems::GetJob(const CSmallString& jobid)
+const CJobPtr CBatchServers::GetJob(const CSmallString& jobid)
 {
     return(CJobPtr());
 }
@@ -104,35 +126,35 @@ const CJobPtr CBatchSystems::GetJob(const CSmallString& jobid)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchSystems::SubmitJob(CJob& job)
+bool CBatchServers::SubmitJob(CJob& job)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::GetJobStatus(CJob& job)
+bool CBatchServers::GetJobStatus(CJob& job)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::KillJob(CJob& job)
+bool CBatchServers::KillJob(CJob& job)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::KillJobByID(const CSmallString& jobid)
+bool CBatchServers::KillJobByID(const CSmallString& jobid)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-const CSmallString CBatchSystems::GetLastErrorMsg(void)
+const CSmallString CBatchServers::GetLastErrorMsg(void)
 {
     return("");
 }
@@ -141,35 +163,35 @@ const CSmallString CBatchSystems::GetLastErrorMsg(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchSystems::PrintQueues(std::ostream& sout)
+bool CBatchServers::PrintQueues(std::ostream& sout)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::PrintNodes(std::ostream& sout)
+bool CBatchServers::PrintNodes(std::ostream& sout)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::PrintNode(std::ostream& sout,const CSmallString& name)
+bool CBatchServers::PrintNode(std::ostream& sout,const CSmallString& name)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::PrintJobs(std::ostream& sout)
+bool CBatchServers::PrintJobs(std::ostream& sout)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchSystems::PrintJob(std::ostream& sout,const CSmallString& name)
+bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& name)
 {
     return(false);
 }

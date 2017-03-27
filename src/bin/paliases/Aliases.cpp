@@ -27,7 +27,7 @@
 #include <AliasList.hpp>
 #include <NodeList.hpp>
 #include <AMSGlobalConfig.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 
 using namespace std;
 
@@ -107,7 +107,7 @@ bool CAliases::ListAliases(void)
 
     vout << low;
     vout << "#" << endl;
-    ABSConfig.PrintBatchServerInfo(vout);
+    BatchServers.PrintServerOverview(vout);
     vout << "#" << endl;
     vout << endl;
 
@@ -138,7 +138,7 @@ bool CAliases::AddAlias(void)
         return(false);
     }
 
-    if( BatchSystems.Init() == false ){
+    if( BatchServers.Init() == false ){
         ES_ERROR("unable to init batch servers");
         return(false);
     }
@@ -161,7 +161,7 @@ bool CAliases::AddAlias(void)
         }
     }
 
-    if( BatchSystems.GetQueues() == false ){
+    if( BatchServers.GetQueues() == false ){
         ES_ERROR("unable to get list of queues");
         return(false);
     }
@@ -172,14 +172,14 @@ bool CAliases::AddAlias(void)
     QueueList.RemoveNonexecutiveQueues();
     QueueList.SortByName();
 
-    if( BatchSystems.GetNodes() == false ){
+    if( BatchServers.GetNodes() == false ){
         ES_ERROR("unable to load nodes");
         return(false);
     }
 
     vout << low;
     if( AliasList.AddAlias(vout,Options.GetProgArg(1),Options.GetProgArg(2),
-                         Options.GetProgArg(3),Options.GetProgArg(4)) == false ){
+                         Options.GetProgArg(3)) == false ){
         vout << endl;
         return(false);
     }

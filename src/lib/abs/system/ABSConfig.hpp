@@ -45,9 +45,6 @@ public:
 // system setup ----------------------------------------------------------------
     bool LoadSystemConfig(void);
 
-    /// load site configuration
-    bool LoadSystemConfig(const CSmallString& site_sid);
-
 // user setup ------------------------------------------------------------------
     /// load user config
     bool LoadUserConfig(void);
@@ -89,20 +86,14 @@ public:
     const CFileName GetUserConfigDir(const CFileName& sub_dir);
 
 // jobs ------------------------------------------------------------------------
-    /// print batch system info
-    void PrintBatchServerInfo(std::ostream& vout);
-
-    /// is sync mode supported
-    bool IsSyncModeSupported(const CSmallString& name);
+    /// get server group configuration
+    CXMLElement* GetServerGroupConfig(void);
 
     /// get node group configuration
     CXMLElement* GetNodeGroupConfig(void);
 
     /// have user valid ticket
     bool IsUserTicketValid(std::ostream& sout);
-
-    /// is server availbale for the active site
-    bool IsServerAvailable(const CSmallString& srv);
 
 // configuration methods -------------------------------------------------------
     /// return system configuration value
@@ -123,13 +114,6 @@ public:
     /// set user configuration value
     void SetUserConfigItem(const CSmallString& item_name,
                            const CSmallString& item_value);
-
-    /// get plugin config item
-    bool GetSystemConfigItem(const CUUID& pobject, const CSmallString& item_name,
-                             CSmallString& item_value);
-
-    /// get plugin config item
-    const CSmallString GetSystemConfigItem(const CUUID& pobject, const CSmallString& item_name);
 
 // section of private data -----------------------------------------------------
 private:

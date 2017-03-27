@@ -20,7 +20,7 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <BatchClient.hpp>
+#include <BatchServer.hpp>
 #include <Job.hpp>
 #include <JobList.hpp>
 
@@ -28,14 +28,14 @@
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CBatchClient::CBatchClient(CPluginObject* p_objectinfo)
+CBatchServer::CBatchServer(CPluginObject* p_objectinfo)
     : CComObject(p_objectinfo)
 {
 }
 
 //------------------------------------------------------------------------------
 
-CBatchClient::~CBatchClient(void)
+CBatchServer::~CBatchServer(void)
 {
 
 }
@@ -44,7 +44,7 @@ CBatchClient::~CBatchClient(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchClient::Init(const CSmallString& server_name)
+bool CBatchServer::Init(const CSmallString& server_name)
 {
     return(false);
 }
@@ -53,42 +53,42 @@ bool CBatchClient::Init(const CSmallString& server_name)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchClient::GetQueues(CQueueList& queues)
+bool CBatchServer::GetQueues(CQueueList& queues)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::GetNodes(CNodeList& nodes)
+bool CBatchServer::GetNodes(CNodeList& nodes)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::GetAllJobs(CJobList& jobs)
+bool CBatchServer::GetAllJobs(CJobList& jobs)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
+bool CBatchServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::GetUserJobs(CJobList& jobs,const CSmallString& user)
+bool CBatchServer::GetUserJobs(CJobList& jobs,const CSmallString& user)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::GetJob(CJobList& jobs,const CSmallString& jobid)
+bool CBatchServer::GetJob(CJobList& jobs,const CSmallString& jobid)
 {
     CJobPtr job = GetJob(jobid);
     if( job != NULL ){
@@ -100,42 +100,42 @@ bool CBatchClient::GetJob(CJobList& jobs,const CSmallString& jobid)
 
 //------------------------------------------------------------------------------
 
-const CJobPtr CBatchClient::GetJob(const CSmallString& jobid)
+const CJobPtr CBatchServer::GetJob(const CSmallString& jobid)
 {
     return(CJobPtr());
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::PrintQueues(std::ostream& sout)
+bool CBatchServer::PrintQueues(std::ostream& sout)
 {
     return(true);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::PrintNodes(std::ostream& sout)
+bool CBatchServer::PrintNodes(std::ostream& sout)
 {
     return(true);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::PrintNode(std::ostream& sout,const CSmallString& name)
+bool CBatchServer::PrintNode(std::ostream& sout,const CSmallString& name)
 {
     return(true);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::PrintJobs(std::ostream& sout)
+bool CBatchServer::PrintJobs(std::ostream& sout)
 {
     return(true);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::PrintJob(std::ostream& sout,const CSmallString& name)
+bool CBatchServer::PrintJob(std::ostream& sout,const CSmallString& name)
 {
     return(true);
 }
@@ -144,35 +144,35 @@ bool CBatchClient::PrintJob(std::ostream& sout,const CSmallString& name)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchClient::SubmitJob(CJob& job)
+bool CBatchServer::SubmitJob(CJob& job)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::GetJobStatus(CJob& job)
+bool CBatchServer::GetJobStatus(CJob& job)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::KillJob(CJob& job)
+bool CBatchServer::KillJob(CJob& job)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchClient::KillJobByID(const CSmallString& jobid)
+bool CBatchServer::KillJobByID(const CSmallString& jobid)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-const std::string CBatchClient::GetLastErrorMsg(void)
+const std::string CBatchServer::GetLastErrorMsg(void)
 {
     return("");
 }

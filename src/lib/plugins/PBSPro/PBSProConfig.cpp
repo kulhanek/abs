@@ -81,7 +81,7 @@ bool CTorqueConfig::LoadSystemConfig(void)
     CFileName      config_name;
 
     // load infinity config
-    config_name = GlobalConfig.GetABSRootDir() / "etc" / "sites" / GlobalConfig.GetActiveSiteID() / "torque.xml";
+    config_name = GlobalConfig.GetABSRootDir() / "etc" / "sites" / GlobalConfig.GetActiveSiteID() / "pbspro.xml";
 
     CXMLParser xml_parser;
     xml_parser.SetOutputXMLNode(&SystemConfig);
@@ -108,7 +108,7 @@ bool CTorqueConfig::LoadSystemConfig(const CSmallString& site_sid)
     CFileName      config_name;
 
     // load infinity config
-    config_name = GlobalConfig.GetABSRootDir() / "etc" / "sites" / site_sid / "torque.xml";
+    config_name = GlobalConfig.GetABSRootDir() / "etc" / "sites" / site_sid / "pbspro.xml";
 
     CXMLParser xml_parser;
     xml_parser.SetOutputXMLNode(&SystemConfig);
@@ -129,7 +129,7 @@ bool CTorqueConfig::LoadSystemConfig(const CSmallString& site_sid)
 bool CTorqueConfig::LoadUserConfig(void)
 {
     CFileName      config_name;
-    config_name = GlobalConfig.GetUserSiteConfigDir() / "torque.xml";
+    config_name = GlobalConfig.GetUserSiteConfigDir() / "pbspro.xml";
 
     // is file?
     if( CFileSystem::IsFile(config_name) == false ){
@@ -160,7 +160,7 @@ bool CTorqueConfig::LoadUserConfig(void)
 bool CTorqueConfig::SaveUserConfig(void)
 {
     CFileName      config_name;
-    config_name = GlobalConfig.GetUserSiteConfigDir() / "torque.xml";
+    config_name = GlobalConfig.GetUserSiteConfigDir() / "pbspro.xml";
 
     CXMLPrinter xml_printer;
     xml_printer.SetPrintedXMLNode(&UserConfig);

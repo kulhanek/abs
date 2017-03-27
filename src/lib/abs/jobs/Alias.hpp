@@ -37,8 +37,7 @@ class ABS_PACKAGE CAlias {
 public:
 // constructor -----------------------------------------------------------------
         CAlias(void);
-        CAlias(const CSmallString& name,const CSmallString& queue,
-               const CSmallString& sync,const CSmallString& resources);
+        CAlias(const CSmallString& name,const CSmallString& queue,const CSmallString& resources);
 
 // executive methods -----------------------------------------------------------
     /// test alias
@@ -57,9 +56,6 @@ public:
     //! get destination
     const CSmallString& GetDestination(void) const;
 
-    //! get sync mode
-    const CSmallString& GetSyncMode(void) const;
-
     //! get resources
     const CResourceList& GetResources(void) const;
 
@@ -75,7 +71,6 @@ private:
     bool            SystemAlias;
     CSmallString    Name;
     CSmallString    Destination;
-    CSmallString    SyncMode;
     CResourceList   Resources;
 };
 

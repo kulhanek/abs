@@ -24,7 +24,7 @@
 #include <SmallTimeAndDate.hpp>
 #include <ABSConfig.hpp>
 #include <Shell.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 
 using namespace std;
 
@@ -90,7 +90,7 @@ bool CSanitize::Run(void)
         return(false);
     }
 
-    if( BatchSystems.Init() == false ){
+    if( BatchServers.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }

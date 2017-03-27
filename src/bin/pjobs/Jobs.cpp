@@ -24,7 +24,7 @@
 #include <SmallTimeAndDate.hpp>
 #include <ABSConfig.hpp>
 #include <CommonParser.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -85,7 +85,7 @@ bool CJobs::Run(void)
 
     vout << low;
     vout << "#" << endl;
-    ABSConfig.PrintBatchServerInfo(vout);
+    BatchServers.PrintServerOverview(vout);
     if( Options.IsOptSearchSet() ){
         std::string str = string(Options.GetOptSearch());
         boost::replace_all(str,"<","<<");
@@ -101,7 +101,7 @@ bool CJobs::Run(void)
     }
 
     // we need ticket here
-    if( BatchSystems.Init() == false ){
+    if( BatchServers.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
@@ -118,7 +118,7 @@ bool CJobs::Run(void)
     vout << endl;
     vout << low;
 
-    if( BatchSystems.GetUserJobs(Jobs,User.GetName()) == false ){
+    if( BatchServers.GetUserJobs(Jobs,User.GetName()) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }

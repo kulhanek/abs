@@ -88,7 +88,7 @@ bool CABSConfig::LoadSystemConfig(void)
     CFileName      config_name;
 
     // load infinity config
-    config_name = GetABSRootDir() / "etc" / "sites" / AMSGlobalConfig.GetActiveSiteID() / "torque.xml";
+    config_name = GetABSRootDir() / "etc" / "sites" / AMSGlobalConfig.GetActiveSiteID() / "abs.xml";
 
     CXMLParser xml_parser;
     xml_parser.SetOutputXMLNode(&SystemConfig);
@@ -109,27 +109,6 @@ bool CABSConfig::LoadSystemConfig(void)
     return(true);
 }
 
-//------------------------------------------------------------------------------
-
-bool CABSConfig::LoadSystemConfig(const CSmallString& site_sid)
-{
-    CFileName      config_name;
-
-    // load infinity config
-    config_name = GetABSRootDir() / "etc" / "sites" / site_sid / "torque.xml";
-
-    CXMLParser xml_parser;
-    xml_parser.SetOutputXMLNode(&SystemConfig);
-
-    // load system setup ---------------------------
-    if( xml_parser.Parse(config_name) == false ){
-        ES_ERROR("unable to load Infinity system config");
-        return(false);
-    }
-
-    return(true);
-}
-
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
@@ -137,7 +116,7 @@ bool CABSConfig::LoadSystemConfig(const CSmallString& site_sid)
 bool CABSConfig::LoadUserConfig(void)
 {
     CFileName      config_name;
-    config_name = GetUserSiteConfigDir() / "torque.xml";
+    config_name = GetUserSiteConfigDir() / "abs.xml";
 
     // is file?
     if( CFileSystem::IsFile(config_name) == false ){
@@ -168,7 +147,7 @@ bool CABSConfig::LoadUserConfig(void)
 bool CABSConfig::SaveUserConfig(void)
 {
     CFileName      config_name;
-    config_name =  GetUserSiteConfigDir() / "torque.xml";
+    config_name =  GetUserSiteConfigDir() / "abs.xml";
 
     CXMLPrinter xml_printer;
     xml_printer.SetPrintedXMLNode(&UserConfig);
@@ -187,7 +166,7 @@ bool CABSConfig::SaveUserConfig(void)
 bool CABSConfig::RemoveUserConfig(void)
 {
     UserConfig.RemoveAllChildNodes();
-    UserConfig.GetChildElementByPath("torque/config",true);
+    UserConfig.GetChildElementByPath("abs/config",true);
     return(true);
 }
 
@@ -274,7 +253,7 @@ const CFileName CABSConfig::GetUserConfigDir(const CFileName& sub_dir)
 
     if( user_config_dir == NULL ) {
         user_config_dir = CShell::GetSystemVariable("HOME");
-        user_config_dir = user_config_dir / ".abs" ;
+        user_config_dir = user_config_dir / ".abs" / LibConfigVersion_ABS ;
     }
 
     if( sub_dir != NULL ) user_config_dir = user_config_dir / sub_dir;
@@ -307,7 +286,7 @@ const CFileName CABSConfig::GetUserConfigDir(const CFileName& sub_dir)
 bool CABSConfig::GetSystemConfigItem(const CSmallString& item_name,
                                         CSmallString& item_value)
 {
-    CXMLElement*    p_ele = SystemConfig.GetChildElementByPath("torque");
+    CXMLElement*    p_ele = SystemConfig.GetChildElementByPath("abs/config");
     return( GetSystemConfigItem(p_ele,item_name,item_value) );
 }
 
@@ -319,8 +298,6 @@ const CSmallString CABSConfig::GetSystemConfigItem(const CSmallString& item_name
     GetSystemConfigItem(item_name,out);
     return(out);
 }
-
-
 
 //------------------------------------------------------------------------------
 
@@ -336,7 +313,7 @@ bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
 bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
                                       CSmallString& item_value,bool& system)
 {
-    CXMLElement*    p_ele = UserConfig.GetChildElementByPath("torque");
+    CXMLElement*    p_ele = UserConfig.GetChildElementByPath("abs/config");
     CXMLIterator    I(p_ele);
     CXMLElement*    p_sele;
 
@@ -370,7 +347,7 @@ bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
 void CABSConfig::SetUserConfigItem(const CSmallString& item_name,
                                       const CSmallString& item_value)
 {
-    CXMLElement*    p_ele = UserConfig.GetChildElementByPath("torque",true);
+    CXMLElement*    p_ele = UserConfig.GetChildElementByPath("abs/config",true);
     CXMLIterator    I(p_ele);
     CXMLElement*    p_sele;
 
@@ -411,86 +388,20 @@ bool CABSConfig::GetSystemConfigItem(CXMLElement* p_root, const CSmallString& it
     return(false);
 }
 
-//------------------------------------------------------------------------------
-
-bool CABSConfig::GetSystemConfigItem(const CUUID& pobject, const CSmallString& item_name,
-                                        CSmallString& item_value)
-{
-    CXMLElement*    p_ele = SystemConfig.GetChildElementByPath("torque/plugins");
-    CXMLIterator    I(p_ele);
-    CXMLElement*    p_sele;
-
-    while( (p_sele = I.GetNextChildElement("plugin")) != NULL ){
-        CSmallString    name;
-        p_sele->GetAttribute("name",name);
-        CExtUUID plugin_uuid(name);
-        if( plugin_uuid == pobject ){
-                return( GetSystemConfigItem(p_sele,item_name,item_value) );
-        }
-    }
-
-    CSmallString error;
-    error << "unable to find system config item '" << item_name << "' for plugin '" << pobject.GetStringForm() << "'";
-    ES_ERROR(error);
-
-    return(false);
-
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CABSConfig::GetSystemConfigItem(const CUUID& pobject, const CSmallString& item_name)
-{
-    CSmallString item_value;
-    GetSystemConfigItem(pobject,item_name,item_value);
-    return(item_value);
-}
-
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-void CABSConfig::PrintBatchServerInfo(std::ostream& vout)
+CXMLElement* CABSConfig::GetServerGroupConfig(void)
 {
-    // FIXME
-    vout << "#" << endl;
-    vout << "# Site name     : " << AMSGlobalConfig.GetActiveSiteName() << endl;
-   // vout << "# Batch  server : " << ABSConfig.GetServerName() << endl;
-    vout << "#" << endl;
-}
-
-//------------------------------------------------------------------------------
-
-bool CABSConfig::IsSyncModeSupported(const CSmallString& name)
-{
-    // FIXME
-//    CSmallString allowed_sync_modes="sync";
-//    ABSConfig.GetSystemConfigItem("INF_SUPPORTED_SYNCMODES",allowed_sync_modes);
-
-//    vector<string>  sync_modes;
-//    string sl = string(allowed_sync_modes);
-//    split(sync_modes,sl,is_any_of(":"));
-
-//    if( find(sync_modes.begin(),sync_modes.end(),string(SyncMode)) == sync_modes.end() ){
-
-//    }
-    return(true);
-}
-
-//------------------------------------------------------------------------------
-
-bool CABSConfig::IsServerAvailable(const CSmallString& srv)
-{
-    // FIXME
-    return(true);
+    return( SystemConfig.GetChildElementByPath("abs/servers") );
 }
 
 //------------------------------------------------------------------------------
 
 CXMLElement* CABSConfig::GetNodeGroupConfig(void)
 {
-    // FIXME
-    return( SystemConfig.GetChildElementByPath("torque/nodes") );
+    return( SystemConfig.GetChildElementByPath("abs/nodes") );
 }
 
 //------------------------------------------------------------------------------

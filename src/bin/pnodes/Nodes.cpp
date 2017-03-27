@@ -26,7 +26,7 @@
 #include <NodeList.hpp>
 #include <QueueList.hpp>
 #include <CommonParser.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -88,7 +88,7 @@ bool CNodes::Run(void)
     vout << low;
     if( Options.GetOptPrintNames() == false ){
         vout << "#" << endl;
-        ABSConfig.PrintBatchServerInfo(vout);
+        BatchServers.PrintServerOverview(vout);
         if( Options.IsOptSearchSet() ){
             std::string str = string(Options.GetOptSearch());
             boost::replace_all(str,"<","<<");
@@ -103,20 +103,20 @@ bool CNodes::Run(void)
         return(false);
     }
 
-    if( BatchSystems.Init() == false ){
+    if( BatchServers.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
 
     if( Options.GetOptTechnical() ){
         vout << endl;
-        BatchSystems.PrintNodes(vout);
+        BatchServers.PrintNodes(vout);
         return(true);
     }
 
     if( Options.IsOptNodeSet() ){
         // only single node info
-        BatchSystems.PrintNode(vout,Options.GetOptNode());
+        BatchServers.PrintNode(vout,Options.GetOptNode());
         return(true);
     }
 
@@ -132,13 +132,13 @@ bool CNodes::Run(void)
         return(true);
     }
 
-    if( BatchSystems.GetNodes() == false ){
+    if( BatchServers.GetNodes() == false ){
         ES_ERROR("unable to load nodes");
         return(false);
     }
 
     if( Options.GetOptKeepAll() == false ) {
-        if( BatchSystems.GetQueues() == false ){
+        if( BatchServers.GetQueues() == false ){
             ES_ERROR("unable to get queues");
             return(false);
         }

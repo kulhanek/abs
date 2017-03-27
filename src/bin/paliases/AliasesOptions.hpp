@@ -48,7 +48,7 @@ class CAliasesOptions : public CSimpleOptions {
         "<b>Actions:</b>\n"
         "   <b><cyan>list</cyan></b>\n"
         "          list all aliases (default action)\n\n"
-        "   <b><cyan>add <u>alias</u> <u>destination</u> <u>sync</u> <u>resources</u></cyan></b>\n"
+        "   <b><cyan>add <u>alias</u> <u>destination</u> <u>resources</u></cyan></b>\n"
         "          add new <u>alias</u>\n\n"
         "   <b><cyan>remove <u>alias</u></cyan></b>\n"
         "          remove the <u>alias</u>\n"

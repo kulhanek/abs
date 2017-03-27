@@ -11,8 +11,8 @@ SET(ABS_SRC
         system/CategoryUUID.cpp
         system/TicketChecker.cpp
         system/JobType.cpp
-        system/BatchClient.cpp
-        system/BatchSystems.cpp
+        system/BatchServer.cpp
+        system/BatchServers.cpp
 
     # jobs ---------------------------------------
         jobs/search/nodes/NodeMask.tab.c

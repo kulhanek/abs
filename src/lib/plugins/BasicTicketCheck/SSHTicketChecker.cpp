@@ -68,7 +68,8 @@ CSSHTicketChecker::CSSHTicketChecker(void)
 bool CSSHTicketChecker::IsTicketValid(std::ostream& sout)
 {
     CSmallString public_key_name = "id_rsa.pub";
-    ABSConfig.GetSystemConfigItem(SSHTicketCheckerID,"INF_PUB_KEY_NAME",public_key_name);
+    // FIXME - config from plugin database
+    // ABSConfig.GetSystemConfigItem(SSHTicketCheckerID,"INF_PUB_KEY_NAME",public_key_name);
 
     // get full paths
     CFileName authorized_keys_name;

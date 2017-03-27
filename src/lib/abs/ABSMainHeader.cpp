@@ -24,6 +24,7 @@
 
 //------------------------------------------------------------------------------
 
+const char* LibConfigVersion_ABS    = "3.x";
 const char* LibBuildVersion_ABS     = "3.x.SVNVERSION (DATE) [ABS]";
 const char* LibBuildVersion_ABS_Web = "3.x.SVNVERSION (DATE)";
 

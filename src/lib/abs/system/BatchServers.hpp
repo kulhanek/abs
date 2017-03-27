@@ -1,5 +1,5 @@
-#ifndef BatchSystemsH
-#define BatchSystemsH
+#ifndef BatchServersH
+#define BatchServersH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -25,6 +25,7 @@
 #include <ABSMainHeader.hpp>
 #include <SmallString.hpp>
 #include <Job.hpp>
+#include <iostream>
 
 // -----------------------------------------------------------------------------
 
@@ -33,16 +34,24 @@ class CJobList;
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CBatchSystems {
+class ABS_PACKAGE CBatchServers {
 public:
 // constructor -----------------------------------------------------------------
-    CBatchSystems(void);
-    ~CBatchSystems(void);
+    CBatchServers(void);
+    ~CBatchServers(void);
 
 // -----------------------------------------------------------------------------
     /// init servers
     bool Init(void);
 
+// -----------------------------------------------------------------------------
+    /// is server available
+    bool IsServerAvailable(const CSmallString& name);
+
+    /// print batch systems
+    void PrintServerOverview(std::ostream& vout);
+
+// -----------------------------------------------------------------------------
     /// list queues
     bool GetQueues(void);
 
@@ -103,7 +112,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-extern CBatchSystems BatchSystems;
+extern CBatchServers BatchServers;
 
 // -----------------------------------------------------------------------------
 

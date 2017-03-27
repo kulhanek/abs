@@ -48,7 +48,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <AMSGlobalConfig.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -464,14 +464,8 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
         if( (host == "local") || (host == "localhost") ){
             host = ABSConfig.GetHostName();
         }
-
-        // merge other setup
-        if( sync == NULL ){
-            sync = p_alias->GetSyncMode();
-        }
         res.Merge(p_alias->GetResources());
         SetItem("specific/resources","INF_ALIAS_RESOURCES",p_alias->GetResources().ToString(false));
-        SetItem("specific/resources","INF_ALIAS_SYNC_MODE",p_alias->GetSyncMode());
     } else {
         SetItem("specific/resources","INF_ALIAS","");
     }
@@ -489,13 +483,8 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
         res.Merge(default_res);
     }
 
-    // default sync mode is sync
-    if( sync == NULL ){
-        sync = "sync";
-    }
-
     // check input data
-    CAlias all_res("test",dest,sync,res.ToString(false));
+    CAlias all_res("test",dest,res.ToString(false));
     if( all_res.TestAlias(sout) == false ){
         ES_TRACE_ERROR("final resources are invalid");
         // something was wrong - exit
@@ -762,13 +751,8 @@ bool CJob::DecodeStartResources(std::ostream& sout)
             host = ABSConfig.GetHostName();
         }
 
-        // merge other setup
-        if( sync == NULL ){
-            sync = p_alias->GetSyncMode();
-        }
         res.Merge(p_alias->GetResources());
         SetItem("specific/resources","INF_ALIAS_RESOURCES",p_alias->GetResources().ToString(false));
-        SetItem("specific/resources","INF_ALIAS_SYNC_MODE",p_alias->GetSyncMode());
     } else {
         SetItem("specific/resources","INF_ALIAS","");
     }
@@ -786,13 +770,8 @@ bool CJob::DecodeStartResources(std::ostream& sout)
         res.Merge(default_res);
     }
 
-    // default sync mode is sync
-    if( sync == NULL ){
-        sync = "sync";
-    }
-
     // check input data
-    CAlias all_res("test",dest,sync,res.ToString(false));
+    CAlias all_res("test",dest,res.ToString(false));
     if( all_res.TestAlias(sout) == false ){
         ES_TRACE_ERROR("final resources are invalid");
         // something was wrong - exit
@@ -998,7 +977,7 @@ bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
 
     if( GetItem("basic/collection","INF_COLLECTION_NAME",true) == NULL ) {
         // submit job to torque
-        if( BatchSystems.SubmitJob(*this) == false ){
+        if( BatchServers.SubmitJob(*this) == false ){
             if( ! siblings ){
                 sout << "<b><red>Job was NOT submited to the Torque server!</red></b>" << endl;
                 sout << "  > Reason: " << GetLastError() << endl;
@@ -1084,7 +1063,7 @@ bool CJob::ResubmitJob(void)
     CFileSystem::SetCurrentDir(GetJobPath());
 
     // submit job to torque
-    if( BatchSystems.SubmitJob(*this) == false ){
+    if( BatchServers.SubmitJob(*this) == false ){
         ES_TRACE_ERROR("unable to resubmit job to torque");
         BatchJobComment = GetLastError();
         CFileSystem::SetCurrentDir(curr_dir);
@@ -1273,9 +1252,9 @@ bool CJob::KillJob(bool force)
             id = GetItem("batch/job","INF_JOB_ID",true);
             id += "." + BatchServerName;
         }
-        if( BatchSystems.KillJobByID(id) == false ){
+        if( BatchServers.KillJobByID(id) == false ){
             CSmallString error;
-            error << "unable to kill job (" << BatchSystems.GetLastErrorMsg() << ")";
+            error << "unable to kill job (" << BatchServers.GetLastErrorMsg() << ")";
             ES_ERROR(error);
             return(false);
         }
@@ -1293,9 +1272,9 @@ bool CJob::KillJob(bool force)
         case EJS_SUBMITTED:
         case EJS_RUNNING:
             // try to kill job
-            if( BatchSystems.KillJob(*this) == false ){
+            if( BatchServers.KillJob(*this) == false ){
                 CSmallString error;
-                error << "unable to kill job (" << BatchSystems.GetLastErrorMsg() << ")";
+                error << "unable to kill job (" << BatchServers.GetLastErrorMsg() << ")";
                 ES_ERROR(error);
                 return(false);
             }
@@ -1333,7 +1312,7 @@ bool CJob::UpdateJobStatus(void)
 
     // get job status and reason
 
-    if( BatchSystems.GetJobStatus(*this) == false ){
+    if( BatchServers.GetJobStatus(*this) == false ){
         ES_ERROR("unable to update job status");
         return(false);
     }

@@ -235,13 +235,13 @@ bool CAliasList::SaveUserAliases(CXMLElement* p_ele)
 //==============================================================================
 
 bool CAliasList::AddAlias(std::ostream& sout,const CSmallString& name,const CSmallString& queue,
-                          const CSmallString& sync,const CSmallString& resources)
+                          const CSmallString& resources)
 {
     // remove previous occurences
     RemoveAlias(name);
 
     // add new alias
-    CAliasPtr alias(new CAlias(name,queue,sync,resources));
+    CAliasPtr alias(new CAlias(name,queue,resources));
     if( alias->TestAlias(sout) == false ) return(false);
     push_back(alias);
     return(true);
@@ -280,8 +280,8 @@ void CAliasList::ClearAllAliases(void)
 
 void CAliasList::PrintInfos(std::ostream& sout)
 {
-    sout << "#      Name        Destination     Sync Mode        Resources        " << endl;
-    sout << "# -------------- ---------------- ------------ --------------------- " << endl;
+    sout << "#      Name        Destination         Resources        " << endl;
+    sout << "# -------------- ---------------- --------------------- " << endl;
 
     std::list<CAliasPtr>::iterator it = begin();
     std::list<CAliasPtr>::iterator et = end();

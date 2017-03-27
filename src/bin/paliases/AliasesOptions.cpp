@@ -87,7 +87,7 @@ int CAliasesOptions::CheckArguments(void)
     }
 
     if( Action == "add" ){
-        if( GetNumberOfProgArgs() != 5 ){
+        if( GetNumberOfProgArgs() != 4 ){
             if( IsVerbose() ) {
                 if( IsError == false ) fprintf(stderr,"\n");
                 fprintf(stderr,"%s: wrong number of arguments for '%s' action\n",

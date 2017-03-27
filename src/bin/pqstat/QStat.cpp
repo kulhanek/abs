@@ -23,7 +23,7 @@
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
 #include <ABSConfig.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 #include <CommonParser.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
@@ -85,7 +85,7 @@ bool CQStat::Run(void)
 
     vout << low;
     vout << "#" << endl;
-    ABSConfig.PrintBatchServerInfo(vout);
+    BatchServers.PrintServerOverview(vout);
     if( Options.IsOptSearchSet() ){
         std::string str = string(Options.GetOptSearch());
         boost::replace_all(str,"<","<<");
@@ -100,19 +100,19 @@ bool CQStat::Run(void)
         return(false);
     }
 
-    if( BatchSystems.Init() == false ){
+    if( BatchServers.Init() == false ){
         ES_ERROR("unable to init torque");
         return(false);
     }
 
     if( Options.GetOptTechnical() ){
-        BatchSystems.PrintJobs(vout);
+        BatchServers.PrintJobs(vout);
         return(true);
     }
 
     if( Options.IsOptJobSet() ){
         // only single node info
-        BatchSystems.PrintJob(vout,Options.GetOptJob());
+        BatchServers.PrintJob(vout,Options.GetOptJob());
         return(true);
     }
 
@@ -124,12 +124,12 @@ bool CQStat::Run(void)
     vout << low;
 
     if( Options.IsOptQueueSet() ){
-        if( BatchSystems.GetQueueJobs(Jobs,Options.GetOptQueue()) == false ){
+        if( BatchServers.GetQueueJobs(Jobs,Options.GetOptQueue()) == false ){
             ES_ERROR("unable to get queue jobs");
             return(false);
         }
     } else {
-        if( BatchSystems.GetAllJobs(Jobs) == false ){
+        if( BatchServers.GetAllJobs(Jobs) == false ){
             ES_ERROR("unable to get all jobs");
             return(false);
         }

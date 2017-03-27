@@ -28,7 +28,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <NodeList.hpp>
 #include <ABSConfig.hpp>
-#include <BatchSystems.hpp>
+#include <BatchServers.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -48,12 +48,11 @@ CAlias::CAlias(void)
 //------------------------------------------------------------------------------
 
 CAlias::CAlias(const CSmallString& name,const CSmallString& queue,
-               const CSmallString& sync,const CSmallString& resources)
+               const CSmallString& resources)
 {
     SystemAlias = false;
     Name = name;
     Destination = queue;
-    SyncMode = sync;
     Resources.Parse(resources);
 }
 
@@ -89,18 +88,11 @@ bool CAlias::TestAlias(std::ostream& sout)
 
     // test if srv is allowed
     if( srv != NULL ){
-        if( ABSConfig.IsServerAvailable(srv) == false ){
+        if( BatchServers.IsServerAvailable(srv) == false ){
             if( result == true ) sout << endl;
             sout << "<b><red> ERROR: The '" << srv << "' batch server is not supported in this site!</red></b>" << endl;
             result = false;
         }
-    }
-
-    // is sync mode supported?
-    if( ABSConfig.IsSyncModeSupported(SyncMode) == false ){
-        if( result == true ) sout << endl;
-        sout << "<b><red> ERROR: The '" << SyncMode << "' syncmode is not supported on the active site!</red></b>" << endl;
-        result = false;
     }
 
     // are all resources valid?
@@ -125,7 +117,6 @@ void CAlias::PrintLineInfo(std::ostream& sout)
     }
     sout << " " << setw(14) << Name;
     sout << " " << setw(16) << Destination;
-    sout << " " << setw(12) << SyncMode;
     sout << left;
     sout << " " << Resources.ToString(true);
     sout << endl;
@@ -150,13 +141,6 @@ const CSmallString& CAlias::GetName(void) const
 const CSmallString& CAlias::GetDestination(void) const
 {
     return(Destination);
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString& CAlias::GetSyncMode(void) const
-{
-    return(SyncMode);
 }
 
 //------------------------------------------------------------------------------
@@ -186,7 +170,6 @@ bool CAlias::Load(CXMLElement* p_ele,bool system)
     bool result = true;
     result &= p_ele->GetAttribute("name",Name);
     result &= p_ele->GetAttribute("dest",Destination);
-    result &= p_ele->GetAttribute("sync",SyncMode);
     CSmallString res;
     result &= p_ele->GetAttribute("res",res);
     if( result ){
@@ -214,7 +197,6 @@ void CAlias::Save(CXMLElement* p_ele)
 
     p_ele->SetAttribute("name",Name);
     p_ele->SetAttribute("dest",Destination);
-    p_ele->SetAttribute("sync",SyncMode);
     p_ele->SetAttribute("res",Resources.ToString(false));
 
 }

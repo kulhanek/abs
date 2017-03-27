@@ -1,5 +1,5 @@
-#ifndef BatchClientH
-#define BatchClientH
+#ifndef BatchServerH
+#define BatchServerH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -38,11 +38,11 @@ class CJob;
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CBatchClient: public CComObject {
+class ABS_PACKAGE CBatchServer: public CComObject {
 public:
 // constructor -----------------------------------------------------------------
-        CBatchClient(CPluginObject* p_objectinfo);
-        ~CBatchClient(void);
+        CBatchServer(CPluginObject* p_objectinfo);
+        ~CBatchServer(void);
 
 // init torque subsystem -------------------------------------------------------
     //! load symbols and connect to server
