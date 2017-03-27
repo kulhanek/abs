@@ -90,7 +90,7 @@ public:
     bool IsDown(void) const;
 
 // section of private data -----------------------------------------------------
-private:
+protected:
     CSmallString                Name;
     int                         NCPUs;
     int                         FreeCPUs;

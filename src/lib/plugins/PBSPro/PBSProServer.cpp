@@ -23,9 +23,6 @@
 #include <ErrorSystem.hpp>
 #include <iostream>
 #include <pbs_ifl.h>
-#include <QueueList.hpp>
-#include <NodeList.hpp>
-#include <JobList.hpp>
 #include <stdlib.h>
 #include <string.h>
 #include "PBSProAttr.hpp"
@@ -39,6 +36,11 @@
 #include <ABSConfig.hpp>
 #include <AMSGlobalConfig.hpp>
 #include <PluginDatabase.hpp>
+#include <NodeList.hpp>
+#include <JobList.hpp>
+#include "PBSProQueue.hpp"
+#include "PBSProNode.hpp"
+//#include "PBSProJob.hpp"
 
 using namespace std;
 using namespace boost;
@@ -299,12 +301,14 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
 
     bool result = true;
     while( p_queues != NULL ){
-        CQueuePtr p_queue(new CQueue);
+        CPBSProQueue* p_queue = new CPBSProQueue();
         if( p_queue->Init(p_queues) == false ){
             ES_ERROR("unable to init queue");
             result = false;
+        } else {
+            CQueuePtr p_queue(p_queue);
+            queues.push_back(p_queue);
         }
-        queues.push_back(p_queue);
         p_queues = p_queues->next;
     }
 

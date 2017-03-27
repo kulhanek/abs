@@ -30,6 +30,9 @@
 #include <ErrorSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <BatchServer.hpp>
+#include <JobList.hpp>
+#include <NodeList.hpp>
+#include <QueueList.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -175,7 +178,7 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
         CSmallString name, short_name;
         p_ele->GetAttribute("name",name);
         p_ele->GetAttribute("short",short_name);
-        vout << "# " << setw(1) << short_name << " " << name << endl;
+        vout << "# -> " << setw(1) << short_name << " " << name << endl;
         p_ele = p_ele->GetNextSiblingElement();
     }
 }
@@ -186,21 +189,60 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
 
 bool CBatchServers::GetQueues(void)
 {
-    return(false);
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    // list queues
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    bool result = true;
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+        result &= srv_ptr->GetQueues(QueueList);
+        it++;
+    }
+    return(result);
 }
 
 //------------------------------------------------------------------------------
 
 bool CBatchServers::GetNodes(void)
 {
-    return(false);
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    // list nodes
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    bool result = true;
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+        result &= srv_ptr->GetNodes(NodeList);
+        it++;
+    }
+    return(result);
 }
 
 //------------------------------------------------------------------------------
 
 bool CBatchServers::GetAllJobs(CJobList& jobs)
 {
-    return(false);
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    // list jobs
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    bool result = true;
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+        result &= srv_ptr->GetAllJobs(JobList);
+        it++;
+    }
+    return(result);
 }
 
 //------------------------------------------------------------------------------
@@ -277,16 +319,15 @@ void CBatchServers::PrintQueues(std::ostream& sout)
     // init servers if not done already
     if( size() == 0 ) InitAll();
 
-    sout << "# Site name     : " << AMSGlobalConfig.GetActiveSiteName() << endl;
-    sout <<  endl;
-
     // list queues
     std::list<CBatchServerPtr>::iterator    it = begin();
     std::list<CBatchServerPtr>::iterator    ie = end();
 
     while( it != ie ){
         CBatchServerPtr srv_ptr = *it;
+    sout << endl;
     sout << "# Batch server  : " << srv_ptr->GetServerName() << " (" << srv_ptr->GetShortName() << ")" << endl;
+    sout << "# ------------------------------------------------------------------------------" << endl;
         srv_ptr->PrintQueues(sout);
         it++;
     }
@@ -294,9 +335,23 @@ void CBatchServers::PrintQueues(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::PrintNodes(std::ostream& sout)
+void CBatchServers::PrintNodes(std::ostream& sout)
 {
-    return(false);
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    // list nodes
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+    sout << endl;
+    sout << "# Batch server  : " << srv_ptr->GetServerName() << " (" << srv_ptr->GetShortName() << ")" << endl;
+    sout << "# ------------------------------------------------------------------------------" << endl;
+        srv_ptr->PrintNodes(sout);
+        it++;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -308,9 +363,23 @@ bool CBatchServers::PrintNode(std::ostream& sout,const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::PrintJobs(std::ostream& sout)
+void CBatchServers::PrintJobs(std::ostream& sout)
 {
-    return(false);
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    // list jobs
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+    sout << endl;
+    sout << "# Batch server  : " << srv_ptr->GetServerName() << " (" << srv_ptr->GetShortName() << ")" << endl;
+    sout << "# ------------------------------------------------------------------------------" << endl;
+        srv_ptr->PrintJobs(sout);
+        it++;
+    }
 }
 
 //------------------------------------------------------------------------------

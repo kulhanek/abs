@@ -112,18 +112,18 @@ bool CJobs::Run(void)
     vout << endl;
     vout << low;
 
-    if( BatchServers.GetUserJobs(Jobs,User.GetName()) == false ){
+    if( BatchServers.GetUserJobs(JobList,User.GetName()) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }
 
     if( Options.GetOptFinished() ) {
-        Jobs.KeepOnlyCompletedJobs();
-        Jobs.SortByFinishDateAndTime();
+        JobList.KeepOnlyCompletedJobs();
+        JobList.SortByFinishDateAndTime();
     } else {
         // filter jobs
         if( ! Options.GetOptKeepCompleted() ){
-            Jobs.RemoveCompletedJobs();
+            JobList.RemoveCompletedJobs();
         }
     }
 
@@ -135,17 +135,17 @@ bool CJobs::Run(void)
             ES_ERROR("unable to set search expression");
             return(false);
         }
-        Jobs.KeepJobsByMask(get_expression_tree());
+        JobList.KeepJobsByMask(get_expression_tree());
         //print_expression_tree(get_expression_tree());
         free_mask_tree();
     }
 
     // print info about jobs
-    Jobs.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
+    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
 
     // print batch stat
     vout << endl;
-    Jobs.PrintBatchInfoStat(vout);
+    JobList.PrintBatchInfoStat(vout);
 
     return(true);
 }

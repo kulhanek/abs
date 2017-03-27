@@ -98,13 +98,13 @@ public:
     void PrintQueues(std::ostream& sout);
 
     //! print technical info about nodes
-    bool PrintNodes(std::ostream& sout);
+    void PrintNodes(std::ostream& sout);
 
     //! print technical info about single node
     bool PrintNode(std::ostream& sout,const CSmallString& name);
 
     //! print technical info about jobs
-    bool PrintJobs(std::ostream& sout);
+    void PrintJobs(std::ostream& sout);
 
     //! print technical info about single job
     bool PrintJob(std::ostream& sout,const CSmallString& name);

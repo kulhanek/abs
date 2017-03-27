@@ -46,64 +46,6 @@ CQueue::CQueue(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-/*bool CQueue::Init(struct batch_status* p_queue)
-{
-    if( p_queue == NULL ){
-        ES_ERROR("p_queue is NULL");
-        return(false);
-    }
-
-    Name = p_queue->name;
-    CSmallString count;
-
-    // get attributes
-    bool result = true;
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_TYPE,NULL,Type);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_STARTED,NULL,Started);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_ENABLED,NULL,Enabled);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_PRIORITY,NULL,Priority);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_TOTAL_JOBS,NULL,TotalJobs);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_STATE_COUNT,NULL,count);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_REQUIRED_PROPERTY,NULL,RequiredProperty);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_MAX_RUNNING,NULL,MaxRunning);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_MAX_USER_RUNNING,NULL,MaxUserRunning);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_RESOURCES_MAX,RESOURCES_PROCS,MaxCPUs);
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_RESOURCES_MAX,RESOURCES_WALLTIME,MaxWallTime);    
-    bool acl_enabled;
-    //---------------------
-    acl_enabled = false;
-    get_attribute(p_queue->attribs,ATTR_QUEUE_ACL_USER_ENABLED,NULL,acl_enabled);
-    if( acl_enabled ){
-        result &= get_attribute(p_queue->attribs,ATTR_QUEUE_ACL_USERS,NULL,ACLUsers);
-    }
-    //---------------------
-    acl_enabled = false;
-    get_attribute(p_queue->attribs,ATTR_QUEUE_ACL_GROUP_ENABLED,NULL,acl_enabled);
-    if( acl_enabled ){
-        result &= get_attribute(p_queue->attribs,ATTR_QUEUE_ACL_GROUPS,NULL,ACLGroups);
-    }
-    //---------------------
-    // optional
-    RouteDestinations = "";
-    get_attribute(p_queue->attribs,ATTR_QUEUE_ROUTE_DESTINATIONS,NULL,RouteDestinations);
-    //---------------------
-    // parse state count
-    int n = 0;
-    sscanf(count,"Transit:%d Queued:%d Held:%d Waiting:%d Running:%d Exiting:%d",&n,&QueuedJobs,&n,&n,&RunningJobs,&n);
-
-    if( result ){
-        CSmallString error;
-        error << "unable to get attribute(s) of queue '" << Name << "'";
-        ES_TRACE_ERROR(error);
-    }
-
-    return(result);
-}*/
-
-//==============================================================================
-//------------------------------------------------------------------------------
-//==============================================================================
-
 bool CQueue::IsStarted(void) const
 {
     return(Started);

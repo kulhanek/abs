@@ -1,5 +1,5 @@
-#ifndef JobsH
-#define JobsH
+#ifndef PBSProNodeH
+#define PBSProNodeH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -21,35 +21,21 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include "JobsOptions.hpp"
-#include <VerboseStr.hpp>
-#include <TerminalStr.hpp>
-#include <ABSConfig.hpp>
-#include <User.hpp>
-#include <JobList.hpp>
+#include <ABSMainHeader.hpp>
+#include <Node.hpp>
 
 // -----------------------------------------------------------------------------
 
-class CJobs{
+/// computational node
+
+class ABS_PACKAGE CPBSProNode : public CNode {
 public:
-// constructor ----------------------------------------------------------------
-        CJobs(void);
+// constructor -----------------------------------------------------------------
+        CPBSProNode(void);
 
-// main methods ---------------------------------------------------------------
-    //! init options
-    int Init(int argc,char* argv[]);
-
-    //! main part of program
-    bool Run(void);
-
-    //! finalize program
-    void Finalize(void);
-
-// section of private data ----------------------------------------------------
-private:
-    CJobsOptions    Options;
-    CTerminalStr    Console;
-    CVerboseStr     vout;
+// methods ---------------------------------------------------------------------
+    /// init node with torque information
+    bool Init(struct batch_status* p_node);
 };
 
 // -----------------------------------------------------------------------------

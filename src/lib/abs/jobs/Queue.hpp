@@ -43,10 +43,6 @@ public:
 // constructor -----------------------------------------------------------------
         CQueue(void);
 
-// methods ---------------------------------------------------------------------
-    //! init queue with torque information
-    bool Init(struct batch_status* p_queue);
-
 // information methods ---------------------------------------------------------
     //! is started?
     bool IsStarted(void) const;
@@ -73,7 +69,7 @@ public:
     const CSmallTime& GetMaxWallTime(void) const;
 
 // section of private data -----------------------------------------------------
-private:
+protected:
     CSmallString                Name;
     CSmallString                Type;
     bool                        Enabled;

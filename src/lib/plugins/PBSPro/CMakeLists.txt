@@ -10,6 +10,8 @@ SET(PBSPRO_SRC
         PBSProModule.cpp
         PBSProServer.cpp
         PBSProAttr.cpp
+        PBSProQueue.cpp
+        PBSProNode.cpp
         )
 
 # create shared library --------------------------------------------------------
