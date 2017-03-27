@@ -107,6 +107,7 @@ protected:
 
     CSmallString                Name;
     CSmallString                MOM;
+    CSmallString                Comment;
 
     int                         NCPUs;
     int                         AssignedCPUs;

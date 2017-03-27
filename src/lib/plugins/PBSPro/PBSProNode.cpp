@@ -104,6 +104,9 @@ bool CPBSProNode::Init(const CSmallString& short_srv_name,struct batch_status* p
     sort(AllPropList.begin(),AllPropList.end());
     Properties = join(PropList,",");
 
+    // comment
+    get_attribute(p_node->attribs,"comment",NULL,Comment);
+
     // decode status
     CSmallString state;
     get_attribute(p_node->attribs,"state",NULL,state);

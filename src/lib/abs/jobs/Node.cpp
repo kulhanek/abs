@@ -78,7 +78,7 @@ char CNode::GetStateCode(void)
     } else if (NCPUs != AssignedCPUs){
         return('O');
     } else {
-        return('B');
+        return('E');
     }
 }
 
@@ -121,6 +121,10 @@ const std::string CNode::GetNiceSize(size_t size)
 
 void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops,int ncolumns)
 {
+    if( IsDown() ){
+        sout << "<red>";
+    }
+
     sout << left;
     sout << ShortServerName;
 
@@ -135,42 +139,50 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
 
     sout << right;
 // ------------------
-    if( AssignedCPUs == 0 ){
-        sout << "<b><green>";
-    } else if (NCPUs != AssignedCPUs){
-        sout << "<green>";
-    } else {
-        sout << "<blue>";
+    if( ! IsDown() ){
+        if( AssignedCPUs == 0 ){
+            sout << "<b><green>";
+        } else if (NCPUs != AssignedCPUs){
+            sout << "<green>";
+        } else {
+            sout << "<blue>";
+        }
     }
     sout << " " << setw(3) << NCPUs-AssignedCPUs;
 // ------------------
     sout << "/" << setw(3) << NCPUs;
 // ------------------
-    if( AssignedCPUs == 0 ){
-        sout << "</green></b>";
-    } else if (NCPUs != AssignedCPUs){
-        sout << "</green>";
-    } else {
-        sout << "</blue>";
+    if( ! IsDown() ){
+        if( AssignedCPUs == 0 ){
+            sout << "</green></b>";
+        } else if (NCPUs != AssignedCPUs){
+            sout << "</green>";
+        } else {
+            sout << "</blue>";
+        }
     }
 // ------------------
-    if( (AssignedGPUs == 0) && (NGPUs > 0) ){
-        sout << "<b><green>";
-    } else if (NGPUs != AssignedGPUs){
-        sout << "<green>";
-    } else if(NGPUs > 0) {
-        sout << "<blue>";
+    if( ! IsDown() ){
+        if( (AssignedGPUs == 0) && (NGPUs > 0) ){
+            sout << "<b><green>";
+        } else if (NGPUs != AssignedGPUs){
+            sout << "<green>";
+        } else if(NGPUs > 0) {
+            sout << "<blue>";
+        }
     }
     sout << " " << setw(2) << NGPUs-AssignedGPUs;
 // ------------------
     sout << "/" << setw(2) << NGPUs;
 // ------------------
-    if( (AssignedGPUs == 0) && (NGPUs > 0) ){
-        sout << "</green></b>";
-    } else if (NGPUs != AssignedGPUs){
-        sout << "</green>";
-    } else if(NGPUs > 0) {
-        sout << "</blue>";
+    if( ! IsDown() ){
+        if( (AssignedGPUs == 0) && (NGPUs > 0) ){
+            sout << "</green></b>";
+        } else if (NGPUs != AssignedGPUs){
+            sout << "</green>";
+        } else if(NGPUs > 0) {
+            sout << "</blue>";
+        }
     }
 // ------------------
 
@@ -180,6 +192,10 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     sout << " " << setw(5) << GetNiceSize(ScratchLocal);
     sout << " " << setw(5) << GetNiceSize(ScratchShared);
     sout << " " << setw(5) << GetNiceSize(ScratchSSD);
+
+    if( IsDown() ){
+        sout << "</red>";
+    }
 
     sout << right;
     sout << " ";
@@ -211,6 +227,9 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
         }
     }
     sout << endl;
+    if( Comment != NULL ){
+        sout << "               " << left << Comment << endl;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -383,7 +402,8 @@ bool CNode::IsDown(void) const
             (State.FindSubString("reserved") != -1) ||
             (State.FindSubString("private") != -1)  ||
             (State.FindSubString("xentest") != -1)  ||
-            (State.FindSubString("offline") != -1) );
+            (State.FindSubString("offline") != -1) ||
+            (State.FindSubString("state-unknown") != -1) );
 }
 
 //==============================================================================
