@@ -354,11 +354,11 @@ void CNodeList::AutoGroups(unsigned int minsize)
 
         while( git != gie ){
             CNodePtr p_gnode = *git;
+            git++;
             if( fnmatch(filter,p_gnode->GetName(),0) == 0 ){
                 p_group->insert(p_gnode);
                 lnodes.remove(p_gnode);
             }
-            git++;
         }
         if( p_group->size() >= minsize ) {
             NodeGroups.push_back(p_group);
