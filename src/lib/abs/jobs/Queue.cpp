@@ -141,7 +141,7 @@ void CQueue::PrintLineInfo(std::ostream& sout)
     }
 
     sout << left;
-    sout << setw(5) << ShortServerName;
+    sout << setw(1) << ShortServerName;
 
     sout << " ";
     sout << left;

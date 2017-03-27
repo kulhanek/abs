@@ -98,6 +98,9 @@ public:
     /// get node type
     bool IsDown(void) const;
 
+    /// get compressed status
+    char GetStateCode(void);
+
 // section of private data -----------------------------------------------------
 protected:
     CSmallString                ShortServerName;
@@ -130,6 +133,8 @@ protected:
 
     CSmallString                Queues;
     std::vector<std::string>    QueueList;
+
+    const std::string GetNiceSize(int size);
 };
 
 // -----------------------------------------------------------------------------

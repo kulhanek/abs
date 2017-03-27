@@ -67,39 +67,43 @@ const CSmallString CNode::GetShortServerName(void)
 
 //------------------------------------------------------------------------------
 
+char CNode::GetStateCode(void)
+{
+    return('F');
+}
+
+//------------------------------------------------------------------------------
+
+const std::string CNode::GetNiceSize(int size)
+{
+    return("0K");
+}
+
+//------------------------------------------------------------------------------
+
 void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops,int ncolumns)
 {
     sout << left;
+    sout << GetStateCode();
 
     CSmallString name = Name;
-    if( Name.GetLength() > 27 ){
-        name = name.GetSubStringFromTo(0,26);
+    if( Name.GetLength() > 12 ){
+        name = name.GetSubStringFromTo(0,11);
     }
-    sout << setw(27) << name;
+    sout << setw(12) << name;
 
     sout << right;
-    stringstream str;
+    sout << " " << setw(3) << NCPUs-AssignedCPUs;
+    sout << "/" << setw(3) << NCPUs;
+    sout << " " << setw(2) << NGPUs-AssignedGPUs;
+    sout << "/" << setw(2) << NGPUs;
 
-    // FIXME
-    str << NCPUs;
-    sout << " " << setw(7) << str.str();
-  //  sout << " " << setw(4) << FreeCPUs;
-    sout << " " << setw(4) << NGPUs;
-  //  sout << " " << setw(4) << FreeGPUs;
-    sout << left;
+    sout << " " << setw(5) << GetNiceSize(Memory-AssignedMemory);
+    sout << "/" << setw(5) << GetNiceSize(Memory);
 
-    if( IsDown() == false ){
-        // FIXME
-//        if( (NCPUs == FreeCPUs) && (FreeCPUs > 0) && (NGPUs == FreeGPUs) ){
-//            sout << " <b><green>" << setw(20) << State << "</green></b>";
-//        } else if( FreeCPUs == 0 ) {
-//            sout << " <blue>" << setw(20) << State<< "</blue>";
-//        } else {
-//            sout << " <green>" << setw(20) << State<< "</green>";
-//        }
-    } else {
-        sout << " <red>" << setw(20) << State << "</red>";
-    }
+    sout << " " << setw(5) << GetNiceSize(ScratchLocal);
+    sout << " " << setw(5) << GetNiceSize(ScratchShared);
+    sout << " " << setw(5) << GetNiceSize(ScratchSSD);
 
     sout << right;
     sout << " ";
