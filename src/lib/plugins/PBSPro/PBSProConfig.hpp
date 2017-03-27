@@ -36,16 +36,6 @@ enum EAliasLevel {
     EAL_SYSTEM
     };
 
-
-// -----------------------------------------------------------------------------
-
-// torque driver mode
-enum ETorqueMode{
-    ETM_TORQUE = 0,         // standard torque
-    ETM_TORQUE_METAVO = 1,  // metacentrum torque
-    ETM_PBSPRO = 2          // PBSPro
-};
-
 //------------------------------------------------------------------------------
 
 class ABS_PACKAGE CTorqueConfig {
@@ -147,7 +137,6 @@ public:
 private:
     CXMLDocument    SystemConfig;
     CXMLDocument    UserConfig;
-    ETorqueMode     Mode;
 
     bool GetSystemConfigItem(CXMLElement* p_root, const CSmallString& item_name,
                              CSmallString& item_value);

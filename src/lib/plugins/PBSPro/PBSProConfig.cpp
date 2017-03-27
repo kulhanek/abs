@@ -325,7 +325,7 @@ bool CTorqueConfig::TestResourceTokens(const CSmallString& name)
 bool CTorqueConfig::GetSystemConfigItem(const CSmallString& item_name,
                                         CSmallString& item_value)
 {
-    CXMLElement*    p_ele = SystemConfig.GetChildElementByPath("torque");
+    CXMLElement*    p_ele = SystemConfig.GetChildElementByPath("abs/config");
     return( GetSystemConfigItem(p_ele,item_name,item_value) );
 }
 
@@ -337,8 +337,6 @@ const CSmallString CTorqueConfig::GetSystemConfigItem(const CSmallString& item_n
     GetSystemConfigItem(item_name,out);
     return(out);
 }
-
-
 
 //------------------------------------------------------------------------------
 
