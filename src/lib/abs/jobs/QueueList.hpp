@@ -58,6 +58,9 @@ public:
     //! find queue
     const CQueuePtr FindQueue(const CSmallString& name);
 
+    //! find queue
+    const CQueuePtr FindQueue(const CSmallString& server,const CSmallString& name);
+
 // section of private data -----------------------------------------------------
 private:
     //! compare two queues by name
@@ -71,6 +74,12 @@ private:
 
     //! remove if nonexecutive
     static bool RemoveIfNonexecutive(const CQueuePtr& p_queue);
+
+    //! map route queues
+    void MapRouteQueues(void);
+
+    //! print route destinations
+    void PrintRouteDestinationInfos(CQueuePtr& p_mqueue, std::ostream& sout);
 };
 
 //------------------------------------------------------------------------------

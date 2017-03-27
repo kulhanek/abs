@@ -58,6 +58,20 @@ bool CQueue::IsEnabled(void) const
 
 //------------------------------------------------------------------------------
 
+bool CQueue::IsRoute(void) const
+{
+    return( RouteDestinations != NULL );
+}
+
+//------------------------------------------------------------------------------
+
+bool CQueue::IsRouteDestination(void) const
+{
+    return( RouteQueue != NULL );
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallString& CQueue::GetName(void) const
 {
     return(Name);
@@ -98,13 +112,13 @@ void CQueue::PrintLineInfo(std::ostream& sout)
         sout << "<gray>";
     }
 
+    sout << right;
+    sout << " " << setw(3) << ShortServerName;
+
     sout << left;
     sout << setw(17) << Name;
+
     sout << right;
-
-    if( Type == "Execution" ) {
-
-    sout << " " << setw(3) << ShortServerName;
     sout << " " << setw(5) << Priority;
     sout << " " << setw(5) << TotalJobs;
     sout << " " << setw(5) << QueuedJobs;
@@ -112,9 +126,6 @@ void CQueue::PrintLineInfo(std::ostream& sout)
     sout << " " << setw(5) << TotalJobs - (RunningJobs+QueuedJobs);
     sout << " " << setw(13) << MaxWallTime.GetSTimeAndDay();
     sout << " " << Comment << endl;
-    } else {
-    sout << " --> " << RouteDestinations << " (routing queue)" << endl;
-    }
 
     if( OnlyRoutable ){
         sout << "</gray>";

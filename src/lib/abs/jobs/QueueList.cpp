@@ -21,9 +21,16 @@
 
 #include <QueueList.hpp>
 #include <SimpleIterator.hpp>
-#include <string.h>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <string>
+#include <vector>
+
+//------------------------------------------------------------------------------
 
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
 
 //------------------------------------------------------------------------------
 
@@ -126,11 +133,19 @@ void CQueueList::PrintInfos(std::ostream& sout)
     sout << "# SRV       Name       Pri    T     Q     R     O      MaxWall     Comment            " << endl;
     sout << "# --- --------------- ----- ----- ----- ----- ----- ------------- --------------------" << endl;
 
+    MapRouteQueues();
+
     std::list<CQueuePtr>::iterator it = begin();
     std::list<CQueuePtr>::iterator et = end();
 
     while( it != et ){
-        (*it)->PrintLineInfo(sout);
+        CQueuePtr p_queue = *it;
+        if( p_queue->IsRouteDestination() == false ){
+            p_queue->PrintLineInfo(sout);
+        }
+        if( p_queue->IsRoute() ){
+            PrintRouteDestinationInfos(p_queue,sout);
+        }
         it++;
     }
 
@@ -145,6 +160,49 @@ void CQueueList::PrintInfos(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
+void CQueueList::PrintRouteDestinationInfos(CQueuePtr& p_mqueue, std::ostream& sout)
+{
+    std::list<CQueuePtr>::iterator it = begin();
+    std::list<CQueuePtr>::iterator et = end();
+
+    while( it != et ){
+        CQueuePtr p_queue = *it;
+        if( (p_queue->RouteQueue == p_mqueue->Name) && (p_queue->ShortServerName == p_mqueue->ShortServerName) ){
+            sout << "->";
+            p_queue->PrintLineInfo(sout);
+        }
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CQueueList::MapRouteQueues(void)
+{
+    std::list<CQueuePtr>::iterator it = begin();
+    std::list<CQueuePtr>::iterator et = end();
+
+    while( it != et ){
+        CQueuePtr p_queue = *it;
+        if( p_queue->IsRoute() ){
+            std::string sdest(p_queue->RouteDestinations);
+            std::vector<std::string> queues;
+            split(queues,sdest,is_any_of(","));
+
+            std::vector<std::string>::iterator qit = queues.begin();
+            std::vector<std::string>::iterator qet = queues.end();
+
+            while( qit != qet ){
+
+                qet++;
+            }
+        }
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
 const CQueuePtr CQueueList::FindQueue(const CSmallString& name)
 {
     std::list<CQueuePtr>::iterator it = begin();
@@ -152,6 +210,21 @@ const CQueuePtr CQueueList::FindQueue(const CSmallString& name)
 
     while( it != et ){
         if( (*it)->GetName() == name ) return(*it);
+        it++;
+    }
+
+    return(CQueuePtr());
+}
+
+//------------------------------------------------------------------------------
+
+const CQueuePtr CQueueList::FindQueue(const CSmallString& server,const CSmallString& name)
+{
+    std::list<CQueuePtr>::iterator it = begin();
+    std::list<CQueuePtr>::iterator et = end();
+
+    while( it != et ){
+        if( ((*it)->GetName() == name) && ((*it)->ShortServerName == server) ) return(*it);
         it++;
     }
 

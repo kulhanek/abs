@@ -50,6 +50,12 @@ public:
     //! is enabled?
     bool IsEnabled(void) const;
 
+    //! is route
+    bool IsRoute(void) const;
+
+    //! is route destination
+    bool IsRouteDestination(void) const;
+
     //! print line info about the queue
     void PrintLineInfo(std::ostream& sout);
 
@@ -84,8 +90,12 @@ protected:
 
     CSmallTime                  MaxWallTime;
     CSmallString                RouteDestinations;
+    CSmallString                RouteQueue;
+
     std::vector<CSmallString>   ACLUsers;
     std::vector<CSmallString>   ACLGroups;
+
+    friend class CQueueList;
 };
 
 // -----------------------------------------------------------------------------

@@ -58,6 +58,8 @@ bool CPBSProQueue::Init(const CSmallString& short_srv_name,struct batch_status* 
     get_attribute(p_queue->attribs,"total_jobs",NULL,TotalJobs);
     get_attribute(p_queue->attribs,"resources_max","walltime",MaxWallTime);
     get_attribute(p_queue->attribs,"route_destinations",NULL,RouteDestinations);
+    get_attribute(p_queue->attribs,"comment",NULL,Comment);
+    get_attribute(p_queue->attribs,"from_route_only",NULL,OnlyRoutable);
 
     bool acl_enabled;
     //---------------------
