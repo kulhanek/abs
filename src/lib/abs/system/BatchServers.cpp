@@ -24,6 +24,9 @@
 #include <Job.hpp>
 #include <JobList.hpp>
 #include <AMSGlobalConfig.hpp>
+#include <ABSConfig.hpp>
+#include <XMLElement.hpp>
+#include <iomanip>
 
 //------------------------------------------------------------------------------
 
@@ -68,7 +71,18 @@ bool CBatchServers::IsServerAvailable(const CSmallString& name)
 void CBatchServers::PrintServerOverview(std::ostream& vout)
 {
     vout << "# Site name     : " << AMSGlobalConfig.GetActiveSiteName() << endl;
-   // vout << "# Torque server : " << GetServerName() << endl;
+    CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
+    if( p_ele ){
+        p_ele = p_ele->GetFirstChildElement("server");
+    }
+    while( p_ele != NULL ){
+        vout << "# PBSPro servers ..." << endl;
+        CSmallString name, short_name;
+        p_ele->GetAttribute("name",name);
+        p_ele->GetAttribute("short",short_name);
+        vout << "# " << setw(1) << short_name << " " << name << endl;
+        p_ele = p_ele->GetNextSiblingElement();
+    }
 }
 
 //==============================================================================
