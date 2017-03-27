@@ -1,0 +1,27 @@
+# ==============================================================================
+# ABS CMake File
+# ==============================================================================
+
+# objects in library -----------------------------------------------------------
+SET(PBSPRO_SRC
+        PBSProMainHeader.cpp
+        PBSProModule.cpp
+        )
+
+# create shared library --------------------------------------------------------
+ADD_LIBRARY(pbspro_shared SHARED ${PBSPRO_SRC})
+ADD_DEPENDENCIES(pbspro_shared abs_shared)
+
+SET_TARGET_PROPERTIES(pbspro_shared PROPERTIES
+                        OUTPUT_NAME PBSPro
+                        CLEAN_DIRECT_OUTPUT 1
+                        VERSION ${ABS_VERSION})
+
+TARGET_LINK_LIBRARIES(pbspro_shared ${ABS_LIBS})
+
+INSTALL(TARGETS
+            pbspro_shared
+        DESTINATION
+            lib
+        )
+
