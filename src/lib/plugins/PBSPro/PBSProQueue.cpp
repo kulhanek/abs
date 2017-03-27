@@ -97,7 +97,7 @@ bool CPBSProQueue::Init(struct batch_status* p_queue)
         ES_TRACE_ERROR(error);
     }
 
-    return(result);
+    return(true);
 }
 
 //==============================================================================
