@@ -102,8 +102,8 @@ void CNodeList::PrintInfos(std::ostream& sout)
         if( p_group->CommonProps.size() > 0 ){
         sout << "# ------------------------------------------------------------------------------" << endl;
         }
-        sout << "#  Node name     CPUs   GPUs    Memory   Local Share  SSD  Extra properties     " << endl;
-        sout << "# ------------ ---/--- --/-- -----/----- ----- ----- ----- ---------------------" << endl;
+        sout << "#  Node name   S   CPUs   GPUs    Memory   Local Share  SSD  Extra properties   " << endl;
+        sout << "# ------------ - ---/--- --/-- -----/----- ----- ----- ----- -------------------" << endl;
 
         list<CNodePtr>::iterator it = p_group->SortedNodes.begin();
         list<CNodePtr>::iterator et = p_group->SortedNodes.end();

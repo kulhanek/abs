@@ -326,7 +326,7 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
     bool result = true;
     while( p_node_attrs != NULL ){
         CPBSProNode* p_node = new CPBSProNode;
-        if( p_node->Init(p_node_attrs) == false ){
+        if( p_node->Init(ShortName,p_node_attrs) == false ){
             ES_ERROR("unable to init node");
             result = false;
         } else {

@@ -90,6 +90,33 @@ bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
 //------------------------------------------------------------------------------
 
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
+                   size_t& value,bool emit_error)
+{
+    if( p_first == NULL ){
+        ES_ERROR("p_first is NULL");
+        return(false);
+    }
+    struct attrl* p_a = FindAttr(p_first,p_name,p_res,emit_error);
+    if( p_a == NULL ) return(!emit_error);
+
+    // convert
+    CSmallString svalue(p_a->value);
+    if( svalue.IsInt() ) {
+        value = svalue.ToLInt();
+        return(true);
+    }
+
+    CSmallString error;
+    error << "incompatible int type for attribute '" << p_name << "' (" << p_res;
+    error << ") got '" << svalue << "'" ;
+    ES_ERROR(error);
+
+    return(false);
+}
+
+//------------------------------------------------------------------------------
+
+bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    CSmallString& value,bool emit_error)
 {
     if( p_first == NULL ){

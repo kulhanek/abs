@@ -35,7 +35,7 @@ public:
 
 // methods ---------------------------------------------------------------------
     /// init node with torque information
-    bool Init(struct batch_status* p_node);
+    bool Init(const CSmallString& short_srv_name,struct batch_status* p_node);
 };
 
 // -----------------------------------------------------------------------------

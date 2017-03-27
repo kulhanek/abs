@@ -114,12 +114,12 @@ protected:
     int                         NGPUs;
     int                         AssignedGPUs;
 
-    int                         Memory;
-    int                         AssignedMemory;
+    size_t                      Memory;
+    size_t                      AssignedMemory;
 
-    int                         ScratchLocal;
-    int                         ScratchShared;
-    int                         ScratchSSD;
+    size_t                      ScratchLocal;
+    size_t                      ScratchShared;
+    size_t                      ScratchSSD;
 
     CSmallString                State;
     CSmallString                Type;
@@ -134,7 +134,7 @@ protected:
     CSmallString                Queues;
     std::vector<std::string>    QueueList;
 
-    const std::string GetNiceSize(int size);
+    const std::string GetNiceSize(size_t size);
 };
 
 // -----------------------------------------------------------------------------

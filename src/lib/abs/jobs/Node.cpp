@@ -74,14 +74,14 @@ char CNode::GetStateCode(void)
 
 //------------------------------------------------------------------------------
 
-const std::string CNode::GetNiceSize(int size)
+const std::string CNode::GetNiceSize(size_t size)
 {
     // initial size is in kB
 
     stringstream str;
     char         unit;
 
-    if( size > 1024 ){
+    if( size < 1024 ){
         unit = 'K';
     }
     if( size > 1024 ){
@@ -112,7 +112,7 @@ const std::string CNode::GetNiceSize(int size)
 void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops,int ncolumns)
 {
     sout << left;
-    sout << GetStateCode();
+    sout << ShortServerName;
 
     sout << " ";
     CSmallString name = Name;
@@ -120,6 +120,8 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
         name = name.GetSubStringFromTo(0,11);
     }
     sout << setw(12) << name;
+
+    sout << " " << GetStateCode();
 
     sout << right;
 // ------------------

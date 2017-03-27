@@ -34,6 +34,8 @@ bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    int& value,bool emit_error=false);
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
+                   size_t& value,bool emit_error=false);
+bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    CSmallString& value,bool emit_error=false);
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    CSmallTime& value,bool emit_error=false);
@@ -50,20 +52,6 @@ struct attrl* FindAttr(struct attrl* p_list,const char* p_name,const char* p_res
                        bool emit_error);
 
 // -----------------------------------------------------------------------------
-
-#define ATTR_NODE_STATE                 "state"
-#define ATTR_NODE_NP                    "np"
-#define ATTR_NODE_JOBS                  "jobs"
-#define ATTR_NODE_PROPERTIES            "properties"
-#define ATTR_NODE_TYPE                  "ntype"
-#define ATTR_NODE_QUEUE                 "queue"
-#define ATTR_NODE_RES_TOTAL             "resources_total"
-#define ATTR_NODE_RES_USED              "resources_used"
-#define ATTR_NODE_RES_GPU               "gpu"
-#define ATTR_NODE_GPUS                  "gpus"
-#define ATTR_NODE_RES_AVAIL             "resources_available"
-#define ATTR_NODE_RES_ASSIGNED          "resources_assigned"
-#define ATTR_NODE_RES_NCPUS             "ncpus"
 
 #define ATTR_JOB_TITLE                  "Job_Name"
 #define ATTR_JOB_OWNER                  "Job_Owner"
