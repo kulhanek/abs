@@ -209,11 +209,11 @@ bool CPBSProServer::InitSymbols(void)
         ES_ERROR("unable to bind to pbs_geterrmsg");
         status = false;
     }
-    pbs_errno  = (PBS_ERRNO)TorqueLib.GetObjAddress("pbs_errno");
-    if( pbs_errno == NULL ){
-        ES_ERROR("unable to bind to pbs_errno");
-        status = false;
-    }
+//    pbs_errno  = (PBS_ERRNO)TorqueLib.GetObjAddress("pbs_errno");
+//    if( pbs_errno == NULL ){
+//        ES_ERROR("unable to bind to pbs_errno");
+//        status = false;
+//    }
     return(status);
 }
 

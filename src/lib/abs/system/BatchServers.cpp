@@ -70,8 +70,8 @@ bool CBatchServers::InitAll(void)
     while( p_sele != NULL ){
 
         CSmallString name, short_name;
-        p_ele->GetAttribute("name",name);
-        p_ele->GetAttribute("short",short_name);
+        p_sele->GetAttribute("name",name);
+        p_sele->GetAttribute("short",short_name);
 
         // create plugin object
         CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(plugin));
@@ -118,8 +118,8 @@ bool CBatchServers::Init(const CSmallString& srv)
     while( p_sele != NULL ){
 
         CSmallString name, short_name;
-        p_ele->GetAttribute("name",name);
-        p_ele->GetAttribute("short",short_name);
+        p_sele->GetAttribute("name",name);
+        p_sele->GetAttribute("short",short_name);
 
         if( (name == srv) || (short_name == srv) ){
             // create plugin object
@@ -170,8 +170,8 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
     if( p_ele ){
         p_ele = p_ele->GetFirstChildElement("server");
     }
-    while( p_ele != NULL ){
     vout << "# Batch servers ..." << endl;
+    while( p_ele != NULL ){
         CSmallString name, short_name;
         p_ele->GetAttribute("name",name);
         p_ele->GetAttribute("short",short_name);
