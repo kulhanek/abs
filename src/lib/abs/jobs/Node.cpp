@@ -76,7 +76,35 @@ char CNode::GetStateCode(void)
 
 const std::string CNode::GetNiceSize(int size)
 {
-    return("0K");
+    // initial size is in kB
+
+    stringstream str;
+    char         unit;
+
+    if( size < 1024 ){
+        unit = 'K';
+    }
+    if( size < 1024 ){
+        unit = 'M';
+        size /= 1024;
+    }
+    if( size < 1024 ){
+        unit = 'G';
+        size /= 1024;
+    }
+    if( size < 1024 ){
+        unit = 'T';
+        size /= 1024;
+    }
+    if( size < 1024 ){
+        unit = 'P';
+        size /= 1024;
+    }
+
+    // size is in kB
+    str << size << unit;
+
+    return(str.str());
 }
 
 //------------------------------------------------------------------------------
@@ -86,6 +114,7 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     sout << left;
     sout << GetStateCode();
 
+    sout << " ";
     CSmallString name = Name;
     if( Name.GetLength() > 12 ){
         name = name.GetSubStringFromTo(0,11);
@@ -93,10 +122,43 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     sout << setw(12) << name;
 
     sout << right;
+// ------------------
+    if( AssignedCPUs == 0 ){
+        sout << "<b><green>";
+    } else if (NCPUs != AssignedCPUs){
+        sout << "<green>";
+    } else {
+        sout << "<blue>";
+    }
     sout << " " << setw(3) << NCPUs-AssignedCPUs;
+    if( AssignedCPUs == 0 ){
+        sout << "</green></b>";
+    } else if (NCPUs != AssignedCPUs){
+        sout << "</green>";
+    } else {
+        sout << "</blue>";
+    }
+// ------------------
     sout << "/" << setw(3) << NCPUs;
+// ------------------
+    if( AssignedGPUs == 0 ){
+        sout << "<b><green>";
+    } else if (NGPUs != AssignedGPUs){
+        sout << "<green>";
+    } else {
+        sout << "<blue>";
+    }
     sout << " " << setw(2) << NGPUs-AssignedGPUs;
+    if( AssignedGPUs == 0 ){
+        sout << "</green></b>";
+    } else if (NGPUs != AssignedGPUs){
+        sout << "</green>";
+    } else {
+        sout << "</blue>";
+    }
+// ------------------
     sout << "/" << setw(2) << NGPUs;
+// ------------------
 
     sout << " " << setw(5) << GetNiceSize(Memory-AssignedMemory);
     sout << "/" << setw(5) << GetNiceSize(Memory);
