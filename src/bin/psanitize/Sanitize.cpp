@@ -90,11 +90,6 @@ bool CSanitize::Run(void)
         return(false);
     }
 
-    if( BatchServers.Init() == false ){
-        ES_ERROR("unable to init torque");
-        return(false);
-    }
-
     // is it Infinity job?
     if( CShell::GetSystemVariable("_INFINITY_JOB_") == "_INFINITY_JOB_" ){
         Jobs.InitFromRunningJob();

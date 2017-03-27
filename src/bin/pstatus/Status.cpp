@@ -88,11 +88,6 @@ bool CStatus::Run(void)
         return(false);
     }
 
-    if( BatchServers.Init() == false ){
-        ES_ERROR("unable to init torque");
-        return(false);
-    }
-
     // get list of info files
     if( Options.GetNumberOfProgArgs() > 0 ){
         for( int i=0; i < Options.GetNumberOfProgArgs(); i++ ){

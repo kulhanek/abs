@@ -436,14 +436,14 @@ private:
     /// print information about job
     void PrintJobInfoCompactOld(std::ostream& sout,bool includepath);
 
+    bool                                DoNotSave;
+
     // job status --------------------------------------------------------------
+public:
     CSmallString                        BatchServerName;
     EJobStatus                          BatchJobStatus;
     CSmallString                        BatchJobComment;
     std::map<std::string,std::string>   BatchVariables;
-    bool                                DoNotSave;
-
-    friend class CTorque;
 };
 
 // -----------------------------------------------------------------------------

@@ -100,12 +100,6 @@ bool CKillAll::Run(void)
         return(false);
     }
 
-    // we need ticket here
-    if( BatchServers.Init() == false ){
-        ES_ERROR("unable to init torque");
-        return(false);
-    }
-
     User.InitUser();
 
     vout << high;

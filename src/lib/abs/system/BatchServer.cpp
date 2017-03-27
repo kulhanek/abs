@@ -44,9 +44,23 @@ CBatchServer::~CBatchServer(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchServer::Init(const CSmallString& server_name)
+bool CBatchServer::Init(const CSmallString& server_name,const CSmallString& short_name)
 {
     return(false);
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CBatchServer::GetServerName(void)
+{
+    return(ServerName);
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CBatchServer::GetShortName(void)
+{
+    return(ShortName);
 }
 
 //==============================================================================
@@ -172,7 +186,7 @@ bool CBatchServer::KillJobByID(const CSmallString& jobid)
 
 //------------------------------------------------------------------------------
 
-const std::string CBatchServer::GetLastErrorMsg(void)
+const CSmallString CBatchServer::GetLastErrorMsg(void)
 {
     return("");
 }

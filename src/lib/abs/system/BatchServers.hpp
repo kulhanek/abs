@@ -25,6 +25,7 @@
 #include <ABSMainHeader.hpp>
 #include <SmallString.hpp>
 #include <Job.hpp>
+#include <BatchServer.hpp>
 #include <iostream>
 
 // -----------------------------------------------------------------------------
@@ -34,15 +35,18 @@ class CJobList;
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CBatchServers {
+class ABS_PACKAGE CBatchServers : std::list<CBatchServerPtr> {
 public:
 // constructor -----------------------------------------------------------------
     CBatchServers(void);
     ~CBatchServers(void);
 
 // -----------------------------------------------------------------------------
-    /// init servers
-    bool Init(void);
+    /// init all servers
+    bool InitAll(void);
+
+    /// init given server - srv can be either the full or short server name
+    bool Init(const CSmallString& srv);
 
 // -----------------------------------------------------------------------------
     /// is server available
@@ -91,7 +95,7 @@ public:
 
 // technical print -------------------------------------------------------------
     //! print technical info about queues
-    bool PrintQueues(std::ostream& sout);
+    void PrintQueues(std::ostream& sout);
 
     //! print technical info about nodes
     bool PrintNodes(std::ostream& sout);

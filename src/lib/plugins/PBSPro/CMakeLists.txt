@@ -2,10 +2,14 @@
 # ABS CMake File
 # ==============================================================================
 
+INCLUDE_DIRECTORIES(torque SYSTEM)
+
 # objects in library -----------------------------------------------------------
 SET(PBSPRO_SRC
         PBSProMainHeader.cpp
         PBSProModule.cpp
+        PBSProServer.cpp
+        PBSProAttr.cpp
         )
 
 # create shared library --------------------------------------------------------

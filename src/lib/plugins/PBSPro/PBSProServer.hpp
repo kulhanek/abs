@@ -1,5 +1,5 @@
-#ifndef TorqueH
-#define TorqueH
+#ifndef PBSProServerH
+#define PBSProServerH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -22,10 +22,10 @@
 // =============================================================================
 
 #include <ABSMainHeader.hpp>
-#include <TorqueConfig.hpp>
 #include <DynamicPackage.hpp>
 #include <iostream>
 #include <Job.hpp>
+#include <BatchServer.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -53,15 +53,15 @@ typedef int* PBS_ERRNO;
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CTorque {
+class ABS_PACKAGE CPBSProServer : public CBatchServer {
 public:
 // constructor -----------------------------------------------------------------
-        CTorque(void);
-        ~CTorque(void);
+        CPBSProServer(void);
+        ~CPBSProServer(void);
 
 // init torque subsystem -------------------------------------------------------
     //! load symbols and connect to server
-    bool Init(void);
+    bool Init(const CSmallString& server_name,const CSmallString& short_name);
 
 // enumeration -----------------------------------------------------------------
     //! init queue list
@@ -114,7 +114,7 @@ public:
     bool KillJobByID(const CSmallString& jobid);
 
     //! get last error message
-    char* GetLastErrorMsg(void);
+    const CSmallString GetLastErrorMsg(void);
 
     //! get job comment from comment, planned_start, planned_nodes
     static void DecodeBatchJobComment(attrl* p_item,CSmallString& comment);
@@ -122,7 +122,6 @@ public:
 // section of private data -----------------------------------------------------
 private:
     CSmallString    TorqueLibName;
-    CSmallString    ServerName;
     CDynamicPackage TorqueLib;
     int             ServerID;
 
@@ -162,7 +161,7 @@ private:
 
 // -----------------------------------------------------------------------------
 
-extern CTorque Torque;
+extern CPBSProServer Torque;
 
 // -----------------------------------------------------------------------------
 

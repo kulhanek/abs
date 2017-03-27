@@ -28,7 +28,7 @@
 
 extern ABS_PACKAGE CExtUUID TICKET_CHECKER_CAT;
 extern ABS_PACKAGE CExtUUID JOB_TYPE_CAT;
-extern ABS_PACKAGE CExtUUID BATCH_CLIENT_CAT;
+extern ABS_PACKAGE CExtUUID BATCH_SERVER_CAT;
 
 // -----------------------------------------------------------------------------
 

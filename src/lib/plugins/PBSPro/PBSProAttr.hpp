@@ -1,5 +1,5 @@
-#ifndef TorqueAttrH
-#define TorqueAttrH
+#ifndef PBSProAttrH
+#define PBSProAttrH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------

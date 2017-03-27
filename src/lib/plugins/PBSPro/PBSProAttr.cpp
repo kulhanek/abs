@@ -19,7 +19,7 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <TorqueAttr.hpp>
+#include "PBSProAttr.hpp"
 #include <ErrorSystem.hpp>
 #include <string.h>
 #include <stdlib.h>

@@ -19,7 +19,7 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <Torque.hpp>
+#include "PBSProServer.hpp"
 #include <ErrorSystem.hpp>
 #include <iostream>
 #include <pbs_ifl.h>
@@ -27,26 +27,50 @@
 #include <NodeList.hpp>
 #include <JobList.hpp>
 #include <stdlib.h>
-#include <GlobalConfig.hpp>
 #include <string.h>
-#include <TorqueAttr.hpp>
+#include "PBSProAttr.hpp"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <Shell.hpp>
 #include <FileSystem.hpp>
+#include <PluginObject.hpp>
+#include "PBSProModule.hpp"
+#include <CategoryUUID.hpp>
+#include <ABSConfig.hpp>
+#include <AMSGlobalConfig.hpp>
+#include <PluginDatabase.hpp>
 
 using namespace std;
 using namespace boost;
-
-// -----------------------------------------------------------------------------
-
-CTorque Torque;
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CTorque::CTorque(void)
+CComObject* PBSProServerCB(void* p_data);
+
+CExtUUID        PBSProServerID(
+                    "{PBSPRO_SERVER:e6425fbb-f6aa-48ff-84b4-1d37a9aa01eb}",
+                    "PBSPro Batch Server");
+
+CPluginObject   PBSProServerObject(&PBSProPlugin,
+                    PBSProServerID,BATCH_SERVER_CAT,
+                    PBSProServerCB);
+
+// -----------------------------------------------------------------------------
+
+CComObject* PBSProServerCB(void* p_data)
+{
+    CComObject* p_object = new CPBSProServer();
+    return(p_object);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+CPBSProServer::CPBSProServer(void)
+    : CBatchServer(&PBSProServerObject)
 {
     ServerID = 0;
 
@@ -67,7 +91,7 @@ CTorque::CTorque(void)
 
 //------------------------------------------------------------------------------
 
-CTorque::~CTorque(void)
+CPBSProServer::~CPBSProServer(void)
 {
     DisconnectFromServer();
 }
@@ -76,11 +100,12 @@ CTorque::~CTorque(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CTorque::Init(void)
+bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& short_name)
 {
     CSmallString libs_tok;
-    if( TorqueConfig.GetSystemConfigItem("INF_TORQUE_LIB",libs_tok) == false){
-        ES_ERROR("unable to get system config item INF_TORQUE_LIB");
+
+    if( PluginDatabase.FindObjectConfigValue(PBSProServerID,"libname",libs_tok) == false ){
+        ES_ERROR("unable to get paths to PBSPro client library");
         return(false);
     }
 
@@ -100,13 +125,14 @@ bool CTorque::Init(void)
         it++;
     }
 
-    // get server name
-    ServerName = TorqueConfig.GetServerName();
-
     if( InitSymbols() == false ){
         ES_ERROR("unable to init symbols");
         return(false);
     }
+
+    ServerName = server_name;
+    ShortName = short_name;
+
     if( ConnectToServer() == false ){
         ES_ERROR("unable to connect to server");
         return(false);
@@ -119,7 +145,7 @@ bool CTorque::Init(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CTorque::InitSymbols(void)
+bool CPBSProServer::InitSymbols(void)
 {
     if( TorqueLib.Open(TorqueLibName) == false ){
         ES_ERROR("unable to load torque library");
@@ -183,60 +209,31 @@ bool CTorque::InitSymbols(void)
         ES_ERROR("unable to bind to pbs_geterrmsg");
         status = false;
     }
-    switch( TorqueConfig.GetTorqueMode ()){
-        case ETM_TORQUE:
-        case ETM_TORQUE_METAVO:
-            pbs_strerror  = (PBS_STRERROR)TorqueLib.GetProcAddress("pbs_strerror");
-            if( pbs_strerror == NULL ){
-                ES_ERROR("unable to bind to pbs_strerror");
-                status = false;
-            }
-            pbs_errno  = (PBS_ERRNO)TorqueLib.GetObjAddress("pbs_errno");
-            if( pbs_errno == NULL ){
-                ES_ERROR("unable to bind to pbs_errno");
-                status = false;
-            }
-        break;
-        case ETM_PBSPRO:
-            // nothing to be here
-        break;
+    pbs_errno  = (PBS_ERRNO)TorqueLib.GetObjAddress("pbs_errno");
+    if( pbs_errno == NULL ){
+        ES_ERROR("unable to bind to pbs_errno");
+        status = false;
     }
-
     return(status);
 }
 
 //------------------------------------------------------------------------------
 
-bool CTorque::ConnectToServer(void)
+bool CPBSProServer::ConnectToServer(void)
 {
     ServerID = pbs_connect(ServerName);
     if( ServerID <= 0 ){    
-        switch( TorqueConfig.GetTorqueMode ()){
-            case ETM_TORQUE:
-            case ETM_TORQUE_METAVO:{
-                CSmallString error;
-                error << "unable to connect to server (error code: " << *pbs_errno
-                      << ", " << pbs_strerror(*pbs_errno) << ")";
-                ES_ERROR(error);
-                return(false);
-                }
-            break;
-            case ETM_PBSPRO:{
-                CSmallString error;
-                error << "unable to connect to server";
-                ES_ERROR(error);
-                return(false);
-                }
-            break;
-        }
-
+        CSmallString error;
+        error << "unable to connect to server";
+        ES_ERROR(error);
+        return(false);
     }
     return(true);
 }
 
 //------------------------------------------------------------------------------
 
-bool CTorque::DisconnectFromServer(void)
+bool CPBSProServer::DisconnectFromServer(void)
 {
     if( ServerID <= 0 ) return(true);
 
@@ -252,7 +249,7 @@ bool CTorque::DisconnectFromServer(void)
 
 //------------------------------------------------------------------------------
 
-void CTorque::PrintBatchStatus(std::ostream& sout,struct batch_status* p_bs)
+void CPBSProServer::PrintBatchStatus(std::ostream& sout,struct batch_status* p_bs)
 {
     int i = 0;
     while( p_bs != NULL ){
@@ -266,7 +263,7 @@ void CTorque::PrintBatchStatus(std::ostream& sout,struct batch_status* p_bs)
 
 //------------------------------------------------------------------------------
 
-void CTorque::PrintAttributes(std::ostream& sout,struct attrl* p_as)
+void CPBSProServer::PrintAttributes(std::ostream& sout,struct attrl* p_as)
 {
     while( p_as != NULL ){
         sout << "    " << p_as->name;
@@ -280,7 +277,7 @@ void CTorque::PrintAttributes(std::ostream& sout,struct attrl* p_as)
 
 //------------------------------------------------------------------------------
 
-void CTorque::PrintAttributes(std::ostream& sout,struct attropl* p_as)
+void CPBSProServer::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 {
     while( p_as != NULL ){
         sout << "    " << p_as->name;
@@ -296,7 +293,7 @@ void CTorque::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CTorque::GetQueues(CQueueList& queues)
+bool CPBSProServer::GetQueues(CQueueList& queues)
 {
     struct batch_status* p_queues = pbs_statque(ServerID,NULL,NULL,NULL);
 
@@ -318,17 +315,18 @@ bool CTorque::GetQueues(CQueueList& queues)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::GetNodes(CNodeList& nodes)
+bool CPBSProServer::GetNodes(CNodeList& nodes)
 {
     struct batch_status* p_nodes = pbs_statnode(ServerID,NULL,NULL,NULL);
 
     bool result = true;
     while( p_nodes != NULL ){
         CNodePtr p_node(new CNode);
-        if( p_node->Init(p_nodes) == false ){
-            ES_ERROR("unable to init node");
-            result = false;
-        }
+        // FIXME
+//        if( p_node->Init(p_nodes) == false ){
+//            ES_ERROR("unable to init node");
+//            result = false;
+//        }
         nodes.push_back(p_node);
         p_nodes = p_nodes->next;
     }
@@ -340,7 +338,7 @@ bool CTorque::GetNodes(CNodeList& nodes)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::GetAllJobs(CJobList& jobs)
+bool CPBSProServer::GetAllJobs(CJobList& jobs)
 {
 // it does not work in PBSPro
 //    struct attrl* p_first = NULL;
@@ -383,7 +381,7 @@ bool CTorque::GetAllJobs(CJobList& jobs)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
+bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
 {
 // it does not work in PBSPro
 //    struct attrl* p_first = NULL;
@@ -426,7 +424,7 @@ bool CTorque::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::GetUserJobs(CJobList& jobs,const CSmallString& user)
+bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user)
 {
     struct attropl* p_first = NULL;
     set_attribute(p_first,ATTR_USER_LIST,NULL,user,EQ);
@@ -452,7 +450,7 @@ bool CTorque::GetUserJobs(CJobList& jobs,const CSmallString& user)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::GetJob(CJobList& jobs,const CSmallString& jobid)
+bool CPBSProServer::GetJob(CJobList& jobs,const CSmallString& jobid)
 {
     CJobPtr job = GetJob(jobid);
     if( job != NULL ){
@@ -464,7 +462,7 @@ bool CTorque::GetJob(CJobList& jobs,const CSmallString& jobid)
 
 //------------------------------------------------------------------------------
 
-const CJobPtr CTorque::GetJob(const CSmallString& jobid)
+const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 {
 // it crashes in PBSPro
 //    struct attrl* p_first = NULL;
@@ -481,7 +479,7 @@ const CJobPtr CTorque::GetJob(const CSmallString& jobid)
 //    set_attribute(p_prev,ATTR_JOB_VARIABLE_LIST,NULL,NULL);
 //    set_attribute(p_prev,ATTR_JOB_RESOURCE_LIST,NULL,NULL);
 
-//    switch(TorqueConfig.GetTorqueMode()){
+//    switch(ABSConfig.GetTorqueMode()){
 //        case ETM_TORQUE:
 //        case ETM_TORQUE_METAVO:
 //            set_attribute(p_prev,ATTR_JOB_CREATE_TIME,NULL,NULL);
@@ -500,7 +498,9 @@ const CJobPtr CTorque::GetJob(const CSmallString& jobid)
 //    }
 
     CSmallString full_job_id;
-    CSmallString server = TorqueConfig.GetServerName();
+    // FIXME
+    // CSmallString server = ABSConfig.GetServerName();
+    CSmallString server;
     full_job_id = jobid;
     if( full_job_id.FindSubString(server) == -1 ){
         full_job_id += "." + server;
@@ -532,7 +532,7 @@ const CJobPtr CTorque::GetJob(const CSmallString& jobid)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::PrintQueues(std::ostream& sout)
+bool CPBSProServer::PrintQueues(std::ostream& sout)
 {
     struct batch_status* p_queues = pbs_statque(ServerID,NULL,NULL,NULL);
     if( p_queues != NULL ) {
@@ -544,7 +544,7 @@ bool CTorque::PrintQueues(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::PrintNodes(std::ostream& sout)
+bool CPBSProServer::PrintNodes(std::ostream& sout)
 {
     struct batch_status* p_nodes = pbs_statnode(ServerID,NULL,NULL,NULL);
     if( p_nodes != NULL ) {
@@ -556,7 +556,7 @@ bool CTorque::PrintNodes(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::PrintNode(std::ostream& sout,const CSmallString& name)
+bool CPBSProServer::PrintNode(std::ostream& sout,const CSmallString& name)
 {
     struct batch_status* p_nodes = pbs_statnode(ServerID,(char*)name.GetBuffer(),NULL,NULL);
     if( p_nodes != NULL ) {
@@ -568,7 +568,7 @@ bool CTorque::PrintNode(std::ostream& sout,const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::PrintJobs(std::ostream& sout)
+bool CPBSProServer::PrintJobs(std::ostream& sout)
 {
     struct batch_status* p_jobs = pbs_statjob(ServerID,NULL,NULL,NULL);
     if( p_jobs != NULL ) {
@@ -580,10 +580,10 @@ bool CTorque::PrintJobs(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::PrintJob(std::ostream& sout,const CSmallString& name)
+bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& name)
 {
     CSmallString full_name;
-    CSmallString server_name = TorqueConfig.GetSystemConfigItem("INF_SERVER_NAME");
+    CSmallString server_name = ABSConfig.GetSystemConfigItem("INF_SERVER_NAME");
     full_name = name;
     if( name.FindSubString(server_name) == -1 ){
         full_name = full_name + "." + server_name;
@@ -601,7 +601,7 @@ bool CTorque::PrintJob(std::ostream& sout,const CSmallString& name)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CTorque::SubmitJob(CJob& job)
+bool CPBSProServer::SubmitJob(CJob& job)
 {
     CFileName script    = job.GetMainScriptName();
     CFileName infout    = job.GetInfoutName();
@@ -623,12 +623,12 @@ bool CTorque::SubmitJob(CJob& job)
     variables << ",INF_JOB_KEY=" << job.GetJobKey();
     variables << ",ABS_ROOT=" << CShell::GetSystemVariable("ABS_ROOT");
 
-    if( TorqueConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",item) ){
+    if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",item) ){
         variables << ",INF_BOOT_SCRIPT=" << item;
     }
 
-    variables << ",INF_SITE_ID=" << GlobalConfig.GetActiveSiteID();
-    variables << ",INF_LibBuildVersion_ABS=" << GlobalConfig.GetABSModuleVersion();
+    variables << ",INF_SITE_ID=" << AMSGlobalConfig.GetActiveSiteID();
+    variables << ",INF_ABS_VERSION=" << ABSConfig.GetABSModuleVersion();
     variables << ",INF_UGROUP=" << job.GetUserGroup();
     variables << ",INF_UMASK=" << job.GetUMask();
 
@@ -649,11 +649,8 @@ bool CTorque::SubmitJob(CJob& job)
     }
 
     variables << ",AMS_SITE_SUPPORT=" << CShell::GetSystemVariable("AMS_SITE_SUPPORT");
-
-    if( TorqueConfig.GetTorqueMode() == ETM_PBSPRO ){
-        // required for accounting?
-        variables << ",PBS_O_LOGNAME=" << User.GetName();
-    }
+    // required for accounting?
+    variables << ",PBS_O_LOGNAME=" << User.GetName();
 
     struct attropl* p_first = NULL;
     struct attropl* p_prev = NULL;
@@ -666,7 +663,7 @@ bool CTorque::SubmitJob(CJob& job)
     set_attribute(p_prev,ATTR_j,NULL,"oe");
 
     // rerunable
-    if( TorqueConfig.GetUserConfigItem("INF_RERUNABLE_JOBS",item) ){
+    if( ABSConfig.GetUserConfigItem("INF_RERUNABLE_JOBS",item) ){
         if( item == "YES" ){
             set_attribute(p_prev,ATTR_r,NULL,"y");
         } else {
@@ -678,46 +675,45 @@ bool CTorque::SubmitJob(CJob& job)
 
     // mail options
     mailoptions = NULL;
-    if( TorqueConfig.GetUserConfigItem("INF_STOP_EMAIL",item) ){
+    if( ABSConfig.GetUserConfigItem("INF_STOP_EMAIL",item) ){
         if( item == "YES" ){
             mailoptions << "e";
         }
     }
-    if( TorqueConfig.GetUserConfigItem("INF_ABORT_EMAIL",item) ){
+    if( ABSConfig.GetUserConfigItem("INF_ABORT_EMAIL",item) ){
         if( item == "YES" ){
             mailoptions << "a";
         }
     }
-    if( TorqueConfig.GetUserConfigItem("INF_START_EMAIL",item) ){
+    if( ABSConfig.GetUserConfigItem("INF_START_EMAIL",item) ){
         if( item == "YES" ){
             mailoptions << "b";
         }
     }
-    if( TorqueConfig.GetTorqueMode() == ETM_PBSPRO ){
-        if( mailoptions == NULL ) mailoptions = "n";
-    }
+    if( mailoptions == NULL ) mailoptions = "n";
 
     set_attribute(p_prev,ATTR_m,NULL,mailoptions);
     set_attribute(p_prev,ATTR_v,NULL,variables);
 
-    switch( TorqueConfig.GetTorqueMode() ){
-        case ETM_TORQUE:
-        case ETM_TORQUE_METAVO:{
-            // get umask in decimal representation
-            int umask  = job.GetUMaskNumber();
-            CSmallString sumask(umask);
-            set_attribute(p_prev,ATTR_umask,NULL,sumask);
-            CSmallString egroup = job.GetUserGroup();
-            set_attribute(p_prev,ATTR_group_list,NULL,egroup);
-        }
-        break;
-        case ETM_PBSPRO:{
+    // FIXME
+//    switch( ABSConfig.GetTorqueMode() ){
+//        case ETM_TORQUE:
+//        case ETM_TORQUE_METAVO:{
+//            // get umask in decimal representation
+//            int umask  = job.GetUMaskNumber();
+//            CSmallString sumask(umask);
+//            set_attribute(p_prev,ATTR_umask,NULL,sumask);
+//            CSmallString egroup = job.GetUserGroup();
+//            set_attribute(p_prev,ATTR_group_list,NULL,egroup);
+//        }
+//        break;
+//        case ETM_PBSPRO:{
             // set mask in octal form
             CSmallString sumask = job.GetUMask();
             set_attribute(p_prev,ATTR_umask,NULL,sumask);
-        }
-        break;
-    }
+//        }
+//        break;
+//    }
 
     if( depjid != NULL ){
         depjid = "afterany:" + depjid;
@@ -759,7 +755,7 @@ bool CTorque::SubmitJob(CJob& job)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::GetJobStatus(CJob& job)
+bool CPBSProServer::GetJobStatus(CJob& job)
 {
     CSmallString jobid = job.GetJobID();
 
@@ -804,7 +800,7 @@ bool CTorque::GetJobStatus(CJob& job)
 
 //------------------------------------------------------------------------------
 
-void CTorque::DecodeBatchJobComment(attrl* p_item,CSmallString& comment)
+void CPBSProServer::DecodeBatchJobComment(attrl* p_item,CSmallString& comment)
 {
     comment = "";
 
@@ -846,7 +842,7 @@ void CTorque::DecodeBatchJobComment(attrl* p_item,CSmallString& comment)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::KillJob(CJob& job)
+bool CPBSProServer::KillJob(CJob& job)
 {
     CSmallString jobid = job.GetJobID();
     int retval = pbs_deljob(ServerID,jobid.GetBuffer(),NULL);
@@ -855,7 +851,7 @@ bool CTorque::KillJob(CJob& job)
 
 //------------------------------------------------------------------------------
 
-bool CTorque::KillJobByID(const CSmallString& jobid)
+bool CPBSProServer::KillJobByID(const CSmallString& jobid)
 {
     CSmallString lid(jobid);
     int retval = pbs_deljob(ServerID,lid.GetBuffer(),NULL);
@@ -864,7 +860,7 @@ bool CTorque::KillJobByID(const CSmallString& jobid)
 
 //------------------------------------------------------------------------------
 
-char* CTorque::GetLastErrorMsg(void)
+const CSmallString CPBSProServer::GetLastErrorMsg(void)
 {
     return(pbs_geterrmsg(ServerID));
 }

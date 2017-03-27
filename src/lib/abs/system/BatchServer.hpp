@@ -38,6 +38,11 @@ class CJob;
 
 // -----------------------------------------------------------------------------
 
+class CBatchServer;
+typedef boost::shared_ptr<CBatchServer>  CBatchServerPtr;
+
+// -----------------------------------------------------------------------------
+
 class ABS_PACKAGE CBatchServer: public CComObject {
 public:
 // constructor -----------------------------------------------------------------
@@ -46,7 +51,13 @@ public:
 
 // init torque subsystem -------------------------------------------------------
     //! load symbols and connect to server
-    virtual bool Init(const CSmallString& server_name);
+    virtual bool Init(const CSmallString& server_name,const CSmallString& short_name);
+
+    /// get server name
+    const CSmallString GetServerName(void);
+
+    /// get short server name
+    const CSmallString GetShortName(void);
 
 // enumeration -----------------------------------------------------------------
     //! init queue list
@@ -99,7 +110,12 @@ public:
     virtual bool KillJobByID(const CSmallString& jobid);
 
     //! get last error message
-    virtual const std::string GetLastErrorMsg(void);
+    virtual const CSmallString GetLastErrorMsg(void);
+
+// -----------------------------------------------------------------------------
+protected:
+    CSmallString    ServerName;
+    CSmallString    ShortName;
 };
 
 // -----------------------------------------------------------------------------

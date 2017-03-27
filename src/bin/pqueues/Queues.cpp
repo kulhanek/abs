@@ -94,11 +94,6 @@ bool CQueues::Run(void)
         return(false);
     }
 
-    if( BatchServers.Init() == false ){
-        ES_ERROR("unable to init torque");
-        return(false);
-    }
-
     if( Options.GetOptTechnical() ){
         vout << endl;
         BatchServers.PrintQueues(vout);

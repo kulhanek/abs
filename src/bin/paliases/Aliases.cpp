@@ -138,11 +138,6 @@ bool CAliases::AddAlias(void)
         return(false);
     }
 
-    if( BatchServers.Init() == false ){
-        ES_ERROR("unable to init batch servers");
-        return(false);
-    }
-
     User.InitUser();
 
     if( AliasList.LoadConfig() == false ){

@@ -31,8 +31,8 @@ CExtUUID JOB_TYPE_CAT(
     "{JOB_TYPE_CAT:efc267c6-ab06-4a7a-abe9-144440523b1b}",
     "Job Type");
 
-CExtUUID BATCH_CLIENT_CAT(
-    "{BATCH_CLIENT_CAT:c919d56f-b5d6-4ee9-8a65-5700cc3e4209}",
-    "Batch Client");
+CExtUUID BATCH_SERVER_CAT(
+    "{BATCH_SERVER_CAT:c919d56f-b5d6-4ee9-8a65-5700cc3e4209}",
+    "Batch Server");
 
 // -----------------------------------------------------------------------------

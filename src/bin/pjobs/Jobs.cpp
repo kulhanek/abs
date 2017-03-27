@@ -100,12 +100,6 @@ bool CJobs::Run(void)
         return(false);
     }
 
-    // we need ticket here
-    if( BatchServers.Init() == false ){
-        ES_ERROR("unable to init torque");
-        return(false);
-    }
-
     if( Options.IsOptUserSet() ){
         // overwrite user name
         User.SetUserName(Options.GetOptUser());
