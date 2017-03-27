@@ -329,7 +329,7 @@ void CNodeList::AutoGroups(unsigned int minsize)
 
     while( it != ie ){
         CNodePtr p_node = *it;
-        lnodes.remove(p_node);
+        it++;
 
         std::string s1 = string(p_node->GetName());
         std::string n1 = s1;
@@ -340,11 +340,17 @@ void CNodeList::AutoGroups(unsigned int minsize)
 
         CNodeGroupPtr p_group = CNodeGroupPtr(new CNodeGroup);
         p_group->GroupName = n1;
+        p_group->insert(p_node);
+
+        // assembly filter
         CSmallString filter = n1;
         filter += "*";
 
         list<CNodePtr>::iterator git = it;
         list<CNodePtr>::iterator gie = lnodes.end();
+
+        // remove already added node
+        lnodes.remove(p_node);
 
         while( git != gie ){
             CNodePtr p_gnode = *git;
