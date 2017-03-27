@@ -47,6 +47,9 @@ public:
     //! get name
     const CSmallString& GetName(void) const;
 
+    //! get chunk queue name
+    const CSmallString& GetChunkQueueName(void) const;
+
     //! get type
     const CSmallString& GetType(void) const;
 
@@ -103,6 +106,8 @@ protected:
     CSmallTime                  MaxWallTime;
     CSmallString                RouteDestinations;
     CSmallString                RouteQueue;
+
+    CSmallString                ChunkQueue;
 
     std::vector<CSmallString>   ACLUsers;
     std::vector<CSmallString>   ACLGroups;

@@ -75,6 +75,8 @@ bool CPBSProQueue::Init(const CSmallString& short_srv_name,struct batch_status* 
         get_attribute(p_queue->attribs,"acl_groups",NULL,ACLGroups);
     }
 
+    get_attribute(p_queue->attribs,"default_chunk","queue_list",ChunkQueue);
+
     //---------------------
     // parse state count
     int n = 0;

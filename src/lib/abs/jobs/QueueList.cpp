@@ -218,9 +218,12 @@ void CQueueList::GetQueuesWithServer(std::vector<std::string>& qlist)
     while( it != et ){
         CQueuePtr    p_queue = *it;
 
-        CSmallString queue;
-        queue << p_queue->GetName() << "." << p_queue->GetShortServerName();
-        qlist.push_back(string(queue));
+        if( p_queue->GetChunkQueueName() != NULL ){
+            CSmallString queue;
+
+            queue << p_queue->GetChunkQueueName() << "." << p_queue->GetShortServerName();
+            qlist.push_back(string(queue));
+        }
 
         it++;
     }

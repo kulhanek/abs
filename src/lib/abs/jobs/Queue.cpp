@@ -107,6 +107,13 @@ const CSmallString& CQueue::GetName(void) const
 
 //------------------------------------------------------------------------------
 
+const CSmallString& CQueue::GetChunkQueueName(void) const
+{
+    return(ChunkQueue);
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallString& CQueue::GetType(void) const
 {
     return(Type);
