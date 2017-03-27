@@ -69,7 +69,6 @@ void CNodeList::PrintInfos(std::ostream& sout)
 
         sout << endl;
         sout << "# Node Group   : " << p_group->GroupName << endl;
-        sout << "# Batch Server : " << p_group->BatchServer << endl;
         sout << "# ---------------------------------------------------------------------------------------------" << endl;
         set<string>::iterator pit = p_group->CommonProps.begin();
         set<string>::iterator pet = p_group->CommonProps.end();
@@ -261,39 +260,94 @@ void CNodeList::PrepareNodeGroups(void)
         }
         NodeGroups.push_back(p_group);
     } else {
-        CXMLElement* p_gele = p_ele->GetFirstChildElement("group");
-        while( p_gele != NULL ){
-            CSmallString gname;
-            p_gele->GetAttribute("name",gname);
+        bool autogroup = false;
+        p_ele->GetAttribute("autogroup",autogroup);
+        int  minsize = 3;
+        p_ele->GetAttribute("minsize",minsize);
+        if( autogroup ){
+            AutoGroups();
+        }
+        PrepareNodeGroups(p_ele);
+    }
+}
 
-            CNodeGroupPtr p_group = CNodeGroupPtr(new CNodeGroup);
-            p_group->GroupName = gname;
+//------------------------------------------------------------------------------
 
-            list<CNodePtr>::iterator it = begin();
-            list<CNodePtr>::iterator ie = end();
-            while( it != ie ){
-                CNodePtr p_node = *it;
+void CNodeList::PrepareNodeGroups(CXMLElement* p_ele)
+{
+    if( p_ele == NULL ) return;
+    CXMLElement* p_gele = p_ele->GetFirstChildElement("group");
+    while( p_gele != NULL ){
+        CSmallString gname;
+        p_gele->GetAttribute("name",gname);
 
-                CXMLElement* p_filter = p_gele->GetFirstChildElement("filter");
-                while( p_filter != NULL ){
-                    CSmallString filter;
-                    p_filter->GetAttribute("name",filter);
+        CNodeGroupPtr p_group = CNodeGroupPtr(new CNodeGroup);
+        p_group->GroupName = gname;
 
+        list<CNodePtr>::iterator it = begin();
+        list<CNodePtr>::iterator ie = end();
+        while( it != ie ){
+            CNodePtr p_node = *it;
+
+            CXMLElement* p_filter = p_gele->GetFirstChildElement("filter");
+            while( p_filter != NULL ){
+                CSmallString filter;
+                if( p_filter->GetAttribute("byname",filter) == true ){
                     if( fnmatch(filter,p_node->GetName(),0) == 0 ){
                         p_group->insert(p_node);
                     }
-
-                    p_filter = p_filter->GetNextSiblingElement("filter");
+                } else if( p_filter->GetAttribute("byprop",filter) == true ){
+                    if( p_node->HasProperty(string(filter)) ){
+                        p_group->insert(p_node);
+                    }
                 }
-
-                it++;
+                p_filter = p_filter->GetNextSiblingElement("filter");
             }
-            if( p_group->size() > 0 ) {
+
+            it++;
+        }
+        if( p_group->size() > 0 ) {
+            NodeGroups.push_back(p_group);
+        }
+        p_gele = p_gele->GetNextSiblingElement("group");
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::AutoGroups(void)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator ie = end();
+
+    CNodeGroupPtr p_group;
+
+    while( it != ie ){
+        CNodePtr p_node = *it;
+
+        std::string s1 = string(p_node->GetName());
+        std::string n1 = s1;
+        std::size_t found = s1.find_first_of("0123456789");
+        if( (found != string::npos) && (found > 0) ){
+            n1 = s1.substr(0,found);
+        }
+
+        if( (p_group == NULL) || fnmatch(p_group->GroupName.c_str(),n1.c_str(),0) != 0 ){
+            if( (p_group != NULL ) && (p_group->size() > 0) ) {
                 NodeGroups.push_back(p_group);
             }
-            p_gele = p_gele->GetNextSiblingElement("group");
+            p_group = CNodeGroupPtr(new CNodeGroup);
+            p_group->GroupName = n1;
         }
+        p_group->insert(p_node);
+
+        it++;
     }
+
+    if( (p_group != NULL ) && (p_group->size() > 0) ) {
+        NodeGroups.push_back(p_group);
+    }
+
 }
 
 //------------------------------------------------------------------------------
@@ -641,33 +695,37 @@ const CNodePtr CNodeList::FindNode(const CSmallString& name,const CQueuePtr& p_q
 
 bool CNodeGroup::CompareNamesB(const CNodePtr& p_left,const CNodePtr& p_right)
 {
-    string s1 = string(p_left->GetName());
-    string s2 = string(p_right->GetName());
+    if( p_left->GetShortServerName() == p_right->GetShortServerName() ) {
+        string s1 = string(p_left->GetName());
+        string s2 = string(p_right->GetName());
 
-    string n1 = s1;
-    string n2 = s2;
-    int    i1 = 0;
-    int    i2 = 0;
+        string n1 = s1;
+        string n2 = s2;
+        int    i1 = 0;
+        int    i2 = 0;
 
-    std::size_t found = s1.find_first_of("0123456789");
-    if( (found != string::npos) && (found > 0) ){
-        n1 = s1.substr(0,found);
-        stringstream str(s1.substr(found));
-        str >> i1;
+        std::size_t found = s1.find_first_of("0123456789");
+        if( (found != string::npos) && (found > 0) ){
+            n1 = s1.substr(0,found);
+            stringstream str(s1.substr(found));
+            str >> i1;
+        }
+
+        found = s2.find_first_of("0123456789");
+        if( (found != string::npos) && (found > 0) ){
+            n2 = s2.substr(0,found);
+            stringstream str(s2.substr(found));
+            str >> i2;
+        }
+
+        if( n1 == n2 ){
+            return( i1 <= i2 );
+        }
+
+        return( n1 <= n2 );
+    } else {
+        return( strcmp(p_left->GetShortServerName(),p_right->GetShortServerName()) < 0 );
     }
-
-    found = s2.find_first_of("0123456789");
-    if( (found != string::npos) && (found > 0) ){
-        n2 = s2.substr(0,found);
-        stringstream str(s2.substr(found));
-        str >> i2;
-    }
-
-    if( n1 == n2 ){
-        return( i1 <= i2 );
-    }
-
-    return( n1 <= n2 );
 }
 
 //------------------------------------------------------------------------------

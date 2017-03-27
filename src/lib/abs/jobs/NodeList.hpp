@@ -36,7 +36,6 @@
 class ABS_PACKAGE CNodeGroup : public std::set<CNodePtr> {
 public:
     std::string             GroupName;
-    std::string             BatchServer;
     std::set<std::string>   CommonProps;
     std::list<CNodePtr>     SortedNodes;
 
@@ -89,7 +88,7 @@ public:
     /// keep only those node groups that are in the list
     void KeepNodeGroups(const CSmallString& groups);
 
-    /// finalize node groups - prepare ReasonableNodes and UniqueProps
+    /// finalize node groups - prepare ReasonableNodes and AllProps
     void FinalizeNodeGroups(void);
 
     /// keep only those nodes that has at least one of properties
@@ -113,6 +112,8 @@ private:
     // helper methods
     bool IsNodeSelected(CNodePtr p_node,struct SExpression* p_expr);
     bool IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel);
+    void AutoGroups(void);
+    void PrepareNodeGroups(CXMLElement* p_ele);
 };
 
 // -----------------------------------------------------------------------------
