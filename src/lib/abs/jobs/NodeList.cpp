@@ -319,7 +319,7 @@ void CNodeList::AutoGroups(unsigned int minsize)
 {
     // make copy of nodes
     list<CNodePtr> lnodes;
-    copy(begin(),end(),lnodes.begin());
+    lnodes.insert(lnodes.begin(),begin(),end());
 
     list<CNodePtr>::iterator it = lnodes.begin();
     list<CNodePtr>::iterator ie = lnodes.end();
@@ -358,7 +358,7 @@ void CNodeList::AutoGroups(unsigned int minsize)
                 p_group->insert(p_gnode);
                 lnodes.remove(p_gnode);
             }
-            gie++;
+            git++;
         }
         if( p_group->size() >= minsize ) {
             NodeGroups.push_back(p_group);
