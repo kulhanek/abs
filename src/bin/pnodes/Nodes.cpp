@@ -147,6 +147,8 @@ bool CNodes::Run(void)
         QueueList.RemoveInaccesibleQueues(User);
         QueueList.RemoveNonexecutiveQueues();
 
+        QueueList.PrintInfos(vout);
+
         // get list of queues - queue.server
         QueueList.GetQueuesWithServer(qlist);
 

@@ -228,7 +228,13 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     }
     sout << endl;
     if( Comment != NULL ){
+        if( IsDown() ){
+            sout << "<red>";
+        }
         sout << "               " << left << Comment << endl;
+        if( IsDown() ){
+            sout << "</red>";
+        }
     }
 }
 
