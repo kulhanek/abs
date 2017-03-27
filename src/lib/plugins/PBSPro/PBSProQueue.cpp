@@ -51,6 +51,7 @@ bool CPBSProQueue::Init(struct batch_status* p_queue)
 
     // get attributes
     bool result = true;
+
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_TYPE,NULL,Type);
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_STARTED,NULL,Started);
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_ENABLED,NULL,Enabled);
@@ -63,7 +64,7 @@ bool CPBSProQueue::Init(struct batch_status* p_queue)
 //    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_MAX_RUNNING,NULL,MaxRunning);
 //    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_MAX_USER_RUNNING,NULL,MaxUserRunning);
 
-    result &= get_attribute(p_queue->attribs,ATTR_QUEUE_RESOURCES_MAX,RESOURCES_PROCS,MaxCPUs);
+    //result &= get_attribute(p_queue->attribs,ATTR_QUEUE_RESOURCES_MAX,RESOURCES_PROCS,MaxCPUs);
     result &= get_attribute(p_queue->attribs,ATTR_QUEUE_RESOURCES_MAX,RESOURCES_WALLTIME,MaxWallTime);
 
     bool acl_enabled;
@@ -91,7 +92,7 @@ bool CPBSProQueue::Init(struct batch_status* p_queue)
         sscanf(count,"Transit:%d Queued:%d Held:%d Waiting:%d Running:%d Exiting:%d Begun:%d",&n,&QueuedJobs,&n,&n,&RunningJobs,&n,&n);
     }
 
-    if( result ){
+    if( result == false ){
         CSmallString error;
         error << "unable to get attribute(s) of queue '" << Name << "'";
         ES_TRACE_ERROR(error);

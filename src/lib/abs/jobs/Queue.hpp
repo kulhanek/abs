@@ -62,27 +62,27 @@ public:
     //! get type
     const CSmallString& GetType(void) const;
 
-    //! get required property
-    const CSmallString& GetRequiredProperty(void) const;
-
     //! get walltime
     const CSmallTime& GetMaxWallTime(void) const;
 
 // section of private data -----------------------------------------------------
 protected:
+    CSmallString                ShortServerName;
+
     CSmallString                Name;
     CSmallString                Type;
     bool                        Enabled;
     bool                        Started;
+    bool                        OnlyRoutable;
     int                         Priority;
+
     int                         TotalJobs;
     int                         QueuedJobs;
-    int                         RunningJobs;   
-    int                         MaxRunning;
-    int                         MaxUserRunning;
-    int                         MaxCPUs;
+    int                         RunningJobs;
+
+    CSmallString                Comment;
+
     CSmallTime                  MaxWallTime;
-    CSmallString                RequiredProperty;
     CSmallString                RouteDestinations;
     std::vector<CSmallString>   ACLUsers;
     std::vector<CSmallString>   ACLGroups;

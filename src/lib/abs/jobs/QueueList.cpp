@@ -116,25 +116,6 @@ void CQueueList::SortByName(void)
     sort(SortCompName);
 }
 
-//------------------------------------------------------------------------------
-
-void CQueueList::GetRequiredProperties(std::vector<std::string>& qprops)
-{
-    qprops.clear();
-
-    std::list<CQueuePtr>::iterator it = begin();
-    std::list<CQueuePtr>::iterator et = end();
-
-    while( it != et ){
-        CQueuePtr p_queue = *it;
-        string rprop = string(p_queue->GetRequiredProperty());
-        if( ! rprop.empty() ) {
-            qprops.push_back(rprop);
-        }
-        it++;
-    }
-}
-
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
@@ -142,8 +123,8 @@ void CQueueList::GetRequiredProperties(std::vector<std::string>& qprops)
 void CQueueList::PrintInfos(std::ostream& sout)
 {
     sout << endl;
-    sout << "#       Name       Pri    T     Q     R     O    Max  UMax CMax    MaxWall    Mod Required property" << endl;
-    sout << "# --------------- ----- ----- ----- ----- ----- ----- ---- ---- ------------- --- -----------------" << endl;
+    sout << "# SRV       Name       Pri    T     Q     R     O      MaxWall     Comment            " << endl;
+    sout << "# --- --------------- ----- ----- ----- ----- ----- ------------- --------------------" << endl;
 
     std::list<CQueuePtr>::iterator it = begin();
     std::list<CQueuePtr>::iterator et = end();
@@ -159,7 +140,6 @@ void CQueueList::PrintInfos(std::ostream& sout)
     sout << "# O - Other (completed, exiting, hold) jobs" << endl;
     sout << "# Max - Max running jobs, UMax - Max user running jobs" << endl;
     sout << "# CMax - Max CPUs per job, MaxWall - Max wall time per job" << endl;
-    sout << "# Mod - Started/(-)Stopped : Enabled/(-)Disabled" << endl;
     sout << low;
 }
 

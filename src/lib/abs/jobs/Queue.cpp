@@ -37,9 +37,7 @@ CQueue::CQueue(void)
     TotalJobs = 0;
     QueuedJobs = 0;
     RunningJobs = 0;
-    MaxRunning = 0;
-    MaxUserRunning = 0;
-    MaxCPUs = 0;
+    OnlyRoutable = false;
 }
 
 //==============================================================================
@@ -74,13 +72,6 @@ const CSmallString& CQueue::GetType(void) const
 
 //------------------------------------------------------------------------------
 
-const CSmallString& CQueue::GetRequiredProperty(void) const
-{
-    return(RequiredProperty);
-}
-
-//------------------------------------------------------------------------------
-
 bool CQueue::IsAllowed(CUser& user) const
 {
     // any ACL?
@@ -103,38 +94,30 @@ bool CQueue::IsAllowed(CUser& user) const
 
 void CQueue::PrintLineInfo(std::ostream& sout)
 {
+    if( OnlyRoutable ){
+        sout << "<gray>";
+    }
+
     sout << left;
     sout << setw(17) << Name;
     sout << right;
 
     if( Type == "Execution" ) {
 
+    sout << " " << setw(3) << ShortServerName;
     sout << " " << setw(5) << Priority;
     sout << " " << setw(5) << TotalJobs;
     sout << " " << setw(5) << QueuedJobs;
     sout << " " << setw(5) << RunningJobs;
     sout << " " << setw(5) << TotalJobs - (RunningJobs+QueuedJobs);
-    sout << " " << setw(5) << MaxRunning;
-    sout << " " << setw(4) << MaxUserRunning;
-    sout << " " << setw(4) << MaxCPUs;
     sout << " " << setw(13) << MaxWallTime.GetSTimeAndDay();
-    sout << left;
-    sout << "  ";
-
-    if( Started ){
-        sout << "S";
-    } else {
-        sout << "-";
-    }
-    if( Enabled ){
-        sout << "E";
-    } else {
-        sout << "-";
-    }
-    sout << " " << RequiredProperty << endl;
-
+    sout << " " << Comment << endl;
     } else {
     sout << " --> " << RouteDestinations << " (routing queue)" << endl;
+    }
+
+    if( OnlyRoutable ){
+        sout << "</gray>";
     }
 }
 

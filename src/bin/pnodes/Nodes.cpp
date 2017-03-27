@@ -149,7 +149,7 @@ bool CNodes::Run(void)
 
         // FIXME
                 // again but for queues accessible to user only
-                QueueList.GetRequiredProperties(qprops);
+                //QueueList.GetRequiredProperties(qprops);
 
                 // remove unwanted nodes
                 NodeList.KeepNodesThatHaveProperty(qprops);

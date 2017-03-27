@@ -48,9 +48,6 @@ public:
     //! sort queues by name
     void SortByName(void);
 
-    /// get required properties
-    void GetRequiredProperties(std::vector<std::string>& qprops);
-
 // information methods ---------------------------------------------------------
     //! print info about all queues
     void PrintInfos(std::ostream& sout);
