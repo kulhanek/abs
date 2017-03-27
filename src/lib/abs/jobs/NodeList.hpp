@@ -97,9 +97,6 @@ public:
     /// keep nodes by mask
     void KeepNodesByMask(struct SExpression* p_mask);
 
-    /// remove nodes without properties
-    void RemoveNodesWithoutProps(void);
-
     /// remove down
     void RemoveDownNodes(void);
 

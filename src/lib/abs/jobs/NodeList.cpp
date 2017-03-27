@@ -325,7 +325,7 @@ void CNodeList::AutoGroups(unsigned int minsize)
     list<CNodePtr>::iterator ie = lnodes.end();
 
     CNodeGroupPtr p_common_group = CNodeGroupPtr(new CNodeGroup);
-    p_common_group->GroupName = "mismatch";
+    p_common_group->GroupName = "various nodes";
 
     while( it != ie ){
         CNodePtr p_node = *it;
@@ -621,23 +621,6 @@ bool CNodeList::IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel)
             return(false);
     }
 
-}
-
-//------------------------------------------------------------------------------
-
-void CNodeList::RemoveNodesWithoutProps(void)
-{
-    list<CNodePtr>::iterator it = begin();
-    list<CNodePtr>::iterator et = end();
-
-    while( it != et ){
-        CNodePtr p_node = *it;
-        if( p_node->GetPropertyList().size() == 0 ){
-            it = erase(it);
-        } else {
-            it++;
-        }
-    }
 }
 
 //------------------------------------------------------------------------------

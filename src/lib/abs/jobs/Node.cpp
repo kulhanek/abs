@@ -69,7 +69,17 @@ const CSmallString CNode::GetShortServerName(void)
 
 char CNode::GetStateCode(void)
 {
-    return('F');
+    if( IsDown() == true ){
+        return('D');
+    }
+
+    if( AssignedCPUs == 0 ){
+        return('F');
+    } else if (NCPUs != AssignedCPUs){
+        return('O');
+    } else {
+        return('B');
+    }
 }
 
 //------------------------------------------------------------------------------

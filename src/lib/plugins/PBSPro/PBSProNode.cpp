@@ -117,6 +117,12 @@ bool CPBSProNode::Init(const CSmallString& short_srv_name,struct batch_status* p
     states.remove("free");
     states.remove("job-exclusive");
 
+    CSmallString queue;
+    get_attribute(p_node->attribs,"queue",NULL,queue);
+    if( queue == "maintenance"){
+        states.push_back("maintenance");
+    }
+
     // update state
     if( IsDown() == false ){
         if( (AssignedCPUs == 0) && (AssignedGPUs  == 0) ) {
