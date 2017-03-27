@@ -367,7 +367,7 @@ void CNodeList::AutoGroups(unsigned int minsize)
         }
 
         // start over
-        it = begin();
+        it = lnodes.begin();
     }
 }
 
