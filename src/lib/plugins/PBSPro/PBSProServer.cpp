@@ -306,8 +306,8 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
             ES_ERROR("unable to init queue");
             result = false;
         } else {
-            CQueuePtr p_queue(p_queue);
-            queues.push_back(p_queue);
+            CQueuePtr queue(p_queue);
+            queues.push_back(queue);
         }
         p_queues = p_queues->next;
     }

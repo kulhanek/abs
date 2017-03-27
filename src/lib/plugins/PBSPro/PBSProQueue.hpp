@@ -28,7 +28,7 @@
 
 /// PBSPro queue
 
-class ABS_PACKAGE CPBSProQueue : protected CQueue {
+class ABS_PACKAGE CPBSProQueue : public CQueue {
 public:
 // constructor -----------------------------------------------------------------
         CPBSProQueue(void);

@@ -47,6 +47,7 @@ bool CPBSProQueue::Init(const CSmallString& short_srv_name,struct batch_status* 
         return(false);
     }
 
+    ShortServerName = short_srv_name;
     Name = p_queue->name;
 
     // all ttributtes are optional
