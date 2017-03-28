@@ -347,25 +347,24 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
 
 bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
 {
-// it does not work in PBSPro
-//    struct attrl* p_first = NULL;
-//    struct attrl* p_prev = NULL;
+    struct attrl* p_first = NULL;
+    struct attrl* p_prev = NULL;
 
-//    set_attribute(p_first,ATTR_JOB_STATE,NULL,NULL);
-//    p_prev = p_first;
-//    set_attribute(p_prev,ATTR_JOB_TITLE,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_OWNER,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_QUEUE,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_COMMENT,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_OUTPUT_PATH,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_EXEC_HOST,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_VARIABLE_LIST,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_RESOURCE_LIST,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_CREATE_TIME,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_SUBMIT_TIME,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_START_TIME,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_FINISH_TIME,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_HOLD_TIME,NULL,NULL);
+    set_attribute(p_first,"job_state",NULL,NULL);
+    p_prev = p_first;
+    set_attribute(p_prev,"Job_Name",NULL,NULL);
+    set_attribute(p_prev,"Job_Owner",NULL,NULL);
+    set_attribute(p_prev,"queue",NULL,NULL);
+    set_attribute(p_prev,"comment",NULL,NULL);
+    set_attribute(p_prev,"Output_Path",NULL,NULL);
+    set_attribute(p_prev,"exec_host2",NULL,NULL);
+    set_attribute(p_prev,"Variable_List",NULL,NULL);
+    set_attribute(p_prev,"Resource_List",NULL,NULL);
+    set_attribute(p_prev,"ctime",NULL,NULL);
+    set_attribute(p_prev,"stime",NULL,NULL);
+    set_attribute(p_prev,"etime",NULL,NULL);
+    set_attribute(p_prev,"mtime",NULL,NULL);
+    set_attribute(p_prev,"qtime",NULL,NULL);
 
     CSmallString extend;
     if( finished ){
@@ -373,7 +372,7 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
     }
 
     struct batch_status* p_jobs;
-    p_jobs = pbs_statjob(ServerID,NULL,NULL,extend);
+    p_jobs = pbs_statjob(ServerID,NULL,p_first,extend.GetBuffer());
 
     bool result = true;
     while( p_jobs != NULL ){
