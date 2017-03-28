@@ -3801,13 +3801,9 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
                 break;
         }
 
-    CSmallString aid = GetItem("batch/job","INF_JOB_ID");
-    CSmallString id = aid;
-    //CSmallString id_domain;
-    if( id.GetLength() >12 ){
-        id = id.GetSubStringFromTo(0,11);
-    }
-    sout << left << setw(12) << id << " ";
+    CSmallString id = GetItem("batch/job","INF_JOB_ID");
+    id << ShortServerName;
+    sout << right << setw(12) << id << " ";
 
     CSmallString user = GetItem("batch/job","INF_JOB_OWNER");
     if( user.GetLength() > 12 ){

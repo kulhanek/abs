@@ -367,8 +367,13 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
 //    set_attribute(p_prev,ATTR_JOB_FINISH_TIME,NULL,NULL);
 //    set_attribute(p_prev,ATTR_JOB_HOLD_TIME,NULL,NULL);
 
+    CSmallString extend;
+    if( finished ){
+        extend << "x";
+    }
+
     struct batch_status* p_jobs;
-    p_jobs = pbs_statjob(ServerID,NULL,NULL,NULL);
+    p_jobs = pbs_statjob(ServerID,NULL,NULL,extend);
 
     bool result = true;
     while( p_jobs != NULL ){
