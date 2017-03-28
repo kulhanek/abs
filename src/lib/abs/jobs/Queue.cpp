@@ -148,14 +148,20 @@ void CQueue::PrintLineInfo(std::ostream& sout)
     }
 
     sout << left;
-    sout << setw(1) << ShortServerName;
+    if( RouteQueue == NULL ){
+        sout << setw(1) << ShortServerName;
+        sout << " ";
+    } else {
+        sout << "  ";
+        sout << setw(1) << ShortServerName;
+    }
 
-    sout << " ";
+
     sout << left;
     if( RouteQueue == NULL ){
         sout << setw(20) << Name;
     } else {
-        sout << " -> " << setw(16) << Name;
+        sout << " > " << setw(16) << Name;
     }
 
     sout << right;
