@@ -134,8 +134,8 @@ void CQueueList::SortByName(void)
 void CQueueList::PrintInfos(std::ostream& sout)
 {
     sout << endl;
-    sout << "#       Name       Pri    T     Q     R     O      MaxWall     Comment          " << endl;
-    sout << "# --------------- ----- ----- ----- ----- ----- ------------- ------------------" << endl;
+    sout << "#       Name            Pri    T     Q     R     O      MaxWall     Comment          " << endl;
+    sout << "# -------------------- ----- ----- ----- ----- ----- ------------- ------------------" << endl;
 
     MapRouteQueues();
 

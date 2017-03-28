@@ -143,8 +143,8 @@ bool CQueue::IsAllowed(CUser& user) const
 
 void CQueue::PrintLineInfo(std::ostream& sout)
 {
-    if( OnlyRoutable ){
-        sout << "<gray>";
+    if( ! OnlyRoutable ){
+        sout << "<blue>";
     }
 
     sout << left;
@@ -153,9 +153,9 @@ void CQueue::PrintLineInfo(std::ostream& sout)
     sout << " ";
     sout << left;
     if( RouteQueue == NULL ){
-        sout << setw(15) << Name;
+        sout << setw(20) << Name;
     } else {
-        sout << " -> " << setw(11) << Name;
+        sout << " -> " << setw(16) << Name;
     }
 
     sout << right;
@@ -167,8 +167,8 @@ void CQueue::PrintLineInfo(std::ostream& sout)
     sout << " " << setw(13) << MaxWallTime.GetSTimeAndDay();
     sout << " " << Comment << endl;
 
-    if( OnlyRoutable ){
-        sout << "</gray>";
+    if( ! OnlyRoutable ){
+        sout << "</blue>";
     }
 }
 
