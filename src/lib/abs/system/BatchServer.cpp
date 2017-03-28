@@ -88,27 +88,15 @@ bool CBatchServer::GetAllJobs(CJobList& jobs,bool finished)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name)
+bool CBatchServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::GetUserJobs(CJobList& jobs,const CSmallString& user)
+bool CBatchServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished)
 {
-    return(false);
-}
-
-//------------------------------------------------------------------------------
-
-bool CBatchServer::GetJob(CJobList& jobs,const CSmallString& jobid)
-{
-    CJobPtr job = GetJob(jobid);
-    if( job != NULL ){
-        jobs.push_back(job);
-        return(true);
-    }
     return(false);
 }
 

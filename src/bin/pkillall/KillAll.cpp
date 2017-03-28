@@ -107,7 +107,7 @@ bool CKillAll::Run(void)
     vout << endl;
     vout << low;
 
-    if( BatchServers.GetUserJobs(JobList,User.GetName(),false) == false ){
+    if( BatchServers.GetUserJobs(User.GetName(),false) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }

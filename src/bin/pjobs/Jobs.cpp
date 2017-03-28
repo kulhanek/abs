@@ -112,7 +112,7 @@ bool CJobs::Run(void)
     vout << endl;
     vout << low;
 
-    if( BatchServers.GetUserJobs(JobList,User.GetName(),Options.GetOptKeepCompleted() | Options.GetOptFinished()) == false ){
+    if( BatchServers.GetUserJobs(User.GetName(),Options.GetOptKeepCompleted() | Options.GetOptFinished()) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }

@@ -63,13 +63,13 @@ public:
     bool GetNodes(void);
 
     //! init all job list
-    bool GetAllJobs(CJobList& jobs,bool finished);
+    bool GetAllJobs(bool finished);
 
     //! get queue jobs
-    bool GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished);
+    bool GetQueueJobs(const CSmallString& queue_name,bool finished);
 
     //! init job list of given user
-    bool GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished);
+    bool GetUserJobs(const CSmallString& user,bool finished);
 
     //! init job list by job id
     bool GetJob(CJobList& jobs,const CSmallString& jobid);
@@ -112,6 +112,16 @@ public:
 // private data ----------------------------------------------------------------
 private:
 
+    /// find batch server by queue
+    /// name@server           short or long name supported
+    /// name                  for default server
+    const CBatchServerPtr FindBatchServerByQueue(const CSmallString& queue_name);
+
+    /// find batch server by jobid
+    /// number.server           1234.wagap-pro.cerit-sc.cz
+    /// numberSERVER_SHORT_NAME 1234C
+    /// number                  for default server
+    const CBatchServerPtr FindBatchServerByJobID(const CSmallString& queue_name);
 };
 
 //------------------------------------------------------------------------------

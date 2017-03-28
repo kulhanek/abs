@@ -156,7 +156,6 @@ void CQueue::PrintLineInfo(std::ostream& sout)
         sout << setw(1) << ShortServerName;
     }
 
-
     sout << left;
     if( RouteQueue == NULL ){
         sout << setw(20) << Name;

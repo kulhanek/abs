@@ -70,13 +70,10 @@ public:
     virtual bool GetAllJobs(CJobList& jobs,bool finished);
 
     //! get queue jobs
-    virtual bool GetQueueJobs(CJobList& jobs,const CSmallString& queue_name);
+    virtual bool GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished);
 
     //! init job list of given user
-    virtual bool GetUserJobs(CJobList& jobs,const CSmallString& user);
-
-    //! init job list by job id
-    virtual bool GetJob(CJobList& jobs,const CSmallString& jobid);
+    virtual bool GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished);
 
     //! get job by job id
     virtual const CJobPtr GetJob(const CSmallString& jobid);

@@ -227,7 +227,7 @@ bool CBatchServers::GetNodes(void)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::GetAllJobs(CJobList& jobs,bool finished)
+bool CBatchServers::GetAllJobs(bool finished)
 {
     // init servers if not done already
     if( size() == 0 ) InitAll();
@@ -247,30 +247,75 @@ bool CBatchServers::GetAllJobs(CJobList& jobs,bool finished)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished)
+bool CBatchServers::GetQueueJobs(const CSmallString& queue_name,bool finished)
 {
-    return(false);
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    CBatchServerPtr srv_ptr = FindBatchServerByQueue(queue_name);
+    if( srv_ptr == NULL ){
+        CSmallString error;
+        error << "batch server was not found for the queue '" << queue_name << "'";
+        ES_ERROR(error);
+        return(false);
+    }
+
+    return( srv_ptr->GetAllJobs(JobList,finished) );
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished)
+bool CBatchServers::GetUserJobs(const CSmallString& user,bool finished)
 {
-    return(false);
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    // list jobs
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    bool result = true;
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+        result &= srv_ptr->GetUserJobs(JobList,user,finished);
+        it++;
+    }
+    return(result);
 }
 
 //------------------------------------------------------------------------------
 
 bool CBatchServers::GetJob(CJobList& jobs,const CSmallString& jobid)
 {
-    return(false);
+    CJobPtr job_ptr = GetJob(jobid);
+    if( job_ptr == NULL ) return(false);
+    jobs.push_back(job_ptr);
+    return(true);
 }
 
 //------------------------------------------------------------------------------
 
 const CJobPtr CBatchServers::GetJob(const CSmallString& jobid)
 {
-    return(CJobPtr());
+    CJobPtr job_ptr;
+
+    CBatchServerPtr srv_ptr = FindBatchServerByJobID(jobid);
+    if( srv_ptr == NULL ){
+        CSmallString error;
+        error << "batch server was not found for the job '" << jobid << "'";
+        ES_ERROR(error);
+        return(job_ptr);
+    }
+
+    job_ptr = srv_ptr->GetJob(jobid);
+    if( job_ptr == NULL ){
+        CSmallString error;
+        error << "unable to locate job '" << jobid << "'";
+        ES_TRACE_ERROR(error);
+        return(job_ptr);
+    }
+
+    return(job_ptr);
 }
 
 //==============================================================================
@@ -387,6 +432,24 @@ void CBatchServers::PrintJobs(std::ostream& sout)
 bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& name)
 {
     return(false);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+const CBatchServerPtr CBatchServers::FindBatchServerByQueue(const CSmallString& queue_name)
+{
+    CBatchServerPtr srv_ptr;
+    return(srv_ptr);
+}
+
+//------------------------------------------------------------------------------
+
+const CBatchServerPtr CBatchServers::FindBatchServerByJobID(const CSmallString& queue_name)
+{
+    CBatchServerPtr srv_ptr;
+    return(srv_ptr);
 }
 
 //==============================================================================

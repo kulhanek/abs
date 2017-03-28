@@ -47,7 +47,6 @@ private:
     CStatusOptions  Options;
     CTerminalStr    Console;
     CVerboseStr     vout;
-    CJobList        Jobs;
 };
 
 // -----------------------------------------------------------------------------

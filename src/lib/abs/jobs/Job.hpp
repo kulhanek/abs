@@ -376,9 +376,14 @@ public:
     /// get job input directory - either PWD or CurrentDir
     static CFileName GetJobInputPath(void);
 
+    //! get short server name
+    const CSmallString GetShortServerName(void);
+
 // section of private data -----------------------------------------------------
 protected:
-    bool        InfoFileLoaded;
+    CSmallString    ShortServerName;
+
+    bool            InfoFileLoaded;
 
     /// list nodes
     bool ListNodes(std::ostream& sout);

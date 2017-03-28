@@ -91,7 +91,7 @@ bool CStatus::Run(void)
     // get list of info files
     if( Options.GetNumberOfProgArgs() > 0 ){
         for( int i=0; i < Options.GetNumberOfProgArgs(); i++ ){
-            if( Jobs.AddJob(Options.GetProgArg(i)) == false ){
+            if( JobList.AddJob(Options.GetProgArg(i)) == false ){
                 vout << endl;
                 vout << "<b><red> ERROR: Unable to load job info file '" << Options.GetProgArg(i) << "'!</red></b>" << endl;
                 vout << endl;
@@ -100,22 +100,22 @@ bool CStatus::Run(void)
         }
 
     } else {
-        Jobs.InitByInfoFiles(".",false);
+        JobList.InitByInfoFiles(".",false);
     }
 
-    if( Jobs.GetNumberOfJobs() == 0 ){
+    if( JobList.GetNumberOfJobs() == 0 ){
         vout << "UN";
         return(false);
     }
 
     // sort them
-    Jobs.SortByPrepareDateAndTime();
+    JobList.SortByPrepareDateAndTime();
 
     // update status of live jobs
-    Jobs.UpdateJobStatuses();
+    JobList.UpdateJobStatuses();
 
     // print final information
-    Jobs.PrintLastJobStatus(vout);
+    JobList.PrintLastJobStatus(vout);
 
     return(true);
 }
