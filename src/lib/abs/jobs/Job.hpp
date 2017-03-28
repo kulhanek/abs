@@ -82,9 +82,6 @@ public:
     /// save job key
     bool SaveJobKey(void);
 
-    /// init job with torque information
-    bool Init(struct batch_status* p_job);
-
 // submit methods --------------------------------------------------------------
     /// 0.0 create info file header
     void CreateHeader(void);
