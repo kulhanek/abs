@@ -40,7 +40,7 @@
 #include <JobList.hpp>
 #include "PBSProQueue.hpp"
 #include "PBSProNode.hpp"
-//#include "PBSProJob.hpp"
+#include "PBSProJob.hpp"
 
 using namespace std;
 using namespace boost;
@@ -305,6 +305,7 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
         if( p_queue->Init(ShortName, p_queue_attrs) == false ){
             ES_ERROR("unable to init queue");
             result = false;
+            delete p_queue;
         } else {
             CQueuePtr queue(p_queue);
             queues.push_back(queue);
@@ -329,6 +330,7 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
         if( p_node->Init(ShortName,p_node_attrs) == false ){
             ES_ERROR("unable to init node");
             result = false;
+            delete p_node;
         } else {
             CNodePtr node(p_node);
             nodes.push_back(node);
@@ -370,12 +372,15 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
 
     bool result = true;
     while( p_jobs != NULL ){
-        CJobPtr p_job(new CJob);
-        if( p_job->Init(p_jobs) == false ){
+        CPBSProJob* p_job = new CPBSProJob;
+        if( p_job->Init(ShortName,p_jobs) == false ){
             ES_ERROR("unable to init job");
             result = false;
+            delete p_job;
+        } else {
+            CJobPtr job(p_job);
+            jobs.push_back(job);
         }
-        jobs.push_back(p_job);
         p_jobs = p_jobs->next;
     }
 
@@ -413,12 +418,15 @@ bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,b
 
     bool result = true;
     while( p_jobs != NULL ){
-        CJobPtr p_job(new CJob);
-        if( p_job->Init(p_jobs) == false ){
+        CPBSProJob* p_job = new CPBSProJob;
+        if( p_job->Init(ShortName,p_jobs) == false ){
             ES_ERROR("unable to init job");
             result = false;
+            delete p_job;
+        } else {
+            CJobPtr job(p_job);
+            jobs.push_back(job);
         }
-        jobs.push_back(p_job);
         p_jobs = p_jobs->next;
     }
 
@@ -439,12 +447,15 @@ bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool fin
 
     bool result = true;
     while( p_jobs != NULL ){
-        CJobPtr p_job(new CJob);
-        if( p_job->Init(p_jobs) == false ){
+        CPBSProJob* p_job = new CPBSProJob;
+        if( p_job->Init(ShortName,p_jobs) == false ){
             ES_ERROR("unable to init job");
             result = false;
+            delete p_job;
+        } else {
+            CJobPtr job(p_job);
+            jobs.push_back(job);
         }
-        jobs.push_back(p_job);
         p_jobs = p_jobs->next;
     }
 
@@ -522,11 +533,12 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
     CJobPtr result;
 
     if( p_jobs != NULL ){
-        CJobPtr p_job(new CJob);
-        if( p_job->Init(p_jobs) == false ){
+        CPBSProJob* p_job = new CPBSProJob;
+        if( p_job->Init(ShortName,p_jobs) == false ){
+            delete p_job;
             ES_ERROR("unable to init job");
         } else {
-            result = p_job;
+            result = CJobPtr(p_job);
         }
     }
 
