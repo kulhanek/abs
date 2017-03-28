@@ -359,7 +359,7 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
     set_attribute(p_prev,"Output_Path",NULL,NULL);
     set_attribute(p_prev,"exec_host2",NULL,NULL);
     set_attribute(p_prev,"Variable_List",NULL,NULL);
-    set_attribute(p_prev,"Resource_List",NULL,NULL);
+//    set_attribute(p_prev,"Resource_List",NULL,NULL);
     set_attribute(p_prev,"ctime",NULL,NULL);
     set_attribute(p_prev,"stime",NULL,NULL);
     set_attribute(p_prev,"etime",NULL,NULL);
