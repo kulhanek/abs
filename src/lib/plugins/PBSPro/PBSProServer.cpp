@@ -759,35 +759,36 @@ void CPBSProServer::DecodeBatchJobComment(attrl* p_item,CSmallString& comment)
 
     while( p_item != NULL ){
         // job comment
-        if( strcmp(p_item->name,ATTR_JOB_COMMENT) == 0 ){
+        if( strcmp(p_item->name,ATTR_comment) == 0 ){
             if( comment == NULL ) {
                 comment = p_item->value;
             }
         }
 
-        if( strcmp(p_item->name,ATTR_JOB_PLANNED_START) == 0 ){
-            CSmallString tmp = p_item->value;
+// fixme
+//        if( strcmp(p_item->name,ATTR_JOB_PLANNED_START) == 0 ){
+//            CSmallString tmp = p_item->value;
 
-            CSmallTimeAndDate   date(tmp.ToLInt());
-            CSmallTimeAndDate   cdate;
-            CSmallTime          ddiff;
-            cdate.GetActualTimeAndDate();
-            ddiff = date - cdate;
-            if( ddiff > 0 ){
-                comment = "planned start within " + ddiff.GetSTimeAndDay();
-            }
-        }
+//            CSmallTimeAndDate   date(tmp.ToLInt());
+//            CSmallTimeAndDate   cdate;
+//            CSmallTime          ddiff;
+//            cdate.GetActualTimeAndDate();
+//            ddiff = date - cdate;
+//            if( ddiff > 0 ){
+//                comment = "planned start within " + ddiff.GetSTimeAndDay();
+//            }
+//        }
 
-        if( strcmp(p_item->name,ATTR_JOB_PLANNED_NODES) == 0 ){
-            vector<string> nodes;
-            string         list(p_item->value);
-            split(nodes,list,is_any_of(" ,"),boost::token_compress_on);
-            if( nodes.size() >= 1 ){
-                comment += " (" + nodes[0];
-                if( nodes.size() > 1 ) comment += ",+";
-                comment += ")";
-            }
-        }
+//        if( strcmp(p_item->name,ATTR_JOB_PLANNED_NODES) == 0 ){
+//            vector<string> nodes;
+//            string         list(p_item->value);
+//            split(nodes,list,is_any_of(" ,"),boost::token_compress_on);
+//            if( nodes.size() >= 1 ){
+//                comment += " (" + nodes[0];
+//                if( nodes.size() > 1 ) comment += ",+";
+//                comment += ")";
+//            }
+//        }
 
         p_item = p_item->next;
     }

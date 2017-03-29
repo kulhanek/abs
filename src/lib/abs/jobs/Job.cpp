@@ -3834,7 +3834,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
     CSmallTimeAndDate current_time;
     current_time.GetActualTimeAndDate();
 
-    sout << " " << setw(20);
+    sout << " " << setw(25);
     switch( BatchJobStatus ){
         case EJS_NONE:
         case EJS_PREPARED:{
@@ -3852,7 +3852,12 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
         case EJS_RUNNING:{
             CSmallTimeAndDate ptime(GetItem("batch/job","INF_START_TIME").ToLInt());
             CSmallTime diff = current_time - ptime;
+            sout << setw(12) << right;
             sout << diff.GetSTimeAndDay();
+            sout << "/";
+            CSmallTime wtime(GetItem("batch/job","INF_WALL_TIME").ToLInt());
+            sout << setw(12) << right;
+            sout << wtime.GetSTimeAndDay();
             }
             break;
         case EJS_FINISHED:
@@ -3872,7 +3877,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
     if( includepath ){
         CSmallString title = GetItem("batch/job","INF_JOB_TITLE");
         if( title == "STDIN" ){
-            sout << "<blue>> Interactive job </blue>" << endl;
+            sout << "         <blue>> Interactive job </blue>" << endl;
         } else {
             if( IsJobDirLocal(true) ){
                 sout << "     <blue>> " << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;

@@ -55,17 +55,7 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
         return(false);
     }
 
-    // retrieve
-    // jobid
-    // jobname
-    // jobdir
-    // owner
-    // queue
-    // ncpus
-    // ngpus
-    // nnodes
-    // last change time
-    // status
+    ShortServerName = short_srv_name;
 
     // create used sections
     CreateSection("batch");
@@ -82,11 +72,10 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     }
 
     // get attributes
-    bool result = true;
     CSmallString tmp;
 // -----------------
     tmp = NULL;
-    result &= get_attribute(p_job->attribs,ATTR_JOB_STATE,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_state,NULL,tmp);
     SetItem("batch/job","INF_JOB_STATE",tmp);
 
     CSmallString status;
@@ -106,12 +95,12 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
 
 // -----------------
     tmp = NULL;
-    result &= get_attribute(p_job->attribs,ATTR_JOB_TITLE,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_name,NULL,tmp);
     SetItem("batch/job","INF_JOB_TITLE",tmp);
 
 // -----------------
     tmp = NULL;
-    result &= get_attribute(p_job->attribs,ATTR_JOB_OWNER,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_owner,NULL,tmp);
     stmp = tmp;
     items.clear();
     split(items,stmp,is_any_of("@"));
@@ -123,14 +112,14 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
 
 // -----------------
     tmp = NULL;
-    result &= get_attribute(p_job->attribs,ATTR_JOB_QUEUE,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_queue,NULL,tmp);
     SetItem("batch/job","INF_JOB_QUEUE",tmp);
     SetItem("specific/resources","INF_QUEUE",tmp);
 
 // job variables
     BatchVariables.clear();
     tmp = NULL;
-    result &= get_attribute(p_job->attribs,ATTR_JOB_VARIABLE_LIST,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_v,NULL,tmp);
     std::string varlist = std::string(tmp);
     std::vector<string> vars;
     split(vars,varlist,is_any_of(","));
@@ -160,7 +149,7 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
 // ------------------
     tmp = NULL;
     // this is optional
-    get_attribute(p_job->attribs,ATTR_JOB_OUTPUT_PATH,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_o,NULL,tmp);
 
     SetItem("basic/jobinput","INF_JOB_MACHINE",BatchVariables["INF_JOB_MACHINE"]);
     SetItem("basic/jobinput","INF_JOB_PATH",BatchVariables["INF_JOB_PATH"]);
@@ -188,152 +177,55 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     tmp = NULL;
     // this is optional - exec host
     SetItem("start/workdir","INF_MAIN_NODE","-unknown-");
-    get_attribute(p_job->attribs,ATTR_JOB_EXEC_HOST,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_exechost2,NULL,tmp);
     if( tmp != NULL ){
         stmp = tmp;
         items.clear();
-        split(items,stmp,is_any_of("+"));
+        split(items,stmp,is_any_of(":"));
         if( items.size() > 0 ){
-            split(items,items[0],is_any_of("/"));
-            if( items.size() > 0 ){
-                SetItem("start/workdir","INF_MAIN_NODE",items[0]);
-            }
+            SetItem("start/workdir","INF_MAIN_NODE",items[0]);
         }
     }
 
 // ------------------
-    tmp = NULL;
     // this is optional - resources
-    int nnodes = 0;
-    int ncpus = 0;
-    int ngpus = 0;
-    get_attribute(p_job->attribs,ATTR_JOB_RESOURCE_LIST,RESOURCES_SELECT,tmp);
-
-
-    stmp = tmp;
-    items.clear();
-    split(items,stmp,is_any_of("+"));
-
-    vector<string>::iterator it = items.begin();
-    vector<string>::iterator ie = items.end();
-
-    while( it != ie ){
-        vector<string> res;
-        split(res,*it,is_any_of(":"));
-
-        // first is node or number of nodes
-        int lnodes = 1;
-
-        vector<string>::iterator rit = res.begin();
-        vector<string>::iterator rie = res.end();
-
-        if( rit != rie ){
-            // is it number?
-            stringstream str(*rit);
-            str >> lnodes;
-            if( str.fail() ){
-                lnodes = 1;
-            }
-        }
-
-        // find number of cpus and gpus
-        rit++;
-        int lncpus=1;
-        int lngpus=0;
-        while( rit != rie ){
-            if( (*rit).find("ppn=") == 0 ){
-                vector<string> ritems;
-                split(ritems,*rit,is_any_of("="));
-                if( ritems.size() >= 2 ){
-                    stringstream str(ritems[1]);
-                    str >> lncpus;
-                }
-            }
-            if( (*rit).find("ncpus=") == 0 ){
-                vector<string> ritems;
-                split(ritems,*rit,is_any_of("="));
-                if( ritems.size() >= 2 ){
-                    stringstream str(ritems[1]);
-                    str >> lncpus;
-                }
-            }
-            // FIXME
-//            switch( TorqueConfig.GetTorqueMode() ){
-//                case ETM_TORQUE:
-//                    if( (*rit).find("gpus=") == 0 ){
-//                        vector<string> ritems;
-//                        split(ritems,*rit,is_any_of("="));
-//                        if( ritems.size() >= 2 ){
-//                            stringstream str(ritems[1]);
-//                            str >> lngpus;
-//                        }
-//                    }
-//                break;
-//                case ETM_TORQUE_METAVO:
-//                    if( (*rit).find("gpu=") == 0 ){
-//                        vector<string> ritems;
-//                        split(ritems,*rit,is_any_of("="));
-//                        if( ritems.size() >= 2 ){
-//                            stringstream str(ritems[1]);
-//                            str >> lngpus;
-//                        }
-//                    }
-//                break;
-//                case ETM_PBSPRO:
-//                    // FIXME
-//                break;
-//            }
-            rit++;
-        }
-        nnodes += lnodes;
-        ncpus += lnodes*lncpus;
-        ngpus += lnodes*lngpus;
-
-        it++;
-    }
-
-    SetItem("specific/resources","INF_NCPU",ncpus);
-    SetItem("specific/resources","INF_NGPU",ngpus);
-    SetItem("specific/resources","INF_NNODE",nnodes);
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_l,"ncpus",tmp);
+    SetItem("specific/resources","INF_NCPU",tmp);
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_l,"ngpus",tmp);
+    SetItem("specific/resources","INF_NGPU",tmp);
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_l,"nodect",tmp);
+    SetItem("specific/resources","INF_NNODE",tmp);
 
 // ------------------
     // this is optional - times
     tmp = NULL;
-    get_attribute(p_job->attribs,ATTR_JOB_CREATE_TIME,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_ctime,NULL,tmp);
     SetItem("batch/job","INF_CREATE_TIME",tmp);
     tmp = NULL;
     if( status == "H" ){
-        get_attribute(p_job->attribs,ATTR_JOB_HOLD_TIME,NULL,tmp);
+        get_attribute(p_job->attribs,ATTR_qtime,NULL,tmp);
         SetItem("batch/job","INF_SUBMIT_TIME",tmp);
     } else {
-        get_attribute(p_job->attribs,ATTR_JOB_SUBMIT_TIME,NULL,tmp);
+        get_attribute(p_job->attribs,ATTR_etime,NULL,tmp);
         SetItem("batch/job","INF_SUBMIT_TIME",tmp);
     }
-    tmp = NULL;
-    // FIXME
-//    switch( TorqueConfig.GetTorqueMode() ){
-//        case ETM_TORQUE:
-//        case ETM_TORQUE_METAVO:
-//            get_attribute(p_job->attribs,ATTR_JOB_START_TIME,NULL,tmp);
-//        break;
-//        case ETM_PBSPRO:
-            get_attribute(p_job->attribs,ATTR_JOB_START_TIME_2,NULL,tmp);
-//        break;
-//    }
 
-    SetItem("batch/job","INF_START_TIME",tmp);
     tmp = NULL;
-    get_attribute(p_job->attribs,ATTR_JOB_FINISH_TIME,NULL,tmp);
+    get_attribute(p_job->attribs,ATTR_stime,NULL,tmp);
+    SetItem("batch/job","INF_START_TIME",tmp);
+
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_mtime,NULL,tmp);
     SetItem("batch/job","INF_FINISH_TIME",tmp);
 
-// ------------------
-    if( ! result ){
-        CSmallString error;
-        error << "unable to get attribute(s) of job '" << p_job->name << "'";
-        ES_TRACE_ERROR(error);
-    }
+    CSmallTime time;
+    get_attribute(p_job->attribs,ATTR_l,"walltime",time);
+    SetItem("batch/job","INF_WALL_TIME",time.GetSecond());
 
-    return(result);
+    return(true);
 }
 
 //==============================================================================

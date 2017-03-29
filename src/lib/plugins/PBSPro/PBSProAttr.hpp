@@ -53,25 +53,6 @@ struct attrl* FindAttr(struct attrl* p_list,const char* p_name,const char* p_res
 
 // -----------------------------------------------------------------------------
 
-#define ATTR_JOB_TITLE                  "Job_Name"
-#define ATTR_JOB_OWNER                  "Job_Owner"
-#define ATTR_JOB_QUEUE                  "queue"
-#define ATTR_JOB_STATE                  "job_state"
-#define ATTR_JOB_COMMENT                "comment"
-#define ATTR_JOB_OUTPUT_PATH            "Output_Path"
-#define ATTR_JOB_EXEC_HOST              "exec_host"
-#define ATTR_JOB_RESOURCE_LIST          "Resource_List"
-#define ATTR_JOB_VARIABLE_LIST          "Variable_List"
-#define ATTR_JOB_CREATE_TIME            "ctime"
-#define ATTR_JOB_SUBMIT_TIME            "etime"
-#define ATTR_JOB_START_TIME             "start_time"
-#define ATTR_JOB_START_TIME_2           "stime"
-#define ATTR_JOB_FINISH_TIME            "mtime"
-#define ATTR_JOB_HOLD_TIME              "qtime"
-#define ATTR_JOB_ACCOUNT_NAME           "Account_Name"
-#define ATTR_JOB_PLANNED_START          "planned_start"
-#define ATTR_JOB_PLANNED_NODES          "planned_nodes"
-
 #define ATTR_USER_LIST                  "User_List"
 #define ATTR_group_list                 "group_list"
 
@@ -80,9 +61,6 @@ struct attrl* FindAttr(struct attrl* p_list,const char* p_name,const char* p_res
 #define RESOURCES_NODES                 "nodes"
 #define RESOURCES_SELECT                "select"
 #define RESOURCES_NCPUS                 "ncpus"
-
-
-
 
 // -----------------------------------------------------------------------------
 
