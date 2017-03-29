@@ -216,17 +216,15 @@ const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_nam
     std::list<CBatchServerPtr>::iterator    it = begin();
     std::list<CBatchServerPtr>::iterator    ie = end();
 
-    CBatchServerPtr srv_ptr;
-
     while( it != ie ){
-        srv_ptr = *it;
+        CBatchServerPtr srv_ptr = *it;
         if( (srv_ptr->GetServerName() == srv_name) || (srv_ptr->GetShortName() == srv_name) ){
             return(srv_ptr);
         }
         it++;
     }
 
-    return(srv_ptr);
+    return(CBatchServerPtr());
 }
 
 //==============================================================================
