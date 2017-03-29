@@ -76,19 +76,19 @@ CPBSProServer::CPBSProServer(void)
 {
     ServerID = 0;
 
-    pbs_connect = NULL;
-    pbs_disconnect = NULL;
-    pbs_statserver = NULL;
-    pbs_statque = NULL;
-    pbs_statnode = NULL;
-    pbs_statjob = NULL;
-    pbs_selstat = NULL;
-    pbs_statfree = NULL;
-    pbs_submit = NULL;
-    pbs_deljob = NULL;
-    pbs_geterrmsg = NULL;
-    pbs_strerror = NULL;
-    pbs_errno = NULL;
+    pbspro_connect = NULL;
+    pbspro_disconnect = NULL;
+    pbspro_statserver = NULL;
+    pbspro_statque = NULL;
+    pbspro_statnode = NULL;
+    pbspro_statjob = NULL;
+    pbspro_selstat = NULL;
+    pbspro_statfree = NULL;
+    pbspro_submit = NULL;
+    pbspro_deljob = NULL;
+    pbspro_geterrmsg = NULL;
+    pbspro_strerror = NULL;
+    pbspro_errno = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
     while( it != ie ){
         CSmallString lib(*it);
         if( CFileSystem::IsFile(lib) == true ){
-            TorqueLibName = lib;
+            PBSProLibName = lib;
             break;
         }
         it++;
@@ -149,73 +149,73 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
 
 bool CPBSProServer::InitSymbols(void)
 {
-    if( TorqueLib.Open(TorqueLibName) == false ){
+    if( PBSProLib.Open(PBSProLibName) == false ){
         ES_ERROR("unable to load torque library");
         return(false);
     }
 
     // load symbols
     bool status = true;
-    pbs_connect     = (PBS_CONNECT)TorqueLib.GetProcAddress("pbs_connect");
-    if( pbs_connect == NULL ){
+    pbspro_connect     = (PBS_CONNECT)PBSProLib.GetProcAddress("pbs_connect");
+    if( pbspro_connect == NULL ){
         ES_ERROR("unable to bind to pbs_connect");
         status = false;
     }
-    pbs_disconnect  = (PBS_DISCONNECT)TorqueLib.GetProcAddress("pbs_disconnect");
-    if( pbs_disconnect == NULL ){
+    pbspro_disconnect  = (PBS_DISCONNECT)PBSProLib.GetProcAddress("pbs_disconnect");
+    if( pbspro_disconnect == NULL ){
         ES_ERROR("unable to bind to pbs_disconnect");
         status = false;
     }
-    pbs_statserver  = (PBS_STATSERVER)TorqueLib.GetProcAddress("pbs_statserver");
-    if( pbs_statserver == NULL ){
+    pbspro_statserver  = (PBS_STATSERVER)PBSProLib.GetProcAddress("pbs_statserver");
+    if( pbspro_statserver == NULL ){
         ES_ERROR("unable to bind to pbs_statserver");
         status = false;
     }
-    pbs_statque  = (PBS_STATQUE)TorqueLib.GetProcAddress("pbs_statque");
-    if( pbs_statque == NULL ){
+    pbspro_statque  = (PBS_STATQUE)PBSProLib.GetProcAddress("pbs_statque");
+    if( pbspro_statque == NULL ){
         ES_ERROR("unable to bind to pbs_statque");
         status = false;
     }
-    pbs_statnode  = (PBS_STATNODE)TorqueLib.GetProcAddress("pbs_statnode");
-    if( pbs_statnode == NULL ){
+    pbspro_statnode  = (PBS_STATNODE)PBSProLib.GetProcAddress("pbs_statnode");
+    if( pbspro_statnode == NULL ){
         ES_ERROR("unable to bind to pbs_statnode");
         status = false;
     }
-    pbs_statjob  = (PBS_STATJOB)TorqueLib.GetProcAddress("pbs_statjob");
-    if( pbs_statjob == NULL ){
+    pbspro_statjob  = (PBS_STATJOB)PBSProLib.GetProcAddress("pbs_statjob");
+    if( pbspro_statjob == NULL ){
         ES_ERROR("unable to bind to pbs_statjob");
         status = false;
     }
-    pbs_selstat  = (PBS_SELSTATJOB)TorqueLib.GetProcAddress("pbs_selstat");
-    if( pbs_selstat == NULL ){
+    pbspro_selstat  = (PBS_SELSTATJOB)PBSProLib.GetProcAddress("pbs_selstat");
+    if( pbspro_selstat == NULL ){
         ES_ERROR("unable to bind to pbs_selstat");
         status = false;
     }
-    pbs_statfree  = (PBS_STATFREE)TorqueLib.GetProcAddress("pbs_statfree");
-    if( pbs_statfree == NULL ){
+    pbspro_statfree  = (PBS_STATFREE)PBSProLib.GetProcAddress("pbs_statfree");
+    if( pbspro_statfree == NULL ){
         ES_ERROR("unable to bind to pbs_statfree");
         status = false;
     }
-    pbs_submit  = (PBS_SUBMIT)TorqueLib.GetProcAddress("pbs_submit");
-    if( pbs_submit == NULL ){
+    pbspro_submit  = (PBS_SUBMIT)PBSProLib.GetProcAddress("pbs_submit");
+    if( pbspro_submit == NULL ){
         ES_ERROR("unable to bind to pbs_submit");
         status = false;
     }
-    pbs_deljob  = (PBS_DELJOB)TorqueLib.GetProcAddress("pbs_deljob");
-    if( pbs_deljob == NULL ){
+    pbspro_deljob  = (PBS_DELJOB)PBSProLib.GetProcAddress("pbs_deljob");
+    if( pbspro_deljob == NULL ){
         ES_ERROR("unable to bind to pbs_deljob");
         status = false;
     }
-    pbs_geterrmsg  = (PBS_GETERRMSG)TorqueLib.GetProcAddress("pbs_geterrmsg");
-    if( pbs_geterrmsg == NULL ){
+    pbspro_geterrmsg  = (PBS_GETERRMSG)PBSProLib.GetProcAddress("pbs_geterrmsg");
+    if( pbspro_geterrmsg == NULL ){
         ES_ERROR("unable to bind to pbs_geterrmsg");
         status = false;
     }
-//    pbs_errno  = (PBS_ERRNO)TorqueLib.GetObjAddress("pbs_errno");
-//    if( pbs_errno == NULL ){
-//        ES_ERROR("unable to bind to pbs_errno");
-//        status = false;
-//    }
+    pbspro_errno  = (PBS_ERRNO)PBSProLib.GetProcAddress("__pbs_errno_location");
+    if( pbspro_errno == NULL ){
+        ES_ERROR("unable to bind to __pbs_errno_location");
+        status = false;
+    }
     return(status);
 }
 
@@ -223,7 +223,7 @@ bool CPBSProServer::InitSymbols(void)
 
 bool CPBSProServer::ConnectToServer(void)
 {
-    ServerID = pbs_connect(ServerName);
+    ServerID = pbspro_connect(ServerName);
     if( ServerID <= 0 ){    
         CSmallString error;
         error << "unable to connect to server";
@@ -239,7 +239,7 @@ bool CPBSProServer::DisconnectFromServer(void)
 {
     if( ServerID <= 0 ) return(true);
 
-    int error = pbs_disconnect(ServerID);
+    int error = pbspro_disconnect(ServerID);
     ServerID = 0;
     if( error != 0 ){
         ES_ERROR("unable to disconnect from server");
@@ -297,7 +297,7 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 
 bool CPBSProServer::GetQueues(CQueueList& queues)
 {
-    struct batch_status* p_queue_attrs = pbs_statque(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_queue_attrs = pbspro_statque(ServerID,NULL,NULL,NULL);
 
     bool result = true;
     while( p_queue_attrs != NULL ){
@@ -313,7 +313,7 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
         p_queue_attrs = p_queue_attrs->next;
     }
 
-    if( p_queue_attrs ) pbs_statfree(p_queue_attrs);
+    if( p_queue_attrs ) pbspro_statfree(p_queue_attrs);
 
     return(result);
 }
@@ -322,7 +322,7 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
 
 bool CPBSProServer::GetNodes(CNodeList& nodes)
 {
-    struct batch_status* p_node_attrs = pbs_statnode(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_node_attrs = pbspro_statnode(ServerID,NULL,NULL,NULL);
 
     bool result = true;
     while( p_node_attrs != NULL ){
@@ -338,7 +338,7 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
         p_node_attrs = p_node_attrs->next;
     }
 
-    if( p_node_attrs ) pbs_statfree(p_node_attrs);
+    if( p_node_attrs ) pbspro_statfree(p_node_attrs);
 
     return(result);
 }
@@ -347,32 +347,13 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
 
 bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
 {
-    struct attrl* p_first = NULL;
-    struct attrl* p_prev = NULL;
-
-    set_attribute(p_first,"job_state",NULL,NULL);
-    p_prev = p_first;
-    set_attribute(p_prev,"Job_Name",NULL,NULL);
-    set_attribute(p_prev,"Job_Owner",NULL,NULL);
-    set_attribute(p_prev,"queue",NULL,NULL);
-    set_attribute(p_prev,"comment",NULL,NULL);
-    set_attribute(p_prev,"Output_Path",NULL,NULL);
-    set_attribute(p_prev,"exec_host2",NULL,NULL);
-    set_attribute(p_prev,"Variable_List",NULL,NULL);
-//    set_attribute(p_prev,"Resource_List",NULL,NULL);
-    set_attribute(p_prev,"ctime",NULL,NULL);
-    set_attribute(p_prev,"stime",NULL,NULL);
-    set_attribute(p_prev,"etime",NULL,NULL);
-    set_attribute(p_prev,"mtime",NULL,NULL);
-    set_attribute(p_prev,"qtime",NULL,NULL);
-
     CSmallString extend;
     if( finished ){
         extend << "x";
     }
 
     struct batch_status* p_jobs;
-    p_jobs = pbs_statjob(ServerID,NULL,p_first,extend.GetBuffer());
+    p_jobs = pbspro_statjob(ServerID,NULL,NULL,extend.GetBuffer());
 
     bool result = true;
     while( p_jobs != NULL ){
@@ -388,7 +369,7 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
         p_jobs = p_jobs->next;
     }
 
-    if( p_jobs ) pbs_statfree(p_jobs);
+    if( p_jobs ) pbspro_statfree(p_jobs);
 
     return(result);
 }
@@ -397,28 +378,13 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
 
 bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished)
 {
-// it does not work in PBSPro
-//    struct attrl* p_first = NULL;
-//    struct attrl* p_prev = NULL;
-
-//    set_attribute(p_first,ATTR_JOB_STATE,NULL,NULL);
-//    p_prev = p_first;
-//    set_attribute(p_prev,ATTR_JOB_TITLE,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_OWNER,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_QUEUE,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_COMMENT,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_OUTPUT_PATH,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_EXEC_HOST,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_VARIABLE_LIST,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_RESOURCE_LIST,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_CREATE_TIME,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_SUBMIT_TIME,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_START_TIME,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_FINISH_TIME,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_HOLD_TIME,NULL,NULL);
+    CSmallString extend;
+    if( finished ){
+        extend << "x";
+    }
 
     struct batch_status* p_jobs;
-    p_jobs = pbs_statjob(ServerID,(char*)queue_name.GetBuffer(),NULL,NULL);
+    p_jobs = pbspro_statjob(ServerID,(char*)queue_name.GetBuffer(),NULL,extend.GetBuffer());
 
     bool result = true;
     while( p_jobs != NULL ){
@@ -434,7 +400,7 @@ bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,b
         p_jobs = p_jobs->next;
     }
 
-    if( p_jobs ) pbs_statfree(p_jobs);
+    if( p_jobs ) pbspro_statfree(p_jobs);
 
     return(result);
 }
@@ -443,11 +409,16 @@ bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,b
 
 bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished)
 {
+    CSmallString extend;
+    if( finished ){
+        extend << "x";
+    }
+
     struct attropl* p_first = NULL;
     set_attribute(p_first,ATTR_USER_LIST,NULL,user,EQ);
 
     struct batch_status* p_jobs;
-    p_jobs = pbs_selstat(ServerID,p_first,NULL,NULL);
+    p_jobs = pbspro_selstat(ServerID,p_first,NULL,extend.GetBuffer());
 
     bool result = true;
     while( p_jobs != NULL ){
@@ -463,7 +434,7 @@ bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool fin
         p_jobs = p_jobs->next;
     }
 
-    if( p_jobs ) pbs_statfree(p_jobs);
+    if( p_jobs ) pbspro_statfree(p_jobs);
 
     return(result);
 }
@@ -484,39 +455,6 @@ bool CPBSProServer::GetJob(CJobList& jobs,const CSmallString& jobid)
 
 const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 {
-// it crashes in PBSPro
-//    struct attrl* p_first = NULL;
-//    struct attrl* p_prev = NULL;
-
-//    set_attribute(p_first,ATTR_JOB_STATE,NULL,NULL);
-//    p_prev = p_first;
-//    set_attribute(p_prev,ATTR_JOB_TITLE,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_OWNER,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_QUEUE,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_COMMENT,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_OUTPUT_PATH,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_EXEC_HOST,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_VARIABLE_LIST,NULL,NULL);
-//    set_attribute(p_prev,ATTR_JOB_RESOURCE_LIST,NULL,NULL);
-
-//    switch(ABSConfig.GetTorqueMode()){
-//        case ETM_TORQUE:
-//        case ETM_TORQUE_METAVO:
-//            set_attribute(p_prev,ATTR_JOB_CREATE_TIME,NULL,NULL);
-//            set_attribute(p_prev,ATTR_JOB_SUBMIT_TIME,NULL,NULL);
-//            set_attribute(p_prev,ATTR_JOB_START_TIME,NULL,NULL);
-//            set_attribute(p_prev,ATTR_JOB_FINISH_TIME,NULL,NULL);
-//            set_attribute(p_prev,ATTR_JOB_HOLD_TIME,NULL,NULL);
-//        break;
-//        case ETM_PBSPRO:
-//            set_attribute(p_prev,ATTR_JOB_CREATE_TIME,NULL,NULL);
-//            set_attribute(p_prev,ATTR_JOB_SUBMIT_TIME,NULL,NULL);
-//            set_attribute(p_prev,ATTR_JOB_START_TIME_2,NULL,NULL);
-//            set_attribute(p_prev,ATTR_JOB_FINISH_TIME,NULL,NULL);
-//            set_attribute(p_prev,ATTR_JOB_HOLD_TIME,NULL,NULL);
-//        break;
-//    }
-
     CSmallString full_job_id;
     // FIXME
     // CSmallString server = ABSConfig.GetServerName();
@@ -527,10 +465,10 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
     }
 
     struct batch_status* p_jobs;
-    p_jobs = pbs_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,NULL);
+    p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,NULL);
 
     if( p_jobs == NULL ){
-        char* p_error = pbs_geterrmsg(ServerID);
+        char* p_error = pbspro_geterrmsg(ServerID);
         if( p_jobs ) ES_TRACE_ERROR(p_error);
     }
 
@@ -546,7 +484,7 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
         }
     }
 
-    if( p_jobs ) pbs_statfree(p_jobs);
+    if( p_jobs ) pbspro_statfree(p_jobs);
 
     return(result);
 }
@@ -555,10 +493,10 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 
 bool CPBSProServer::PrintQueues(std::ostream& sout)
 {
-    struct batch_status* p_queues = pbs_statque(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_queues = pbspro_statque(ServerID,NULL,NULL,NULL);
     if( p_queues != NULL ) {
         PrintBatchStatus(sout,p_queues);
-        pbs_statfree(p_queues);
+        pbspro_statfree(p_queues);
     }
     return(true);
 }
@@ -567,10 +505,10 @@ bool CPBSProServer::PrintQueues(std::ostream& sout)
 
 bool CPBSProServer::PrintNodes(std::ostream& sout)
 {
-    struct batch_status* p_nodes = pbs_statnode(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_nodes = pbspro_statnode(ServerID,NULL,NULL,NULL);
     if( p_nodes != NULL ) {
         PrintBatchStatus(sout,p_nodes);
-        pbs_statfree(p_nodes);
+        pbspro_statfree(p_nodes);
     }
     return(true);
 }
@@ -579,10 +517,10 @@ bool CPBSProServer::PrintNodes(std::ostream& sout)
 
 bool CPBSProServer::PrintNode(std::ostream& sout,const CSmallString& name)
 {
-    struct batch_status* p_nodes = pbs_statnode(ServerID,(char*)name.GetBuffer(),NULL,NULL);
+    struct batch_status* p_nodes = pbspro_statnode(ServerID,(char*)name.GetBuffer(),NULL,NULL);
     if( p_nodes != NULL ) {
         PrintBatchStatus(sout,p_nodes);
-        pbs_statfree(p_nodes);
+        pbspro_statfree(p_nodes);
     }
     return(true);
 }
@@ -591,10 +529,10 @@ bool CPBSProServer::PrintNode(std::ostream& sout,const CSmallString& name)
 
 bool CPBSProServer::PrintJobs(std::ostream& sout)
 {
-    struct batch_status* p_jobs = pbs_statjob(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_jobs = pbspro_statjob(ServerID,NULL,NULL,NULL);
     if( p_jobs != NULL ) {
         PrintBatchStatus(sout,p_jobs);
-        pbs_statfree(p_jobs);
+        pbspro_statfree(p_jobs);
     }
     return(true);
 }
@@ -610,10 +548,10 @@ bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& name)
         full_name = full_name + "." + server_name;
     }
 
-    struct batch_status* p_jobs = pbs_statjob(ServerID,(char*)full_name.GetBuffer(),NULL,NULL);
+    struct batch_status* p_jobs = pbspro_statjob(ServerID,(char*)full_name.GetBuffer(),NULL,NULL);
     if( p_jobs != NULL ) {
         PrintBatchStatus(sout,p_jobs);
-        pbs_statfree(p_jobs);
+        pbspro_statfree(p_jobs);
     }
     return(true);
 }
@@ -717,7 +655,7 @@ bool CPBSProServer::SubmitJob(CJob& job)
     set_attribute(p_prev,ATTR_v,NULL,variables);
 
     // FIXME
-//    switch( ABSConfig.GetTorqueMode() ){
+//    switch( ABSConfig.GetPBSProMode() ){
 //        case ETM_TORQUE:
 //        case ETM_TORQUE_METAVO:{
 //            // get umask in decimal representation
@@ -756,10 +694,10 @@ bool CPBSProServer::SubmitJob(CJob& job)
 //    PrintAttributes(cout,p_first);
 
     // submit jobs
-    char* p_jobid = pbs_submit(ServerID,p_first,script,queue,NULL);
+    char* p_jobid = pbspro_submit(ServerID,p_first,script,queue,NULL);
 
     if( p_jobid == NULL ){
-        char* p_error = pbs_geterrmsg(ServerID);
+        char* p_error = pbspro_geterrmsg(ServerID);
         job.WriteErrorSection(p_error);
         CSmallString error;
         error << "unable to submit job, error: "  << p_error;
@@ -780,7 +718,7 @@ bool CPBSProServer::GetJobStatus(CJob& job)
 {
     CSmallString jobid = job.GetJobID();
 
-    batch_status* p_status = pbs_statjob(ServerID,jobid.GetBuffer(),NULL,NULL);
+    batch_status* p_status = pbspro_statjob(ServerID,jobid.GetBuffer(),NULL,NULL);
 
     job.BatchJobComment = NULL;
     job.BatchJobStatus = EJS_ERROR;
@@ -814,7 +752,7 @@ bool CPBSProServer::GetJobStatus(CJob& job)
         p_item = p_item->next;
     }
 
-    pbs_statfree(p_status);
+    pbspro_statfree(p_status);
 
     return(true);
 }
@@ -866,7 +804,7 @@ void CPBSProServer::DecodeBatchJobComment(attrl* p_item,CSmallString& comment)
 bool CPBSProServer::KillJob(CJob& job)
 {
     CSmallString jobid = job.GetJobID();
-    int retval = pbs_deljob(ServerID,jobid.GetBuffer(),NULL);
+    int retval = pbspro_deljob(ServerID,jobid.GetBuffer(),NULL);
     return( retval == 0 );
 }
 
@@ -875,7 +813,7 @@ bool CPBSProServer::KillJob(CJob& job)
 bool CPBSProServer::KillJobByID(const CSmallString& jobid)
 {
     CSmallString lid(jobid);
-    int retval = pbs_deljob(ServerID,lid.GetBuffer(),NULL);
+    int retval = pbspro_deljob(ServerID,lid.GetBuffer(),NULL);
     return( retval == 0 );
 }
 
@@ -883,7 +821,7 @@ bool CPBSProServer::KillJobByID(const CSmallString& jobid)
 
 const CSmallString CPBSProServer::GetLastErrorMsg(void)
 {
-    return(pbs_geterrmsg(ServerID));
+    return(pbspro_geterrmsg(ServerID));
 }
 
 //==============================================================================

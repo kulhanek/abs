@@ -51,37 +51,37 @@ bool CPBSProQueue::Init(const CSmallString& short_srv_name,struct batch_status* 
     Name = p_queue->name;
 
     // all ttributtes are optional
-    get_attribute(p_queue->attribs,"queue_type",NULL,Type);
-    get_attribute(p_queue->attribs,"started",NULL,Started);
-    get_attribute(p_queue->attribs,"enabled",NULL,Enabled);
-    get_attribute(p_queue->attribs,"Priority",NULL,Priority);
-    get_attribute(p_queue->attribs,"total_jobs",NULL,TotalJobs);
-    get_attribute(p_queue->attribs,"resources_max","walltime",MaxWallTime);
-    get_attribute(p_queue->attribs,"route_destinations",NULL,RouteDestinations);
-    get_attribute(p_queue->attribs,"comment",NULL,Comment);
-    get_attribute(p_queue->attribs,"from_route_only",NULL,OnlyRoutable);
+    get_attribute(p_queue->attribs,ATTR_qtype,NULL,Type);
+    get_attribute(p_queue->attribs,ATTR_start,NULL,Started);
+    get_attribute(p_queue->attribs,ATTR_enable,NULL,Enabled);
+    get_attribute(p_queue->attribs,ATTR_p,NULL,Priority);
+    get_attribute(p_queue->attribs,ATTR_total,NULL,TotalJobs);
+    get_attribute(p_queue->attribs,ATTR_rescmax,"walltime",MaxWallTime);
+    get_attribute(p_queue->attribs,ATTR_routedest,NULL,RouteDestinations);
+    get_attribute(p_queue->attribs,ATTR_comment,NULL,Comment);
+    get_attribute(p_queue->attribs,ATTR_fromroute,NULL,OnlyRoutable);
 
     bool acl_enabled;
     //---------------------
     acl_enabled = false;
-    get_attribute(p_queue->attribs,"acl_user_enable",NULL,acl_enabled);
+    get_attribute(p_queue->attribs,ATTR_acluren,NULL,acl_enabled);
     if( acl_enabled ){
-        get_attribute(p_queue->attribs,"acl_users",NULL,ACLUsers);
+        get_attribute(p_queue->attribs,ATTR_acluser,NULL,ACLUsers);
     }
     //---------------------
     acl_enabled = false;
-    get_attribute(p_queue->attribs,"acl_group_enable",NULL,acl_enabled);
+    get_attribute(p_queue->attribs,ATTR_aclgren,NULL,acl_enabled);
     if( acl_enabled ){
-        get_attribute(p_queue->attribs,"acl_groups",NULL,ACLGroups);
+        get_attribute(p_queue->attribs,ATTR_aclgroup,NULL,ACLGroups);
     }
 
-    get_attribute(p_queue->attribs,"default_chunk","queue_list",ChunkQueue);
+    get_attribute(p_queue->attribs,ATTR_DefaultChunk,"queue_list",ChunkQueue);
 
     //---------------------
     // parse state count
     int n = 0;
     CSmallString count;
-    if( get_attribute(p_queue->attribs,"state_count",NULL,count) == true ){
+    if( get_attribute(p_queue->attribs,ATTR_count,NULL,count) == true ){
         sscanf(count,"Transit:%d Queued:%d Held:%d Waiting:%d Running:%d Exiting:%d Begun:%d",&n,&QueuedJobs,&n,&n,&RunningJobs,&n,&n);
     }
 

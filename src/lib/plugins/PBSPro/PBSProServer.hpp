@@ -49,7 +49,7 @@ typedef char* (*PBS_SUBMIT)(int,struct attropl*,const char*,const char*,char*);
 typedef char* (*PBS_GETERRMSG)(int connect);
 typedef int (*PBS_DELJOB)(int,char*,char*);
 typedef char* (*PBS_STRERROR)(int);
-typedef int* PBS_ERRNO;
+typedef int (*PBS_ERRNO)(void);
 
 // -----------------------------------------------------------------------------
 
@@ -121,8 +121,8 @@ public:
 
 // section of private data -----------------------------------------------------
 private:
-    CSmallString    TorqueLibName;
-    CDynamicPackage TorqueLib;
+    CSmallString    PBSProLibName;
+    CDynamicPackage PBSProLib;
     int             ServerID;
 
     // init symbols
@@ -144,24 +144,24 @@ private:
     void PrintAttributes(std::ostream& sout,struct attropl* p_as);
 
     // torque api symbols
-    PBS_CONNECT     pbs_connect;
-    PBS_DISCONNECT  pbs_disconnect;
-    PBS_STATSERVER  pbs_statserver;
-    PBS_STATQUE     pbs_statque;
-    PBS_STATNODE    pbs_statnode;
-    PBS_STATJOB     pbs_statjob;
-    PBS_SELSTATJOB  pbs_selstat;
-    PBS_STATFREE    pbs_statfree;
-    PBS_SUBMIT      pbs_submit;
-    PBS_DELJOB      pbs_deljob;
-    PBS_GETERRMSG   pbs_geterrmsg;
-    PBS_STRERROR    pbs_strerror;
-    PBS_ERRNO       pbs_errno;
+    PBS_CONNECT     pbspro_connect;
+    PBS_DISCONNECT  pbspro_disconnect;
+    PBS_STATSERVER  pbspro_statserver;
+    PBS_STATQUE     pbspro_statque;
+    PBS_STATNODE    pbspro_statnode;
+    PBS_STATJOB     pbspro_statjob;
+    PBS_SELSTATJOB  pbspro_selstat;
+    PBS_STATFREE    pbspro_statfree;
+    PBS_SUBMIT      pbspro_submit;
+    PBS_DELJOB      pbspro_deljob;
+    PBS_GETERRMSG   pbspro_geterrmsg;
+    PBS_STRERROR    pbspro_strerror;
+    PBS_ERRNO       pbspro_errno;
 };
 
 // -----------------------------------------------------------------------------
 
-extern CPBSProServer Torque;
+extern CPBSProServer PBSPro;
 
 // -----------------------------------------------------------------------------
 

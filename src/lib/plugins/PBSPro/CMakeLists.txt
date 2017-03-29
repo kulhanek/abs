@@ -2,7 +2,7 @@
 # ABS CMake File
 # ==============================================================================
 
-INCLUDE_DIRECTORIES(torque SYSTEM)
+INCLUDE_DIRECTORIES(pbspro SYSTEM)
 
 # objects in library -----------------------------------------------------------
 SET(PBSPRO_SRC
