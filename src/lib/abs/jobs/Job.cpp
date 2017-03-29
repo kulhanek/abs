@@ -1050,48 +1050,49 @@ const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& s
 {
     CSmallString outpath = inpath;
 
-    string inrules;
-    inrules = ABSConfig.GetSystemConfigItem("INF_JOB_PATH_CHECK");
+// FIXME
+//    string inrules;
+//    inrules = ABSConfig.GetSystemConfigItem("INF_JOB_PATH_CHECK");
 
-    if( ! inrules.empty() ){
-        // try to remove specified prefixies until success
-        vector<string> rules;
-        split(rules,inrules,is_any_of(";"));
+//    if( ! inrules.empty() ){
+//        // try to remove specified prefixies until success
+//        vector<string> rules;
+//        split(rules,inrules,is_any_of(";"));
 
-        vector<string>::iterator it = rules.begin();
-        vector<string>::iterator ie = rules.end();
-        string sinpath(inpath);
+//        vector<string>::iterator it = rules.begin();
+//        vector<string>::iterator ie = rules.end();
+//        string sinpath(inpath);
 
-        while( it != ie ){
-            string rule = *it;
-            it++;
-            if( rule.empty() ) continue;
+//        while( it != ie ){
+//            string rule = *it;
+//            it++;
+//            if( rule.empty() ) continue;
 
-            string::iterator ipos = find(rule.begin(), rule.end(), '|');
-            string prefix;
-            string substi;
-            if( ipos != rule.end() ){
-                prefix = string(rule.begin(), ipos);
-                substi = string(ipos + 1, rule.end());
-            } else {
-                prefix = rule;
-            }
+//            string::iterator ipos = find(rule.begin(), rule.end(), '|');
+//            string prefix;
+//            string substi;
+//            if( ipos != rule.end() ){
+//                prefix = string(rule.begin(), ipos);
+//                substi = string(ipos + 1, rule.end());
+//            } else {
+//                prefix = rule;
+//            }
 
-            size_t pos = sinpath.find(prefix);
-            if( pos == 0 ){
-                // strip down prefix
-                string new_path = sinpath.substr(prefix.size());
-                if( ! substi.empty() ){
-                    new_path = substi + new_path;
-                }
-                // does it exist?
-                if( CFileSystem::IsDirectory(new_path.c_str()) == true ){
-                    outpath = new_path;
-                    break;
-                }
-            }
-        }
-    }
+//            size_t pos = sinpath.find(prefix);
+//            if( pos == 0 ){
+//                // strip down prefix
+//                string new_path = sinpath.substr(prefix.size());
+//                if( ! substi.empty() ){
+//                    new_path = substi + new_path;
+//                }
+//                // does it exist?
+//                if( CFileSystem::IsDirectory(new_path.c_str()) == true ){
+//                    outpath = new_path;
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     string legall_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_+-.#/";
     string legall_char_short = "a-z A-Z 0-9 _+-.#/";
