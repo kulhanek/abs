@@ -624,6 +624,8 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
         }
     }
 
+    cout << "short:" << srv_name << endl;
+
     // update joid name
     jobid = new_jobid;
 
