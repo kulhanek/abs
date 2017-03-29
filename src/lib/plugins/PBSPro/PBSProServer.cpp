@@ -533,16 +533,12 @@ bool CPBSProServer::PrintJobs(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& name)
+bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid)
 {
-    CSmallString full_name;
-    CSmallString server_name = ABSConfig.GetSystemConfigItem("INF_SERVER_NAME");
-    full_name = name;
-    if( name.FindSubString(server_name) == -1 ){
-        full_name = full_name + "." + server_name;
-    }
+    CSmallString full_job_id;
+    full_job_id << jobid << "." << ServerName;
 
-    struct batch_status* p_jobs = pbspro_statjob(ServerID,(char*)full_name.GetBuffer(),NULL,NULL);
+    struct batch_status* p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,NULL);
     if( p_jobs != NULL ) {
         PrintBatchStatus(sout,p_jobs);
         pbspro_statfree(p_jobs);

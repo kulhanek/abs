@@ -98,7 +98,7 @@ public:
     bool PrintJobs(std::ostream& sout);
 
     //! print technical info about single job
-    bool PrintJob(std::ostream& sout,const CSmallString& name);
+    bool PrintJob(std::ostream& sout,const CSmallString& jobid);
 
 // execution -------------------------------------------------------------------
     //! submit job
