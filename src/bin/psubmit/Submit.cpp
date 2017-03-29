@@ -451,9 +451,6 @@ bool CSubmit::ExecPresubmitHook(void)
 
 bool CSubmit::Finalize(void)
 {
-    // unload plugins
-    PluginDatabase.UnloadPlugins();
-
     CSmallTimeAndDate dt;
     dt.GetActualTimeAndDate();
 
