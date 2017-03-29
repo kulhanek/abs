@@ -34,6 +34,7 @@
 #include <NodeList.hpp>
 #include <QueueList.hpp>
 #include <Shell.hpp>
+#include <cctype>
 
 //------------------------------------------------------------------------------
 

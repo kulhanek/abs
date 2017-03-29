@@ -226,7 +226,7 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
 
     CSmallTime time;
     get_attribute(p_job->attribs,ATTR_l,"walltime",time);
-    SetItem("batch/job","INF_WALL_TIME",time.GetSecond());
+    SetItem("batch/job","INF_WALL_TIME",time.GetSecondsFromBeginning());
 
     return(true);
 }
