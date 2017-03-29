@@ -48,6 +48,12 @@ public:
     /// init given server - srv can be either the full or short server name
     bool Init(const CSmallString& srv);
 
+    /// get default server name
+    const CSmallString GetDefaultSrvName(void);
+
+    /// get batch server - srv_name can be full or short name
+    const CBatchServerPtr FindBatchServer(const CSmallString& srv_name);
+
 // -----------------------------------------------------------------------------
     /// is server available
     bool IsServerAvailable(const CSmallString& name);
@@ -111,17 +117,24 @@ public:
 
 // private data ----------------------------------------------------------------
 private:
-
     /// find batch server by queue
     /// name@server           short or long name supported
     /// name                  for default server
-    const CBatchServerPtr FindBatchServerByQueue(const CSmallString& queue_name);
+    /// the server name is stripped from the queue name
+    const CBatchServerPtr FindBatchServerByQueue(CSmallString& name);
+
+    /// find batch server by node
+    /// name@server           short or long name supported
+    /// name                  for default server
+    /// the server name is stripped from the node name
+    const CBatchServerPtr FindBatchServerByNode(CSmallString& name);
 
     /// find batch server by jobid
     /// number.server           1234.wagap-pro.cerit-sc.cz
     /// numberSERVER_SHORT_NAME 1234C
     /// number                  for default server
-    const CBatchServerPtr FindBatchServerByJobID(const CSmallString& queue_name);
+    /// the server name is stripped from the jobid
+    const CBatchServerPtr FindBatchServerByJobID(CSmallString& jobid);
 };
 
 //------------------------------------------------------------------------------

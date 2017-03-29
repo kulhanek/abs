@@ -60,6 +60,9 @@ public:
     const CSmallString GetShortName(void);
 
 // enumeration -----------------------------------------------------------------
+    // IMPORTANT NOTE:
+    // in this API, jobid, vnode, queue must be without server specification
+
     //! init queue list
     virtual bool GetQueues(CQueueList& queues);
 

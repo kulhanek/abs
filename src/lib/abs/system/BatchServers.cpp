@@ -33,6 +33,7 @@
 #include <JobList.hpp>
 #include <NodeList.hpp>
 #include <QueueList.hpp>
+#include <Shell.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -155,6 +156,78 @@ bool CBatchServers::Init(const CSmallString& srv)
     return(true);
 }
 
+//------------------------------------------------------------------------------
+
+const CSmallString CBatchServers::GetDefaultSrvName(void)
+{
+    CSmallString srv_name;
+
+    CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
+    if( p_ele == NULL ) {
+        ES_ERROR("no servers");
+        return(srv_name);
+    }
+
+    // is PBS_SERVER set?
+    srv_name = CShell::GetSystemVariable("PBS_SERVER");
+    if( srv_name ){
+        // is it in the list of supported servers?
+        CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
+        while( p_sele != NULL ){
+            CSmallString name, short_name;
+            p_sele->GetAttribute("name",name);
+            p_sele->GetAttribute("short",short_name);
+            if( srv_name == name ) return(srv_name);
+            p_sele = p_sele->GetNextSiblingElement();
+        }
+    }
+
+    // get default or the first server
+    CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
+    bool set = false;
+    while( p_sele != NULL ){
+        CSmallString name, short_name;
+        p_sele->GetAttribute("name",name);
+        p_sele->GetAttribute("short",short_name);
+        if( set == false ){
+            srv_name = name;
+            set = true;
+        }
+        bool def = false;
+        p_sele->GetAttribute("default",def);
+        if( def == true ){
+            srv_name = name;
+        }
+        if( srv_name == name ) return(srv_name);
+        p_sele = p_sele->GetNextSiblingElement();
+    }
+
+    return(srv_name);
+}
+
+//------------------------------------------------------------------------------
+
+const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_name)
+{
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    CBatchServerPtr srv_ptr;
+
+    while( it != ie ){
+        srv_ptr = *it;
+        if( (srv_ptr->GetServerName() == srv_name) || (srv_ptr->GetShortName() == srv_name) ){
+            return(srv_ptr);
+        }
+        it++;
+    }
+
+    return(srv_ptr);
+}
+
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
@@ -252,7 +325,8 @@ bool CBatchServers::GetQueueJobs(const CSmallString& queue_name,bool finished)
     // init servers if not done already
     if( size() == 0 ) InitAll();
 
-    CBatchServerPtr srv_ptr = FindBatchServerByQueue(queue_name);
+    CSmallString new_queue_name = queue_name;
+    CBatchServerPtr srv_ptr = FindBatchServerByQueue(new_queue_name);
     if( srv_ptr == NULL ){
         CSmallString error;
         error << "batch server was not found for the queue '" << queue_name << "'";
@@ -260,7 +334,7 @@ bool CBatchServers::GetQueueJobs(const CSmallString& queue_name,bool finished)
         return(false);
     }
 
-    return( srv_ptr->GetAllJobs(JobList,finished) );
+    return( srv_ptr->GetQueueJobs(JobList,new_queue_name,finished) );
 }
 
 //------------------------------------------------------------------------------
@@ -299,7 +373,8 @@ const CJobPtr CBatchServers::GetJob(const CSmallString& jobid)
 {
     CJobPtr job_ptr;
 
-    CBatchServerPtr srv_ptr = FindBatchServerByJobID(jobid);
+    CSmallString new_jobid = jobid;
+    CBatchServerPtr srv_ptr = FindBatchServerByJobID(new_jobid);
     if( srv_ptr == NULL ){
         CSmallString error;
         error << "batch server was not found for the job '" << jobid << "'";
@@ -310,7 +385,7 @@ const CJobPtr CBatchServers::GetJob(const CSmallString& jobid)
     job_ptr = srv_ptr->GetJob(jobid);
     if( job_ptr == NULL ){
         CSmallString error;
-        error << "unable to locate job '" << jobid << "'";
+        error << "unable to locate job '" << new_jobid << "'";
         ES_TRACE_ERROR(error);
         return(job_ptr);
     }
@@ -403,6 +478,22 @@ void CBatchServers::PrintNodes(std::ostream& sout)
 
 bool CBatchServers::PrintNode(std::ostream& sout,const CSmallString& name)
 {
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    CSmallString batch_name = name;
+    CBatchServerPtr srv_ptr = FindBatchServerByNode(batch_name);
+
+    if( srv_ptr == NULL ){
+        ES_ERROR("no server found");
+        return(false);
+    }
+
+    sout << endl;
+    sout << "# Batch server  : " << srv_ptr->GetServerName() << " (" << srv_ptr->GetShortName() << ")" << endl;
+    sout << "# ------------------------------------------------------------------------------" << endl;
+    srv_ptr->PrintNode(sout,batch_name);
+
     return(false);
 }
 
@@ -429,8 +520,24 @@ void CBatchServers::PrintJobs(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& name)
+bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& jobid)
 {
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    CSmallString batch_jobid = jobid;
+    CBatchServerPtr srv_ptr = FindBatchServerByJobID(batch_jobid);
+
+    if( srv_ptr == NULL ){
+        ES_ERROR("no server found");
+        return(false);
+    }
+
+    sout << endl;
+    sout << "# Batch server  : " << srv_ptr->GetServerName() << " (" << srv_ptr->GetShortName() << ")" << endl;
+    sout << "# ------------------------------------------------------------------------------" << endl;
+    srv_ptr->PrintJob(sout,batch_jobid);
+
     return(false);
 }
 
@@ -438,17 +545,130 @@ bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& name)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-const CBatchServerPtr CBatchServers::FindBatchServerByQueue(const CSmallString& queue_name)
+const CBatchServerPtr CBatchServers::FindBatchServerByQueue(CSmallString& name)
 {
+    // queue            default server name
+    // queue@S          short server name
+    // queue@server     explicit server name
+
     CBatchServerPtr srv_ptr;
+    if( name == NULL ) return(srv_ptr);
+
+    CSmallString srv_name;
+    CSmallString new_name = name;
+
+    unsigned int at = name.FindSubString("@");
+    if( at >= 0 ){
+        if( at + 1 < name.GetLength() ){
+            srv_name = name.GetSubString(at+1,name.GetLength()-(at+1));
+        }
+        if( at > 0 ){
+            new_name = name.GetSubString(0,at);
+        } else {
+            new_name = NULL;
+        }
+    }
+
+    // update queue name
+    name = new_name;
+
+    // not provided - use default server
+    if( srv_name == NULL ){
+        srv_name = GetDefaultSrvName();
+    }
+
+    srv_ptr = FindBatchServer(srv_name);
     return(srv_ptr);
 }
 
 //------------------------------------------------------------------------------
 
-const CBatchServerPtr CBatchServers::FindBatchServerByJobID(const CSmallString& queue_name)
+const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
 {
+    // jobid            default server name
+    // jobidS           short server name
+    // jobid.server     explicit server name
+
     CBatchServerPtr srv_ptr;
+    if( jobid == NULL ) return(srv_ptr);
+
+    CSmallString srv_name;
+    CSmallString new_jobid = jobid;
+
+    unsigned int at = jobid.FindSubString(".");
+    if( at >= 0 ){
+        if( at + 1 < jobid.GetLength() ){
+            srv_name = jobid.GetSubString(at+1,jobid.GetLength()-(at+1));
+        }
+        if( at > 0 ){
+            new_jobid = jobid.GetSubString(0,at);
+        } else {
+            new_jobid = NULL;
+        }
+    }
+
+    // update joid name
+    jobid = new_jobid;
+
+    // is it in short form?
+    if( jobid != NULL ){
+        if( isalpha(jobid[jobid.GetLength()-1]) == true ){
+            srv_name = jobid[jobid.GetLength()-1];
+            if( jobid.GetLength() > 1 ){
+                new_jobid = jobid.GetSubString(0,jobid.GetLength()-1);
+            } else {
+                new_jobid = NULL;
+            }
+        }
+    }
+
+    // update joid name
+    jobid = new_jobid;
+
+    // not provided - use default server
+    if( srv_name == NULL ){
+        srv_name = GetDefaultSrvName();
+    }
+
+    srv_ptr = FindBatchServer(srv_name);
+    return(srv_ptr);
+}
+
+//------------------------------------------------------------------------------
+
+const CBatchServerPtr CBatchServers::FindBatchServerByNode(CSmallString& name)
+{
+    // node             default server name
+    // node@S           short server name
+    // node@server      explicit server name
+
+    CBatchServerPtr srv_ptr;
+    if( name == NULL ) return(srv_ptr);
+
+    CSmallString srv_name;
+    CSmallString new_name = name;
+
+    unsigned int at = name.FindSubString("@");
+    if( at >= 0 ){
+        if( at + 1 < name.GetLength() ){
+            srv_name = name.GetSubString(at+1,name.GetLength()-(at+1));
+        }
+        if( at > 0 ){
+            new_name = name.GetSubString(0,at);
+        } else {
+            new_name = NULL;
+        }
+    }
+
+    // update node name
+    name = new_name;
+
+    // not provided - use default server
+    if( srv_name == NULL ){
+        srv_name = GetDefaultSrvName();
+    }
+
+    srv_ptr = FindBatchServer(srv_name);
     return(srv_ptr);
 }
 

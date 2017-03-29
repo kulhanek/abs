@@ -456,13 +456,7 @@ bool CPBSProServer::GetJob(CJobList& jobs,const CSmallString& jobid)
 const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 {
     CSmallString full_job_id;
-    // FIXME
-    // CSmallString server = ABSConfig.GetServerName();
-    CSmallString server;
-    full_job_id = jobid;
-    if( full_job_id.FindSubString(server) == -1 ){
-        full_job_id += "." + server;
-    }
+    full_job_id << jobid << "." << ServerName;
 
     struct batch_status* p_jobs;
     p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,NULL);
