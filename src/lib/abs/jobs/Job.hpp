@@ -166,10 +166,16 @@ public:
     void PrintJobStatus(std::ostream& sout);
 
     /// print basic info about job
-    void PrintBasic(std::ostream& sout);
+    void PrintBasicV3(std::ostream& sout);
+
+    /// print basic info about job
+    void PrintBasicV2(std::ostream& sout);
 
     /// print resources
-    void PrintResources(std::ostream& sout);
+    void PrintResourcesV3(std::ostream& sout);
+
+    /// print resources
+    void PrintResourcesV2(std::ostream& sout);
 
     /// print executive part
     bool PrintExec(std::ostream& sout);

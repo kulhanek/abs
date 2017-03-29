@@ -14,6 +14,10 @@ SET(ABS_SRC
         system/BatchServer.cpp
         system/BatchServers.cpp
 
+    # resources ----------------------------------
+        resources/ResourceValue.cpp
+        resources/ResourceList.cpp
+
     # jobs ---------------------------------------
         jobs/search/nodes/NodeMask.tab.c
         jobs/search/nodes/NodeMask.yy.c
@@ -21,8 +25,6 @@ SET(ABS_SRC
         jobs/search/jobs/JobMask.yy.c
         jobs/search/CommonParser.cpp
 
-        jobs/ResourceValue.cpp
-        jobs/ResourceList.cpp
         jobs/Alias.cpp
         jobs/AliasList.cpp
         jobs/Job.cpp

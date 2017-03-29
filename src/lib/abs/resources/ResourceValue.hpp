@@ -3,6 +3,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -24,14 +25,13 @@
 #include <ABSMainHeader.hpp>
 #include <SmallString.hpp>
 #include <boost/shared_ptr.hpp>
-#include <map>
-#include <string>
+#include <ComObject.hpp>
 
 // -----------------------------------------------------------------------------
 
 /// resource key and its value
 
-class ABS_PACKAGE CResourceValue {
+class ABS_PACKAGE CResourceValue : public CComObject {
 public:
 // constructor -----------------------------------------------------------------
         CResourceValue(void);
@@ -39,50 +39,15 @@ public:
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
-    void TestValue(std::ostream& sout,bool& rstatus);
+    virtual void TestValue(std::ostream& sout,bool& rstatus);
 
     /// test value if it is in expected range
     bool TestValue(std::ostream& sout);
-
-    // aditional tests
-    // identity
-    bool TestUMask(std::ostream& sout,bool& rstatus);
-    bool TestGroup(std::ostream& sout,bool& rstatus);
-    bool TestEmail(std::ostream& sout,bool& rstatus);
-
-    // time
-    bool TestWallTime(std::ostream& sout,bool& rstatus);
-
-    // resources
-    bool TestNCPUs(std::ostream& sout,bool& rstatus);
-    bool TestNGPUs(std::ostream& sout,bool& rstatus);
-    bool TestMaxCPUsPerNode(std::ostream& sout,bool& rstatus);
-    bool TestMem(std::ostream& sout,bool& rstatus);
-    bool TestMemPerCPU(std::ostream& sout,bool& rstatus);
-    bool TestProps(std::ostream& sout,bool& rstatus);
-    bool TestPlace(std::ostream& sout,bool& rstatus);
-    bool TestNode(std::ostream& sout,bool& rstatus);
-    bool TestNUMA(std::ostream& sout,bool& rstatus);
-
-    // workdir
-    bool TestWorkDir(std::ostream& sout,bool& rstatus);
-    bool TestWorkSize(std::ostream& sout,bool& rstatus);
-    bool TestWorkSizePerCPU(std::ostream& sout,bool& rstatus);
-
-    /// is helper token?
-    bool IsHelperToken(void);
-
-    /// finalize resource
-    void Finalize(std::map<std::string,std::string>& variables);
 
 // section of private data -----------------------------------------------------
 public:
     CSmallString    Name;
     CSmallString    Value;
-    bool            HelperValue;
-
-    // NUMBERp -> hh:mm:ss
-    void TransformWallTimeShortNotation(void);
 };
 
 // -----------------------------------------------------------------------------

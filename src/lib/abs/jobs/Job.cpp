@@ -2779,7 +2779,7 @@ void CJob::PrintJobInfoV1(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintBasic(std::ostream& sout)
+void CJob::PrintBasicV3(std::ostream& sout)
 {
     CSmallString tmp,col;
 
@@ -2799,8 +2799,7 @@ void CJob::PrintBasic(std::ostream& sout)
     if( tmp == NULL ) tmp = "-none-";
     sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
 
-    sout << "Site name        : " << GetSiteName() << " (Torque server: " << GetServerName() << ")" << endl;
-
+    sout << "Site name        : " << GetSiteName() << endl;
     sout << "Job key          : " << GetItem("basic/jobinput","INF_JOB_KEY") << endl;
 
     tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX",true);
@@ -2813,7 +2812,366 @@ void CJob::PrintBasic(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintResources(std::ostream& sout)
+void CJob::PrintBasicV2(std::ostream& sout)
+{
+    CSmallString tmp,col;
+
+    sout << "Job name         : " << GetItem("basic/jobinput","INF_JOB_NAME") << endl;
+    if( GetItem("submit/job","INF_JOB_ID",true) != NULL ){
+    sout << "Job ID           : " << GetItem("submit/job","INF_JOB_ID") << endl;
+    }
+    sout << "Job title        : " << GetItem("basic/jobinput","INF_JOB_TITLE") << " (Job type: ";
+    sout << GetItem("basic/jobinput","INF_JOB_TYPE") << ")" << endl;
+
+    sout << "Job directory    : " << GetItem("basic/jobinput","INF_JOB_MACHINE");
+    sout << ":" << GetItem("basic/jobinput","INF_JOB_PATH") << endl;
+
+    col = GetItem("basic/collection","INF_COLLECTION_NAME",true);
+    if( col == NULL ) col = "-none-";
+    tmp = GetItem("basic/jobinput","INF_JOB_PROJECT");
+    if( tmp == NULL ) tmp = "-none-";
+    sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
+
+    sout << "Site name        : " << GetSiteName() << endl;
+    sout << "Job key          : " << GetItem("basic/jobinput","INF_JOB_KEY") << endl;
+
+    tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX",true);
+    if( tmp != NULL ) {
+    sout << "Parametric job   : " << tmp << endl;
+    }
+
+    sout << "========================================================" << endl;
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::PrintResourcesV3(std::ostream& sout)
+{
+    CSmallString tmp,tmp1,tmp2;
+
+    tmp = GetItem("basic/arguments","INF_ARG_DESTINATION");
+    sout << "Req destination  : " << tmp << endl;
+
+    tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
+    if( tmp == NULL ){
+    sout << "Req resources    : -none-" << endl;
+    } else {
+
+        CResourceList res;
+        res.Parse(tmp);
+        res.SortByName();
+
+        std::list<CResourceValuePtr>::const_iterator     it = res.begin();
+        std::list<CResourceValuePtr>::const_iterator     ie = res.end();
+
+        sout << "Req resources    : ";
+
+        int len = 19;
+        while( it != ie ){
+            CResourceValuePtr p_res = *it;
+            sout <<  p_res->Name << "=" << p_res->Value;
+            len += p_res->Name.GetLength();
+            len += p_res->Value.GetLength();
+            len++;
+            it++;
+            if( it != ie ){
+                p_res = *it;
+                int tlen = len;
+                tlen += p_res->Name.GetLength();
+                tlen += p_res->Value.GetLength();
+                tlen++;
+                if( tlen > 80 ){
+                    sout << "," << endl;
+                    sout << "                   ";
+                    len = 19;
+                } else {
+                    sout << ",";
+                    len += 1;
+                }
+            }
+        }
+        sout << endl;
+    }
+
+    tmp = GetItem("basic/arguments","INF_ARG_SYNC_MODE");
+    if( tmp == NULL ){
+    sout << "Req sync mode    : -none-" << endl;
+    }
+    else{
+    sout << "Req sync mode    : " << tmp << endl;
+    }
+
+    sout << "----------------------------------------" << endl;
+    tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
+    if( tmp != NULL ) {
+
+        CResourceList res;
+        res.Parse(tmp);
+        res.SortByName();
+
+        std::list<CResourceValuePtr>::const_iterator     it = res.begin();
+        std::list<CResourceValuePtr>::const_iterator     ie = res.end();
+
+        sout << "Default resources: ";
+
+        int len = 19;
+        while( it != ie ){
+            CResourceValuePtr p_res = *it;
+            sout <<  p_res->Name << "=" << p_res->Value;
+            len += p_res->Name.GetLength();
+            len += p_res->Value.GetLength();
+            len++;
+            it++;
+            if( it != ie ){
+                p_res = *it;
+                int tlen = len;
+                tlen += p_res->Name.GetLength();
+                tlen += p_res->Value.GetLength();
+                tlen++;
+                if( tlen > 80 ){
+                    sout << "," << endl;
+                    sout << "                   ";
+                    len = 19;
+                } else {
+                    sout << ", ";
+                    len += 2;
+                }
+            }
+        }
+        sout << endl;
+    }
+
+    tmp = GetItem("specific/resources","INF_ALIAS");
+    if( tmp == NULL ){
+    sout << "Alias            : -none-" << endl;
+    }
+    else{
+    sout << "Alias            : " << tmp << endl;
+    tmp = GetItem("specific/resources","INF_ALIAS_RESOURCES");
+
+    CResourceList res;
+    res.Parse(tmp);
+    res.SortByName();
+
+    std::list<CResourceValuePtr>::const_iterator     it = res.begin();
+    std::list<CResourceValuePtr>::const_iterator     ie = res.end();
+
+    sout << "Alias resources  : ";
+
+    if( it == ie ) sout << "-none-";
+
+    int len = 19;
+    while( it != ie ){
+        CResourceValuePtr p_res = *it;
+        sout <<  p_res->Name << "=" << p_res->Value;
+        len += p_res->Name.GetLength();
+        len += p_res->Value.GetLength();
+        len++;
+        it++;
+        if( it != ie ){
+            p_res = *it;
+            int tlen = len;
+            tlen += p_res->Name.GetLength();
+            tlen += p_res->Value.GetLength();
+            tlen++;
+            if( tlen > 80 ){
+                sout << "," << endl;
+                sout << "                   ";
+                len = 19;
+            } else {
+                sout << ", ";
+                len += 2;
+            }
+        }
+    }
+    sout << endl;
+
+    tmp = GetItem("specific/resources","INF_ALIAS_SYNC_MODE");
+    sout << "Alias sync mode  : " << tmp << endl;
+    }
+
+    tmp = GetItem("specific/resources","INF_QUEUE");
+    sout << "Queue            : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_RESOURCES");
+    CResourceList res;
+    res.Parse(tmp);
+    res.SortByName();
+
+    std::list<CResourceValuePtr>::const_iterator     it = res.begin();
+    std::list<CResourceValuePtr>::const_iterator     ie = res.end();
+
+    sout << "All resources    : ";
+
+    int len = 19;
+    while( it != ie ){
+        CResourceValuePtr p_res = *it;
+        sout <<  p_res->Name << "=" << p_res->Value;
+        len += p_res->Name.GetLength();
+        len += p_res->Value.GetLength();
+        len++;
+        it++;
+        if( it != ie ){
+            p_res = *it;
+            int tlen = len;
+            tlen += p_res->Name.GetLength();
+            tlen += p_res->Value.GetLength();
+            tlen++;
+            if( tlen > 80 ){
+                sout << "," << endl;
+                sout << "                   ";
+                len = 19;
+            } else {
+                sout << ", ";
+                len += 2;
+            }
+        }
+    }
+    sout << endl;
+
+    sout << "----------------------------------------" << endl;
+
+
+    tmp = GetItem("specific/resources","INF_NCPU");
+    sout << "Number of CPUs   : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_NGPU");
+    sout << "Number of GPUs   : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_MAX_CPUS_PER_NODE");
+    sout << "Max CPUs / node  : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_NNODE");
+    if( tmp != NULL ){
+    sout << "Number of nodes  : " << tmp << endl;
+    }
+
+    res.Finalize();
+
+    // generate list of internal variables
+    std::map<std::string,std::string>::iterator vit = res.Variables.begin();
+    std::map<std::string,std::string>::iterator vie = res.Variables.end();
+
+    while( vit != vie ){
+        CSmallString name = vit->first;
+        CSmallString value = vit->second;
+        SetItem("specific/variables",name,value);
+        vit++;
+    }
+
+    res.RemoveHelperResources();
+
+    it = res.begin();
+    ie = res.end();
+
+    sout << "Resources        : ";
+
+    len = 19;
+    while( it != ie ){
+        CResourceValuePtr p_res = *it;
+        sout <<  p_res->Name << "=" << p_res->Value;
+        len += p_res->Name.GetLength();
+        len += p_res->Value.GetLength();
+        len++;
+        it++;
+        if( it != ie ){
+            p_res = *it;
+            int tlen = len;
+            tlen += p_res->Name.GetLength();
+            tlen += p_res->Value.GetLength();
+            tlen++;
+            if( tlen > 80 ){
+                sout << "," << endl;
+                sout << "                   ";
+                len = 19;
+            } else {
+                sout << ", ";
+                len += 2;
+            }
+        }
+    }
+    sout << endl;
+
+    sout << "----------------------------------------" << endl;
+
+    tmp = GetItem("specific/resources","INF_SURROGATE_MACHINE",true);
+    if( tmp == NULL ) tmp = GetItem("basic/jobinput","INF_JOB_MACHINE");
+    if( tmp == GetItem("basic/jobinput","INF_JOB_MACHINE") ){
+    sout << "Surrogate machine: " << " -- none -- " << endl;
+    } else {
+    sout << "Surrogate machine: " << tmp << endl;
+    }
+
+    tmp = GetItem("specific/resources","INF_SYNC_MODE");
+    sout << "Sync mode        : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_SCRATCH_TYPE",true);
+    if( tmp == NULL ) tmp = "scratch";
+    sout << "Scratch type     : " << tmp << endl;
+
+    CSmallString fs_type = GetItem("specific/resources","INF_FS_TYPE",true);
+    if( fs_type == NULL ) fs_type = "consistent";
+    sout << "Input FS type    : " << fs_type << endl;
+
+    if( fs_type == "inconsistent" ) sout << "<blue>";
+
+    tmp = GetItem("specific/resources","INF_UGROUP",true);
+    tmp1 = GetItem("specific/resources","INF_UGROUP_REALM",true);
+    tmp2 = GetItem("specific/resources","INF_UGROUP_ORIG",true);
+    if( tmp == NULL ) tmp = "-not specified-";
+    sout << "User group       : ";
+    if( tmp2 != NULL ){
+        sout << tmp2 << " -> ";
+    }
+    sout << tmp;
+    if( tmp1 != NULL ){
+        sout << "@" << tmp1 << endl;
+    } else {
+        sout << endl;
+    }
+
+    tmp = GetItem("specific/resources","INF_UMASK",true);
+    if( tmp == NULL ){
+        tmp = "-not specified-";
+    sout << "User file mask   : " << tmp << endl;
+    } else {
+    sout << "User file mask   : " << tmp << " [" << GetUMaskPermissions() << "]" << endl;
+    }
+
+    if( fs_type == "inconsistent" ) sout << "</blue>";
+
+    tmp = GetItem("basic/jobinput","INF_EXCLUDED_FILES");
+    if( tmp == NULL ){
+    sout << "Excluded files   : -none-" << endl;
+    }
+    else{
+    sout << "Excluded files   : " << tmp << endl;
+    }
+
+    sout << "----------------------------------------" << endl;
+
+    tmp = GetItem("basic/external","INF_EXTERNAL_START_AFTER");
+    if( tmp == NULL ){
+    sout << "Start after      : -not defined-" << endl;
+    }
+    else{
+    sout << "Start after      : " << tmp << endl;
+    }
+
+    tmp = GetItem("basic/modules","INF_EXPORTED_MODULES");
+    if( tmp == NULL ){
+    sout << "Exported modules : -none-" << endl;
+    }
+    else{
+    sout << "Exported modules : " << tmp << endl;
+    }
+
+    sout << "========================================================" << endl;
+}
+
+// -----------------------------------------------------------------------------
+
+void CJob::PrintResourcesV2(std::ostream& sout)
 {
     CSmallString tmp,tmp1,tmp2;
 

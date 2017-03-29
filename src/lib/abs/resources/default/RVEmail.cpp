@@ -40,14 +40,7 @@ using namespace boost;
 
 CResourceValue::CResourceValue(void)
 {
-}
-
-//------------------------------------------------------------------------------
-
-CResourceValue::CResourceValue(const CSmallString& name,const CSmallString& value)
-{
-    Name = name;
-    Value = value;
+    Name = "email";
 }
 
 //------------------------------------------------------------------------------

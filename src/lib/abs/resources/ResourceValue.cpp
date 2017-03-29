@@ -1,6 +1,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -96,95 +97,7 @@ void CResourceValue::Finalize(std::map<std::string,std::string>& variables)
 
 void CResourceValue::TestValue(std::ostream& sout,bool& rstatus)
 {
-    bool found = false;
-
-    if( Name == "ncpus" ){
-        TestNCPUs(sout,rstatus);
-        found = true;
-    }
-    if( Name == "ngpus" ){
-        TestNGPUs(sout,rstatus);
-        found = true;
-    }
-    if( Name == "maxcpuspernode" ){
-        TestMaxCPUsPerNode(sout,rstatus);
-        found = true;
-    }
-    if( Name == "props" ){
-        TestProps(sout,rstatus);
-        found = true;
-    }
-    if( Name == "mem" ){
-        TestMem(sout,rstatus);
-        found = true;
-    }
-
-    if( Name == "walltime" ){
-        TestWallTime(sout,rstatus);
-        found = true;
-    }
-    if( Name == "scratch" ){
-        TestScratch(sout,rstatus);
-        found = true;
-    }
-    if( Name == "account" ){
-        rstatus = true;
-        found = true;
-    }
-    if( Name == "place" ){
-        TestPlace(sout,rstatus);
-        found = true;
-    }
-    if( Name == "scratch_type" ){
-        TestScratchType(sout,rstatus);
-        found = true;
-    }
-    if( Name == "umask" ){
-        TestUMask(sout,rstatus);
-        found = true;
-    }
-    if( Name == "group" ){
-        TestGroup(sout,rstatus);
-        found = true;
-    }
-    if( Name == "cpu_freq" ){
-        TestCPUFreq(sout,rstatus);
-        found = true;
-    }
-    if( Name == "numa" ){
-        TestNUMA(sout,rstatus);
-        found = true;
-    }
-    if( Name == "email" ){
-        TestEmail(sout,rstatus);
-        found = true;
-    }
-    if( Name == "host" ){
-        TestHost(sout,rstatus);
-        found = true;
-    }
-    if( Name == "surrogate" ){
-        TestSurrogate(sout,rstatus);
-        found = true;
-    }
-
-// FIXME
-//    if( found == true ){
-//        if( ABSConfig.TestResourceTokens(Name) == false ){
-//            if( rstatus == true ) sout << endl;
-//            sout << "<b><red> ERROR: Resource token '" << Name << "' is recognized but not allowed on this site!</red></b>" << endl;
-//            sout << "<b><red>        Allowed tokens: ";
-//            ABSConfig.PrintAllowedResTokens(sout);
-//            sout << "!</red></b>" << endl;
-//            rstatus = false;
-//        }
-//    } else {
-//        if( rstatus == true ) sout << endl;
-//        sout << "<b><red> ERROR: Unsupported resource '" << Name << "'!</red></b>" << endl;
-//        rstatus = false;
-//    }
-// FIXME
-    rstatus = found;
+    rstatus = false;
 }
 
 //------------------------------------------------------------------------------

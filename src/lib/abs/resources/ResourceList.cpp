@@ -1,6 +1,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2013 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
