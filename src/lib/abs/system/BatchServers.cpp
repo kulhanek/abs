@@ -615,6 +615,7 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
     if( jobid != NULL ){
         if( isalpha(jobid[jobid.GetLength()-1]) == true ){
             srv_name = jobid[jobid.GetLength()-1];
+            cout << "short:" << srv_name << endl;
             if( jobid.GetLength() > 1 ){
                 new_jobid = jobid.GetSubString(0,jobid.GetLength()-1);
             } else {
