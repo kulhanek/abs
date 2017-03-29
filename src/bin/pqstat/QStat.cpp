@@ -92,7 +92,6 @@ bool CQStat::Run(void)
     vout << "# Search expr.  : " << str << endl;
     }
     vout << "#" << endl;
-    vout << endl;
 
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
@@ -115,7 +114,6 @@ bool CQStat::Run(void)
 
     vout << high;
     User.PrintUserInfo(vout);
-    vout << endl;
     vout << low;
 
     if( Options.IsOptQueueSet() ){
