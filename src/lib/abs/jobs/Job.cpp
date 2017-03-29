@@ -189,7 +189,7 @@ void CJob::CreateHeader(void)
 
     CSmallString version;
 
-    version = "INFINITY_INFO_v_2_0";
+    version = "INFINITY_INFO_v_3_0";
 
     p_header->SetAttribute("version",version);
     p_header->SetAttribute("site",AMSGlobalConfig.GetActiveSiteID());
@@ -215,12 +215,11 @@ void CJob::SetExternalOptions(void)
 //------------------------------------------------------------------------------
 
 bool CJob::SetArguments(const CSmallString& dst,const CSmallString& js,
-                        const CSmallString& res,const CSmallString& cm)
+                        const CSmallString& res)
 {
     SetItem("basic/arguments","INF_ARG_DESTINATION",dst);
     SetItem("basic/arguments","INF_ARG_JOB",js);
     SetItem("basic/arguments","INF_ARG_RESOURCES",res);
-    SetItem("basic/arguments","INF_ARG_SYNC_MODE",cm);
     return(true);
 }
 
@@ -399,7 +398,7 @@ ERetStatus CJob::JobInput(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CJob::DecodeTorqueResources(std::ostream& sout)
+bool CJob::DecodeResources(std::ostream& sout)
 {
     // set default user group and umask
     SetItem("specific/resources","INF_UGROUP",User.GetEGroup());
@@ -420,21 +419,13 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
     // input from user
     CSmallString dest = GetItem("basic/arguments","INF_ARG_DESTINATION");
     CSmallString sres = GetItem("basic/arguments","INF_ARG_RESOURCES");
-    CSmallString sync = GetItem("basic/arguments","INF_ARG_SYNC_MODE");
-    CSmallString host;
 
-    // decode host if provided
-    string          sdest = string(dest);
-    vector<string>  items;
-    split(items,sdest,is_any_of("@"));
-    if( items.size() > 1 ){
-        host = items[0];
-        dest = items[1];
-    } else if( items.size() == 1 ) {
-        dest = items[0];
-    }
-    if( (host == "local") || (host == "localhost") ){
-        host = ABSConfig.GetHostName();
+    // decode destination if necessary
+    CSmallString queue;
+    if( BatchServers.DecodeQueueName(dest,BatchServerName,ShortServerName,queue) == false ){
+        ES_TRACE_ERROR("unable to decode job destination (queue[@server])");
+        // something was wrong - exit
+        return(false);
     }
 
     // decode user resources
@@ -450,19 +441,11 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
     CAliasPtr p_alias = AliasList.FindAlias(dest);
     if( p_alias ){
         SetItem("specific/resources","INF_ALIAS",p_alias->GetName());
-        // override destination
-        dest = p_alias->GetDestination();
-        string          sdest = string(dest);
-        vector<string>  items;
-        split(items,sdest,is_any_of("@"));
-        if( items.size() > 1 ){
-            host = items[0];
-            dest = items[1];
-        } else if( items.size() == 1 ) {
-            dest = items[0];
-        }
-        if( (host == "local") || (host == "localhost") ){
-            host = ABSConfig.GetHostName();
+        // decode destination
+        if( BatchServers.DecodeQueueName(p_alias->GetDestination(),BatchServerName,ShortServerName,queue) == false ){
+            ES_TRACE_ERROR("unable to decode job destination (queue[@server])");
+            // something was wrong - exit
+            return(false);
         }
         res.Merge(p_alias->GetResources());
         SetItem("specific/resources","INF_ALIAS_RESOURCES",p_alias->GetResources().ToString(false));
@@ -483,376 +466,97 @@ bool CJob::DecodeTorqueResources(std::ostream& sout)
         res.Merge(default_res);
     }
 
-    // check input data
-    CAlias all_res("test",dest,res.ToString(false));
-    if( all_res.TestAlias(sout) == false ){
+    res.SetBatchServerName(BatchServerName);
+    bool result = true;
+    res.TestResources(sout,result);
+    if( result == false ){
         ES_TRACE_ERROR("final resources are invalid");
         // something was wrong - exit
-        return(false);
-    }
-
-    // determine number of nodes
-    int ncpus = res.GetNumOfCPUs();
-    int ngpus = res.GetNumOfGPUs();
-    int mcpuspernode = res.GetMaxNumOfCPUsPerNode();
-    if( (ncpus % mcpuspernode) && (ncpus > mcpuspernode) ) {
-        ES_TRACE_ERROR("number of CPUs in not multiple of maxcpuspernode");
-        sout << endl;
-        sout << "<b><red> ERROR: Number of CPUs " << ncpus << " is not multiply of max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-        return(false);
-    }
-
-    int nnodes = ncpus / mcpuspernode;
-    if( nnodes == 0 ){
-        nnodes = 1;
-    }
-
-    // FIXME
-//    // generate nodes resources
-//    CSmallString rnodes;
-//    switch( ABSConfig.GetTorqueMode() ){
-//        case ETM_TORQUE:{
-//            if( host == NULL ){
-//                rnodes << nnodes;
-//            } else {
-//                if( nnodes > 1 ){
-//                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
-//                    sout << endl;
-//                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-//                    return(false);
-//                }
-//                rnodes << host;
-//            }
-//            if( ncpus <= mcpuspernode ) {
-//                rnodes << ":ppn=" << ncpus;
-//            } else {
-//                rnodes << ":ppn=" << mcpuspernode;
-//            }
-//            if( ngpus > 0 ){
-//                rnodes << ":" << "gpus=" << ngpus;
-//            }
-//            CSmallString props;
-//            props = res.GetResourceValue("props");
-//            if( props != NULL ){
-//                rnodes << ":" << props;
-//            }
-//        }
-//        res.AddResourceToBegin("nodes",rnodes);
-//        break;
-//        case ETM_TORQUE_METAVO: {
-//            if( host == NULL ){
-//                rnodes << nnodes;
-//            } else {
-//                if( nnodes > 1 ){
-//                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
-//                    sout << endl;
-//                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-//                    return(false);
-//                }
-//                rnodes << host;
-//            }
-//            if( ncpus <= mcpuspernode ) {
-//                rnodes << ":ppn=" << ncpus;
-//            } else {
-//                rnodes << ":ppn=" << mcpuspernode;
-//            }
-//            if( ngpus > 0 ){
-//                rnodes << ":" << "gpu=" << ngpus;
-//            }
-//            CSmallString props;
-//            props = res.GetResourceValue("props");
-//            if( props != NULL ){
-//                rnodes << ":" << props;
-//            }
-//        }
-//        res.AddResourceToBegin("nodes",rnodes);
-//        break;
-//        case ETM_PBSPRO: {
-//            if( host == NULL ){
-//                rnodes << nnodes;
-//            } else {
-//                if( nnodes > 1 ){
-//                    ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
-//                    sout << endl;
-//                    sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-//                    return(false);
-//                }
-//                rnodes << host;
-//            }
-//            if( ncpus <= mcpuspernode ) {
-//                rnodes << ":ncpus=" << ncpus << ":mpiprocs=" << ncpus;
-//            } else {
-//                rnodes << ":ncpus=" << mcpuspernode << ":mpiprocs=" << mcpuspernode;
-//            }
-//            if( ngpus > 0 ){
-//                // FIXME
-//            }
-//            // special resources
-//            if( res.GetResource("cpu_freq") != NULL ) {
-//                rnodes << ":cpu_freq=" << res.GetResourceValue("cpu_freq");
-//            }
-//            if( res.GetResource("host") != NULL ) {
-//                rnodes << ":host=" << res.GetResourceValue("host");
-//            }
-//// properties are not supported by PBSPro
-////            CSmallString props;
-////            props = res.GetResourceValue("props");
-////            if( props != NULL ){
-////                rnodes << ":" << props;
-////            }
-//        }
-//        res.AddResourceToBegin("select",rnodes);
-//        break;
-//    }
-
-    CSmallString tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX",true);
-    if( (sync == "jobdir") && (tmp != NULL) ){
-        sout << endl;
-        sout << "<b><red> ERROR: Parametric job cannot have the jobdir sync mode switched on!</red></b>" << endl;
-        ES_TRACE_ERROR("parametric job cannot have the jobdir sync mode switched on");
         return(false);
     }
 
     // finalize resources
     res.Finalize();
 
-    // FIXME
-    CSmallString scratch_type = res.GetResourceValue("scratch_type");
-//    if( scratch_type == NULL ){
-//        scratch_type = ABSConfig.GetDefaultScratchType();
+//    // FIXME
+//    CSmallString scratch_type = res.GetResourceValue("scratch_type");
+////    if( scratch_type == NULL ){
+////        scratch_type = ABSConfig.GetDefaultScratchType();
+////    }
+
+//    CSmallString umask = res.GetResourceValue("umask");
+//    if( umask == NULL ){
+//        umask = User.GetUMask();
 //    }
 
-    CSmallString umask = res.GetResourceValue("umask");
-    if( umask == NULL ){
-        umask = User.GetUMask();
-    }
+//    CSmallString ugroup = res.GetResourceValue("group");
+//    CSmallString ugroup_realm;
+//    CSmallString ugroup_orig;
+//    if( ugroup == NULL ){
+//        ugroup = User.GetEGroup();
+//    }
 
-    CSmallString ugroup = res.GetResourceValue("group");
-    CSmallString ugroup_realm;
-    CSmallString ugroup_orig;
-    if( ugroup == NULL ){
-        ugroup = User.GetEGroup();
-    }
+//    // split to ugroup and ugroup_realm
+//    string          sgroup = string(ugroup);
+//    vector<string>  items;
+//    items.clear();
+//    split(items,sgroup,is_any_of("@"));
+//    if( items.size() > 1 ){
+//        ugroup = items[0];
+//        ugroup_realm = items[1];
+//    } else if( items.size() == 1 ) {
+//        ugroup = items[0];
+//    }
 
-    // split to ugroup and ugroup_realm
-    string          sgroup = string(ugroup);
-    items.clear();
-    split(items,sgroup,is_any_of("@"));
-    if( items.size() > 1 ){
-        ugroup = items[0];
-        ugroup_realm = items[1];
-    } else if( items.size() == 1 ) {
-        ugroup = items[0];
-    }
+//    // decode surrogate machine
+//    // FIXME
+//    CSmallString surrogate = res.GetResourceValue("surrogate");
+////    if( (surrogate == "localhost") || (surrogate == NULL) ) {
+////        surrogate  = GetItem("basic/jobinput","INF_JOB_MACHINE");
+////    } else if ( surrogate == "auto" ) {
+////        surrogate = ABSConfig.GetSurrogateMachine(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"));
+////        if( surrogate == NULL ){
+////            ES_TRACE_ERROR("unable to get surrogate machine");
+////            sout << endl;
+////            sout << "<b><red> ERROR: Unable to determine the surrogate machine for " << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" <<  GetItem("basic/jobinput","INF_JOB_PATH") << "!</red></b>" << endl;
+////            sout << "<b><red>        Perhaps, your are trying to submit the job from the unsupported machine or job input directory.</red></b>" << endl;
+////            return(false);
+////        }
+////        // transform group
+////        CSmallString orig_group = ugroup;
+////        if( ABSConfig.GetSurrogateGroup(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"),ugroup,ugroup_realm) == true ){
+////            ugroup_orig = orig_group;
+////        }
+////    } else {
+////        // keep surrogate value as surrogate machine name
+////    }
 
-    // decode surrogate machine
-    // FIXME
-    CSmallString surrogate = res.GetResourceValue("surrogate");
-//    if( (surrogate == "localhost") || (surrogate == NULL) ) {
-//        surrogate  = GetItem("basic/jobinput","INF_JOB_MACHINE");
-//    } else if ( surrogate == "auto" ) {
-//        surrogate = ABSConfig.GetSurrogateMachine(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"));
-//        if( surrogate == NULL ){
-//            ES_TRACE_ERROR("unable to get surrogate machine");
-//            sout << endl;
-//            sout << "<b><red> ERROR: Unable to determine the surrogate machine for " << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" <<  GetItem("basic/jobinput","INF_JOB_PATH") << "!</red></b>" << endl;
-//            sout << "<b><red>        Perhaps, your are trying to submit the job from the unsupported machine or job input directory.</red></b>" << endl;
+//    if( surrogate != GetItem("basic/jobinput","INF_JOB_MACHINE") ){
+//        SetItem("specific/resources","INF_FS_TYPE","consistent");
+//    }
+
+//    // check group only if not REALM is defined
+//    if( ugroup_realm == NULL ){
+//        if( User.IsInGroup(ugroup) == false ){
+//            sout << "<b><red> ERROR: Illegal group name '" << ugroup << "' for the group resource token!" << endl;
+//            sout <<         "        Allowed values: " << User.GetGroups() << "</red></b>" << endl;
 //            return(false);
 //        }
-//        // transform group
-//        CSmallString orig_group = ugroup;
-//        if( ABSConfig.GetSurrogateGroup(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"),ugroup,ugroup_realm) == true ){
-//            ugroup_orig = orig_group;
-//        }
-//    } else {
-//        // keep surrogate value as surrogate machine name
 //    }
 
-    if( surrogate != GetItem("basic/jobinput","INF_JOB_MACHINE") ){
-        SetItem("specific/resources","INF_FS_TYPE","consistent");
-    }
-
-    // check group only if not REALM is defined
-    if( ugroup_realm == NULL ){
-        if( User.IsInGroup(ugroup) == false ){
-            sout << "<b><red> ERROR: Illegal group name '" << ugroup << "' for the group resource token!" << endl;
-            sout <<         "        Allowed values: " << User.GetGroups() << "</red></b>" << endl;
-            return(false);
-        }
-    }
-
-    SetItem("specific/resources","INF_QUEUE",dest);
-    SetItem("specific/resources","INF_NCPU",ncpus);
-    SetItem("specific/resources","INF_NGPU",ngpus);
-    SetItem("specific/resources","INF_MAX_CPUS_PER_NODE",mcpuspernode);
-    SetItem("specific/resources","INF_NNODE",nnodes);
-
+    SetItem("specific/resources","INF_QUEUE",queue);
+    SetItem("specific/resources","INF_NCPU",res.GetNumOfCPUs());
+    SetItem("specific/resources","INF_NGPU",res.GetNumOfGPUs());
+    SetItem("specific/resources","INF_MAX_CPUS_PER_NODE",res.GetMaxNumOfCPUsPerNode());
+    SetItem("specific/resources","INF_NNODE",res.GetMaxNumOfCPUsPerNode());
     SetItem("specific/resources","INF_RESOURCES",res.ToString(false));
-    SetItem("specific/resources","INF_SURROGATE_MACHINE",surrogate);
-    SetItem("specific/resources","INF_SYNC_MODE",sync);
-    SetItem("specific/resources","INF_SCRATCH_TYPE",scratch_type);
-    SetItem("specific/resources","INF_UMASK",umask);
-    SetItem("specific/resources","INF_UGROUP",ugroup);
-    SetItem("specific/resources","INF_UGROUP_REALM",ugroup_realm);
-    SetItem("specific/resources","INF_UGROUP_ORIG",ugroup_orig);
 
-    return(true);
-}
-
-//------------------------------------------------------------------------------
-
-bool CJob::DecodeStartResources(std::ostream& sout)
-{
-    // input from user
-    CSmallString dest = GetItem("basic/arguments","INF_ARG_DESTINATION");
-    CSmallString sres = GetItem("basic/arguments","INF_ARG_RESOURCES");
-    CSmallString sync = GetItem("basic/arguments","INF_ARG_SYNC_MODE");
-    CSmallString host;
-
-    // decode host if provided
-    string          sdest = string(dest);
-    vector<string>  items;
-    split(items,sdest,is_any_of("@"));
-    if( items.size() > 1 ){
-        host = items[0];
-        dest = items[1];
-    } else if( items.size() == 1 ) {
-        dest = items[0];
-    }
-    if( (host == "local") || (host == "localhost") ){
-        host = ABSConfig.GetHostName();
-    }
-
-    // decode user resources
-    CResourceList res;
-    res.Parse(sres);
-    if( res.TestResources(sout) == false ){
-        ES_TRACE_ERROR("unable to test user provided resources");
-        // something was wrong - exit
-        return(false);
-    }
-
-    // is destination alias?
-    CAliasPtr p_alias = AliasList.FindAlias(dest);
-    if( p_alias ){
-        SetItem("specific/resources","INF_ALIAS",p_alias->GetName());
-        // override destination
-        dest = p_alias->GetDestination();
-        string          sdest = string(dest);
-        vector<string>  items;
-        split(items,sdest,is_any_of("@"));
-        if( items.size() > 1 ){
-            host = items[0];
-            dest = items[1];
-        } else if( items.size() == 1 ) {
-            dest = items[0];
-        }
-        if( (host == "local") || (host == "localhost") ){
-            host = ABSConfig.GetHostName();
-        }
-
-        res.Merge(p_alias->GetResources());
-        SetItem("specific/resources","INF_ALIAS_RESOURCES",p_alias->GetResources().ToString(false));
-    } else {
-        SetItem("specific/resources","INF_ALIAS","");
-    }
-
-    // add default resources
-    CResourceList default_res;
-    CSmallString  sdef_res;
-    if( ABSConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
-        default_res.Parse(sdef_res);
-        if( default_res.TestResources(sout) == false ){
-            ES_ERROR("default resources are invalid");
-            return(false);
-        }
-        SetItem("specific/resources","INF_DEFAULT_RESOURCES",default_res.ToString(false));
-        res.Merge(default_res);
-    }
-
-    // check input data
-    CAlias all_res("test",dest,res.ToString(false));
-    if( all_res.TestAlias(sout) == false ){
-        ES_TRACE_ERROR("final resources are invalid");
-        // something was wrong - exit
-        return(false);
-    }
-
-    // determine number of nodes
-    int ncpus = res.GetNumOfCPUs();
-    int ngpus = res.GetNumOfGPUs();
-    int mcpuspernode = res.GetMaxNumOfCPUsPerNode();
-    if( (ncpus % mcpuspernode) && (ncpus > mcpuspernode) ) {
-        ES_TRACE_ERROR("number of CPUs in not multiple of maxcpuspernode");
-        sout << endl;
-        sout << "<b><red> ERROR: Number of CPUs " << ncpus << " is not multiply of max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-        return(false);
-    }
-
-    int nnodes = ncpus / mcpuspernode;
-    if( nnodes == 0 ){
-        nnodes = 1;
-    }
-
-    // generate nodes resources
-    CSmallString rnodes;
-    if( host == NULL ){
-        rnodes << nnodes;
-    } else {
-        if( nnodes > 1 ){
-            ES_TRACE_ERROR("number of nodes is higher than 1 when explicit node name is provided");
-            sout << endl;
-            sout << "<b><red> ERROR: When the node name (" << host << ") is provided then number of CPUs " << ncpus << " must lower or equal to max CPUs per node " << mcpuspernode << "! </red></b>" << endl;
-            return(false);
-        }
-        rnodes << host;
-    }
-    if( ncpus <= mcpuspernode ) {
-        rnodes << ":ppn=" << ncpus;
-    } else {
-        rnodes << ":ppn=" << mcpuspernode;
-    }
-    if( ngpus > 0 ){
-        rnodes << ":gpus=" << ngpus;
-    }
-    CSmallString props;
-    props = res.GetResourceValue("props");
-    if( props != NULL ){
-        rnodes << ":" << props;
-    }
-    res.AddResourceToBegin("nodes",rnodes);
-
-    // finalize resources
-    res.Finalize();
-
-    CSmallString scratch_type = res.GetResourceValue("scratch_type");
-    if( scratch_type == NULL ){
-        scratch_type = "scratch";
-    }
-
-    CSmallString umask = res.GetResourceValue("umask");
-    if( umask == NULL ){
-        umask = User.GetUMask();
-    }
-
-    CSmallString ugroup = res.GetResourceValue("group");
-    if( ugroup == NULL ){
-        ugroup = User.GetEGroup();
-    }
-
-    SetItem("specific/resources","INF_QUEUE",dest);
-    SetItem("specific/resources","INF_NCPU",ncpus);
-    SetItem("specific/resources","INF_NGPU",ngpus);
-    SetItem("specific/resources","INF_MAX_CPUS_PER_NODE",mcpuspernode);
-    SetItem("specific/resources","INF_NNODE",nnodes);
-
-    SetItem("specific/resources","INF_RESOURCES",res.ToString(false));
-    SetItem("specific/resources","INF_SYNC_MODE",sync);
-    SetItem("specific/resources","INF_SCRATCH_TYPE",scratch_type);
-
-    SetItem("specific/resources","INF_UMASK",umask);
-    SetItem("specific/resources","INF_UGROUP",ugroup);
-
+//    SetItem("specific/resources","INF_SURROGATE_MACHINE",surrogate);
+//    SetItem("specific/resources","INF_SCRATCH_TYPE",scratch_type);
+//    SetItem("specific/resources","INF_UMASK",umask);
+//    SetItem("specific/resources","INF_UGROUP",ugroup);
+//    SetItem("specific/resources","INF_UGROUP_REALM",ugroup_realm);
+//    SetItem("specific/resources","INF_UGROUP_ORIG",ugroup_orig);
 
     return(true);
 }
@@ -1252,13 +956,7 @@ bool CJob::KillJob(bool force)
             id = GetItem("batch/job","INF_JOB_ID",true);
             id += "." + BatchServerName;
         }
-        if( BatchServers.KillJobByID(id) == false ){
-            CSmallString error;
-            error << "unable to kill job (" << BatchServers.GetLastErrorMsg() << ")";
-            ES_ERROR(error);
-            return(false);
-        }
-        return(true);
+        return(BatchServers.KillJobByID(id));
     }
 
     // normal termination
@@ -1272,13 +970,7 @@ bool CJob::KillJob(bool force)
         case EJS_SUBMITTED:
         case EJS_RUNNING:
             // try to kill job
-            if( BatchServers.KillJob(*this) == false ){
-                CSmallString error;
-                error << "unable to kill job (" << BatchServers.GetLastErrorMsg() << ")";
-                ES_ERROR(error);
-                return(false);
-            }
-            break;
+            return(BatchServers.KillJob(*this));
         default:
             ES_ERROR("unable to kill job that is not running or queued");
             return(false);
@@ -2208,10 +1900,12 @@ const CSmallString CJob::GetLastError(void)
 void CJob::PrintJobInfo(std::ostream& sout)
 {
     CSmallString ver = GetInfoFileVersion();
-    if( ver == "INFINITY_INFO_v_2_0"){
-        PrintJobInfoNew(sout);
+    if( ver == "INFINITY_INFO_v_3_0"){
+        PrintJobInfoV3(sout);
+    }  else if( ver == "INFINITY_INFO_v_2_0"){
+        PrintJobInfoV2(sout);
     }  else if( ver == "INFINITY_INFO_v_1_0" ){
-        PrintJobInfoOld(sout);
+        PrintJobInfoV1(sout);
     } else {
         ES_ERROR("unsupported version");
     }
@@ -2222,10 +1916,12 @@ void CJob::PrintJobInfo(std::ostream& sout)
 void CJob::PrintJobInfoCompact(std::ostream& sout,bool includepath,bool includecomment)
 {
     CSmallString ver = GetInfoFileVersion();
-    if( ver == "INFINITY_INFO_v_2_0"){
-        PrintJobInfoCompactNew(sout,includepath,includecomment);
+    if( ver == "INFINITY_INFO_v_3_0"){
+        PrintJobInfoCompactV3(sout,includepath,includecomment);
+    }  else    if( ver == "INFINITY_INFO_v_2_0"){
+        PrintJobInfoCompactV2(sout,includepath,includecomment);
     }  else if( ver == "INFINITY_INFO_v_1_0" ){
-        PrintJobInfoCompactOld(sout,includepath);
+        PrintJobInfoCompactV1(sout,includepath);
     } else {
         ES_ERROR("unsupported version");
     }
@@ -2360,7 +2056,7 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintJobInfoCompactNew(std::ostream& sout,bool includepath,bool includecomment)
+void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includecomment)
 {
 //    sout << "# ST       Job ID            Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
 //    sout << "# -- -------------------- --------------- --------------- ----- ----- ----- --------------------" << endl;
@@ -2483,7 +2179,130 @@ void CJob::PrintJobInfoCompactNew(std::ostream& sout,bool includepath,bool inclu
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintJobInfoCompactOld(std::ostream& sout,bool includepath)
+void CJob::PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includecomment)
+{
+//    sout << "# ST       Job ID            Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
+//    sout << "# -- -------------------- --------------- --------------- ----- ----- ----- --------------------" << endl;
+
+    sout << "  ";
+    switch( GetJobStatus() ){
+        case EJS_NONE:
+            sout << "UN";
+            break;
+        case EJS_PREPARED:
+            sout << "<yellow>P</yellow> ";
+            break;
+        case EJS_SUBMITTED:
+            sout << "<purple>Q</purple> ";
+            break;
+        case EJS_RUNNING:
+            sout << "<green>R</green> ";
+            break;
+        case EJS_FINISHED:
+            sout << "F ";
+            break;
+        case EJS_KILLED:
+            sout << "<red>KI</red>";
+            break;
+        case EJS_ERROR:
+            sout << "<red>ER</red>";
+            break;
+        case EJS_INCONSISTENT:
+            sout << "<red>IN</red>";
+            break;
+    }
+    if( GetItem("submit/job","INF_JOB_ID",true) != NULL ){
+    CSmallString id = GetItem("submit/job","INF_JOB_ID");
+    string stmp(id);
+    vector<string> items;
+    split(items,stmp,is_any_of("."));
+    if( items.size() >= 1 ){
+        id = items[0];
+    }
+    if( id.GetLength() > 20 ){
+        id = id.GetSubStringFromTo(0,19);
+    }
+    sout << " " << left << setw(20) << id;
+    } else {
+    sout << "                     ";
+    }
+    CSmallString title = GetItem("basic/jobinput","INF_JOB_TITLE");
+    sout << " " << setw(15) << title;
+    CSmallString queue = GetItem("specific/resources","INF_QUEUE");
+    if( queue.GetLength() > 15 ){
+        queue = queue.GetSubStringFromTo(0,14);
+    }
+    sout << " " << setw(15) << left << queue;
+    sout << right;
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NCPU");
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NGPU");
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NNODE");
+
+    CSmallTimeAndDate   last_change;
+    CSmallTimeAndDate   curr_time;
+    CSmallTime          from_last_change;
+
+    curr_time.GetActualTimeAndDate();
+    last_change = GetTimeOfLastChange();
+
+    sout << " " ;
+    switch( GetJobStatus() ){
+        case EJS_NONE:
+        case EJS_INCONSISTENT:
+        case EJS_ERROR:
+            break;
+        case EJS_PREPARED:
+        case EJS_SUBMITTED:
+        case EJS_RUNNING:
+            from_last_change = curr_time - last_change;
+            sout << right << setw(20) << from_last_change.GetSTimeAndDay();
+            break;
+        case EJS_FINISHED:
+        case EJS_KILLED:
+            sout << right << setw(20) << last_change.GetSDateAndTime();
+            break;
+    }
+
+    sout << endl;
+
+    if( includepath ){
+        if( IsJobDirLocal() ){
+            sout << "     <blue>> " << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
+        } else {
+            sout << "     <blue>> " << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
+        }
+    }
+
+    if( includecomment ){
+        switch( GetJobStatus() ){
+            case EJS_NONE:
+            case EJS_PREPARED:
+            case EJS_FINISHED:
+            case EJS_KILLED:
+                // nothing to be here
+                break;
+
+            case EJS_ERROR:
+            case EJS_INCONSISTENT:
+                sout << "     <red>" << GetJobBatchComment() << "</red>" << endl;
+                break;
+            case EJS_SUBMITTED:
+                sout << "     <purple>" << GetJobBatchComment() << "</purple>" << endl;
+                break;
+            case EJS_RUNNING:
+                sout << "     <green>" << GetItem("start/workdir","INF_MAIN_NODE");
+                if( GetItem("specific/resources","INF_NNODE").ToInt() > 1 ){
+                    sout << ",+";
+                }
+                sout << "</green>" << endl;
+                break;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::PrintJobInfoCompactV1(std::ostream& sout,bool includepath)
 {
 //    sout << "# ST       Job ID            Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
 //    sout << "# -- -------------------- --------------- --------------- ----- ----- ----- --------------------" << endl;
@@ -2574,7 +2393,112 @@ void CJob::PrintJobInfoCompactOld(std::ostream& sout,bool includepath)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintJobInfoNew(std::ostream& sout)
+void CJob::PrintJobInfoV3(std::ostream& sout)
+{
+    PrintBasic(sout);
+    PrintResources(sout);
+
+    if( HasSection("start") == true ){
+        PrintExec(sout);
+    }
+
+    CSmallTimeAndDate ctad;
+    ctad.GetActualTimeAndDate();
+
+    CSmallTimeAndDate stad;
+    if( HasSection("submit",stad) == true ){
+        sout << "Job was submitted on " << stad.GetSDateAndTime() << endl;
+    } else {
+        HasSection("basic",stad);
+        sout << "Job was prepared for submission on " << stad.GetSDateAndTime() << endl;
+        return;
+    }
+
+    bool inconsistent = false;
+
+    CSmallTimeAndDate btad;
+    if( HasSection("start",btad) == true ){
+        CSmallTime qtime;
+        qtime = btad - stad;
+        sout << "  and was queued for " << qtime.GetSTimeAndDay() << endl;
+        sout << "Job was started on " << btad.GetSDateAndTime() << endl;
+    } else {
+        if( GetJobBatchStatus() == EJS_SUBMITTED ){
+            CSmallTime qtime;
+            qtime = ctad - stad;
+            sout << "<purple>";
+            sout << "  and is queued for " << qtime.GetSTimeAndDay() << endl;
+            sout << "  >>> Comment: " << GetJobBatchComment() << endl;
+            sout << "</purple>";
+            return;
+        }
+        if( GetJobStatus() == EJS_INCONSISTENT ){
+            CSmallTime qtime;
+            qtime = ctad - stad;
+            sout << "  and is queued for " << qtime.GetSTimeAndDay() << endl;
+            inconsistent = true;
+        }
+    }
+
+    CSmallTimeAndDate etad;
+    if( HasSection("stop",etad) == true ){
+        CSmallTime qtime;
+        qtime = etad - btad;
+        sout << "  and was running for " << qtime.GetSTimeAndDay() << endl;
+        sout << "Job was finished on " << etad.GetSDateAndTime() << endl;
+        return;
+    } else {
+        if( GetJobStatus() == EJS_RUNNING  ){
+            CSmallTime qtime;
+            qtime = ctad - btad;
+            sout << "<green>";
+            sout << "  and is running for " << qtime.GetSTimeAndDay() << endl;
+            sout << "</green>";
+            return;
+        }
+        if( GetJobBatchStatus() == EJS_RUNNING  ){
+            sout << "<purple>Job was started but details are not known yet" << endl;
+            sout << "    >>> Comment: " << GetJobBatchComment() << endl;
+            sout << "</purple>";
+            return;
+        }
+        if( (GetJobStatus() == EJS_INCONSISTENT) && (inconsistent == false) ){
+            CSmallTime qtime;
+            qtime = ctad - btad;
+            sout << "  and is running for " << qtime.GetSTimeAndDay() << endl;
+        }
+    }
+
+    CSmallTimeAndDate ktad;
+    if( HasSection("kill",ktad) == true ){
+        CSmallTime qtime;
+        if( HasSection("start") == true ) {
+            qtime = ktad - btad;
+            sout << "  and was running for " << qtime.GetSTimeAndDay() << endl;
+        } else {
+            if( HasSection("submit") == true ) {
+                qtime = ktad - stad;
+                sout << "  and was queued for " << qtime.GetSTimeAndDay() << endl;
+            }
+        }
+        sout << "Job was killed on " << ktad.GetSDateAndTime() << endl;
+        return;
+    }
+
+    if( GetJobStatus() == EJS_INCONSISTENT ){
+        sout << "<red>>>> Job is in inconsistent state!"<< endl;
+        sout <<         "    Comment: " << GetJobBatchComment() << "</red>" << endl;
+    }
+
+    if( GetJobStatus() == EJS_ERROR){
+        sout << "<red>>>> Job is in error state!"<< endl;
+        sout <<         "    Comment: " << GetJobBatchComment() << "</red>" << endl;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::PrintJobInfoV2(std::ostream& sout)
 {
     PrintBasic(sout);
     PrintResources(sout);
@@ -2723,7 +2647,7 @@ void CJob::PrintJobStatus(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintJobInfoOld(std::ostream& sout)
+void CJob::PrintJobInfoV1(std::ostream& sout)
 {
     CSmallString tmp,col;
 

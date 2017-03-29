@@ -25,7 +25,6 @@
 #include <VerboseStr.hpp>
 #include <TerminalStr.hpp>
 #include <ABSConfig.hpp>
-#include <Torque.hpp>
 #include <Job.hpp>
 
 // -----------------------------------------------------------------------------

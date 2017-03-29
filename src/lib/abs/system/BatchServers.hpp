@@ -55,11 +55,11 @@ public:
     const CBatchServerPtr FindBatchServer(const CSmallString& srv_name);
 
 // -----------------------------------------------------------------------------
-    /// is server available
-    bool IsServerAvailable(const CSmallString& name);
-
     /// print batch systems
     void PrintServerOverview(std::ostream& vout);
+
+    /// decode queue name
+    bool DecodeQueueName(const CSmallString& input,CSmallString& srv_name,CSmallString& srv_short,CSmallString& queue);
 
 // -----------------------------------------------------------------------------
     /// list queues
@@ -95,9 +95,6 @@ public:
 
     //! kill job by ID
     bool KillJobByID(const CSmallString& jobid);
-
-    //! get last error message
-    const CSmallString GetLastErrorMsg(void);
 
 // technical print -------------------------------------------------------------
     //! print technical info about queues

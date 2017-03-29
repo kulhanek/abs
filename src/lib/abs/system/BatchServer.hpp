@@ -109,9 +109,6 @@ public:
     //! kill job by ID
     virtual bool KillJobByID(const CSmallString& jobid);
 
-    //! get last error message
-    virtual const CSmallString GetLastErrorMsg(void);
-
 // -----------------------------------------------------------------------------
 protected:
     CSmallString    ServerName;

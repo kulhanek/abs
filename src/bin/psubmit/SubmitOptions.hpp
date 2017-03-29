@@ -41,7 +41,7 @@ class CSubmitOptions : public CSimpleOptions {
     CSO_PROG_DESC_END
 
     CSO_PROG_ARGS_SHORT_DESC_BEGIN
-        "destination job [resources] [syncmode]"
+        "destination job [resources]"
     CSO_PROG_ARGS_SHORT_DESC_END
 
     CSO_PROG_ARGS_LONG_DESC_BEGIN
@@ -52,8 +52,6 @@ class CSubmitOptions : public CSimpleOptions {
         "          job script or job input file\n\n"
         "   <b><cyan>resources</cyan></b>\n"
         "          number of CPUs or explicit resources\n\n"
-        "   <b><cyan>syncmode</cyan></b>\n"
-        "          synchronization mode\n"
     CSO_PROG_ARGS_LONG_DESC_END
 
     CSO_PROG_VERS_BEGIN

@@ -94,7 +94,7 @@ public:
 
     /// 1.2) set arguments
     bool SetArguments(const CSmallString& dst,const CSmallString& js,
-                      const CSmallString& res,const CSmallString& cm);
+                      const CSmallString& res);
 
     bool SetOutputNumber(std::ostream& sout,int i);
 
@@ -105,11 +105,8 @@ public:
     ERetStatus JobInput(std::ostream& sout);
 
     /// 2.0) decode resources
-    /// decode resources for Torque
-    bool DecodeTorqueResources(std::ostream& sout);
-
-    /// decode resources for pstart
-    bool DecodeStartResources(std::ostream& sout);
+    /// decode resources
+    bool DecodeResources(std::ostream& sout);
 
     /// last job check before it is submitted to Torque server
     bool LastJobCheck(std::ostream& sout);
@@ -427,16 +424,22 @@ protected:
     bool GetJobFileConfigItem(const CSmallString& key,CSmallString& value);
 
     /// print information about job
-    void PrintJobInfoNew(std::ostream& sout);
+    void PrintJobInfoV3(std::ostream& sout);
 
     /// print information about job
-    void PrintJobInfoOld(std::ostream& sout);
+    void PrintJobInfoV2(std::ostream& sout);
 
     /// print information about job
-    void PrintJobInfoCompactNew(std::ostream& sout,bool includepath,bool includecomment);
+    void PrintJobInfoV1(std::ostream& sout);
 
     /// print information about job
-    void PrintJobInfoCompactOld(std::ostream& sout,bool includepath);
+    void PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includecomment);
+
+    /// print information about job
+    void PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includecomment);
+
+    /// print information about job
+    void PrintJobInfoCompactV1(std::ostream& sout,bool includepath);
 
     bool                                DoNotSave;
 

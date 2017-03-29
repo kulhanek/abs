@@ -23,10 +23,10 @@
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
 #include <PluginDatabase.hpp>
-#include <GlobalConfig.hpp>
 #include <NodeList.hpp>
 #include <JobList.hpp>
 #include <FileSystem.hpp>
+#include <BatchServers.hpp>
 
 using namespace std;
 
@@ -88,12 +88,6 @@ bool CSubmit::Run(void)
         return(false);
     }
 
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
-        return(false);
-    }
-
     vout << medium;
 
     // check if user has valid ticket
@@ -102,19 +96,10 @@ bool CSubmit::Run(void)
         return(false);
     }
 
-    // we need ticket here
-    if( Torque.Init() == false ){
-        ES_ERROR("unable to init torque");
-        return(false);
-    }
+    User.InitUser();
 
-    if( User.InitUser() == false ){
-        ES_ERROR("unable to init current user");
-        return(false);
-    }
-
-    if( Torque.GetQueues(QueueList) == false ){
-        ES_ERROR("unable to get list of queues");
+    if( BatchServers.GetQueues() == false ){
+        ES_ERROR("unable to get queues");
         return(false);
     }
 
@@ -123,14 +108,6 @@ bool CSubmit::Run(void)
     QueueList.RemoveInaccesibleQueues(User);
     QueueList.RemoveNonexecutiveQueues();
     QueueList.SortByName();
-
-    if( Torque.GetNodes(NodeList) == false ){
-        ES_ERROR("unable to load nodes");
-        return(false);
-    }
-
-    // get unique properties
-    //NodeList.PrepareUniqueProperties();
 
     if( AliasList.LoadConfig() == false ){
         ES_TRACE_ERROR("unable to load aliases");
@@ -177,14 +154,13 @@ bool CSubmit::SubmitJobFull(void)
     Job->CreateBasicSection();
     Job->SetExternalOptions();
 
-    CSmallString qa,jn,rs,sm;
+    CSmallString qa,jn,rs;
     qa = Options.GetProgArg(0);
     jn = Options.GetProgArg(1);
     if( Options.GetNumberOfProgArgs() >= 3 ) rs = Options.GetProgArg(2);
-    if( Options.GetNumberOfProgArgs() >= 4 ) sm = Options.GetProgArg(3);
 
-    if( Job->SetArguments(qa,jn,rs,sm) == false ) return(false);
-    if( Job->CheckRuntimeFiles(vout,ABSConfig,Options.GetOptIgnoreRuntimeFiles()) == false ){
+    if( Job->SetArguments(qa,jn,rs) == false ) return(false);
+    if( Job->CheckRuntimeFiles(vout,Options.GetOptIgnoreRuntimeFiles()) == false ){
         CJobList jobs;
         jobs.InitByInfoFiles(".",false);
         if( jobs.GetNumberOfJobs() > 0 ){
@@ -239,7 +215,7 @@ bool CSubmit::SubmitJobFull(void)
     Job->PrintBasic(vout);
 
     // resources
-    if( Job->DecodeTorqueResources(vout) == false ){
+    if( Job->DecodeResources(vout) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }
@@ -288,18 +264,17 @@ bool CSubmit::SubmitJobHeader(void)
     Job->CreateBasicSection();
     Job->SetExternalOptions();
 
-    CSmallString qa,jn,rs,sm;
+    CSmallString qa,jn,rs;
     qa = Options.GetProgArg(0);
     jn = Options.GetProgArg(1);
     if( Options.GetNumberOfProgArgs() >= 3 ) rs = Options.GetProgArg(2);
-    if( Options.GetNumberOfProgArgs() >= 4 ) sm = Options.GetProgArg(3);
 
-    if( Job->SetArguments(qa,jn,rs,sm) == false ) return(false);
+    if( Job->SetArguments(qa,jn,rs) == false ) return(false);
 
     // set output number
     if( Job->SetOutputNumber(vout,1) == false ) return(false);
 
-    if( Job->CheckRuntimeFiles(vout,ABSConfig,Options.GetOptIgnoreRuntimeFiles()) == false ){
+    if( Job->CheckRuntimeFiles(vout,Options.GetOptIgnoreRuntimeFiles()) == false ){
         CJobList jobs;
         jobs.InitByInfoFiles(".",false);
         if( jobs.GetNumberOfJobs() > 0 ){
@@ -340,7 +315,7 @@ bool CSubmit::SubmitJobHeader(void)
     Job->PrintBasic(vout);
 
     // resources
-    if( Job->DecodeTorqueResources(vout) == false ){
+    if( Job->DecodeResources(vout) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }
@@ -393,9 +368,8 @@ bool CSubmit::SubmitJobCopy(int i)
     qa = Options.GetProgArg(0);
     jn = Options.GetProgArg(1);
     if( Options.GetNumberOfProgArgs() >= 3 ) rs = Options.GetProgArg(2);
-    if( Options.GetNumberOfProgArgs() >= 4 ) sm = Options.GetProgArg(3);
 
-    if( Job->SetArguments(qa,jn,rs,sm) == false ) return(false);
+    if( Job->SetArguments(qa,jn,rs) == false ) return(false);
 
     // set output number
     if( Job->SetOutputNumber(vout,i) == false ) return(false);
@@ -411,7 +385,7 @@ bool CSubmit::SubmitJobCopy(int i)
         return(true);
     }
     // resources
-    if( Job->DecodeTorqueResources(stmp) == false ){
+    if( Job->DecodeResources(stmp) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }

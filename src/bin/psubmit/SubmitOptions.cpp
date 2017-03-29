@@ -37,9 +37,9 @@ CSubmitOptions::CSubmitOptions(void)
 int CSubmitOptions::CheckOptions(void)
 {
     if( IsOptNumOfCopiesSet() ){
-        if( (GetProgArg(1) == "screen") || (GetProgArg(1) == "gui") ){
+        if( (GetProgArg(1) == "cli") || (GetProgArg(1) == "gui") ){
             if( IsError == false ) fprintf(stderr,"\n");
-            fprintf(stderr,"%s: interactive job (screen, gui) is not compatible with the --numofcopies option\n",
+            fprintf(stderr,"%s: interactive job (cli, gui) is not compatible with the --numofcopies option\n",
                     (const char*)GetProgramName());
             IsError = true;
             return(SO_OPTS_ERROR);

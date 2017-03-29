@@ -231,13 +231,6 @@ const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_nam
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchServers::IsServerAvailable(const CSmallString& name)
-{
-    return(false);
-}
-
-//------------------------------------------------------------------------------
-
 void CBatchServers::PrintServerOverview(std::ostream& vout)
 {
     vout << "# Site name     : " << AMSGlobalConfig.GetActiveSiteName() << endl;
@@ -259,6 +252,54 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
         }
         p_ele = p_ele->GetNextSiblingElement();
     }
+}
+
+//------------------------------------------------------------------------------
+
+bool CBatchServers::DecodeQueueName(const CSmallString& input,CSmallString& srv_name,CSmallString& srv_short,CSmallString& queue)
+{
+    // queue            default server name
+    // queue@S          short server name
+    // queue@server     explicit server name
+
+    srv_name = NULL;
+    queue = input;
+
+    int at = input.FindSubString("@");
+    if( at >= 0 ){
+        if( at + 1 < (int)input.GetLength() ){
+            srv_name = input.GetSubString(at+1,input.GetLength()-(at+1));
+        }
+        if( at > 0 ){
+            queue = input.GetSubString(0,at);
+        } else {
+            queue = NULL;
+        }
+    }
+
+    // not provided - use default server
+    if( srv_name == NULL ){
+        srv_name = GetDefaultSrvName();
+    }
+
+    // check if server is supported by the site
+    CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
+    if( p_ele ){
+        p_ele = p_ele->GetFirstChildElement("server");
+    }
+    while( p_ele != NULL ){
+        CSmallString sname,sshort;
+        p_ele->GetAttribute("name",sname);
+        p_ele->GetAttribute("short",sshort);
+        if( (sname == srv_name) || (sshort == srv_name) ){
+            srv_name = sname;
+            srv_short = sshort;
+            return(true);
+        }
+        p_ele = p_ele->GetNextSiblingElement();
+    }
+
+    return((srv_name != NULL)&&(srv_short != NULL)&&(queue != NULL));
 }
 
 //==============================================================================
@@ -404,35 +445,55 @@ const CJobPtr CBatchServers::GetJob(const CSmallString& jobid)
 
 bool CBatchServers::SubmitJob(CJob& job)
 {
-    return(false);
+    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName());
+    if( srv_ptr == NULL ){
+        ES_ERROR("no batch server was found for the job");
+        return(false);
+    }
+
+    return(srv_ptr->SubmitJob(job));
 }
 
 //------------------------------------------------------------------------------
 
 bool CBatchServers::GetJobStatus(CJob& job)
 {
-    return(false);
+    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName());
+    if( srv_ptr == NULL ){
+        ES_ERROR("no batch server was found for the job");
+        return(false);
+    }
+
+    return(srv_ptr->GetJobStatus(job));
 }
 
 //------------------------------------------------------------------------------
 
 bool CBatchServers::KillJob(CJob& job)
 {
-    return(false);
+    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName());
+    if( srv_ptr == NULL ){
+        ES_ERROR("no batch server was found for the job");
+        return(false);
+    }
+
+    return(srv_ptr->KillJob(job));
 }
 
 //------------------------------------------------------------------------------
 
 bool CBatchServers::KillJobByID(const CSmallString& jobid)
 {
-    return(false);
-}
+    CSmallString    new_jobid = jobid;
+    CBatchServerPtr srv_ptr = FindBatchServerByJobID(new_jobid);
+    if( srv_ptr == NULL ){
+        CSmallString error;
+        error << "batch server was not found for the job '" << jobid << "'";
+        ES_ERROR(error);
+        return(false);
+    }
 
-//------------------------------------------------------------------------------
-
-const CSmallString CBatchServers::GetLastErrorMsg(void)
-{
-    return("");
+    return(srv_ptr->KillJobByID(new_jobid));
 }
 
 //==============================================================================

@@ -64,39 +64,32 @@ bool CAlias::TestAlias(std::ostream& sout)
 {
     bool result = true;
 
-    CSmallString dest = Destination;
-    CSmallString srv;
-    // queue[@srv]
-    string          sdest = string(Destination);
-    vector<string>  items;
-    split(items,sdest,is_any_of("@"));
-    if( items.size() > 1 ){
-        dest = items[0];
-        srv = items[1];
-    } else if( items.size() == 1 ) {
-        dest = items[0];
+    CSmallString srv_name,srv_short,queue;
+    if( BatchServers.DecodeQueueName(Destination,srv_name,srv_short,queue) == false ){
+        ES_TRACE_ERROR("unable to decode alias destination (queue[@server])");
+        // something was wrong - exit
+        return(false);
+    }
+
+    // list queues
+    CBatchServerPtr srv_ptr = BatchServers.FindBatchServer(srv_name);
+    if( srv_ptr ){
+        srv_ptr->GetQueues(QueueList);
+    } else {
+        ES_TRACE_ERROR("unable to init batch server");
     }
 
     // does queue exist?
-    CQueuePtr p_queue = QueueList.FindQueue(dest);
+    CQueuePtr p_queue = QueueList.FindQueue(queue);
     if( p_queue == NULL ){
         ES_TRACE_ERROR("queue does not exist or is not allowed");
         if( result == true ) sout << endl;
-        sout << "<b><red> ERROR: The '" << dest << "' queue does not exist or is not accessible to the user!</red></b>" << endl;
+        sout << "<b><red> ERROR: The '" << queue << "' queue does not exist or is not accessible to the user on the server '" << srv_name << "'!</red></b>" << endl;
         result = false;
     }
 
-    // test if srv is allowed
-    if( srv != NULL ){
-        if( BatchServers.IsServerAvailable(srv) == false ){
-            if( result == true ) sout << endl;
-            sout << "<b><red> ERROR: The '" << srv << "' batch server is not supported in this site!</red></b>" << endl;
-            result = false;
-        }
-    }
-
     // are all resources valid?
-    Resources.SetBatchServerName(srv);
+    Resources.SetBatchServerName(srv_name);
     Resources.TestResources(sout,result);
 
     return(result);
