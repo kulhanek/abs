@@ -92,7 +92,6 @@ bool CJobs::Run(void)
     vout << "# Search expr.  : " << str << endl;
     }
     vout << "#" << endl;
-    vout << endl;
 
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
@@ -109,7 +108,6 @@ bool CJobs::Run(void)
 
     vout << high;
     User.PrintUserInfo(vout);
-    vout << endl;
     vout << low;
 
     if( BatchServers.GetUserJobs(User.GetName(),Options.GetOptKeepCompleted() | Options.GetOptFinished()) == false ){

@@ -245,12 +245,18 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
     if( p_ele ){
         p_ele = p_ele->GetFirstChildElement("server");
     }
+    CSmallString default_srv = GetDefaultSrvName();
+
     vout << "# Batch servers ..." << endl;
     while( p_ele != NULL ){
         CSmallString name, short_name;
         p_ele->GetAttribute("name",name);
         p_ele->GetAttribute("short",short_name);
-        vout << "# -> " << setw(1) << short_name << " " << name << endl;
+        if( default_srv == name ){
+            vout << "# -> * " << setw(1) << short_name << " " << name << endl;
+        } else {
+            vout << "# ->   " << setw(1) << short_name << " " << name << endl;
+        }
         p_ele = p_ele->GetNextSiblingElement();
     }
 }

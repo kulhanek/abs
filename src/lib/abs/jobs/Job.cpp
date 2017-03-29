@@ -3877,7 +3877,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
     if( includepath ){
         CSmallString title = GetItem("batch/job","INF_JOB_TITLE");
         if( title == "STDIN" ){
-            sout << "         <blue>> Interactive job </blue>" << endl;
+                sout << "     <blue>> Interactive job </blue>" << endl;
         } else {
             if( IsJobDirLocal(true) ){
                 sout << "     <blue>> " << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
