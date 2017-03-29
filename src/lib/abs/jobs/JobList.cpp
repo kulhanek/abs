@@ -1797,8 +1797,9 @@ void CJobList::GetNumberOfResFromBatchSys(EJobStatus status,int& ncpus,int& ngpu
 
 void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment)
 {
-    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change/Duration" << endl;
-    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- --------------------" << endl;
+    sout << endl;
+    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change/Duration     " << endl;
+    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------------" << endl;
 
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();

@@ -557,9 +557,9 @@ const CBatchServerPtr CBatchServers::FindBatchServerByQueue(CSmallString& name)
     CSmallString srv_name;
     CSmallString new_name = name;
 
-    unsigned int at = name.FindSubString("@");
+    int at = name.FindSubString("@");
     if( at >= 0 ){
-        if( at + 1 < name.GetLength() ){
+        if( at + 1 < (int)name.GetLength() ){
             srv_name = name.GetSubString(at+1,name.GetLength()-(at+1));
         }
         if( at > 0 ){
@@ -595,9 +595,9 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
     CSmallString srv_name;
     CSmallString new_jobid = jobid;
 
-    unsigned int at = jobid.FindSubString(".");
+    int at = jobid.FindSubString(".");
     if( at >= 0 ){
-        if( at + 1 < jobid.GetLength() ){
+        if( at + 1 < (int)jobid.GetLength() ){
             srv_name = jobid.GetSubString(at+1,jobid.GetLength()-(at+1));
         }
         if( at > 0 ){
@@ -648,9 +648,9 @@ const CBatchServerPtr CBatchServers::FindBatchServerByNode(CSmallString& name)
     CSmallString srv_name;
     CSmallString new_name = name;
 
-    unsigned int at = name.FindSubString("@");
+    int at = name.FindSubString("@");
     if( at >= 0 ){
-        if( at + 1 < name.GetLength() ){
+        if( at + 1 < (int)name.GetLength() ){
             srv_name = name.GetSubString(at+1,name.GetLength()-(at+1));
         }
         if( at > 0 ){
