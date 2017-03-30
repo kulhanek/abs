@@ -29,7 +29,7 @@ CComObject* RVMemPerCPUCB(void* p_data);
 
 CExtUUID        RVMemPerCPUID(
                     "{MEM_PER_CPU:cf7326f2-1172-4e69-8356-ba40661ed1bb}",
-                    "mempernode");
+                    "mempercpu");
 
 CPluginObject   RVMemPerCPUObject(&ABSPlugin,
                     RVMemPerCPUID,RESOURCES_CAT,
