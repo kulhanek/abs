@@ -35,41 +35,50 @@
 
 /// list of resources
 
-class ABS_PACKAGE CResourceList : public std::list<CResourceValuePtr> {
+class ABS_PACKAGE CResourceList : private std::list<CResourceValuePtr> {
 public:
 // constructor -----------------------------------------------------------------
         CResourceList(void);
         ~CResourceList(void);
 
 // executive methods -----------------------------------------------------------
-    /// set server name
-    void SetBatchServerName(const CSmallString& name);
+    /// add resources - override existing setup
+    bool AddResources(const CSmallString& reslist);
 
-    /// parse resources string, do not check for errors
-    void Parse(const CSmallString& resources);
+    /// add resources - override existing setup
+    void AddResources(const CSmallString& reslist,std::ostream& sout,bool& rstatus);
 
-    /// merge resources
-    void Merge(const CResourceList& source);
+    /// add a single resource
+    void AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,bool& rstatus);
 
-    /// test resources
-    void TestResources(std::ostream& sout,bool& rstatus);
+    /// add a specific resource
+    void AddResource(const CResourceValuePtr& res);
 
-    /// test resources
-    bool TestResources(std::ostream& sout);
+    /// find resource
+    CResourceValuePtr FindResource(const CSmallString& name) const;
 
-    /// test for duplicate occurences
-    void TestDuplicateResources(std::ostream& sout,bool& rstatus);
-
-    /// add new resource to the begin
-    void AddResourceToBegin(const CSmallString& name,const CSmallString& value);
+    /// remove resource
+    void RemoveResource(const CSmallString& name);
 
     /// remove all resources
     void RemoveAllResources(void);
 
-    /// remove all resources
-    void RemoveHelperResources(void);
+    /// sort by name
+    void SortByName(void);
+
+    /// resolve conflicts
+    void ResolveConflicts(void);
+
+    /// test all resources
+    void TestResourceValues(std::ostream& sout,bool& rstatus);
+
+    /// finalize resources
+    void FinalizeResources(void);
 
 // information methods ---------------------------------------------------------
+    /// get resource value
+    const CSmallString GetResourceValue(const CSmallString& name) const;
+
     /// print resources to the string
     const CSmallString ToString(bool include_spaces) const;
 
@@ -85,36 +94,23 @@ public:
     /// get number of nodes
     int GetNumOfNodes(void) const;
 
-    /// find resource with given name
-    CResourceValuePtr GetResource(const CSmallString& name) const;
-
-    /// get resource value
-    CSmallString GetResourceValue(const CSmallString& name) const;
-
     /// get memory in Bytes
     long int GetMemory(void) const;
 
     /// get walltime
     bool GetWallTime(CSmallTime& time) const;
 
-    /// get torque resources
-    void GetTorqueResources(struct attropl* &p_prev);
-
-    /// sort by name
-    void SortByName(void);
-
-    /// finalize resources
-    void Finalize(void);
-
-// section of public data ------------------------------------------------------
-    /// resource variables
-    std::map<std::string,std::string> Variables;
-
 // section of private data -----------------------------------------------------
 private:
     /// helper method
     static bool SortCompName(const CResourceValuePtr& p_left,const CResourceValuePtr& p_right);
+
+    friend class CJob;
 };
+
+// -----------------------------------------------------------------------------
+
+extern CResourceList ResourceList;
 
 // -----------------------------------------------------------------------------
 

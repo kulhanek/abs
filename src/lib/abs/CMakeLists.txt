@@ -5,6 +5,7 @@
 # objects in library -----------------------------------------------------------
 SET(ABS_SRC
         ABSMainHeader.cpp
+        ABSModule.cpp
     # system -------------------------------------
         system/ABSConfig.cpp
     #    system/ABSCompletion.cpp
@@ -17,6 +18,7 @@ SET(ABS_SRC
     # resources ----------------------------------
         resources/ResourceValue.cpp
         resources/ResourceList.cpp
+        resources/default/RVEmail.cpp
 
     # jobs ---------------------------------------
         jobs/search/nodes/NodeMask.tab.c

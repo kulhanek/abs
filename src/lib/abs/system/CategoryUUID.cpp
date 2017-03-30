@@ -35,4 +35,8 @@ CExtUUID BATCH_SERVER_CAT(
     "{BATCH_SERVER_CAT:c919d56f-b5d6-4ee9-8a65-5700cc3e4209}",
     "Batch Server");
 
+CExtUUID RESOURCES_CAT(
+    "{RESOURCES_CAT:9c6ccf0d-8795-45fa-aba0-2e93929e141d}",
+    "Resources");
+
 // -----------------------------------------------------------------------------

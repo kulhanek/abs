@@ -23,7 +23,6 @@
 
 #include <ABSMainHeader.hpp>
 #include <SmallString.hpp>
-#include <ResourceList.hpp>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
@@ -57,7 +56,7 @@ public:
     const CSmallString& GetDestination(void) const;
 
     //! get resources
-    const CResourceList& GetResources(void) const;
+    const CSmallString& GetResources(void) const;
 
 // i/o methods -----------------------------------------------------------------
     //! load alias
@@ -71,7 +70,7 @@ private:
     bool            SystemAlias;
     CSmallString    Name;
     CSmallString    Destination;
-    CResourceList   Resources;
+    CSmallString    Resources;
 };
 
 // -----------------------------------------------------------------------------

@@ -447,6 +447,9 @@ protected:
     /// print information about job
     void PrintJobInfoCompactV1(std::ostream& sout,bool includepath);
 
+    /// print resource tokens
+    void PrintResourceTokens(std::ostream& sout,const CSmallString& title,const CSmallString& res_list);
+
     bool                                DoNotSave;
 
     // job status --------------------------------------------------------------

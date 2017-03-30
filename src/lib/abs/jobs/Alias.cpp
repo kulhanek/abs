@@ -29,6 +29,7 @@
 #include <NodeList.hpp>
 #include <ABSConfig.hpp>
 #include <BatchServers.hpp>
+#include <ResourceList.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -53,7 +54,7 @@ CAlias::CAlias(const CSmallString& name,const CSmallString& queue,
     SystemAlias = false;
     Name = name;
     Destination = queue;
-    Resources.Parse(resources);
+    Resources = resources;
 }
 
 //==============================================================================
@@ -89,8 +90,8 @@ bool CAlias::TestAlias(std::ostream& sout)
     }
 
     // are all resources valid?
-    Resources.SetBatchServerName(srv_name);
-    Resources.TestResources(sout,result);
+    CResourceList res;
+    res.AddResources(Resources,sout,result);
 
     return(result);
 }
@@ -111,7 +112,7 @@ void CAlias::PrintLineInfo(std::ostream& sout)
     sout << " " << setw(14) << Name;
     sout << " " << setw(16) << Destination;
     sout << left;
-    sout << " " << Resources.ToString(true);
+    sout << " " << Resources;
     sout << endl;
 }
 
@@ -138,7 +139,7 @@ const CSmallString& CAlias::GetDestination(void) const
 
 //------------------------------------------------------------------------------
 
-const CResourceList& CAlias::GetResources(void) const
+const CSmallString& CAlias::GetResources(void) const
 {
     return(Resources);
 }
@@ -163,11 +164,7 @@ bool CAlias::Load(CXMLElement* p_ele,bool system)
     bool result = true;
     result &= p_ele->GetAttribute("name",Name);
     result &= p_ele->GetAttribute("dest",Destination);
-    CSmallString res;
-    result &= p_ele->GetAttribute("res",res);
-    if( result ){
-        Resources.Parse(res);
-    }
+    result &= p_ele->GetAttribute("res",Resources);
 
     if( result == false ){
         ES_ERROR("unable to get alias attribute(s)");
@@ -190,8 +187,7 @@ void CAlias::Save(CXMLElement* p_ele)
 
     p_ele->SetAttribute("name",Name);
     p_ele->SetAttribute("dest",Destination);
-    p_ele->SetAttribute("res",Resources.ToString(false));
-
+    p_ele->SetAttribute("res",Resources);
 }
 
 //==============================================================================

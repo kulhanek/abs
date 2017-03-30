@@ -26,12 +26,19 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/lexical_cast.hpp>
+#include <SimpleIterator.hpp>
+#include <PluginDatabase.hpp>
+#include <CategoryUUID.hpp>
 
 //------------------------------------------------------------------------------
 
 using namespace std;
 using namespace boost;
 using namespace boost::algorithm;
+
+//------------------------------------------------------------------------------
+
+CResourceList ResourceList;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -51,14 +58,7 @@ CResourceList::~CResourceList(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-void CResourceList::SetBatchServerName(const CSmallString& name)
-{
-    // FIXME
-}
-
-//------------------------------------------------------------------------------
-
-void CResourceList::Parse(const CSmallString& resources)
+void CResourceList::AddResources(const CSmallString& resources,std::ostream& sout,bool& rstatus)
 {
     string          svalue = string(resources);
     vector<string>  items;
@@ -75,117 +75,143 @@ void CResourceList::Parse(const CSmallString& resources)
         // resource is empty string
         if( sres.size() == 0 ) continue;
 
-        // does it contain '='?
-        if( sres.find('=') == string::npos ){
-            // is it an integer number?
-            CResourceValuePtr p_ritem = CResourceValuePtr(new CResourceValue);
-            try {
-                lexical_cast<int>(sres);
-                p_ritem->Name = "ncpus";
-                p_ritem->Value = sres;
-            } catch(bad_lexical_cast &) {
-                p_ritem->Name = sres;
-                p_ritem->Value = NULL;
+        char   command = '+';
+        string name;
+        string value;
+
+        if( sres[0] == '-' ){
+            command = '-';
+            sres = string(sres.begin()+1,sres.end()); // strip down a letter
+        }
+
+        // resource is empty string
+        if( sres.size() == 0 ) continue;
+
+        // is it an integer number?
+        try {
+            lexical_cast<int>(sres);
+            name = "ncpus";
+            value = sres;
+        } catch(bad_lexical_cast &) {
+            if( sres.find('=') == string::npos ){
+                name = sres;
+                value = "";
+            } else {
+                // it contains '=', split on the first occurence
+                string::iterator pos = find(sres.begin(), sres.end(), '=');
+                name = string(sres.begin(), pos);
+                value = string(pos + 1, sres.end());
             }
-            push_back(p_ritem);
-            continue;
         }
 
-        // it contains '=', split on the first occurence
-        string::iterator pos = find(sres.begin(), sres.end(), '=');
-        string key(sres.begin(), pos);
-        string value(pos + 1, sres.end());
-
-        CResourceValuePtr p_ritem = CResourceValuePtr(new CResourceValue);
-        p_ritem->Name = key;
-        p_ritem->Value = value;
-        push_back(p_ritem);
+        // process resource
+        switch(command){
+            case '+':
+                AddResource(name,value,sout,rstatus);
+                break;
+            case '-':
+                RemoveResource(name);
+                break;
+        }
     }
 }
 
 //------------------------------------------------------------------------------
 
-// put from the source only missing resources
-
-void CResourceList::Merge(const CResourceList& source)
+bool CResourceList::AddResources(const CSmallString& resources)
 {
-    list<CResourceValuePtr>::const_iterator it = source.begin();
-    list<CResourceValuePtr>::const_iterator ie = source.end();
+    stringstream sout;
+    bool         result = true;
+    AddResources(resources,sout,result);
+    return(result);
+}
 
-    while( it != ie ){
-        CResourceValuePtr p_srv = *it;
-        CResourceValuePtr p_drv = GetResource(p_srv->Name);
-        if( p_drv == NULL ){
-            CResourceValuePtr p_nrv = CResourceValuePtr(new CResourceValue);
-            p_nrv->Name = p_srv->Name;
-            p_nrv->Value = p_srv->Value;
-            push_back(p_nrv);
+//------------------------------------------------------------------------------
+
+void CResourceList::AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,bool& rstatus)
+{
+    // be sure that the resource is unique
+    RemoveResource(name);
+
+    // try to find resource plugin object
+    CSimpleIteratorC<CPluginObject> I(PluginDatabase.GetObjectList());
+    CPluginObject* p_pobj;
+    while( (p_pobj = I.Current()) ){
+        if( p_pobj->GetCategoryUUID() == RESOURCES_CAT ){
+            CSmallString res_name;
+            PluginDatabase.FindObjectConfigValue(p_pobj->GetObjectUUID(),"_name",res_name);
+            if( name == res_name ){
+                CComObject* p_obj = p_pobj->CreateObject(NULL);
+                CResourceValue* p_res = dynamic_cast<CResourceValue*>(p_obj);
+                if( p_res != NULL ){
+                    CResourceValuePtr res_ptr(p_res);
+                    res_ptr->Value = value;
+                    push_back(res_ptr);
+                    return;
+                } else {
+                    delete p_obj;
+                }
+            }
         }
-        it++;
+        I++;
     }
+
+    // plugin object was not found
+    if( rstatus == true ) sout << endl;
+    sout << "<red>ERROR: Resource '" << name << "' is not supported!</red>" << endl;
+    rstatus = false;
 }
 
 //------------------------------------------------------------------------------
 
-bool CResourceList::TestResources(std::ostream& sout)
+void CResourceList::AddResource(const CResourceValuePtr& res)
 {
-    bool rstatus = true;
-    TestResources(sout,rstatus);
-    return(rstatus);
+    if( res == NULL ) return;
+    push_back(res);
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceList::TestResources(std::ostream& sout,bool& rstatus)
+void CResourceList::RemoveResource(const CSmallString& name)
 {
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        p_rv->TestValue(sout,rstatus);
+        if( p_rv->Name == name ){
+            erase(it);
+            return;
+        }
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+CResourceValuePtr CResourceList::FindResource(const CSmallString& name) const
+{
+    std::list<CResourceValuePtr>::const_iterator     it = begin();
+    std::list<CResourceValuePtr>::const_iterator     ie = end();
+
+    while( it != ie ){
+        CResourceValuePtr p_rv = *it;
+        if( p_rv->Name == name ){
+            return( p_rv );
+        }
         it++;
     }
 
-    TestDuplicateResources(sout,rstatus);
+    return(CResourceValuePtr());
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceList::TestDuplicateResources(std::ostream& sout,bool& rstatus)
+const CSmallString CResourceList::GetResourceValue(const CSmallString& name) const
 {
-    std::list<CResourceValuePtr>::iterator     oit = begin();
-    std::list<CResourceValuePtr>::iterator     oie = end();
-
-    while( oit != oie ){
-
-        std::list<CResourceValuePtr>::iterator    iit = begin();
-        std::list<CResourceValuePtr>::iterator    iie = end();
-
-        while( iit != iie ){
-            if( iit != oit ) {
-                if( (*iit)->Name == (*oit)->Name ){
-                    if( rstatus == true ) sout << endl;
-                    sout << "<b><red> ERROR: Duplicate occurence of '" << (*oit)->Name << "' resource specification!</red></b>" << endl;
-                    rstatus = false;
-                    return;
-                }
-            }
-            iit++;
-        }
-
-        oit++;
-    }
-}
-
-//------------------------------------------------------------------------------
-
-void CResourceList::AddResourceToBegin(const CSmallString& name,const CSmallString& value)
-{
-    CResourceValuePtr p_nrv = CResourceValuePtr(new CResourceValue);
-    p_nrv->Name = name;
-    p_nrv->Value = value;
-    push_front(p_nrv);
+   CResourceValuePtr rs_ptr = FindResource(name);
+   if( rs_ptr == NULL ) return("");
+   return(rs_ptr->Value);
 }
 
 //------------------------------------------------------------------------------
@@ -197,31 +223,42 @@ void CResourceList::RemoveAllResources(void)
 
 //------------------------------------------------------------------------------
 
-void CResourceList::RemoveHelperResources(void)
+void CResourceList::ResolveConflicts(void)
 {
-    list<CResourceValuePtr>::iterator it = begin();
-    list<CResourceValuePtr>::iterator ie = end();
+    std::list<CResourceValuePtr>::iterator     it = begin();
+    std::list<CResourceValuePtr>::iterator     ie = end();
 
     while( it != ie ){
-        CResourceValuePtr p_res = *it;
-        if( p_res->IsHelperToken() == true ){
-            it = erase(it);
-        } else {
-            it++;
-        }
+        CResourceValuePtr p_rv = *it;
+        p_rv->ResolveConflicts();
+        it++;
     }
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceList::Finalize(void)
+void CResourceList::TestResourceValues(std::ostream& sout,bool& rstatus)
 {
-    list<CResourceValuePtr>::iterator it = begin();
-    list<CResourceValuePtr>::iterator ie = end();
+    std::list<CResourceValuePtr>::iterator     it = begin();
+    std::list<CResourceValuePtr>::iterator     ie = end();
 
     while( it != ie ){
-        CResourceValuePtr p_res = *it;
-        p_res->Finalize(Variables);
+        CResourceValuePtr p_rv = *it;
+        p_rv->TestValue(sout,rstatus);
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CResourceList::FinalizeResources(void)
+{
+    std::list<CResourceValuePtr>::iterator     it = begin();
+    std::list<CResourceValuePtr>::iterator     ie = end();
+
+    while( it != ie ){
+        CResourceValuePtr p_rv = *it;
+        p_rv->FinalizeResource();
         it++;
     }
 }
@@ -250,31 +287,13 @@ const CSmallString CResourceList::ToString(bool include_spaces) const
     return(output);
 }
 
-//------------------------------------------------------------------------------
-
-CResourceValuePtr CResourceList::GetResource(const CSmallString& name) const
-{
-    std::list<CResourceValuePtr>::const_iterator     it = begin();
-    std::list<CResourceValuePtr>::const_iterator     ie = end();
-
-    while( it != ie ){
-        CResourceValuePtr p_rv = *it;
-        if( p_rv->Name == name ){
-            return( p_rv );
-        }
-        it++;
-    }
-
-    return(CResourceValuePtr());
-}
-
 
 
 //------------------------------------------------------------------------------
 
 int CResourceList::GetNumOfCPUs(void) const
 {
-    const CResourceValuePtr p_rv = GetResource("ncpus");
+    const CResourceValuePtr p_rv = FindResource("ncpus");
     if( p_rv == NULL ) return(1);
     return( p_rv->Value.ToInt() );
 }
@@ -283,7 +302,7 @@ int CResourceList::GetNumOfCPUs(void) const
 
 int CResourceList::GetNumOfGPUs(void) const
 {
-    const CResourceValuePtr p_rv = GetResource("ngpus");
+    const CResourceValuePtr p_rv = FindResource("ngpus");
     if( p_rv == NULL ) return(0);
     return( p_rv->Value.ToInt() );
 }
@@ -292,7 +311,7 @@ int CResourceList::GetNumOfGPUs(void) const
 
 int CResourceList::GetMaxNumOfCPUsPerNode(void) const
 {
-    const CResourceValuePtr p_rv = GetResource("maxcpuspernode");
+    const CResourceValuePtr p_rv = FindResource("maxcpuspernode");
     if( p_rv == NULL ) return(1);
     return( p_rv->Value.ToInt() );
 }
@@ -301,24 +320,16 @@ int CResourceList::GetMaxNumOfCPUsPerNode(void) const
 
 int CResourceList::GetNumOfNodes(void) const
 {
-    const CResourceValuePtr p_rv = GetResource("ncpus");
+    // FIXME
+    const CResourceValuePtr p_rv = FindResource("ncpus");
     return(1);
-}
-
-//------------------------------------------------------------------------------
-
-CSmallString CResourceList::GetResourceValue(const CSmallString& name) const
-{
-    const CResourceValuePtr p_rv = GetResource(name);
-    if( p_rv == NULL ) return("");
-    return( p_rv->Value );
 }
 
 //------------------------------------------------------------------------------
 
 long int CResourceList::GetMemory(void) const
 {
-    const CResourceValuePtr p_rv = GetResource("mem");
+    const CResourceValuePtr p_rv = FindResource("mem");
     if( p_rv == NULL ) return(0);
 
     string          svalue(p_rv->Value);
@@ -343,7 +354,7 @@ long int CResourceList::GetMemory(void) const
 
 bool CResourceList::GetWallTime(CSmallTime& time) const
 {
-    const CResourceValuePtr p_rv = GetResource("walltime");
+    const CResourceValuePtr p_rv = FindResource("walltime");
     if( p_rv == NULL ) return(false);
 
     int             hvalue = 0;
@@ -356,26 +367,6 @@ bool CResourceList::GetWallTime(CSmallTime& time) const
     time = ltime;
     return(true);
 }
-
-// FIXME
-////------------------------------------------------------------------------------
-
-//void CResourceList::GetTorqueResources(struct attropl* &p_prev)
-//{
-//    std::list<CResourceValuePtr>::iterator     it = begin();
-//    std::list<CResourceValuePtr>::iterator     ie = end();
-
-//    while( it != ie ){
-//        CResourceValuePtr p_res = (*it);
-//        if( p_res->IsHelperToken() ) {
-//            it++;       // skip helper tokens
-//            continue;
-//        }
-
-//        set_attribute(p_prev,ATTR_l,p_res->Name,p_res->Value);
-//        it++;
-//    }
-//}
 
 //------------------------------------------------------------------------------
 

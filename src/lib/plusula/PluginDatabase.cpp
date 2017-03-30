@@ -276,8 +276,7 @@ bool CPluginDatabase::GetObjectExtType(const CUUID& object_uuid,
 //---------------------------------------------------------------------------
 
 bool CPluginDatabase::FindObjectConfigValue(const CUUID& object_uuid,
-        const CSmallString& key,
-        CUUID& value) const
+        const CSmallString& key, CUUID& value) const
 {
     CSmallString uuid_value;
     if( FindObjectConfigValue(object_uuid,key,uuid_value) == false ) return(false);
@@ -290,8 +289,7 @@ bool CPluginDatabase::FindObjectConfigValue(const CUUID& object_uuid,
 //---------------------------------------------------------------------------
 
 bool CPluginDatabase::FindObjectConfigValue(const CUUID& object_uuid,
-        const CSmallString& key,
-        CExtUUID& value) const
+        const CSmallString& key, CExtUUID& value) const
 {
     CSmallString uuid_value;
     if( FindObjectConfigValue(object_uuid,key,uuid_value) == false ) return(false);
@@ -304,8 +302,7 @@ bool CPluginDatabase::FindObjectConfigValue(const CUUID& object_uuid,
 //---------------------------------------------------------------------------
 
 bool CPluginDatabase::FindObjectConfigValue(const CUUID& object_uuid,
-        const CSmallString& key,
-        CSmallString& value) const
+        const CSmallString& key, CSmallString& value) const
 {
     CXMLElement*   p_ele;
     p_ele = PluginConfig.GetFirstChildElement("PLUGINS");

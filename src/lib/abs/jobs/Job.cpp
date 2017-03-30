@@ -49,6 +49,7 @@
 #include <unistd.h>
 #include <AMSGlobalConfig.hpp>
 #include <BatchServers.hpp>
+#include <ResourceList.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -428,13 +429,18 @@ bool CJob::DecodeResources(std::ostream& sout)
         return(false);
     }
 
-    // decode user resources
-    CResourceList res;
-    res.Parse(sres);
-    if( res.TestResources(sout) == false ){
-        ES_TRACE_ERROR("unable to test user provided resources");
-        // something was wrong - exit
-        return(false);
+    CResourceList job_res;
+    bool          result = true;
+
+    // add default resources
+    CSmallString  sdef_res;
+    if( ABSConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
+        job_res.AddResources(sdef_res,sout,result);
+        if( result == false ){
+            ES_TRACE_ERROR("default resources are invalid");
+            return(false);
+        }
+        SetItem("specific/resources","INF_DEFAULT_RESOURCES",sdef_res);
     }
 
     // is destination alias?
@@ -447,36 +453,31 @@ bool CJob::DecodeResources(std::ostream& sout)
             // something was wrong - exit
             return(false);
         }
-        res.Merge(p_alias->GetResources());
-        SetItem("specific/resources","INF_ALIAS_RESOURCES",p_alias->GetResources().ToString(false));
+        job_res.AddResources(p_alias->GetResources(),sout,result);
+        if( result == false ){
+            ES_TRACE_ERROR("alias resources are invalid");
+            return(false);
+        }
+        SetItem("specific/resources","INF_ALIAS_RESOURCES",p_alias->GetResources());
     } else {
         SetItem("specific/resources","INF_ALIAS","");
     }
 
-    // add default resources
-    CResourceList default_res;
-    CSmallString  sdef_res;
-    if( ABSConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
-        default_res.Parse(sdef_res);
-        if( default_res.TestResources(sout) == false ){
-            ES_ERROR("default resources are invalid");
-            return(false);
-        }
-        SetItem("specific/resources","INF_DEFAULT_RESOURCES",default_res.ToString(false));
-        res.Merge(default_res);
-    }
-
-    res.SetBatchServerName(BatchServerName);
-    bool result = true;
-    res.TestResources(sout,result);
+    // decode user resources
+    job_res.AddResources(sres,sout,result);
     if( result == false ){
-        ES_TRACE_ERROR("final resources are invalid");
-        // something was wrong - exit
+        ES_TRACE_ERROR("user resources are invalid");
         return(false);
     }
 
-    // finalize resources
-    res.Finalize();
+    job_res.TestResourceValues(sout,result);
+    if( result == false ){
+        ES_TRACE_ERROR("some resource value is invalid");
+        return(false);
+    }
+
+//    // finalize resources
+//    job_res.Finalize();
 
 //    // FIXME
 //    CSmallString scratch_type = res.GetResourceValue("scratch_type");
@@ -545,11 +546,11 @@ bool CJob::DecodeResources(std::ostream& sout)
 //    }
 
     SetItem("specific/resources","INF_QUEUE",queue);
-    SetItem("specific/resources","INF_NCPU",res.GetNumOfCPUs());
-    SetItem("specific/resources","INF_NGPU",res.GetNumOfGPUs());
-    SetItem("specific/resources","INF_MAX_CPUS_PER_NODE",res.GetMaxNumOfCPUsPerNode());
-    SetItem("specific/resources","INF_NNODE",res.GetMaxNumOfCPUsPerNode());
-    SetItem("specific/resources","INF_RESOURCES",res.ToString(false));
+////    SetItem("specific/resources","INF_NCPU",res.GetNumOfCPUs());
+////    SetItem("specific/resources","INF_NGPU",res.GetNumOfGPUs());
+//    SetItem("specific/resources","INF_MAX_CPUS_PER_NODE",res.GetMaxNumOfCPUsPerNode());
+//    SetItem("specific/resources","INF_NNODE",res.GetMaxNumOfCPUsPerNode());
+//    SetItem("specific/resources","INF_RESOURCES",res.ToString(false));
 
 //    SetItem("specific/resources","INF_SURROGATE_MACHINE",surrogate);
 //    SetItem("specific/resources","INF_SCRATCH_TYPE",scratch_type);
@@ -2396,8 +2397,8 @@ void CJob::PrintJobInfoCompactV1(std::ostream& sout,bool includepath)
 
 void CJob::PrintJobInfoV3(std::ostream& sout)
 {
-    PrintBasic(sout);
-    PrintResources(sout);
+    PrintBasicV3(sout);
+    PrintResourcesV3(sout);
 
     if( HasSection("start") == true ){
         PrintExec(sout);
@@ -2501,8 +2502,8 @@ void CJob::PrintJobInfoV3(std::ostream& sout)
 
 void CJob::PrintJobInfoV2(std::ostream& sout)
 {
-    PrintBasic(sout);
-    PrintResources(sout);
+    PrintBasicV2(sout);
+    PrintResourcesV2(sout);
 
     if( HasSection("start") == true ){
         PrintExec(sout);
@@ -2832,7 +2833,7 @@ void CJob::PrintBasicV2(std::ostream& sout)
     if( tmp == NULL ) tmp = "-none-";
     sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
 
-    sout << "Site name        : " << GetSiteName() << endl;
+    sout << "Site name        : " << GetSiteName() << " (Torque server: " << GetServerName() << ")" << endl;
     sout << "Job key          : " << GetItem("basic/jobinput","INF_JOB_KEY") << endl;
 
     tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX",true);
@@ -2853,92 +2854,12 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Req destination  : " << tmp << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
-    if( tmp == NULL ){
-    sout << "Req resources    : -none-" << endl;
-    } else {
-
-        CResourceList res;
-        res.Parse(tmp);
-        res.SortByName();
-
-        std::list<CResourceValuePtr>::const_iterator     it = res.begin();
-        std::list<CResourceValuePtr>::const_iterator     ie = res.end();
-
-        sout << "Req resources    : ";
-
-        int len = 19;
-        while( it != ie ){
-            CResourceValuePtr p_res = *it;
-            sout <<  p_res->Name << "=" << p_res->Value;
-            len += p_res->Name.GetLength();
-            len += p_res->Value.GetLength();
-            len++;
-            it++;
-            if( it != ie ){
-                p_res = *it;
-                int tlen = len;
-                tlen += p_res->Name.GetLength();
-                tlen += p_res->Value.GetLength();
-                tlen++;
-                if( tlen > 80 ){
-                    sout << "," << endl;
-                    sout << "                   ";
-                    len = 19;
-                } else {
-                    sout << ",";
-                    len += 1;
-                }
-            }
-        }
-        sout << endl;
-    }
-
-    tmp = GetItem("basic/arguments","INF_ARG_SYNC_MODE");
-    if( tmp == NULL ){
-    sout << "Req sync mode    : -none-" << endl;
-    }
-    else{
-    sout << "Req sync mode    : " << tmp << endl;
-    }
+    PrintResourceTokens(sout,"Req resources    :",tmp);
 
     sout << "----------------------------------------" << endl;
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
-    if( tmp != NULL ) {
-
-        CResourceList res;
-        res.Parse(tmp);
-        res.SortByName();
-
-        std::list<CResourceValuePtr>::const_iterator     it = res.begin();
-        std::list<CResourceValuePtr>::const_iterator     ie = res.end();
-
-        sout << "Default resources: ";
-
-        int len = 19;
-        while( it != ie ){
-            CResourceValuePtr p_res = *it;
-            sout <<  p_res->Name << "=" << p_res->Value;
-            len += p_res->Name.GetLength();
-            len += p_res->Value.GetLength();
-            len++;
-            it++;
-            if( it != ie ){
-                p_res = *it;
-                int tlen = len;
-                tlen += p_res->Name.GetLength();
-                tlen += p_res->Value.GetLength();
-                tlen++;
-                if( tlen > 80 ){
-                    sout << "," << endl;
-                    sout << "                   ";
-                    len = 19;
-                } else {
-                    sout << ", ";
-                    len += 2;
-                }
-            }
-        }
-        sout << endl;
+    if( tmp ){
+        PrintResourceTokens(sout,"Default resources: ",tmp);
     }
 
     tmp = GetItem("specific/resources","INF_ALIAS");
@@ -2946,91 +2867,18 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Alias            : -none-" << endl;
     }
     else{
-    sout << "Alias            : " << tmp << endl;
+    sout << "Alias            : " << tmp << endl;    
     tmp = GetItem("specific/resources","INF_ALIAS_RESOURCES");
-
-    CResourceList res;
-    res.Parse(tmp);
-    res.SortByName();
-
-    std::list<CResourceValuePtr>::const_iterator     it = res.begin();
-    std::list<CResourceValuePtr>::const_iterator     ie = res.end();
-
-    sout << "Alias resources  : ";
-
-    if( it == ie ) sout << "-none-";
-
-    int len = 19;
-    while( it != ie ){
-        CResourceValuePtr p_res = *it;
-        sout <<  p_res->Name << "=" << p_res->Value;
-        len += p_res->Name.GetLength();
-        len += p_res->Value.GetLength();
-        len++;
-        it++;
-        if( it != ie ){
-            p_res = *it;
-            int tlen = len;
-            tlen += p_res->Name.GetLength();
-            tlen += p_res->Value.GetLength();
-            tlen++;
-            if( tlen > 80 ){
-                sout << "," << endl;
-                sout << "                   ";
-                len = 19;
-            } else {
-                sout << ", ";
-                len += 2;
-            }
-        }
-    }
-    sout << endl;
-
-    tmp = GetItem("specific/resources","INF_ALIAS_SYNC_MODE");
-    sout << "Alias sync mode  : " << tmp << endl;
+    PrintResourceTokens(sout,"Alias resources  : ",tmp);
     }
 
     tmp = GetItem("specific/resources","INF_QUEUE");
     sout << "Queue            : " << tmp << endl;
 
     tmp = GetItem("specific/resources","INF_RESOURCES");
-    CResourceList res;
-    res.Parse(tmp);
-    res.SortByName();
-
-    std::list<CResourceValuePtr>::const_iterator     it = res.begin();
-    std::list<CResourceValuePtr>::const_iterator     ie = res.end();
-
-    sout << "All resources    : ";
-
-    int len = 19;
-    while( it != ie ){
-        CResourceValuePtr p_res = *it;
-        sout <<  p_res->Name << "=" << p_res->Value;
-        len += p_res->Name.GetLength();
-        len += p_res->Value.GetLength();
-        len++;
-        it++;
-        if( it != ie ){
-            p_res = *it;
-            int tlen = len;
-            tlen += p_res->Name.GetLength();
-            tlen += p_res->Value.GetLength();
-            tlen++;
-            if( tlen > 80 ){
-                sout << "," << endl;
-                sout << "                   ";
-                len = 19;
-            } else {
-                sout << ", ";
-                len += 2;
-            }
-        }
-    }
-    sout << endl;
+    PrintResourceTokens(sout,"All resources    : ",tmp);
 
     sout << "----------------------------------------" << endl;
-
 
     tmp = GetItem("specific/resources","INF_NCPU");
     sout << "Number of CPUs   : " << tmp << endl;
@@ -3046,51 +2894,38 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Number of nodes  : " << tmp << endl;
     }
 
-    res.Finalize();
+    // batch resources
 
-    // generate list of internal variables
-    std::map<std::string,std::string>::iterator vit = res.Variables.begin();
-    std::map<std::string,std::string>::iterator vie = res.Variables.end();
+//    it = res.begin();
+//    ie = res.end();
 
-    while( vit != vie ){
-        CSmallString name = vit->first;
-        CSmallString value = vit->second;
-        SetItem("specific/variables",name,value);
-        vit++;
-    }
+//    sout << "Resources        : ";
 
-    res.RemoveHelperResources();
-
-    it = res.begin();
-    ie = res.end();
-
-    sout << "Resources        : ";
-
-    len = 19;
-    while( it != ie ){
-        CResourceValuePtr p_res = *it;
-        sout <<  p_res->Name << "=" << p_res->Value;
-        len += p_res->Name.GetLength();
-        len += p_res->Value.GetLength();
-        len++;
-        it++;
-        if( it != ie ){
-            p_res = *it;
-            int tlen = len;
-            tlen += p_res->Name.GetLength();
-            tlen += p_res->Value.GetLength();
-            tlen++;
-            if( tlen > 80 ){
-                sout << "," << endl;
-                sout << "                   ";
-                len = 19;
-            } else {
-                sout << ", ";
-                len += 2;
-            }
-        }
-    }
-    sout << endl;
+//    len = 19;
+//    while( it != ie ){
+//        CResourceValuePtr p_res = *it;
+//        sout <<  p_res->Name << "=" << p_res->Value;
+//        len += p_res->Name.GetLength();
+//        len += p_res->Value.GetLength();
+//        len++;
+//        it++;
+//        if( it != ie ){
+//            p_res = *it;
+//            int tlen = len;
+//            tlen += p_res->Name.GetLength();
+//            tlen += p_res->Value.GetLength();
+//            tlen++;
+//            if( tlen > 80 ){
+//                sout << "," << endl;
+//                sout << "                   ";
+//                len = 19;
+//            } else {
+//                sout << ", ";
+//                len += 2;
+//            }
+//        }
+//    }
+//    sout << endl;
 
     sout << "----------------------------------------" << endl;
 
@@ -3179,45 +3014,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     sout << "Req destination  : " << tmp << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
-    if( tmp == NULL ){
-    sout << "Req resources    : -none-" << endl;
-    } else {
-
-        CResourceList res;
-        res.Parse(tmp);
-        res.SortByName();
-
-        std::list<CResourceValuePtr>::const_iterator     it = res.begin();
-        std::list<CResourceValuePtr>::const_iterator     ie = res.end();
-
-        sout << "Req resources    : ";
-
-        int len = 19;
-        while( it != ie ){
-            CResourceValuePtr p_res = *it;
-            sout <<  p_res->Name << "=" << p_res->Value;
-            len += p_res->Name.GetLength();
-            len += p_res->Value.GetLength();
-            len++;
-            it++;
-            if( it != ie ){
-                p_res = *it;
-                int tlen = len;
-                tlen += p_res->Name.GetLength();
-                tlen += p_res->Value.GetLength();
-                tlen++;
-                if( tlen > 80 ){
-                    sout << "," << endl;
-                    sout << "                   ";
-                    len = 19;
-                } else {
-                    sout << ",";
-                    len += 1;
-                }
-            }
-        }
-        sout << endl;
-    }
+    PrintResourceTokens(sout,"Req resources    :",tmp);
 
     tmp = GetItem("basic/arguments","INF_ARG_SYNC_MODE");
     if( tmp == NULL ){
@@ -3230,41 +3027,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     sout << "----------------------------------------" << endl;
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
     if( tmp != NULL ) {
-
-        CResourceList res;
-        res.Parse(tmp);
-        res.SortByName();
-
-        std::list<CResourceValuePtr>::const_iterator     it = res.begin();
-        std::list<CResourceValuePtr>::const_iterator     ie = res.end();
-
-        sout << "Default resources: ";
-
-        int len = 19;
-        while( it != ie ){
-            CResourceValuePtr p_res = *it;
-            sout <<  p_res->Name << "=" << p_res->Value;
-            len += p_res->Name.GetLength();
-            len += p_res->Value.GetLength();
-            len++;
-            it++;
-            if( it != ie ){
-                p_res = *it;
-                int tlen = len;
-                tlen += p_res->Name.GetLength();
-                tlen += p_res->Value.GetLength();
-                tlen++;
-                if( tlen > 80 ){
-                    sout << "," << endl;
-                    sout << "                   ";
-                    len = 19;
-                } else {
-                    sout << ", ";
-                    len += 2;
-                }
-            }
-        }
-        sout << endl;
+        PrintResourceTokens(sout,"Default resources: ",tmp);
     }
 
     tmp = GetItem("specific/resources","INF_ALIAS");
@@ -3274,43 +3037,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     else{
     sout << "Alias            : " << tmp << endl;
     tmp = GetItem("specific/resources","INF_ALIAS_RESOURCES");
-
-    CResourceList res;
-    res.Parse(tmp);
-    res.SortByName();
-
-    std::list<CResourceValuePtr>::const_iterator     it = res.begin();
-    std::list<CResourceValuePtr>::const_iterator     ie = res.end();
-
-    sout << "Alias resources  : ";
-
-    if( it == ie ) sout << "-none-";
-
-    int len = 19;
-    while( it != ie ){
-        CResourceValuePtr p_res = *it;
-        sout <<  p_res->Name << "=" << p_res->Value;
-        len += p_res->Name.GetLength();
-        len += p_res->Value.GetLength();
-        len++;
-        it++;
-        if( it != ie ){
-            p_res = *it;
-            int tlen = len;
-            tlen += p_res->Name.GetLength();
-            tlen += p_res->Value.GetLength();
-            tlen++;
-            if( tlen > 80 ){
-                sout << "," << endl;
-                sout << "                   ";
-                len = 19;
-            } else {
-                sout << ", ";
-                len += 2;
-            }
-        }
-    }
-    sout << endl;
+    PrintResourceTokens(sout,"Alias resources  : ",tmp);
 
     tmp = GetItem("specific/resources","INF_ALIAS_SYNC_MODE");
     sout << "Alias sync mode  : " << tmp << endl;
@@ -3320,43 +3047,9 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     sout << "Queue            : " << tmp << endl;
 
     tmp = GetItem("specific/resources","INF_RESOURCES");
-    CResourceList res;
-    res.Parse(tmp);
-    res.SortByName();
-
-    std::list<CResourceValuePtr>::const_iterator     it = res.begin();
-    std::list<CResourceValuePtr>::const_iterator     ie = res.end();
-
-    sout << "All resources    : ";
-
-    int len = 19;
-    while( it != ie ){
-        CResourceValuePtr p_res = *it;
-        sout <<  p_res->Name << "=" << p_res->Value;
-        len += p_res->Name.GetLength();
-        len += p_res->Value.GetLength();
-        len++;
-        it++;
-        if( it != ie ){
-            p_res = *it;
-            int tlen = len;
-            tlen += p_res->Name.GetLength();
-            tlen += p_res->Value.GetLength();
-            tlen++;
-            if( tlen > 80 ){
-                sout << "," << endl;
-                sout << "                   ";
-                len = 19;
-            } else {
-                sout << ", ";
-                len += 2;
-            }
-        }
-    }
-    sout << endl;
+    PrintResourceTokens(sout,"All resources    : ",tmp);
 
     sout << "----------------------------------------" << endl;
-
 
     tmp = GetItem("specific/resources","INF_NCPU");
     sout << "Number of CPUs   : " << tmp << endl;
@@ -3371,52 +3064,6 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     if( tmp != NULL ){
     sout << "Number of nodes  : " << tmp << endl;
     }
-
-    res.Finalize();
-
-    // generate list of internal variables
-    std::map<std::string,std::string>::iterator vit = res.Variables.begin();
-    std::map<std::string,std::string>::iterator vie = res.Variables.end();
-
-    while( vit != vie ){
-        CSmallString name = vit->first;
-        CSmallString value = vit->second;
-        SetItem("specific/variables",name,value);
-        vit++;
-    }
-
-    res.RemoveHelperResources();
-
-    it = res.begin();
-    ie = res.end();
-
-    sout << "Resources        : ";
-
-    len = 19;
-    while( it != ie ){
-        CResourceValuePtr p_res = *it;
-        sout <<  p_res->Name << "=" << p_res->Value;
-        len += p_res->Name.GetLength();
-        len += p_res->Value.GetLength();
-        len++;
-        it++;
-        if( it != ie ){
-            p_res = *it;
-            int tlen = len;
-            tlen += p_res->Name.GetLength();
-            tlen += p_res->Value.GetLength();
-            tlen++;
-            if( tlen > 80 ){
-                sout << "," << endl;
-                sout << "                   ";
-                len = 19;
-            } else {
-                sout << ", ";
-                len += 2;
-            }
-        }
-    }
-    sout << endl;
 
     sout << "----------------------------------------" << endl;
 
@@ -3493,6 +3140,48 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     }
 
     sout << "========================================================" << endl;
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, const CSmallString& res_list)
+{
+    string          svalue = string(res_list);
+    vector<string>  items;
+
+    // split to items
+    split(items,svalue,is_any_of(","));
+
+    vector<string>::iterator it = items.begin();
+    vector<string>::iterator ie = items.end();
+
+    sout << title;
+    int len = title.GetLength();
+
+    while( it != ie ){
+        string sres = *it;
+        sout << sres;
+        len += sres.size();
+        len++;
+        it++;
+        if( it != ie ){
+            string sres = *it;
+            int tlen = len;
+            tlen += sres.size();
+            tlen++;
+            if( tlen > 80 ){
+                sout << "," << endl;
+                for(unsigned int i=0; i < title.GetLength(); i++){
+                    sout << " ";
+                }
+                len = title.GetLength();
+            } else {
+                sout << ", ";
+                len += 2;
+            }
+        }
+    }
+    sout << endl;
 }
 
 //------------------------------------------------------------------------------

@@ -38,6 +38,7 @@
 #include <PluginDatabase.hpp>
 #include <NodeList.hpp>
 #include <JobList.hpp>
+#include <ResourceList.hpp>
 #include "PBSProQueue.hpp"
 #include "PBSProNode.hpp"
 #include "PBSProJob.hpp"
@@ -669,16 +670,15 @@ bool CPBSProServer::SubmitJob(CJob& job)
         set_attribute(p_prev,ATTR_depend,NULL,depjid);
     }
 
-    CResourceList res;
-    res.Parse(sres);
 
-    CSmallString account   = res.GetResourceValue("account");
+    CSmallString account   = ResourceList.GetResourceValue("account");
     if( account != NULL ){
         set_attribute(p_prev,ATTR_A,NULL,account);
     }
 
-    res.Finalize();
-    res.GetTorqueResources(p_prev);
+    // FIXME
+//    res.Finalize();
+//    res.GetTorqueResources(p_prev);
 
 //  DEBUG
 //    PrintAttributes(cout,p_first);

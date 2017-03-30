@@ -212,14 +212,14 @@ bool CSubmit::SubmitJobFull(void)
     }
 
     vout << endl;
-    Job->PrintBasic(vout);
+    Job->PrintBasicV3(vout);
 
     // resources
     if( Job->DecodeResources(vout) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }
-    Job->PrintResources(vout);
+    Job->PrintResourcesV3(vout);
 
     // last job check
     if( Job->LastJobCheck(vout) == false ){
@@ -312,14 +312,14 @@ bool CSubmit::SubmitJobHeader(void)
         return(true);
     }
     vout << endl;
-    Job->PrintBasic(vout);
+    Job->PrintBasicV3(vout);
 
     // resources
     if( Job->DecodeResources(vout) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }
-    Job->PrintResources(vout);
+    Job->PrintResourcesV3(vout);
 
     // last job check
     if( Job->LastJobCheck(vout) == false ){

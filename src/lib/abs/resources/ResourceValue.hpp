@@ -26,6 +26,12 @@
 #include <SmallString.hpp>
 #include <boost/shared_ptr.hpp>
 #include <ComObject.hpp>
+#include <map>
+#include <string>
+
+// -----------------------------------------------------------------------------
+
+class CResourceList;
 
 // -----------------------------------------------------------------------------
 
@@ -34,19 +40,27 @@
 class ABS_PACKAGE CResourceValue : public CComObject {
 public:
 // constructor -----------------------------------------------------------------
-        CResourceValue(void);
-        CResourceValue(const CSmallString& name,const CSmallString& value);
+        CResourceValue(CPluginObject* p_objectinfo);
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
     virtual void TestValue(std::ostream& sout,bool& rstatus);
 
-    /// test value if it is in expected range
-    bool TestValue(std::ostream& sout);
+    /// resolve conflicts
+    virtual void ResolveConflicts(void);
+
+    /// resolve conflicts
+    virtual void FinalizeResource(void);
+
+    /// init variable list
+    virtual void SetVariables(std::map<std::string,std::string>& variables);
+
+    /// get batch definition
+    virtual const CSmallString GetBatchResource(void);
 
 // section of private data -----------------------------------------------------
 public:
-    CSmallString    Name;
+    CSmallString    Name;           // derived from plusula object configuration
     CSmallString    Value;
 };
 

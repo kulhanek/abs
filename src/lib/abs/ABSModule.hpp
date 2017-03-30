@@ -1,9 +1,9 @@
-#ifndef PBSProModuleH
-#define PBSProModuleH
+#ifndef ABSModuleH
+#define ABSModuleH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2012 Petr Kulhanek (kulhanek@chemi.muni.cz)
+//    Copyright (C) 2017 Petr Kulhanek (kulhanek@chemi.muni.cz)
 //
 //     This program is free software; you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 
 //------------------------------------------------------------------------------
 
-extern CPluginModule   PBSProPlugin;
+extern CPluginModule   ABSPlugin;
 
 //------------------------------------------------------------------------------
 #endif

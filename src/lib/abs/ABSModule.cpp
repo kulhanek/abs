@@ -1,7 +1,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2012 Petr Kulhanek (kulhanek@chemi.muni.cz)
+//    Copyright (C) 2017 Petr Kulhanek (kulhanek@chemi.muni.cz)
 //
 //     This program is free software; you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -19,28 +19,28 @@
 // =============================================================================
 
 #include <PluginDatabase.hpp>
-#include "PBSProModule.hpp"
+#include <ABSModule.hpp>
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool PBSProPluginCB(EModuleRequest request,void* p_data);
+bool ABSPluginCB(EModuleRequest request,void* p_data);
 
 // -----------------------------------------------------------------------------
 
-CExtUUID        PBSProPluginID(
-                    "{PBSPRO:4774704a-0272-4d92-b651-67aa6692a271}");
+CExtUUID        ABSPluginID(
+                    "{ABS:b3d091c1-b416-4318-8e23-a71263f0fcc3}");
 
-CPluginModule   PBSProPlugin(
-                    PBSProPluginID,
-                    PBSProPluginCB);
+CPluginModule   ABSPlugin(
+                    ABSPluginID,
+                    ABSPluginCB);
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool PBSProPluginCB(EModuleRequest request,void* p_data)
+bool ABSPluginCB(EModuleRequest request,void* p_data)
 {
     switch(request) {
         case EMR_INITIALIZE:

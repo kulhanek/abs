@@ -27,6 +27,7 @@
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
 #include <AMSGlobalConfig.hpp>
+#include <ResourceList.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <fstream>
@@ -203,10 +204,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
     }
 
     // check memory keyword
-    CResourceList res_list;
-    CSmallString sres = job.GetItem("specific/resources","INF_RESOURCES");
-    res_list.Parse(sres);
-    long int mem = res_list.GetMemory();
+    long int mem = ResourceList.GetMemory();
 
     long int umem = GetMemory(job_name);
 

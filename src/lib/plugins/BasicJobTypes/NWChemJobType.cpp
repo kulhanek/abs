@@ -26,6 +26,7 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
+#include <ResourceList.hpp>
 #include <AMSGlobalConfig.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -173,10 +174,7 @@ bool CNWChemJobType::CheckInputFile(CJob& job,std::ostream& sout)
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");
 
     // check memory keyword
-    CResourceList res_list;
-    CSmallString sres = job.GetItem("specific/resources","INF_RESOURCES");
-    res_list.Parse(sres);
-    long int mem = res_list.GetMemory();
+    long int mem = ResourceList.GetMemory();
 
     long int umem = GetMemory(job_name);
 
