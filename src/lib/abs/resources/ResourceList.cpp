@@ -138,6 +138,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     CSimpleIteratorC<CPluginObject> I(PluginDatabase.GetObjectList());
     CPluginObject* p_pobj;
     while( (p_pobj = I.Current()) ){
+        std::cout << "res >: " << endl;
         if( p_pobj->GetCategoryUUID() == RESOURCES_CAT ){
             std::cout << "res >: " << p_pobj->GetObjectUUID().GetDescription() <<  std::endl;
             CSmallString res_name = p_pobj->GetObjectUUID().GetDescription();
