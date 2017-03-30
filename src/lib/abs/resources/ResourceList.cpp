@@ -138,6 +138,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     CPluginObject* p_pobj;
     while( (p_pobj = I.Current()) ){
         if( p_pobj->GetCategoryUUID() == RESOURCES_CAT ){
+            cout << "res >: " << p_pobj->GetObjectUUID().GetDescription() <<  endl;
             CSmallString res_name = p_pobj->GetObjectUUID().GetDescription();
             if( name == res_name ){
                 CComObject* p_obj = p_pobj->CreateObject(NULL);
