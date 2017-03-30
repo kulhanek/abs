@@ -1,7 +1,6 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -20,8 +19,29 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <ResourceValue.hpp>
-#include <PluginDatabase.hpp>
+#include <RVWorkSize.hpp>
+#include <CategoryUUID.hpp>
+#include <ABSModule.hpp>
+
+// -----------------------------------------------------------------------------
+
+CComObject* RVWorkSizeCB(void* p_data);
+
+CExtUUID        RVWorkSizeID(
+                    "{WORK_SIZE:829fae68-ffed-4aae-8fab-b701fc623974}",
+                    "worksize");
+
+CPluginObject   RVWorkSizeObject(&ABSPlugin,
+                    RVWorkSizeID,RESOURCES_CAT,
+                    RVWorkSizeCB);
+
+// -----------------------------------------------------------------------------
+
+CComObject* RVWorkSizeCB(void* p_data)
+{
+    CComObject* p_object = new CRVWorkSize();
+    return(p_object);
+}
 
 //------------------------------------------------------------------------------
 
@@ -31,48 +51,16 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CResourceValue::CResourceValue(CPluginObject* p_objectinfo)
-    : CComObject(p_objectinfo)
+CRVWorkSize::CRVWorkSize(void)
+    : CResourceValue(&RVWorkSizeObject)
 {
-    if( p_objectinfo ){
-        p_objectinfo->GetObjectUUID().GetDescription();
-    }
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceValue::TestValue(std::ostream& sout,bool& rstatus)
+void CRVWorkSize::TestValue(std::ostream& sout,bool& rstatus)
 {
-    // nothing to be here
-}
 
-//------------------------------------------------------------------------------
-
-void CResourceValue::ResolveConflicts(void)
-{
-    // nothing to be here
-}
-
-//------------------------------------------------------------------------------
-
-void CResourceValue::FinalizeResource(void)
-{
-    // nothing to be here
-}
-
-//------------------------------------------------------------------------------
-
-void CResourceValue::SetVariables(std::map<std::string,std::string>& variables)
-{
-    // nothing to be here
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CResourceValue::GetBatchResource(void)
-{
-    // nothing to be here
-    return("");
 }
 
 //==============================================================================

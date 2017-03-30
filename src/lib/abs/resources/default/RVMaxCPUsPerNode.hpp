@@ -1,6 +1,9 @@
+#ifndef RVMaxCPUsPerNodeH
+#define RVMaxCPUsPerNodeH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -19,51 +22,21 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVEmail.hpp>
-#include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <ABSMainHeader.hpp>
+#include <ResourceValue.hpp>
+#include <iostream>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVEmailCB(void* p_data);
+class ABS_PACKAGE CRVMaxCPUsPerNode : public CResourceValue {
+public:
+// constructor -----------------------------------------------------------------
+        CRVMaxCPUsPerNode(void);
 
-CExtUUID        RVEmailID(
-                    "{RV_EMAIL:3f07ddbf-f19b-423f-80fb-2346493454e8}",
-                    "email");
-
-CPluginObject   RVEmailObject(&ABSPlugin,
-                    RVEmailID,RESOURCES_CAT,
-                    RVEmailCB);
+// information methods ---------------------------------------------------------
+    virtual void TestValue(std::ostream& sout,bool& rstatus);
+};
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVEmailCB(void* p_data)
-{
-    CComObject* p_object = new CRVEmail();
-    return(p_object);
-}
-
-//------------------------------------------------------------------------------
-
-using namespace std;
-
-//==============================================================================
-//------------------------------------------------------------------------------
-//==============================================================================
-
-CRVEmail::CRVEmail(void)
-    : CResourceValue(&RVEmailObject)
-{
-}
-
-//------------------------------------------------------------------------------
-
-void CRVEmail::TestValue(std::ostream& sout,bool& rstatus)
-{
-
-}
-
-//==============================================================================
-//------------------------------------------------------------------------------
-//==============================================================================
-
+#endif

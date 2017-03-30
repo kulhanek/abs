@@ -1,7 +1,6 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -20,8 +19,29 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <ResourceValue.hpp>
-#include <PluginDatabase.hpp>
+#include <RVNGPUs.hpp>
+#include <CategoryUUID.hpp>
+#include <ABSModule.hpp>
+
+// -----------------------------------------------------------------------------
+
+CComObject* RVNGPUsCB(void* p_data);
+
+CExtUUID        RVNGPUsID(
+                    "{NGPUS:97946b9a-96bd-499c-bc4b-ddc9e549a3ec}",
+                    "ngpus");
+
+CPluginObject   RVNNGUsObject(&ABSPlugin,
+                    RVNGPUsID,RESOURCES_CAT,
+                    RVNGPUsCB);
+
+// -----------------------------------------------------------------------------
+
+CComObject* RVNGPUsCB(void* p_data)
+{
+    CComObject* p_object = new CRVNGPUs();
+    return(p_object);
+}
 
 //------------------------------------------------------------------------------
 
@@ -31,48 +51,16 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CResourceValue::CResourceValue(CPluginObject* p_objectinfo)
-    : CComObject(p_objectinfo)
+CRVNGPUs::CRVNGPUs(void)
+    : CResourceValue(&RVNNGUsObject)
 {
-    if( p_objectinfo ){
-        p_objectinfo->GetObjectUUID().GetDescription();
-    }
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceValue::TestValue(std::ostream& sout,bool& rstatus)
+void CRVNGPUs::TestValue(std::ostream& sout,bool& rstatus)
 {
-    // nothing to be here
-}
 
-//------------------------------------------------------------------------------
-
-void CResourceValue::ResolveConflicts(void)
-{
-    // nothing to be here
-}
-
-//------------------------------------------------------------------------------
-
-void CResourceValue::FinalizeResource(void)
-{
-    // nothing to be here
-}
-
-//------------------------------------------------------------------------------
-
-void CResourceValue::SetVariables(std::map<std::string,std::string>& variables)
-{
-    // nothing to be here
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CResourceValue::GetBatchResource(void)
-{
-    // nothing to be here
-    return("");
 }
 
 //==============================================================================

@@ -138,8 +138,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     CPluginObject* p_pobj;
     while( (p_pobj = I.Current()) ){
         if( p_pobj->GetCategoryUUID() == RESOURCES_CAT ){
-            CSmallString res_name;
-            PluginDatabase.FindObjectConfigValue(p_pobj->GetObjectUUID(),"_name",res_name);
+            CSmallString res_name = p_pobj->GetObjectUUID().GetDescription();
             if( name == res_name ){
                 CComObject* p_obj = p_pobj->CreateObject(NULL);
                 CResourceValue* p_res = dynamic_cast<CResourceValue*>(p_obj);
