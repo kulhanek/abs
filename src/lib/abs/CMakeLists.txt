@@ -20,11 +20,11 @@ SET(ABS_SRC
         resources/ResourceValue.cpp
         resources/ResourceList.cpp
         resources/default/RVEmail.cpp
-        resources/default/RVMaxCPUsPerNode.cpp
         resources/default/RVMem.cpp
         resources/default/RVMemPerCPU.cpp
         resources/default/RVNCPUs.cpp
         resources/default/RVNGPUs.cpp
+        resources/default/RVNNodes.cpp
         resources/default/RVWorkDir.cpp
         resources/default/RVWorkSize.cpp
         resources/default/RVWorkSizePerCPU.cpp

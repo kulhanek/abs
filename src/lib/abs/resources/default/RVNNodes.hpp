@@ -1,5 +1,5 @@
-#ifndef RVMaxCPUsPerNodeH
-#define RVMaxCPUsPerNodeH
+#ifndef RVNNodesH
+#define RVNNodesH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -28,10 +28,10 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CRVMaxCPUsPerNode : public CResourceValue {
+class ABS_PACKAGE CRVNNodes : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CRVMaxCPUsPerNode(void);
+        CRVNNodes(void);
 
 // information methods ---------------------------------------------------------
     virtual void TestValue(std::ostream& sout,bool& rstatus);

@@ -19,27 +19,27 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVMaxCPUsPerNode.hpp>
+#include <RVNNodes.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVMaxCPUsPerNodeCB(void* p_data);
+CComObject* RVNNodesCB(void* p_data);
 
-CExtUUID        RVMaxCPUsPerNodeID(
-                    "{MAX_CPUS_PER_NODE:93c5d47b-7a1b-47b5-852e-84691704974c}",
-                    "maxcpuspernode");
+CExtUUID        RVNNodesID(
+                    "{NNODES:93c5d47b-7a1b-47b5-852e-84691704974c}",
+                    "nnodes");
 
-CPluginObject   RVMaxCPUsPerNodeObject(&ABSPlugin,
-                    RVMaxCPUsPerNodeID,RESOURCES_CAT,
-                    RVMaxCPUsPerNodeCB);
+CPluginObject   RVNNodesObject(&ABSPlugin,
+                    RVNNodesID,RESOURCES_CAT,
+                    RVNNodesCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVMaxCPUsPerNodeCB(void* p_data)
+CComObject* RVNNodesCB(void* p_data)
 {
-    CComObject* p_object = new CRVMaxCPUsPerNode();
+    CComObject* p_object = new CRVNNodes();
     return(p_object);
 }
 
@@ -51,14 +51,14 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVMaxCPUsPerNode::CRVMaxCPUsPerNode(void)
-    : CResourceValue(&RVMaxCPUsPerNodeObject)
+CRVNNodes::CRVNNodes(void)
+    : CResourceValue(&RVNNodesObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CRVMaxCPUsPerNode::TestValue(std::ostream& sout,bool& rstatus)
+void CRVNNodes::TestValue(std::ostream& sout,bool& rstatus)
 {
 
 }

@@ -3156,6 +3156,12 @@ void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, con
     vector<string>::iterator ie = items.end();
 
     sout << title;
+
+    if(items.size() == 0 ){
+        sout << "-none-" << endl;
+        return;
+    }
+
     int len = title.GetLength();
 
     while( it != ie ){
