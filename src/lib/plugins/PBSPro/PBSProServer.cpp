@@ -697,10 +697,10 @@ bool CPBSProServer::SubmitJob(CJob& job)
     }
     if( mailoptions == NULL ) mailoptions = "n";
 
-//    set_attribute(p_prev,ATTR_m,NULL,mailoptions);
-//    set_attribute(p_prev,ATTR_v,NULL,variables);
+    set_attribute(p_prev,ATTR_m,NULL,mailoptions);
+    set_attribute(p_prev,ATTR_v,NULL,variables);
 
-  //  CreateJobAttributes(p_prev,&(job.ResourceList));
+    CreateJobAttributes(p_prev,&(job.ResourceList));
 
     if( depjid != NULL ){
         depjid = "afterany:" + depjid;
