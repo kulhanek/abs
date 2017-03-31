@@ -61,7 +61,7 @@ CRVNGPUs::CRVNGPUs(void)
 
 void CRVNGPUs::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    if( TestNumberValue(p_rl,sout,rstatus) == false ) return;
+    if( TestNumberValue(sout,rstatus) == false ) return;
     long long size = GetNumber();
     if( size < 0 ) {
         if( rstatus == true ) sout << endl;

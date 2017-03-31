@@ -89,6 +89,9 @@ public:
     /// get server group configuration
     CXMLElement* GetServerGroupConfig(void);
 
+    /// get workdir configuration
+    CXMLElement* GetWorkDirConfig(void);
+
     /// get node group configuration
     CXMLElement* GetNodeGroupConfig(void);
 

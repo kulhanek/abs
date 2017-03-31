@@ -276,9 +276,26 @@ void CResourceList::ResolveDynamicResources(void)
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
+    // resolve dynamic resources
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
         p_rv->ResolveDynamicResource(this);
+        it++;
+    }
+
+    // do variable substitution
+    it = begin();
+    while( it != ie ){
+        CResourceValuePtr p_rv = *it;
+        if( p_rv->Value.GetLength() >= 2 ){
+            if( p_rv->Value[0] == '$' ){
+                CSmallString sres = p_rv->Value.GetSubString(1,p_rv->Value.GetLength()-1);
+                CResourceValuePtr p_srv = FindResource(sres);
+                if( p_srv ){
+                    p_rv->Value = p_srv->Value;
+                }
+            }
+        }
         it++;
     }
 }

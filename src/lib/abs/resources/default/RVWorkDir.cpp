@@ -23,6 +23,9 @@
 #include <RVWorkDir.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <XMLElement.hpp>
+#include <ABSConfig.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -61,7 +64,46 @@ CRVWorkDir::CRVWorkDir(void)
 
 void CRVWorkDir::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
+    CXMLElement* p_ele = ABSConfig.GetWorkDirConfig();
+    if( p_ele == NULL ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout <<         "        No workdir types configured (ask for support)!</red></b>" << endl;
+        rstatus = false;
+        return;
+    }
 
+    // assembly list of types
+    CSmallString keys;
+    CXMLElement* p_wele = p_ele->GetFirstChildElement("workdir");
+    while( p_wele != NULL ){
+        CSmallString name;
+        p_wele->GetAttribute("name",name);
+        if( name == Value ) break;
+        if( name != NULL ){
+            if( keys != NULL ) keys << ",";
+            keys << name;
+        }
+        p_wele = p_wele->GetNextSiblingElement("workdir");
+    }
+
+    if( p_wele == NULL ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout <<         "        Allowed values '" << keys << "' but '" << Value << "' is specified!</red></b>" << endl;
+        rstatus = false;
+        return;
+    }
+
+    // generate dependent resources
+    CXMLElement* p_rele = p_wele->GetFirstChildElement("resource");
+    while( p_rele != NULL ){
+        CSmallString name,value;
+        p_rele->GetAttribute("name",name);
+        p_rele->GetAttribute("value",value);
+        p_rl->AddResource(name,value);
+        p_rele = p_rele->GetNextSiblingElement("resource");
+    }
 }
 
 //==============================================================================

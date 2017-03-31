@@ -399,6 +399,13 @@ CXMLElement* CABSConfig::GetServerGroupConfig(void)
 
 //------------------------------------------------------------------------------
 
+CXMLElement* CABSConfig::GetWorkDirConfig(void)
+{
+    return( SystemConfig.GetChildElementByPath("abs/workdirs") );
+}
+
+//------------------------------------------------------------------------------
+
 CXMLElement* CABSConfig::GetNodeGroupConfig(void)
 {
     return( SystemConfig.GetChildElementByPath("abs/nodes") );

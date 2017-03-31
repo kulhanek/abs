@@ -25,6 +25,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <vector>
 #include <boost/algorithm/string.hpp>
 
 //------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ void CResourceValue::GetAttribute(CSmallString& name, CSmallString& resource, CS
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CResourceValue::TestSizeValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+bool CResourceValue::TestSizeValue(std::ostream& sout,bool& rstatus)
 {
     string svalue(Value);
 
@@ -92,7 +93,7 @@ bool CResourceValue::TestSizeValue(CResourceList* p_rl,std::ostream& sout,bool& 
     if( svalue.find_first_not_of(legall_characters) != string::npos ){
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        Only integer number and one of b,kb,mb,gb,tb sufixes are allowed!</red></b>" << endl;
+        sout <<         "        Only integer number and one of kb,mb,gb,tb sufixes are allowed!</red></b>" << endl;
         rstatus = false;
         return(false);
     }
@@ -104,8 +105,7 @@ bool CResourceValue::TestSizeValue(CResourceList* p_rl,std::ostream& sout,bool& 
     str >> mvalue >> munit;
 
     to_lower(munit);
-    if( (munit != "b")  &&
-        (munit != "kb") &&
+    if( (munit != "kb") &&
         (munit != "mb") &&
         (munit != "gb") &&
         (munit != "tb") ) {
@@ -218,7 +218,7 @@ void CResourceValue::SetSize(long long size)
 
 //------------------------------------------------------------------------------
 
-bool CResourceValue::TestNumberValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+bool CResourceValue::TestNumberValue(std::ostream& sout,bool& rstatus)
 {
     string svalue(Value);
 
@@ -252,6 +252,31 @@ long long CResourceValue::GetNumber(void)
 const CSmallString& CResourceValue::GetValue(void)
 {
     return(Value);
+}
+
+//------------------------------------------------------------------------------
+
+bool CResourceValue::TestKeyValue(std::ostream& sout,bool& rstatus,const CSmallString& keys)
+{
+    string          skeys(keys);
+    vector<string>  items;
+
+    split(items,skeys,is_any_of(","),boost::token_compress_on);
+
+    vector<string>::iterator it = items.begin();
+    vector<string>::iterator ie = items.end();
+
+    while( it != ie ){
+        if( CSmallString(*it) == Value ) return(true);
+        it++;
+    }
+
+    // not found
+    if( rstatus == true ) sout << endl;
+    sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+    sout <<         "        Allowed values '" << keys << "' but '" << Value << "' is specified!</red></b>" << endl;
+    rstatus = false;
+    return(false);
 }
 
 //==============================================================================

@@ -581,7 +581,7 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
     if( rv_ptr ){
         vector<string> slist;
         string         svalue(rv_ptr->GetValue());
-        split(slist,svalue,is_any_of("#"));
+        split(slist,svalue,is_any_of("#"),boost::token_compress_on);
 
         vector<string>::iterator it = slist.begin();
         vector<string>::iterator ie = slist.end();
@@ -592,12 +592,11 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
             if( item.size() == 0 ) continue;
             string name = item;
             string value = "true";
-            if( (item[0] == '!') && (item[0] == '^') ){
+            if( item[0] == '^' ){
                 name = string(item.begin()+1,item.end());
                 value = "false";
             }
             str << ":" << name << "=" << value;
-            it++;
         }
     }
 

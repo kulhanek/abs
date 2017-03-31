@@ -62,12 +62,12 @@ CRVMem::CRVMem(void)
 
 void CRVMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    if( TestSizeValue(p_rl,sout,rstatus) == false ) return;
+    if( TestSizeValue(sout,rstatus) == false ) return;
     long long size = GetSize();
-    if( size / 1024 <= 0 ) {
+    if( size <= 0 ) {
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        Size must be larger than 1kb but " << size << "b is specified!</red></b>" << endl;
+        sout <<         "        Size must be larger than 1kb but " << GetSizeString() << " is specified!</red></b>" << endl;
         rstatus = false;
     }
 }

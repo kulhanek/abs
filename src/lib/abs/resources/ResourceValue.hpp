@@ -79,10 +79,13 @@ protected:
     CSmallString    Value;
 
     /// test value if it is in expected range (number[b][kb][mb][gb][tb])
-    bool TestSizeValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+    bool TestSizeValue(std::ostream& sout,bool& rstatus);
 
     /// test value if it is in expected range (number)
-    bool TestNumberValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+    bool TestNumberValue(std::ostream& sout,bool& rstatus);
+
+    /// test value if it is in expected range (key)
+    bool TestKeyValue(std::ostream& sout,bool& rstatus,const CSmallString& keys);
 
     friend class CResourceList;
 };
