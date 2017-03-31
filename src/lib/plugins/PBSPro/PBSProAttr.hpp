@@ -53,15 +53,4 @@ struct attrl* FindAttr(struct attrl* p_list,const char* p_name,const char* p_res
 
 // -----------------------------------------------------------------------------
 
-#define ATTR_USER_LIST                  "User_List"
-#define ATTR_group_list                 "group_list"
-
-#define RESOURCES_WALLTIME              "walltime"
-#define RESOURCES_PROCS                 "procs"
-#define RESOURCES_NODES                 "nodes"
-#define RESOURCES_SELECT                "select"
-#define RESOURCES_NCPUS                 "ncpus"
-
-// -----------------------------------------------------------------------------
-
 #endif

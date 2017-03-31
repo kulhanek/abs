@@ -270,7 +270,7 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attrl* p_as)
 {
     while( p_as != NULL ){
         sout << "    " << p_as->name;
-        if( p_as->resource ){
+        if( strlen(p_as->resource) > 0 ){
         sout << "." << p_as->resource;
         }
         sout << " = " << p_as->value << endl;
@@ -284,7 +284,7 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 {
     while( p_as != NULL ){
         sout << "    " << p_as->name;
-        if( p_as->resource ){
+        if( strlen(p_as->resource) > 0 ){
         sout << "." << p_as->resource;
         }
         sout << " = " << p_as->value << endl;
@@ -416,7 +416,7 @@ bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool fin
     }
 
     struct attropl* p_first = NULL;
-    set_attribute(p_first,ATTR_USER_LIST,NULL,user,EQ);
+    set_attribute(p_first,ATTR_u,NULL,user,EQ);
 
     struct batch_status* p_jobs;
     p_jobs = pbspro_selstat(ServerID,p_first,NULL,extend.GetBuffer());
@@ -706,7 +706,6 @@ bool CPBSProServer::SubmitJob(CJob& job)
         depjid = "afterany:" + depjid;
         set_attribute(p_prev,ATTR_depend,NULL,depjid);
     }
-
 
 //  DEBUG
     PrintAttributes(cout,p_first);
