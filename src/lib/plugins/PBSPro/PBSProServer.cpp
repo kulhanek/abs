@@ -270,7 +270,7 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attrl* p_as)
 {
     while( p_as != NULL ){
         sout << "    " << p_as->name;
-        if( strlen(p_as->resource) > 0 ){
+        if( (p_as->resource != NULL) && (strlen(p_as->resource) > 0) ){
         sout << "." << p_as->resource;
         }
         sout << " = " << p_as->value << endl;
@@ -284,7 +284,7 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 {
     while( p_as != NULL ){
         sout << "    " << p_as->name;
-        if( strlen(p_as->resource) > 0 ){
+        if( (p_as->resource != NULL) && (strlen(p_as->resource) > 0) ){
         sout << "." << p_as->resource;
         }
         sout << " = " << p_as->value << endl;
