@@ -42,6 +42,7 @@
 #include "PBSProQueue.hpp"
 #include "PBSProNode.hpp"
 #include "PBSProJob.hpp"
+#include <XMLElement.hpp>
 
 using namespace std;
 using namespace boost;
@@ -577,6 +578,32 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
         str << ":mem=" << rv_ptr->GetSizeString();
     }
 // ------------
+    rv_ptr = p_rl->FindResource("workdir");
+    CResourceValuePtr rvs_ptr = p_rl->FindResource("worksize");
+    if( rv_ptr && rvs_ptr ){
+        CXMLElement* p_ele = ABSConfig.GetWorkDirConfig();
+        if( p_ele != NULL ){
+            // find workdir type
+            CXMLElement* p_wele = p_ele->GetFirstChildElement("workdir");
+            while( p_wele != NULL ){
+                CSmallString name;
+                p_wele->GetAttribute("name",name);
+                if( name == rv_ptr->GetValue() ) break;
+                p_wele = p_wele->GetNextSiblingElement("workdir");
+            }
+            if( p_wele != NULL ){
+                // generate dependent resources
+                CXMLElement* p_rele = p_wele->GetFirstChildElement("select");
+                if( p_rele != NULL ){
+                    CSmallString name;
+                    p_rele->GetAttribute("name",name);
+                    str << ":" << name << "=" << rvs_ptr->GetSizeString();
+                }
+            }
+        }
+    }
+
+// ------------
     rv_ptr = p_rl->FindResource("props");
     if( rv_ptr ){
         vector<string> slist;
@@ -707,7 +734,7 @@ bool CPBSProServer::SubmitJob(CJob& job)
     }
 
 //  DEBUG
-    PrintAttributes(cout,p_first);
+//    PrintAttributes(cout,p_first);
 
     // submit jobs
     char* p_jobid = pbspro_submit(ServerID,p_first,script,queue,NULL);

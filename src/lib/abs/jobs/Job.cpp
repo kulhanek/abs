@@ -2817,12 +2817,11 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Req destination  : " << tmp << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
-    PrintResourceTokens(sout,"Req resources    : ",tmp);
+    sout << "Req resources    : " << tmp << endl;
 
     sout << "----------------------------------------" << endl;
 
     sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
-    tmp = GetItem("specific/resources","INF_QUEUE");
 
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
     if( tmp ){
@@ -2842,6 +2841,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_RESOURCES");
     PrintResourceTokens(sout,"All resources    : ",tmp);
 
+    tmp = GetItem("specific/resources","INF_QUEUE");
     sout << "Queue            : " << tmp << endl;
 
     sout << "-------------------------------------------" << endl;
