@@ -345,6 +345,15 @@ long long CResourceList::GetMemory(void) const
 
 //------------------------------------------------------------------------------
 
+const CSmallString CResourceList::GetMemoryString(void) const
+{
+    const CResourceValuePtr p_rv = FindResource("mem");
+    if( p_rv == NULL ) return("-not provided-");
+    return(p_rv->GetSizeString());
+}
+
+//------------------------------------------------------------------------------
+
 bool CResourceList::SortCompName(const CResourceValuePtr& p_left,const CResourceValuePtr& p_right)
 {
     return( strcmp(p_left->Name,p_right->Name) < 0 );

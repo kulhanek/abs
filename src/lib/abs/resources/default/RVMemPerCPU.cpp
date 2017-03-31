@@ -82,12 +82,7 @@ void CRVMemPerCPU::ResolveDynamicResource(CResourceList* p_rl)
         ES_TRACE_ERROR("ncpus is not provided");
         return;
     }
-    cout << "ncpus = " << res->GetNumber() << endl;
-    cout << "size = " << GetSize() << endl;
-
     long long mem =  res->GetNumber() * GetSize();
-    cout << "mem = " << mem << endl;
-
     p_rl->AddSizeResource("mem",mem);
 }
 

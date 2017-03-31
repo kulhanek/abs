@@ -481,6 +481,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_FIN_NCPU",ResourceList.GetNumOfCPUs());
     SetItem("specific/resources","INF_FIN_NGPU",ResourceList.GetNumOfGPUs());
     SetItem("specific/resources","INF_FIN_NNODE",ResourceList.GetNumOfNodes());
+    SetItem("specific/resources","INF_FIN_MEMORY",ResourceList.GetMemoryString());
     SetItem("specific/resources","INF_FIN_RESOURCES",ResourceList.ToString(false));
 
     return(true);

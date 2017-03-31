@@ -79,15 +79,6 @@ void CRVMem::ResolveConflicts(CResourceList* p_rl)
     p_rl->RemoveResource("mempercpu");
 }
 
-//------------------------------------------------------------------------------
-
-void CRVMem::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
-{
-    name = "Resource_List";
-    resource = Name;
-    value = Value;
-}
-
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================

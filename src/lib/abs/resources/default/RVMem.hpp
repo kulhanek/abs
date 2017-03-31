@@ -40,9 +40,6 @@ public:
 
     /// resolve conflicts
     virtual void ResolveConflicts(CResourceList* p_rl);
-
-    /// get batch attribute
-    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
 };
 
 // -----------------------------------------------------------------------------

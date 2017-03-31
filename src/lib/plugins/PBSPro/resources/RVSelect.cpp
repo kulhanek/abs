@@ -62,7 +62,39 @@ CRVSelect::CRVSelect(void)
 
 void CRVSelect::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    // FIXME
+    CResourceValuePtr res_ptr;
+    res_ptr = p_rl->FindResource("ncpus");
+    if( res_ptr ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout << "<b><red>        This resource cannot be specified together with 'ncpus'!</red></b>" << endl;
+        rstatus = false;
+        return;
+    }
+    res_ptr = p_rl->FindResource("ngpus");
+    if( res_ptr ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout << "<b><red>        This resource cannot be specified together with 'ngpus'!</red></b>" << endl;
+        rstatus = false;
+        return;
+    }
+    res_ptr = p_rl->FindResource("mem");
+    if( res_ptr ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout << "<b><red>        This resource cannot be specified together with 'mem'!</red></b>" << endl;
+        rstatus = false;
+        return;
+    }
+    res_ptr = p_rl->FindResource("nnodes");
+    if( res_ptr ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout << "<b><red>        This resource cannot be specified together with 'nnodes'!</red></b>" << endl;
+        rstatus = false;
+        return;
+    }
 }
 
 //------------------------------------------------------------------------------

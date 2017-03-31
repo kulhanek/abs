@@ -96,6 +96,9 @@ public:
     /// get memory in kB
     long long GetMemory(void) const;
 
+    /// get memory in variable unit
+    const CSmallString GetMemoryString(void) const;
+
 // section of private data -----------------------------------------------------
 private:
     /// helper method

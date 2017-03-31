@@ -551,6 +551,61 @@ bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid)
 //------------------------------------------------------------------------------
 //==============================================================================
 
+bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
+{
+    CResourceValuePtr rv_ptr;
+    rv_ptr = p_rl->FindResource("select");
+    if( rv_ptr ){
+        // FIXME
+        ES_ERROR("explicit select is not supported yet");
+        return(false);
+    }
+
+    stringstream str;
+
+// ------------
+    int nnodes = p_rl->GetNumOfNodes();
+    int ncpus = p_rl->GetNumOfCPUs();
+    int ngpus = p_rl->GetNumOfGPUs();
+    str << nnodes << ":ncpus=" << ncpus / nnodes;
+    if( ngpus > 0 ){
+        str << ":ngpus=" << ngpus / nnodes;
+    }
+// ------------
+    rv_ptr = p_rl->FindResource("mem");
+    if( rv_ptr ){
+        str << ":mem=" << rv_ptr->GetSizeString();
+    }
+// ------------
+    rv_ptr = p_rl->FindResource("props");
+    if( rv_ptr ){
+        vector<string> slist;
+        string         svalue(rv_ptr->GetValue());
+        split(slist,svalue,is_any_of("#"));
+
+        vector<string>::iterator it = slist.begin();
+        vector<string>::iterator ie = slist.end();
+
+        while( it != ie ){
+            string item = *it;
+            it++;
+            if( item.size() == 0 ) continue;
+            string name = item;
+            string value = "true";
+            if( (item[0] == '!') && (item[0] == '^') ){
+                name = string(item.begin()+1,item.end());
+                value = "false";
+            }
+            str << ":" << name << "=" << value;
+            it++;
+        }
+    }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
 bool CPBSProServer::SubmitJob(CJob& job)
 {
     CFileName script    = job.GetMainScriptName();

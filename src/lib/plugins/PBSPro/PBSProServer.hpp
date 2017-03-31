@@ -101,6 +101,9 @@ public:
     bool PrintJob(std::ostream& sout,const CSmallString& jobid);
 
 // execution -------------------------------------------------------------------
+    //! init specific resources for batch server
+    bool InitBatchResources(CResourceList* p_rl);
+
     //! submit job
     bool SubmitJob(CJob& job);
 

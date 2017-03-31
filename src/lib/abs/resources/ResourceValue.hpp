@@ -61,11 +61,17 @@ public:
     /// get size in kB from Value
     long long GetSize(void);
 
+    /// get size in variable unit
+    CSmallString GetSizeString(void);
+
     /// set size in kB
     void SetSize(long long size);
 
     /// get number from Value
     long long GetNumber(void);
+
+    /// get value
+    const CSmallString& GetValue(void);
 
 // section of private data -----------------------------------------------------
 protected:
