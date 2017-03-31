@@ -30,6 +30,7 @@
 #include <PluginDatabase.hpp>
 #include <CategoryUUID.hpp>
 #include <iostream>
+#include <BatchServers.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -184,10 +185,16 @@ CResourceValuePtr CResourceList::AddResource(const CSmallString& name,bool exper
     }
     if( expertmode == false ) return(CResourceValuePtr());
 
-    // FIXME
-    // add batch generic resource
+    // create generic resource
+    CSmallString gen_name = BatchServers.GetGenericResourceName();
+    if( gen_name == NULL ) return(CResourceValuePtr());
 
-    return(CResourceValuePtr());
+    // must be always false to avoid infinite recursion
+    CResourceValuePtr gen_res = AddResource(gen_name,false);
+    // override resource name
+    gen_res->Name = name;
+
+    return(gen_res);
 }
 
 //------------------------------------------------------------------------------
