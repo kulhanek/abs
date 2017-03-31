@@ -78,11 +78,11 @@ void CRVMemPerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatu
 void CRVMemPerCPU::ResolveDynamicResource(CResourceList* p_rl)
 {
     CResourceValuePtr res = p_rl->FindResource("ncpus");
-    if( res == NULL ){
-        ES_TRACE_ERROR("ncpus is not provided");
-        return;
+    int ncpus = 1;
+    if( res != NULL ){
+        ncpus = res->GetNumber();
     }
-    long long mem =  res->GetNumber() * GetSize();
+    long long mem =  ncpus * GetSize();
     p_rl->AddSizeResource("mem",mem);
 }
 

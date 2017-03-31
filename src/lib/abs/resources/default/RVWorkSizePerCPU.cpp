@@ -79,11 +79,11 @@ void CRVWorkSizePerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& r
 void CRVWorkSizePerCPU::ResolveDynamicResource(CResourceList* p_rl)
 {
     CResourceValuePtr res = p_rl->FindResource("ncpus");
-    if( res == NULL ){
-        ES_TRACE_ERROR("ncpus is not provided");
-        return;
+    int ncpus = 1;
+    if( res != NULL ){
+        ncpus = res->GetNumber();
     }
-    long long size = res->GetNumber() * GetSize();
+    long long size = ncpus * GetSize();
     p_rl->AddSizeResource("worksize",size);
 }
 
