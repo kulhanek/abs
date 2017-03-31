@@ -49,10 +49,14 @@ public:
     void AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,bool& rstatus, bool expertmode);
 
     /// add a single resource - always in expert mode
-    void AddResource(const CSmallString& name,long int value);
+    /// value is kB
+    void AddSizeResource(const CSmallString& name,long long value);
 
     /// add a single resource
-    bool AddResource(const CSmallString& name,const CSmallString& value, bool expertmode);
+    void AddResource(const CSmallString& name,const CSmallString& value);
+
+    /// add a single resource
+    CResourceValuePtr AddResource(const CSmallString& name, bool expertmode);
 
     /// find resource
     CResourceValuePtr FindResource(const CSmallString& name) const;
@@ -89,8 +93,8 @@ public:
     /// get number of nodes
     int GetNumOfNodes(void) const;
 
-    /// get memory in Bytes
-    long int GetMemory(void) const;
+    /// get memory in kB
+    long long GetMemory(void) const;
 
 // section of private data -----------------------------------------------------
 private:

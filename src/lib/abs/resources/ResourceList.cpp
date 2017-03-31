@@ -123,7 +123,11 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     RemoveResource(name);
 
     // add resource
-    if( AddResource(name,value,expertmode) == true ) return;
+    CResourceValuePtr res_ptr =  AddResource(name,true);
+    if( res_ptr != NULL ){
+        res_ptr->Value = value;
+        return;
+    }
 
     // plugin object was not found
     if( rstatus == true ) sout << endl;
@@ -133,15 +137,27 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
 
 //------------------------------------------------------------------------------
 
-void CResourceList::AddResource(const CSmallString& name,long int value)
+void CResourceList::AddSizeResource(const CSmallString& name,long long value)
 {
-    CSmallString svalue(value);
-    AddResource(name,svalue,true);
+    CResourceValuePtr res_ptr =  AddResource(name,true);
+    if( res_ptr != NULL ){
+        res_ptr->SetSize(value);
+    }
 }
 
 //------------------------------------------------------------------------------
 
-bool CResourceList::AddResource(const CSmallString& name,const CSmallString& value, bool expertmode)
+void CResourceList::AddResource(const CSmallString& name,const CSmallString& value)
+{
+    CResourceValuePtr res_ptr =  AddResource(name,true);
+    if( res_ptr != NULL ){
+        res_ptr->Value = value;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+CResourceValuePtr CResourceList::AddResource(const CSmallString& name,bool expertmode)
 {
     // be sure that the resource is unique
     RemoveResource(name);
@@ -157,9 +173,8 @@ bool CResourceList::AddResource(const CSmallString& name,const CSmallString& val
                 CResourceValue* p_res = dynamic_cast<CResourceValue*>(p_obj);
                 if( p_res != NULL ){
                     CResourceValuePtr res_ptr(p_res);
-                    res_ptr->Value = value;
                     push_back(res_ptr);
-                    return(true);
+                    return(res_ptr);
                 } else {
                     delete p_obj;
                 }
@@ -167,12 +182,12 @@ bool CResourceList::AddResource(const CSmallString& name,const CSmallString& val
         }
         I++;
     }
-    if( expertmode == false ) return(false);
+    if( expertmode == false ) return(CResourceValuePtr());
 
     // FIXME
     // add batch generic resource
 
-    return(true);
+    return(CResourceValuePtr());
 }
 
 //------------------------------------------------------------------------------
@@ -314,27 +329,11 @@ int CResourceList::GetNumOfNodes(void) const
 
 //------------------------------------------------------------------------------
 
-long int CResourceList::GetMemory(void) const
+long long CResourceList::GetMemory(void) const
 {
     const CResourceValuePtr p_rv = FindResource("mem");
     if( p_rv == NULL ) return(0);
-
-    string          svalue(p_rv->Value);
-    long int        mem;
-    string          munit;
-    stringstream    str(svalue);
-
-    str >> mem >> munit;
-
-    to_lower(munit);
-
-    if( munit == "b" )  mem = mem * 1;
-    if( munit == "kb" ) mem = mem * 1024;
-    if( munit == "mb" ) mem = mem * 1024 * 1024;
-    if( munit == "gb" ) mem = mem * 1024 * 1024 * 1024;
-    if( munit == "tb" ) mem = mem * 1024 * 1024 * 1024 * 1024;
-
-    return( mem );
+    return(p_rv->GetSize());
 }
 
 //------------------------------------------------------------------------------

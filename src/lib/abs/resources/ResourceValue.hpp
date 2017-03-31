@@ -58,8 +58,11 @@ public:
     /// get batch attribute
     virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
 
-    /// get size in bytes from Value
+    /// get size in kB from Value
     long long GetSize(void);
+
+    /// set size in kB
+    void SetSize(long long size);
 
     /// get number from Value
     long long GetNumber(void);

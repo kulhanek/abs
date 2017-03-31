@@ -132,13 +132,49 @@ long long CResourceValue::GetSize(void)
 
     to_lower(munit);
 
-    if( munit == "b" )  size = size * 1;
-    if( munit == "kb" ) size = size * 1024;
-    if( munit == "mb" ) size = size * 1024 * 1024;
-    if( munit == "gb" ) size = size * 1024 * 1024 * 1024;
-    if( munit == "tb" ) size = size * 1024 * 1024 * 1024 * 1024;
+    if( munit == "kb" ) size = size;
+    if( munit == "mb" ) size = size * 1024;
+    if( munit == "gb" ) size = size * 1024 * 1024;
+    if( munit == "tb" ) size = size * 1024 * 1024 * 1024;
 
     return( size );
+}
+
+//------------------------------------------------------------------------------
+
+void CResourceValue::SetSize(long long size)
+{
+    string          munit;
+    long long       msize;
+
+    munit = "kb";
+
+    if( size > 1024 ){
+        msize = size % 1024;
+        if( msize == 0 ){
+            munit = "mb";
+            size /= 1024;
+        }
+    }
+    if( size > 1024 ){
+        msize = size % 1024;
+        if( msize == 0 ){
+            munit = "gb";
+            size /= 1024;
+        }
+    }
+    if( size > 1024 ){
+        msize = size % 1024;
+        if( msize == 0 ){
+            munit = "tb";
+            size /= 1024;
+        }
+    }
+
+    stringstream    str;
+    str << size << munit;
+
+    Value = str.str().c_str();
 }
 
 //------------------------------------------------------------------------------
