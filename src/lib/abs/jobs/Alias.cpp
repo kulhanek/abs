@@ -61,7 +61,7 @@ CAlias::CAlias(const CSmallString& name,const CSmallString& queue,
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CAlias::TestAlias(std::ostream& sout)
+bool CAlias::TestAlias(std::ostream& sout,bool expertmode)
 {
     bool result = true;
 
@@ -91,7 +91,7 @@ bool CAlias::TestAlias(std::ostream& sout)
 
     // are all resources valid?
     CResourceList res;
-    res.AddResources(Resources,sout,result);
+    res.AddResources(Resources,sout,result,expertmode);
 
     return(result);
 }

@@ -65,6 +65,7 @@ class CSubmitOptions : public CSimpleOptions {
         CSO_OPT(bool,IgnoreRuntimeFiles)
         CSO_OPT(bool,AssumeYes)
         CSO_OPT(bool,Silent)
+        CSO_OPT(bool,ExpertMode)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -107,6 +108,15 @@ class CSubmitOptions : public CSimpleOptions {
                 "silent",                      /* long option name */
                 NULL,                           /* parametr name */
                 "decrease verbosity to minimum")   /* option description */
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                ExpertMode,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'e',                           /* short option name */
+                "expert",                      /* long option name */
+                NULL,                           /* parametr name */
+                "it enables expert mode, in which you can define any batch resource")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */

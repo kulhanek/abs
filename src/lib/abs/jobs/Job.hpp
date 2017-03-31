@@ -31,6 +31,7 @@
 #include <map>
 #include <JobType.hpp>
 #include <FileName.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -106,7 +107,7 @@ public:
 
     /// 2.0) decode resources
     /// decode resources
-    bool DecodeResources(std::ostream& sout);
+    bool DecodeResources(std::ostream& sout,bool expertmode);
 
     /// last job check before it is submitted to Torque server
     bool LastJobCheck(std::ostream& sout);
@@ -303,8 +304,14 @@ public:
     /// get site id
     const CSmallString GetSiteID(void);
 
-    /// get server nameIsInteractiveJob
+    /// get server name
     const CSmallString GetServerName(void);
+
+    /// get server name
+    const CSmallString GetServerNameV2(void);
+
+    //! get short server name
+    const CSmallString GetShortServerName(void);
 
     /// get queued time
     const CSmallTime GetQueuedTime(void);
@@ -376,13 +383,8 @@ public:
     /// get job input directory - either PWD or CurrentDir
     static CFileName GetJobInputPath(void);
 
-    //! get short server name
-    const CSmallString GetShortServerName(void);
-
 // section of private data -----------------------------------------------------
 protected:
-    CSmallString    ShortServerName;
-
     bool            InfoFileLoaded;
 
     /// list nodes
@@ -450,14 +452,22 @@ protected:
     /// print resource tokens
     void PrintResourceTokens(std::ostream& sout,const CSmallString& title,const CSmallString& res_list);
 
+    /// prepare data about input directory - called by DecodeResources
+    bool InputDirectory(void);
+
+    /// prepare data about work directory - called by DecodeResources
+    bool WorkDirectory(void);
+
     bool                                DoNotSave;
 
     // job status --------------------------------------------------------------
 public:
     CSmallString                        BatchServerName;
+    CSmallString                        ShortServerName;
     EJobStatus                          BatchJobStatus;
     CSmallString                        BatchJobComment;
     std::map<std::string,std::string>   BatchVariables;
+    CResourceList                       ResourceList;
 };
 
 // -----------------------------------------------------------------------------

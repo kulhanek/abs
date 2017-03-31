@@ -557,7 +557,6 @@ bool CPBSProServer::SubmitJob(CJob& job)
     CFileName infout    = job.GetInfoutName();
     CFileName queue     = job.GetQueue();
     CFileName jobtitle  = job.GetJobTitle();
-    CSmallString sres   = job.GetItem("specific/resources","INF_RESOURCES");
     CSmallString depjid = job.GetItem("basic/external","INF_EXTERNAL_START_AFTER");
 
     CSmallString item;
@@ -569,9 +568,9 @@ bool CPBSProServer::SubmitJob(CJob& job)
     variables << ",INF_JOB_NAME_SUFFIX=" << job.GetJobNameSuffix();
     variables << ",INF_JOB_PATH=" << job.GetJobPath();
     variables << ",INF_JOB_MACHINE=" << job.GetJobMachine();
-    variables << ",INF_SURROGATE_MACHINE=" << job.GetSurrogateMachine();
     variables << ",INF_JOB_KEY=" << job.GetJobKey();
     variables << ",ABS_ROOT=" << CShell::GetSystemVariable("ABS_ROOT");
+    variables << ",AMS_ROOT=" << CShell::GetSystemVariable("AMS_ROOT");
 
     if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",item) ){
         variables << ",INF_BOOT_SCRIPT=" << item;
@@ -645,25 +644,7 @@ bool CPBSProServer::SubmitJob(CJob& job)
     set_attribute(p_prev,ATTR_m,NULL,mailoptions);
     set_attribute(p_prev,ATTR_v,NULL,variables);
 
-    // FIXME
-//    switch( ABSConfig.GetPBSProMode() ){
-//        case ETM_TORQUE:
-//        case ETM_TORQUE_METAVO:{
-//            // get umask in decimal representation
-//            int umask  = job.GetUMaskNumber();
-//            CSmallString sumask(umask);
-//            set_attribute(p_prev,ATTR_umask,NULL,sumask);
-//            CSmallString egroup = job.GetUserGroup();
-//            set_attribute(p_prev,ATTR_group_list,NULL,egroup);
-//        }
-//        break;
-//        case ETM_PBSPRO:{
-            // set mask in octal form
-            CSmallString sumask = job.GetUMask();
-            set_attribute(p_prev,ATTR_umask,NULL,sumask);
-//        }
-//        break;
-//    }
+    CreateJobAttributes(p_prev,&(job.ResourceList));
 
     if( depjid != NULL ){
         depjid = "afterany:" + depjid;
@@ -671,17 +652,8 @@ bool CPBSProServer::SubmitJob(CJob& job)
     }
 
 
-    CSmallString account   = ResourceList.GetResourceValue("account");
-    if( account != NULL ){
-        set_attribute(p_prev,ATTR_A,NULL,account);
-    }
-
-    // FIXME
-//    res.Finalize();
-//    res.GetTorqueResources(p_prev);
-
 //  DEBUG
-//    PrintAttributes(cout,p_first);
+    PrintAttributes(cout,p_first);
 
     // submit jobs
     char* p_jobid = pbspro_submit(ServerID,p_first,script,queue,NULL);
@@ -700,6 +672,24 @@ bool CPBSProServer::SubmitJob(CJob& job)
 
     free(p_jobid);
     return(true);
+}
+
+//------------------------------------------------------------------------------
+
+void CPBSProServer::CreateJobAttributes(struct attropl* &p_prev,CResourceList* p_rl)
+{
+    std::list<CResourceValuePtr>::iterator     it = p_rl->begin();
+    std::list<CResourceValuePtr>::iterator     ie = p_rl->end();
+
+    while( it != ie ){
+        CResourceValuePtr p_rv = *it;
+        CSmallString name,resource,value;
+        p_rv->GetAttribute(name,resource,value);
+        if( name != NULL ){
+            set_attribute(p_prev,name,resource,value);
+        }
+        it++;
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -35,6 +35,7 @@ class CQueueList;
 class CNodeList;
 class CJobList;
 class CJob;
+class CResourceList;
 
 // -----------------------------------------------------------------------------
 
@@ -97,6 +98,9 @@ public:
     virtual bool PrintJob(std::ostream& sout,const CSmallString& name);
 
 // execution -------------------------------------------------------------------
+    //! init specific resources for batch server
+    virtual bool InitBatchResources(CResourceList* p_rl);
+
     //! submit job
     virtual bool SubmitJob(CJob& job);
 

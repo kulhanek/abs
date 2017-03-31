@@ -174,7 +174,7 @@ bool CAliases::AddAlias(void)
 
     vout << low;
     if( AliasList.AddAlias(vout,Options.GetProgArg(1),Options.GetProgArg(2),
-                         Options.GetProgArg(3)) == false ){
+                         Options.GetProgArg(3),Options.GetOptExpertMode()) == false ){
         vout << endl;
         return(false);
     }

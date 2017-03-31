@@ -108,6 +108,21 @@ bool CBatchServers::InitAll(void)
 
 //------------------------------------------------------------------------------
 
+const CSmallString CBatchServers::GetGenericResourceName(void)
+{
+    CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
+    if( p_ele == NULL ) {
+        ES_ERROR("no servers");
+        return(false);
+    }
+
+    CSmallString genres;
+    p_ele->GetAttribute("genres",genres);
+    return(genres);
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServers::Init(const CSmallString& srv)
 {
     CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
@@ -208,7 +223,7 @@ const CSmallString CBatchServers::GetDefaultSrvName(void)
 
 //------------------------------------------------------------------------------
 
-const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_name)
+const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_name,bool create)
 {
     // init servers if not done already
     if( size() == 0 ) InitAll();
@@ -222,6 +237,11 @@ const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_nam
             return(srv_ptr);
         }
         it++;
+    }
+
+    if( create == true ){
+        if( Init(srv_name) == false ) return(CBatchServerPtr());
+        return(back());
     }
 
     return(CBatchServerPtr());

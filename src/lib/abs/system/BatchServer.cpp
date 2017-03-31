@@ -146,6 +146,13 @@ bool CBatchServer::PrintJob(std::ostream& sout,const CSmallString& name)
 //------------------------------------------------------------------------------
 //==============================================================================
 
+bool CBatchServer::InitBatchResources(CResourceList* p_rl)
+{
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServer::SubmitJob(CJob& job)
 {
     return(false);

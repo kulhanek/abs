@@ -20,27 +20,28 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVEmail.hpp>
+#include <RVPBSProGeneric.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVEmailCB(void* p_data);
+CComObject* RVPBSProGenericCB(void* p_data);
 
-CExtUUID        RVEmailID(
-                    "{RV_EMAIL:3f07ddbf-f19b-423f-80fb-2346493454e8}",
-                    "email");
+CExtUUID        RVPBSProGenericID(
+                    "{PBSPRO_GENERIC:5cf1351c-883d-4927-8348-6448c0baa888}",
+                    "pbsprogeneric");
 
-CPluginObject   RVEmailObject(&ABSPlugin,
-                    RVEmailID,RESOURCES_CAT,
-                    RVEmailCB);
+CPluginObject   RVPBSProGenericObject(&ABSPlugin,
+                    RVPBSProGenericID,RESOURCES_CAT,
+                    RVPBSProGenericCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVEmailCB(void* p_data)
+CComObject* RVPBSProGenericCB(void* p_data)
 {
-    CComObject* p_object = new CRVEmail();
+    CComObject* p_object = new CRVPBSProGeneric();
     return(p_object);
 }
 
@@ -52,29 +53,17 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVEmail::CRVEmail(void)
-    : CResourceValue(&RVEmailObject)
+CRVPBSProGeneric::CRVPBSProGeneric(void)
+    : CResourceValue(&RVPBSProGenericObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CRVEmail::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVPBSProGeneric::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    if( Value.FindSubString("@") == -1 ){
-        if( rstatus == true ) sout << endl;
-        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout << "<b><red>        The character '@' is not found in the resource value!</red></b>" << endl;
-        rstatus = false;
-        return;
-    }
-}
-
-//------------------------------------------------------------------------------
-
-void CRVEmail::GetVariable(CSmallString& name, CSmallString& value)
-{
-    name = "INF_EMAIL";
+    name = "Resource_List";
+    resource = Name;
     value = Value;
 }
 

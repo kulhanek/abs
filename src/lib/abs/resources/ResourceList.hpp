@@ -43,19 +43,16 @@ public:
 
 // executive methods -----------------------------------------------------------
     /// add resources - override existing setup
-    bool AddResources(const CSmallString& reslist);
-
-    /// add resources - override existing setup
-    void AddResources(const CSmallString& reslist,std::ostream& sout,bool& rstatus);
+    void AddResources(const CSmallString& reslist,std::ostream& sout,bool& rstatus, bool expertmode);
 
     /// add a single resource
-    void AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,bool& rstatus);
+    void AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,bool& rstatus, bool expertmode);
+
+    /// add a single resource - always in expert mode
+    void AddResource(const CSmallString& name,long int value);
 
     /// add a single resource
-    void AddResource(const CSmallString& name,const long long& value);
-
-    /// add a specific resource
-    void AddResource(const CResourceValuePtr& res);
+    bool AddResource(const CSmallString& name,const CSmallString& value, bool expertmode);
 
     /// find resource
     CResourceValuePtr FindResource(const CSmallString& name) const;
@@ -94,9 +91,6 @@ public:
 
     /// get memory in Bytes
     long int GetMemory(void) const;
-
-    /// get walltime
-    bool GetWallTime(CSmallTime& time) const;
 
 // section of private data -----------------------------------------------------
 private:

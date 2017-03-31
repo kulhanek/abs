@@ -62,6 +62,7 @@ class CAliasesOptions : public CSimpleOptions {
     CSO_LIST_BEGIN
         // options ------------------------------
         CSO_OPT(bool,Force)
+        CSO_OPT(bool,ExpertMode)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -77,6 +78,15 @@ class CAliasesOptions : public CSimpleOptions {
                     "force",                      /* long option name */
                     NULL,                           /* parametr name */
                     "add an alias even if another exists")   /* option description */
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                ExpertMode,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'e',                           /* short option name */
+                "expert",                      /* long option name */
+                NULL,                           /* parametr name */
+                "it enables expert mode, in which you can define any batch resource")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */

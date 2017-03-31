@@ -194,7 +194,6 @@ void CJob::CreateHeader(void)
 
     p_header->SetAttribute("version",version);
     p_header->SetAttribute("site",AMSGlobalConfig.GetActiveSiteID());
-    p_header->SetAttribute("server",BatchServerName);
 }
 
 //------------------------------------------------------------------------------
@@ -399,26 +398,8 @@ ERetStatus CJob::JobInput(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CJob::DecodeResources(std::ostream& sout)
+bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 {
-// file system -----------------------------------
-    // set default user group and umask
-    SetItem("specific/resources","INF_UGROUP",User.GetEGroup());
-    SetItem("specific/resources","INF_UMASK",User.GetUMask());
-
-    // check job input FS consistency
-    CSmallString job_dir = GetItem("basic/jobinput","INF_JOB_PATH");
-
-    struct stat job_dir_stat;
-    stat(job_dir,&job_dir_stat);
-
-    if( job_dir_stat.st_uid == User.GetUserID() ){
-        SetItem("specific/resources","INF_FS_TYPE","consistent");
-    } else {
-        SetItem("specific/resources","INF_FS_TYPE","inconsistent");
-    }
-
-// input resources -------------------------------
     // input from user
     CSmallString dest = GetItem("basic/arguments","INF_ARG_DESTINATION");
     CSmallString sres = GetItem("basic/arguments","INF_ARG_RESOURCES");
@@ -435,7 +416,7 @@ bool CJob::DecodeResources(std::ostream& sout)
     // add default resources
     CSmallString  sdef_res;
     if( ABSConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
-        ResourceList.AddResources(sdef_res,sout,result);
+        ResourceList.AddResources(sdef_res,sout,result,expertmode);
         if( result == false ){
             ES_TRACE_ERROR("default resources are invalid");
             return(false);
@@ -452,7 +433,7 @@ bool CJob::DecodeResources(std::ostream& sout)
             ES_TRACE_ERROR("unable to decode job destination (queue[@server])");
             return(false);
         }
-        ResourceList.AddResources(p_alias->GetResources(),sout,result);
+        ResourceList.AddResources(p_alias->GetResources(),sout,result,expertmode);
         if( result == false ){
             ES_TRACE_ERROR("alias resources are invalid");
             return(false);
@@ -462,8 +443,11 @@ bool CJob::DecodeResources(std::ostream& sout)
         SetItem("specific/resources","INF_ALIAS","");
     }
 
+    SetItem("specific/resources","INF_QUEUE",queue);
+    SetItem("specific/resources","INF_SERVER",BatchServerName);
+
     // decode user resources
-    ResourceList.AddResources(sres,sout,result);
+    ResourceList.AddResources(sres,sout,result,expertmode);
     if( result == false ){
         ES_TRACE_ERROR("user resources are invalid");
         return(false);
@@ -482,85 +466,54 @@ bool CJob::DecodeResources(std::ostream& sout)
     // calculate dynamic resources
     ResourceList.ResolveDynamicResources();
 
+    // determine batch resources
+    CBatchServerPtr srv_ptr = BatchServers.FindBatchServer(BatchServerName,true);
+    if( srv_ptr == NULL ){
+        ES_TRACE_ERROR("unable to init batch server");
+        return(false);
+    }
+    if( srv_ptr->InitBatchResources(&ResourceList) == false ){
+        ES_TRACE_ERROR("unable to init batch resources");
+        return(false);
+    }
+
     // set final resources
-    //SetItem("specific/resources","INF_RESOURCES",ResourcesList.ToString());
+    SetItem("specific/resources","INF_FIN_NCPU",ResourceList.GetNumOfCPUs());
+    SetItem("specific/resources","INF_FIN_NGPU",ResourceList.GetNumOfGPUs());
+    SetItem("specific/resources","INF_FIN_NNODE",ResourceList.GetNumOfNodes());
+    SetItem("specific/resources","INF_FIN_RESOURCES",ResourceList.ToString(false));
 
+    return(true);
+}
 
+//------------------------------------------------------------------------------
 
-//    // finalize resources
-//    job_res.Finalize();
+bool CJob::InputDirectory(void)
+{
+    // file system -----------------------------------
+        // set default user group and umask
+        SetItem("specific/resources","INF_UGROUP",User.GetEGroup());
+        SetItem("specific/resources","INF_UMASK",User.GetUMask());
 
-//    // FIXME
-//    CSmallString scratch_type = res.GetResourceValue("scratch_type");
-////    if( scratch_type == NULL ){
-////        scratch_type = ABSConfig.GetDefaultScratchType();
-////    }
+        // check job input FS consistency
+        CSmallString job_dir = GetItem("basic/jobinput","INF_JOB_PATH");
 
-//    CSmallString umask = res.GetResourceValue("umask");
-//    if( umask == NULL ){
-//        umask = User.GetUMask();
-//    }
+        struct stat job_dir_stat;
+        stat(job_dir,&job_dir_stat);
 
-//    CSmallString ugroup = res.GetResourceValue("group");
-//    CSmallString ugroup_realm;
-//    CSmallString ugroup_orig;
-//    if( ugroup == NULL ){
-//        ugroup = User.GetEGroup();
-//    }
+        if( job_dir_stat.st_uid == User.GetUserID() ){
+            SetItem("specific/resources","INF_FS_TYPE","consistent");
+        } else {
+            SetItem("specific/resources","INF_FS_TYPE","inconsistent");
+        }
 
-//    // split to ugroup and ugroup_realm
-//    string          sgroup = string(ugroup);
-//    vector<string>  items;
-//    items.clear();
-//    split(items,sgroup,is_any_of("@"));
-//    if( items.size() > 1 ){
-//        ugroup = items[0];
-//        ugroup_realm = items[1];
-//    } else if( items.size() == 1 ) {
-//        ugroup = items[0];
-//    }
+    return(true);
+}
 
-//    // decode surrogate machine
-//    // FIXME
-//    CSmallString surrogate = res.GetResourceValue("surrogate");
-////    if( (surrogate == "localhost") || (surrogate == NULL) ) {
-////        surrogate  = GetItem("basic/jobinput","INF_JOB_MACHINE");
-////    } else if ( surrogate == "auto" ) {
-////        surrogate = ABSConfig.GetSurrogateMachine(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"));
-////        if( surrogate == NULL ){
-////            ES_TRACE_ERROR("unable to get surrogate machine");
-////            sout << endl;
-////            sout << "<b><red> ERROR: Unable to determine the surrogate machine for " << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" <<  GetItem("basic/jobinput","INF_JOB_PATH") << "!</red></b>" << endl;
-////            sout << "<b><red>        Perhaps, your are trying to submit the job from the unsupported machine or job input directory.</red></b>" << endl;
-////            return(false);
-////        }
-////        // transform group
-////        CSmallString orig_group = ugroup;
-////        if( ABSConfig.GetSurrogateGroup(GetItem("basic/jobinput","INF_JOB_MACHINE"),GetItem("basic/jobinput","INF_JOB_PATH"),ugroup,ugroup_realm) == true ){
-////            ugroup_orig = orig_group;
-////        }
-////    } else {
-////        // keep surrogate value as surrogate machine name
-////    }
+//------------------------------------------------------------------------------
 
-//    if( surrogate != GetItem("basic/jobinput","INF_JOB_MACHINE") ){
-//        SetItem("specific/resources","INF_FS_TYPE","consistent");
-//    }
-
-//    // check group only if not REALM is defined
-//    if( ugroup_realm == NULL ){
-//        if( User.IsInGroup(ugroup) == false ){
-//            sout << "<b><red> ERROR: Illegal group name '" << ugroup << "' for the group resource token!" << endl;
-//            sout <<         "        Allowed values: " << User.GetGroups() << "</red></b>" << endl;
-//            return(false);
-//        }
-//    }
-
-    SetItem("specific/resources","INF_QUEUE",queue);
-    SetItem("specific/resources","INF_NCPU",ResourceList.GetNumOfCPUs());
-    SetItem("specific/resources","INF_NGPU",ResourceList.GetNumOfGPUs());
-    SetItem("specific/resources","INF_NNODE",ResourceList.GetNumOfNodes());
-
+bool CJob::WorkDirectory(void)
+{
     return(true);
 }
 
@@ -1581,6 +1534,21 @@ CSmallString CJob::GetInfoFileVersion(void)
 //------------------------------------------------------------------------------
 
 const CSmallString CJob::GetServerName(void)
+{
+    CXMLElement* p_rele = GetElementByPath("infinity",false);
+    if( p_rele == NULL ){
+        ES_ERROR("infinity element was not found");
+        return("");
+    }
+
+    CSmallString mode;
+    p_rele->GetAttribute("server",mode);
+    return(mode);
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CJob::GetServerNameV2(void)
 {
     CXMLElement* p_rele = GetElementByPath("infinity",false);
     if( p_rele == NULL ){

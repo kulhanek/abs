@@ -234,7 +234,7 @@ bool CAliasList::SaveUserAliases(CXMLElement* p_ele)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CAliasList::AddAlias(std::ostream& sout,const CSmallString& name,const CSmallString& queue,
+bool CAliasList::AddAlias(std::ostream& sout,bool expertmode,const CSmallString& name,const CSmallString& queue,
                           const CSmallString& resources)
 {
     // remove previous occurences
@@ -242,7 +242,7 @@ bool CAliasList::AddAlias(std::ostream& sout,const CSmallString& name,const CSma
 
     // add new alias
     CAliasPtr alias(new CAlias(name,queue,resources));
-    if( alias->TestAlias(sout) == false ) return(false);
+    if( alias->TestAlias(sout,expertmode) == false ) return(false);
     push_back(alias);
     return(true);
 }

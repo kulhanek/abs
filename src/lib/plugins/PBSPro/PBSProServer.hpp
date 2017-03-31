@@ -119,6 +119,9 @@ public:
     //! get job comment from comment, planned_start, planned_nodes
     static void DecodeBatchJobComment(attrl* p_item,CSmallString& comment);
 
+    //! decode batch attributes
+    void CreateJobAttributes(struct attropl* &p_prev,CResourceList* p_rl);
+
 // section of private data -----------------------------------------------------
 private:
     CSmallString    PBSProLibName;

@@ -55,7 +55,8 @@ CResourceList::~CResourceList(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-void CResourceList::AddResources(const CSmallString& resources,std::ostream& sout,bool& rstatus)
+void CResourceList::AddResources(const CSmallString& resources,std::ostream& sout,
+                                 bool& rstatus, bool expertmode)
 {
     string          svalue = string(resources);
     vector<string>  items;
@@ -104,7 +105,7 @@ void CResourceList::AddResources(const CSmallString& resources,std::ostream& sou
         // process resource
         switch(command){
             case '+':
-                AddResource(name,value,sout,rstatus);
+                AddResource(name,value,sout,rstatus,expertmode);
                 break;
             case '-':
                 RemoveResource(name);
@@ -115,17 +116,32 @@ void CResourceList::AddResources(const CSmallString& resources,std::ostream& sou
 
 //------------------------------------------------------------------------------
 
-bool CResourceList::AddResources(const CSmallString& resources)
+void CResourceList::AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,
+                                bool& rstatus, bool expertmode)
 {
-    stringstream sout;
-    bool         result = true;
-    AddResources(resources,sout,result);
-    return(result);
+    // be sure that the resource is unique
+    RemoveResource(name);
+
+    // add resource
+    if( AddResource(name,value,expertmode) == true ) return;
+
+    // plugin object was not found
+    if( rstatus == true ) sout << endl;
+    sout << "<red>ERROR: Resource '" << name << "' is not supported!</red>" << endl;
+    rstatus = false;
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceList::AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,bool& rstatus)
+void CResourceList::AddResource(const CSmallString& name,long int value)
+{
+    CSmallString svalue(value);
+    AddResource(name,svalue,true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CResourceList::AddResource(const CSmallString& name,const CSmallString& value, bool expertmode)
 {
     // be sure that the resource is unique
     RemoveResource(name);
@@ -143,7 +159,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
                     CResourceValuePtr res_ptr(p_res);
                     res_ptr->Value = value;
                     push_back(res_ptr);
-                    return;
+                    return(true);
                 } else {
                     delete p_obj;
                 }
@@ -151,19 +167,12 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
         }
         I++;
     }
+    if( expertmode == false ) return(false);
 
-    // plugin object was not found
-    if( rstatus == true ) sout << endl;
-    sout << "<red>ERROR: Resource '" << name << "' is not supported!</red>" << endl;
-    rstatus = false;
-}
+    // FIXME
+    // add batch generic resource
 
-//------------------------------------------------------------------------------
-
-void CResourceList::AddResource(const CResourceValuePtr& res)
-{
-    if( res == NULL ) return;
-    push_back(res);
+    return(true);
 }
 
 //------------------------------------------------------------------------------
@@ -326,24 +335,6 @@ long int CResourceList::GetMemory(void) const
     if( munit == "tb" ) mem = mem * 1024 * 1024 * 1024 * 1024;
 
     return( mem );
-}
-
-//------------------------------------------------------------------------------
-
-bool CResourceList::GetWallTime(CSmallTime& time) const
-{
-    const CResourceValuePtr p_rv = FindResource("walltime");
-    if( p_rv == NULL ) return(false);
-
-    int             hvalue = 0;
-    int             mvalue = 0;
-    int             ssvalue = 0;
-    stringstream    str(p_rv->Value.GetBuffer());
-    char            d1,d2;
-    str >> hvalue >> d1 >> mvalue >> d2 >> ssvalue;
-    CSmallTime ltime(hvalue*3600 + mvalue*60 + ssvalue);
-    time = ltime;
-    return(true);
 }
 
 //------------------------------------------------------------------------------

@@ -18,6 +18,7 @@ SET(PBSPRO_SRC
         resources/RVSelect.cpp
         resources/RVAccount.cpp
         resources/RVWalltime.cpp
+        resources/RVPBSProGeneric.cpp
         )
 
 # create shared library --------------------------------------------------------

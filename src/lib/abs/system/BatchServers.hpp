@@ -52,11 +52,14 @@ public:
     const CSmallString GetDefaultSrvName(void);
 
     /// get batch server - srv_name can be full or short name
-    const CBatchServerPtr FindBatchServer(const CSmallString& srv_name);
+    const CBatchServerPtr FindBatchServer(const CSmallString& srv_name,bool init=false);
 
 // -----------------------------------------------------------------------------
     /// print batch systems
     void PrintServerOverview(std::ostream& vout);
+
+    /// return name of the generic resource
+    const CSmallString GetGenericResourceName(void);
 
     /// decode queue name
     bool DecodeQueueName(const CSmallString& input,CSmallString& srv_name,CSmallString& srv_short,CSmallString& queue);

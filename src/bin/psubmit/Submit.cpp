@@ -215,7 +215,7 @@ bool CSubmit::SubmitJobFull(void)
     Job->PrintBasicV3(vout);
 
     // resources
-    if( Job->DecodeResources(vout) == false ){
+    if( Job->DecodeResources(vout,Options.GetOptExpertMode()) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }
@@ -315,7 +315,7 @@ bool CSubmit::SubmitJobHeader(void)
     Job->PrintBasicV3(vout);
 
     // resources
-    if( Job->DecodeResources(vout) == false ){
+    if( Job->DecodeResources(vout,Options.GetOptExpertMode()) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }
@@ -385,7 +385,7 @@ bool CSubmit::SubmitJobCopy(int i)
         return(true);
     }
     // resources
-    if( Job->DecodeResources(stmp) == false ){
+    if( Job->DecodeResources(stmp,Options.GetOptExpertMode()) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }

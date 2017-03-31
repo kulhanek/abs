@@ -1,9 +1,11 @@
-#ifndef AliasH
-#define AliasH
+#ifndef RVPBSProGenericH
+#define RVPBSProGenericH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2011      Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
 //     This program is free software; you can redistribute it and/or modify
@@ -22,60 +24,20 @@
 // =============================================================================
 
 #include <ABSMainHeader.hpp>
-#include <SmallString.hpp>
-#include <boost/shared_ptr.hpp>
+#include <ResourceValue.hpp>
 #include <iostream>
 
 // -----------------------------------------------------------------------------
 
-class CXMLElement;
-
-// -----------------------------------------------------------------------------
-
-class ABS_PACKAGE CAlias {
+class ABS_PACKAGE CRVPBSProGeneric : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CAlias(void);
-        CAlias(const CSmallString& name,const CSmallString& queue,const CSmallString& resources);
-
-// executive methods -----------------------------------------------------------
-    /// test alias
-    bool TestAlias(std::ostream& sout,bool expertmode);
+        CRVPBSProGeneric(void);
 
 // information methods ---------------------------------------------------------
-    //! print line info about the node
-    void PrintLineInfo(std::ostream& sout);
-
-    //! is system alias
-    bool IsSystemAlias(void) const;
-
-    //! get name
-    const CSmallString& GetName(void) const;
-
-    //! get destination
-    const CSmallString& GetDestination(void) const;
-
-    //! get resources
-    const CSmallString& GetResources(void) const;
-
-// i/o methods -----------------------------------------------------------------
-    //! load alias
-    bool Load(CXMLElement* p_ele,bool system);
-
-    //! save alias
-    void Save(CXMLElement* p_ele);
-
-// section of private data -----------------------------------------------------
-private:
-    bool            SystemAlias;
-    CSmallString    Name;
-    CSmallString    Destination;
-    CSmallString    Resources;
+    /// get batch attribute
+    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
 };
-
-// -----------------------------------------------------------------------------
-
-typedef boost::shared_ptr<CAlias>  CAliasPtr;
 
 // -----------------------------------------------------------------------------
 
