@@ -2819,7 +2819,6 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     PrintResourceTokens(sout,"Req resources    : ",tmp);
 
     sout << "----------------------------------------" << endl;
-    sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
 
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
     if( tmp ){
@@ -2836,13 +2835,14 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     PrintResourceTokens(sout,"Alias resources  : ",tmp);
     }
 
-    tmp = GetItem("specific/resources","INF_QUEUE");
-    sout << "Queue            : " << tmp << endl;
-
     tmp = GetItem("specific/resources","INF_FIN_RESOURCES");
     PrintResourceTokens(sout,"All resources    : ",tmp);
 
-    sout << "----------------------------------------" << endl;
+    sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
+    tmp = GetItem("specific/resources","INF_QUEUE");
+    sout << "Queue            : " << tmp << endl;
+
+    sout << "-------------------------------------------" << endl;
     sout << "NCPUs NGPUs NNodes Memory WorkSize WallTime" << endl;
     tmp = GetItem("specific/resources","INF_FIN_NCPU");
     sout << setw(5) << tmp;
@@ -2863,7 +2863,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << setw(8) << tmp;
     sout << endl;
 
-    sout << "----------------------------------------" << endl;
+    sout << "-------------------------------------------" << endl;
 
     tmp = GetItem("specific/resources","INF_WORKDIR");
     sout << "Work directory   : " << tmp << endl;
@@ -2914,7 +2914,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Excluded files   : " << tmp << endl;
     }
 
-    sout << "----------------------------------------" << endl;
+    sout << "-------------------------------------------" << endl;
 
     tmp = GetItem("basic/external","INF_EXTERNAL_START_AFTER");
     if( tmp == NULL ){
