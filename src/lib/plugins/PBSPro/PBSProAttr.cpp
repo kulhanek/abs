@@ -244,7 +244,7 @@ void set_attribute(struct attropl* &p_prev,const char* p_name,const char* p_res,
         strcpy(p_attr->name,p_name);
     } else {
         p_attr->name = static_cast<char*>(malloc(1));
-        strncpy(p_attr->name,"",1);
+        p_attr->name[0] = '\0';
     }
 
     // -------------------------------------
@@ -256,7 +256,7 @@ void set_attribute(struct attropl* &p_prev,const char* p_name,const char* p_res,
         strcpy(p_attr->resource,p_res);
     } else {
         p_attr->resource = static_cast<char*>(malloc(1));
-        strncpy(p_attr->resource,"",1);
+        p_attr->resource[0] = '\0';
     }
 
     // -------------------------------------
@@ -268,7 +268,7 @@ void set_attribute(struct attropl* &p_prev,const char* p_name,const char* p_res,
         strcpy(p_attr->value,p_value);
     } else {
         p_attr->value = static_cast<char*>(malloc(1));
-        strncpy(p_attr->value,"",1);
+        p_attr->value[0] = '\0';
     }
     p_attr->op = SET;
     p_attr->next = NULL;
@@ -298,7 +298,8 @@ void set_attribute(struct attropl* &p_prev,const char* p_name,const char* p_res,
         }
         strcpy(p_attr->name,p_name);
     } else {
-        p_attr->name = NULL;
+        p_attr->name = static_cast<char*>(malloc(1));
+        p_attr->name[0] = '\0';
     }
 
     // -------------------------------------
@@ -309,7 +310,8 @@ void set_attribute(struct attropl* &p_prev,const char* p_name,const char* p_res,
         }
         strcpy(p_attr->resource,p_res);
     } else {
-        p_attr->resource = NULL;
+        p_attr->resource = static_cast<char*>(malloc(1));
+        p_attr->resource[0] = '\0';
     }
 
     // -------------------------------------
@@ -320,7 +322,8 @@ void set_attribute(struct attropl* &p_prev,const char* p_name,const char* p_res,
         }
         strcpy(p_attr->value,p_value);
     } else {
-        p_attr->value=NULL;
+        p_attr->value = static_cast<char*>(malloc(1));
+        p_attr->value[0] = '\0';
     }
     p_attr->op = op;
     p_attr->next = NULL;
