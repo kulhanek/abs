@@ -41,9 +41,11 @@ bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    CSmallTime& value,bool emit_error=false);
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    std::vector<CSmallString>& values,const char* p_delim=",",bool emit_error=false);
+
 void set_attribute(struct attropl* &p_prev,const char* p_name,const char* p_res,const char* p_value);
 void set_attribute(struct attropl* &p_prev,const char* p_name,const char* p_res,
                    const char* p_value,enum batch_op op);
+
 void set_attribute(struct attrl* &p_prev,const char* p_name,const char* p_res,const char* p_value);
 
 // -----------------------------------------------------------------------------
