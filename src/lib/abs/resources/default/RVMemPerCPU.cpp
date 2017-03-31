@@ -88,7 +88,7 @@ void CRVMemPerCPU::ResolveDynamicResource(CResourceList* p_rl)
     long long mem =  res->GetNumber() * GetSize();
     cout << "mem = " << mem << endl;
 
-    p_rl->AddResource("mem",mem);
+    p_rl->AddSizeResource("mem",mem);
 }
 
 //==============================================================================

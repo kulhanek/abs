@@ -84,7 +84,7 @@ void CRVWorkSizePerCPU::ResolveDynamicResource(CResourceList* p_rl)
         return;
     }
     long long size = res->GetNumber() * GetSize();
-    p_rl->AddResource("worksize",size);
+    p_rl->AddSizeResource("worksize",size);
 }
 
 //==============================================================================
