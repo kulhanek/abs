@@ -44,24 +44,38 @@ public:
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
-    virtual void TestValue(std::ostream& sout,bool& rstatus);
+    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
     /// resolve conflicts
-    virtual void ResolveConflicts(void);
+    virtual void ResolveConflicts(CResourceList* p_rl);
 
-    /// resolve conflicts
-    virtual void FinalizeResource(void);
+    /// resolve dynamic resource
+    virtual void ResolveDynamicResource(CResourceList* p_rl);
 
-    /// init variable list
-    virtual void SetVariables(std::map<std::string,std::string>& variables);
+    /// get variable
+    virtual void GetVariable(CSmallString& name, CSmallString& value);
 
-    /// get batch definition
-    virtual const CSmallString GetBatchResource(void);
+    /// get batch attribute
+    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
+
+    /// get size in bytes from Value
+    long long GetSize(void);
+
+    /// get number from Value
+    long long GetNumber(void);
 
 // section of private data -----------------------------------------------------
-public:
+protected:
     CSmallString    Name;           // derived from plusula object configuration
     CSmallString    Value;
+
+    /// test value if it is in expected range (number[b][kb][mb][gb][tb])
+    bool TestSizeValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+
+    /// test value if it is in expected range (number)
+    bool TestNumberValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+
+    friend class CResourceList;
 };
 
 // -----------------------------------------------------------------------------

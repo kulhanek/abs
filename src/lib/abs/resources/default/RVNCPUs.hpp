@@ -4,6 +4,7 @@
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
 //    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -34,7 +35,8 @@ public:
         CRVNCPUs(void);
 
 // information methods ---------------------------------------------------------
-    virtual void TestValue(std::ostream& sout,bool& rstatus);
+    /// test value if it is in expected range
+    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 };
 
 // -----------------------------------------------------------------------------

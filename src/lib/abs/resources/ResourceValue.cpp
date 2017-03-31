@@ -22,10 +22,15 @@
 
 #include <ResourceValue.hpp>
 #include <PluginDatabase.hpp>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <boost/algorithm/string.hpp>
 
 //------------------------------------------------------------------------------
 
 using namespace std;
+using namespace boost;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -41,38 +46,130 @@ CResourceValue::CResourceValue(CPluginObject* p_objectinfo)
 
 //------------------------------------------------------------------------------
 
-void CResourceValue::TestValue(std::ostream& sout,bool& rstatus)
+void CResourceValue::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     // nothing to be here
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceValue::ResolveConflicts(void)
+void CResourceValue::ResolveConflicts(CResourceList* p_rl)
 {
     // nothing to be here
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceValue::FinalizeResource(void)
+void CResourceValue::ResolveDynamicResource(CResourceList* p_rl)
 {
     // nothing to be here
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceValue::SetVariables(std::map<std::string,std::string>& variables)
+void CResourceValue::GetVariable(CSmallString& name, CSmallString& value)
 {
     // nothing to be here
 }
 
 //------------------------------------------------------------------------------
 
-const CSmallString CResourceValue::GetBatchResource(void)
+void CResourceValue::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
     // nothing to be here
-    return("");
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+bool CResourceValue::TestSizeValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+{
+    string svalue(Value);
+
+    string legall_characters = "01234567890bkmgt";
+
+    if( svalue.find_first_not_of(legall_characters) != string::npos ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout <<         "        Only integer number and one of b,kb,mb,gb,tb sufixes are allowed!</red></b>" << endl;
+        rstatus = false;
+        return(false);
+    }
+
+    long int        mvalue;
+    string          munit;
+    stringstream    str(svalue);
+
+    str >> mvalue >> munit;
+
+    to_lower(munit);
+    if( (munit != "b")  &&
+        (munit != "kb") &&
+        (munit != "mb") &&
+        (munit != "gb") &&
+        (munit != "tb") ) {
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout <<         "        Allowed suffixes are kb,mb,gb,tb but '" << munit << "' is specified!</red></b>" << endl;
+        rstatus = false;
+        return(false);
+    }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+long long CResourceValue::GetSize(void)
+{
+    string          svalue(Value);
+    long long       size;
+    string          munit;
+    stringstream    str(svalue);
+
+    str >> size >> munit;
+
+    to_lower(munit);
+
+    if( munit == "b" )  size = size * 1;
+    if( munit == "kb" ) size = size * 1024;
+    if( munit == "mb" ) size = size * 1024 * 1024;
+    if( munit == "gb" ) size = size * 1024 * 1024 * 1024;
+    if( munit == "tb" ) size = size * 1024 * 1024 * 1024 * 1024;
+
+    return( size );
+}
+
+//------------------------------------------------------------------------------
+
+bool CResourceValue::TestNumberValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+{
+    string svalue(Value);
+
+    string legall_characters = "01234567890";
+
+    if( svalue.find_first_not_of(legall_characters) != string::npos ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout <<         "        Integer number expected but '" << Value << "' is specified!</red></b>" << endl;
+        rstatus = false;
+        return(false);
+    }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+long long CResourceValue::GetNumber(void)
+{
+    string          svalue(Value);
+    long long       size;
+    stringstream    str(svalue);
+
+    str >> size;
+    return(size);
 }
 
 //==============================================================================

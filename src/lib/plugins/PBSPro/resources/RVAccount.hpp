@@ -1,6 +1,10 @@
+#ifndef RVAccountH
+#define RVAccountH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -19,51 +23,22 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVMem.hpp>
-#include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <ABSMainHeader.hpp>
+#include <ResourceValue.hpp>
+#include <iostream>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVMemCB(void* p_data);
+class ABS_PACKAGE CRVAccount : public CResourceValue {
+public:
+// constructor -----------------------------------------------------------------
+        CRVAccount(void);
 
-CExtUUID        RVMemID(
-                    "{MEM:45b8522a-e690-47ef-93b6-725bc2cb74f0}",
-                    "mem");
-
-CPluginObject   RVMemObject(&ABSPlugin,
-                    RVMemID,RESOURCES_CAT,
-                    RVMemCB);
+// information methods ---------------------------------------------------------
+    /// get batch attribute
+    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
+};
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVMemCB(void* p_data)
-{
-    CComObject* p_object = new CRVMem();
-    return(p_object);
-}
-
-//------------------------------------------------------------------------------
-
-using namespace std;
-
-//==============================================================================
-//------------------------------------------------------------------------------
-//==============================================================================
-
-CRVMem::CRVMem(void)
-    : CResourceValue(&RVMemObject)
-{
-}
-
-//------------------------------------------------------------------------------
-
-void CRVMem::TestValue(std::ostream& sout,bool& rstatus)
-{
-
-}
-
-//==============================================================================
-//------------------------------------------------------------------------------
-//==============================================================================
-
+#endif

@@ -35,7 +35,7 @@
 
 /// list of resources
 
-class ABS_PACKAGE CResourceList : private std::list<CResourceValuePtr> {
+class ABS_PACKAGE CResourceList : public std::list<CResourceValuePtr> {
 public:
 // constructor -----------------------------------------------------------------
         CResourceList(void);
@@ -51,6 +51,9 @@ public:
     /// add a single resource
     void AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,bool& rstatus);
 
+    /// add a single resource
+    void AddResource(const CSmallString& name,const long long& value);
+
     /// add a specific resource
     void AddResource(const CResourceValuePtr& res);
 
@@ -60,20 +63,18 @@ public:
     /// remove resource
     void RemoveResource(const CSmallString& name);
 
-    /// remove all resources
-    void RemoveAllResources(void);
-
     /// sort by name
     void SortByName(void);
 
+// expected order of execution ....
     /// resolve conflicts
     void ResolveConflicts(void);
 
     /// test all resources
     void TestResourceValues(std::ostream& sout,bool& rstatus);
 
-    /// finalize resources
-    void FinalizeResources(void);
+    /// resolve dynamic resources
+    void ResolveDynamicResources(void);
 
 // information methods ---------------------------------------------------------
     /// get resource value
@@ -87,9 +88,6 @@ public:
 
     /// get number of GPUs
     int GetNumOfGPUs(void) const;
-
-    /// get maximum number of CPUS per node
-    int GetMaxNumOfCPUsPerNode(void) const;
 
     /// get number of nodes
     int GetNumOfNodes(void) const;
@@ -107,10 +105,6 @@ private:
 
     friend class CJob;
 };
-
-// -----------------------------------------------------------------------------
-
-extern CResourceList ResourceList;
 
 // -----------------------------------------------------------------------------
 

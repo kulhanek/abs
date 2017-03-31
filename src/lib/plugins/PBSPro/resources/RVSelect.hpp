@@ -1,8 +1,9 @@
-#ifndef RVMemH
-#define RVMemH
+#ifndef RVSelectH
+#define RVSelectH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
@@ -28,13 +29,17 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CRVMem : public CResourceValue {
+class ABS_PACKAGE CRVSelect : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CRVMem(void);
+        CRVSelect(void);
 
 // information methods ---------------------------------------------------------
-    virtual void TestValue(std::ostream& sout,bool& rstatus);
+    /// test value if it is in expected range
+    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+
+    /// get batch attribute
+    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
 };
 
 // -----------------------------------------------------------------------------

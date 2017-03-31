@@ -20,27 +20,28 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVNNodes.hpp>
+#include <RVAccount.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVNNodesCB(void* p_data);
+CComObject* RVAccountCB(void* p_data);
 
-CExtUUID        RVNNodesID(
-                    "{NNODES:93c5d47b-7a1b-47b5-852e-84691704974c}",
-                    "nnodes");
+CExtUUID        RVAccountID(
+                    "{ACCOUNT:4d347675-abd8-4b0d-8672-ee35d0e8062e}",
+                    "account");
 
-CPluginObject   RVNNodesObject(&ABSPlugin,
-                    RVNNodesID,RESOURCES_CAT,
-                    RVNNodesCB);
+CPluginObject   RVAccountObject(&ABSPlugin,
+                    RVAccountID,RESOURCES_CAT,
+                    RVAccountCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVNNodesCB(void* p_data)
+CComObject* RVAccountCB(void* p_data)
 {
-    CComObject* p_object = new CRVNNodes();
+    CComObject* p_object = new CRVAccount();
     return(p_object);
 }
 
@@ -52,23 +53,18 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVNNodes::CRVNNodes(void)
-    : CResourceValue(&RVNNodesObject)
+CRVAccount::CRVAccount(void)
+    : CResourceValue(&RVAccountObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CRVNNodes::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVAccount::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    if( TestNumberValue(p_rl,sout,rstatus) == false ) return;
-    long long size = GetNumber();
-    if( size <= 0 ) {
-        if( rstatus == true ) sout << endl;
-        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        At least one node must be requested but '" << size << "' is specified!</red></b>" << endl;
-        rstatus = false;
-    }
+    name = Name;
+    resource = "";
+    value = Value;
 }
 
 //==============================================================================

@@ -20,27 +20,28 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVNNodes.hpp>
+#include <RVWalltime.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVNNodesCB(void* p_data);
+CComObject* RVWalltimeCB(void* p_data);
 
-CExtUUID        RVNNodesID(
-                    "{NNODES:93c5d47b-7a1b-47b5-852e-84691704974c}",
-                    "nnodes");
+CExtUUID        RVWalltimeID(
+                    "{WALLTIME:0bf8863e-67fa-4027-9c0e-41e42be50ecc}",
+                    "walltime");
 
-CPluginObject   RVNNodesObject(&ABSPlugin,
-                    RVNNodesID,RESOURCES_CAT,
-                    RVNNodesCB);
+CPluginObject   RVWalltimeObject(&ABSPlugin,
+                    RVWalltimeID,RESOURCES_CAT,
+                    RVWalltimeCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVNNodesCB(void* p_data)
+CComObject* RVWalltimeCB(void* p_data)
 {
-    CComObject* p_object = new CRVNNodes();
+    CComObject* p_object = new CRVWalltime();
     return(p_object);
 }
 
@@ -52,23 +53,32 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVNNodes::CRVNNodes(void)
-    : CResourceValue(&RVNNodesObject)
+CRVWalltime::CRVWalltime(void)
+    : CResourceValue(&RVWalltimeObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CRVNNodes::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVWalltime::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    if( TestNumberValue(p_rl,sout,rstatus) == false ) return;
-    long long size = GetNumber();
-    if( size <= 0 ) {
+    if( TestSizeValue(p_rl,sout,rstatus) == false ) return;
+    long long size = GetSize();
+    if( size / 1024 <= 0 ) {
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        At least one node must be requested but '" << size << "' is specified!</red></b>" << endl;
+        sout <<         "        Size must be larger than 1kb but " << size << "b is specified!</red></b>" << endl;
         rstatus = false;
     }
+}
+
+//------------------------------------------------------------------------------
+
+void CRVWalltime::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
+{
+    name = Name;
+    resource = "";
+    value = Value;
 }
 
 //==============================================================================

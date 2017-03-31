@@ -1,6 +1,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -58,9 +59,16 @@ CRVNGPUs::CRVNGPUs(void)
 
 //------------------------------------------------------------------------------
 
-void CRVNGPUs::TestValue(std::ostream& sout,bool& rstatus)
+void CRVNGPUs::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-
+    if( TestNumberValue(p_rl,sout,rstatus) == false ) return;
+    long long size = GetNumber();
+    if( size < 0 ) {
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout <<         "        Number of GPUs must be zero or positive number but '" << size << "' is specified!</red></b>" << endl;
+        rstatus = false;
+    }
 }
 
 //==============================================================================

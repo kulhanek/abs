@@ -3,6 +3,7 @@
 # ==============================================================================
 
 INCLUDE_DIRECTORIES(pbspro SYSTEM)
+INCLUDE_DIRECTORIES(resources SYSTEM)
 
 # objects in library -----------------------------------------------------------
 SET(PBSPRO_SRC
@@ -13,6 +14,10 @@ SET(PBSPRO_SRC
         PBSProQueue.cpp
         PBSProNode.cpp
         PBSProJob.cpp
+        resources/RVMem.cpp
+        resources/RVSelect.cpp
+        resources/RVAccount.cpp
+        resources/RVWalltime.cpp
         )
 
 # create shared library --------------------------------------------------------

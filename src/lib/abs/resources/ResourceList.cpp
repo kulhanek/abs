@@ -37,10 +37,6 @@ using namespace std;
 using namespace boost;
 using namespace boost::algorithm;
 
-//------------------------------------------------------------------------------
-
-CResourceList ResourceList;
-
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
@@ -216,13 +212,6 @@ const CSmallString CResourceList::GetResourceValue(const CSmallString& name) con
 
 //------------------------------------------------------------------------------
 
-void CResourceList::RemoveAllResources(void)
-{
-    clear();
-}
-
-//------------------------------------------------------------------------------
-
 void CResourceList::ResolveConflicts(void)
 {
     std::list<CResourceValuePtr>::iterator     it = begin();
@@ -230,7 +219,7 @@ void CResourceList::ResolveConflicts(void)
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        p_rv->ResolveConflicts();
+        p_rv->ResolveConflicts(this);
         it++;
     }
 }
@@ -244,21 +233,21 @@ void CResourceList::TestResourceValues(std::ostream& sout,bool& rstatus)
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        p_rv->TestValue(sout,rstatus);
+        p_rv->TestValue(this,sout,rstatus);
         it++;
     }
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceList::FinalizeResources(void)
+void CResourceList::ResolveDynamicResources(void)
 {
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        p_rv->FinalizeResource();
+        p_rv->ResolveDynamicResource(this);
         it++;
     }
 }
@@ -287,8 +276,6 @@ const CSmallString CResourceList::ToString(bool include_spaces) const
     return(output);
 }
 
-
-
 //------------------------------------------------------------------------------
 
 int CResourceList::GetNumOfCPUs(void) const
@@ -309,20 +296,11 @@ int CResourceList::GetNumOfGPUs(void) const
 
 //------------------------------------------------------------------------------
 
-int CResourceList::GetMaxNumOfCPUsPerNode(void) const
-{
-    const CResourceValuePtr p_rv = FindResource("maxcpuspernode");
-    if( p_rv == NULL ) return(1);
-    return( p_rv->Value.ToInt() );
-}
-
-//------------------------------------------------------------------------------
-
 int CResourceList::GetNumOfNodes(void) const
 {
-    // FIXME
-    const CResourceValuePtr p_rv = FindResource("ncpus");
-    return(1);
+    const CResourceValuePtr p_rv = FindResource("nnodes");
+    if( p_rv == NULL ) return(1);
+    return( p_rv->Value.ToInt() );
 }
 
 //------------------------------------------------------------------------------

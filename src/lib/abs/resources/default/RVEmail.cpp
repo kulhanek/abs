@@ -1,6 +1,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -58,9 +59,15 @@ CRVEmail::CRVEmail(void)
 
 //------------------------------------------------------------------------------
 
-void CRVEmail::TestValue(std::ostream& sout,bool& rstatus)
+void CRVEmail::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-
+    if( Value.FindSubString("@") == -1 ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout << "<b><red>        The character '@' is not found in the resource value!</red></b>" << endl;
+        rstatus = false;
+        return;
+    }
 }
 
 //==============================================================================

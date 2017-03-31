@@ -20,27 +20,28 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVNNodes.hpp>
+#include <RVMem.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVNNodesCB(void* p_data);
+CComObject* RVMemCB(void* p_data);
 
-CExtUUID        RVNNodesID(
-                    "{NNODES:93c5d47b-7a1b-47b5-852e-84691704974c}",
-                    "nnodes");
+CExtUUID        RVMemID(
+                    "{MEM:45b8522a-e690-47ef-93b6-725bc2cb74f0}",
+                    "mem");
 
-CPluginObject   RVNNodesObject(&ABSPlugin,
-                    RVNNodesID,RESOURCES_CAT,
-                    RVNNodesCB);
+CPluginObject   RVMemObject(&ABSPlugin,
+                    RVMemID,RESOURCES_CAT,
+                    RVMemCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVNNodesCB(void* p_data)
+CComObject* RVMemCB(void* p_data)
 {
-    CComObject* p_object = new CRVNNodes();
+    CComObject* p_object = new CRVMem();
     return(p_object);
 }
 
@@ -52,23 +53,39 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVNNodes::CRVNNodes(void)
-    : CResourceValue(&RVNNodesObject)
+CRVMem::CRVMem(void)
+    : CResourceValue(&RVMemObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CRVNNodes::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    if( TestNumberValue(p_rl,sout,rstatus) == false ) return;
-    long long size = GetNumber();
-    if( size <= 0 ) {
+    if( TestSizeValue(p_rl,sout,rstatus) == false ) return;
+    long long size = GetSize();
+    if( size / 1024 <= 0 ) {
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        At least one node must be requested but '" << size << "' is specified!</red></b>" << endl;
+        sout <<         "        Size must be larger than 1kb but " << size << "b is specified!</red></b>" << endl;
         rstatus = false;
     }
+}
+
+//------------------------------------------------------------------------------
+
+void CRVMem::ResolveConflicts(CResourceList* p_rl)
+{
+    p_rl->RemoveResource("mempercpu");
+}
+
+//------------------------------------------------------------------------------
+
+void CRVMem::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
+{
+    name = "Resource_List";
+    resource = Name;
+    value = Value;
 }
 
 //==============================================================================

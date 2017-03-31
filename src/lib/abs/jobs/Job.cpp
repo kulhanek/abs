@@ -401,6 +401,7 @@ ERetStatus CJob::JobInput(std::ostream& sout)
 
 bool CJob::DecodeResources(std::ostream& sout)
 {
+// file system -----------------------------------
     // set default user group and umask
     SetItem("specific/resources","INF_UGROUP",User.GetEGroup());
     SetItem("specific/resources","INF_UMASK",User.GetUMask());
@@ -417,6 +418,7 @@ bool CJob::DecodeResources(std::ostream& sout)
         SetItem("specific/resources","INF_FS_TYPE","inconsistent");
     }
 
+// input resources -------------------------------
     // input from user
     CSmallString dest = GetItem("basic/arguments","INF_ARG_DESTINATION");
     CSmallString sres = GetItem("basic/arguments","INF_ARG_RESOURCES");
@@ -425,17 +427,15 @@ bool CJob::DecodeResources(std::ostream& sout)
     CSmallString queue;
     if( BatchServers.DecodeQueueName(dest,BatchServerName,ShortServerName,queue) == false ){
         ES_TRACE_ERROR("unable to decode job destination (queue[@server])");
-        // something was wrong - exit
         return(false);
     }
 
-    CResourceList job_res;
-    bool          result = true;
+    bool result = true;
 
     // add default resources
     CSmallString  sdef_res;
     if( ABSConfig.GetSystemConfigItem("INF_DEFAULT_RESOURCES",sdef_res) ){
-        job_res.AddResources(sdef_res,sout,result);
+        ResourceList.AddResources(sdef_res,sout,result);
         if( result == false ){
             ES_TRACE_ERROR("default resources are invalid");
             return(false);
@@ -450,10 +450,9 @@ bool CJob::DecodeResources(std::ostream& sout)
         // decode destination
         if( BatchServers.DecodeQueueName(p_alias->GetDestination(),BatchServerName,ShortServerName,queue) == false ){
             ES_TRACE_ERROR("unable to decode job destination (queue[@server])");
-            // something was wrong - exit
             return(false);
         }
-        job_res.AddResources(p_alias->GetResources(),sout,result);
+        ResourceList.AddResources(p_alias->GetResources(),sout,result);
         if( result == false ){
             ES_TRACE_ERROR("alias resources are invalid");
             return(false);
@@ -464,17 +463,29 @@ bool CJob::DecodeResources(std::ostream& sout)
     }
 
     // decode user resources
-    job_res.AddResources(sres,sout,result);
+    ResourceList.AddResources(sres,sout,result);
     if( result == false ){
         ES_TRACE_ERROR("user resources are invalid");
         return(false);
     }
 
-    job_res.TestResourceValues(sout,result);
+    // resolve conflicts
+    ResourceList.ResolveConflicts();
+
+    // test resources
+    ResourceList.TestResourceValues(sout,result);
     if( result == false ){
         ES_TRACE_ERROR("some resource value is invalid");
         return(false);
     }
+
+    // calculate dynamic resources
+    ResourceList.ResolveDynamicResources();
+
+    // set final resources
+    //SetItem("specific/resources","INF_RESOURCES",ResourcesList.ToString());
+
+
 
 //    // finalize resources
 //    job_res.Finalize();
@@ -546,18 +557,9 @@ bool CJob::DecodeResources(std::ostream& sout)
 //    }
 
     SetItem("specific/resources","INF_QUEUE",queue);
-////    SetItem("specific/resources","INF_NCPU",res.GetNumOfCPUs());
-////    SetItem("specific/resources","INF_NGPU",res.GetNumOfGPUs());
-//    SetItem("specific/resources","INF_MAX_CPUS_PER_NODE",res.GetMaxNumOfCPUsPerNode());
-//    SetItem("specific/resources","INF_NNODE",res.GetMaxNumOfCPUsPerNode());
-//    SetItem("specific/resources","INF_RESOURCES",res.ToString(false));
-
-//    SetItem("specific/resources","INF_SURROGATE_MACHINE",surrogate);
-//    SetItem("specific/resources","INF_SCRATCH_TYPE",scratch_type);
-//    SetItem("specific/resources","INF_UMASK",umask);
-//    SetItem("specific/resources","INF_UGROUP",ugroup);
-//    SetItem("specific/resources","INF_UGROUP_REALM",ugroup_realm);
-//    SetItem("specific/resources","INF_UGROUP_ORIG",ugroup_orig);
+    SetItem("specific/resources","INF_NCPU",ResourceList.GetNumOfCPUs());
+    SetItem("specific/resources","INF_NGPU",ResourceList.GetNumOfGPUs());
+    SetItem("specific/resources","INF_NNODE",ResourceList.GetNumOfNodes());
 
     return(true);
 }
@@ -2800,7 +2802,6 @@ void CJob::PrintBasicV3(std::ostream& sout)
     if( tmp == NULL ) tmp = "-none-";
     sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
 
-    sout << "Site name        : " << GetSiteName() << endl;
     sout << "Job key          : " << GetItem("basic/jobinput","INF_JOB_KEY") << endl;
 
     tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX",true);
@@ -2857,6 +2858,8 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     PrintResourceTokens(sout,"Req resources    :",tmp);
 
     sout << "----------------------------------------" << endl;
+    sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
+
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
     if( tmp ){
         PrintResourceTokens(sout,"Default resources: ",tmp);
@@ -2886,67 +2889,28 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_NGPU");
     sout << "Number of GPUs   : " << tmp << endl;
 
-    tmp = GetItem("specific/resources","INF_MAX_CPUS_PER_NODE");
-    sout << "Max CPUs / node  : " << tmp << endl;
-
     tmp = GetItem("specific/resources","INF_NNODE");
-    if( tmp != NULL ){
     sout << "Number of nodes  : " << tmp << endl;
-    }
 
-    // batch resources
+    tmp = GetItem("specific/resources","INF_MEMORY");
+    sout << "Memory           : " << tmp << endl;
 
-//    it = res.begin();
-//    ie = res.end();
-
-//    sout << "Resources        : ";
-
-//    len = 19;
-//    while( it != ie ){
-//        CResourceValuePtr p_res = *it;
-//        sout <<  p_res->Name << "=" << p_res->Value;
-//        len += p_res->Name.GetLength();
-//        len += p_res->Value.GetLength();
-//        len++;
-//        it++;
-//        if( it != ie ){
-//            p_res = *it;
-//            int tlen = len;
-//            tlen += p_res->Name.GetLength();
-//            tlen += p_res->Value.GetLength();
-//            tlen++;
-//            if( tlen > 80 ){
-//                sout << "," << endl;
-//                sout << "                   ";
-//                len = 19;
-//            } else {
-//                sout << ", ";
-//                len += 2;
-//            }
-//        }
-//    }
-//    sout << endl;
+    tmp = GetItem("specific/resources","INF_BATCH_RESOURCES");
+    PrintResourceTokens(sout,"Batch resources  : ",tmp);
 
     sout << "----------------------------------------" << endl;
 
-    tmp = GetItem("specific/resources","INF_SURROGATE_MACHINE",true);
-    if( tmp == NULL ) tmp = GetItem("basic/jobinput","INF_JOB_MACHINE");
-    if( tmp == GetItem("basic/jobinput","INF_JOB_MACHINE") ){
-    sout << "Surrogate machine: " << " -- none -- " << endl;
-    } else {
-    sout << "Surrogate machine: " << tmp << endl;
-    }
+    tmp = GetItem("specific/resources","INF_WORKDIR");
+    sout << "Work directory   : " << tmp << endl;
 
-    tmp = GetItem("specific/resources","INF_SYNC_MODE");
-    sout << "Sync mode        : " << tmp << endl;
-
-    tmp = GetItem("specific/resources","INF_SCRATCH_TYPE",true);
-    if( tmp == NULL ) tmp = "scratch";
-    sout << "Scratch type     : " << tmp << endl;
+    tmp = GetItem("specific/resources","INF_WORKSIZE");
+    sout << "Work dir size    : " << tmp << endl;
 
     CSmallString fs_type = GetItem("specific/resources","INF_FS_TYPE",true);
     if( fs_type == NULL ) fs_type = "consistent";
     sout << "Input FS type    : " << fs_type << endl;
+
+// ----------------------
 
     if( fs_type == "inconsistent" ) sout << "<blue>";
 
@@ -2974,6 +2938,8 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     }
 
     if( fs_type == "inconsistent" ) sout << "</blue>";
+
+// ----------------------
 
     tmp = GetItem("basic/jobinput","INF_EXCLUDED_FILES");
     if( tmp == NULL ){

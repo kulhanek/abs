@@ -1,6 +1,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -22,6 +23,8 @@
 #include <RVMemPerCPU.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
+#include <ErrorSystem.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -58,9 +61,29 @@ CRVMemPerCPU::CRVMemPerCPU(void)
 
 //------------------------------------------------------------------------------
 
-void CRVMemPerCPU::TestValue(std::ostream& sout,bool& rstatus)
+void CRVMemPerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
+    if( TestSizeValue(p_rl,sout,rstatus) == false ) return;
+    long long size = GetSize();
+    if( size / 1024 <= 0 ) {
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout <<         "        Size must be larger than 1kb but " << size << "b is specified!</red></b>" << endl;
+        rstatus = false;
+    }
+}
 
+//------------------------------------------------------------------------------
+
+void CRVMemPerCPU::ResolveDynamicResource(CResourceList* p_rl)
+{
+    CResourceValuePtr res = p_rl->FindResource("ncpus");
+    if( res == NULL ){
+        ES_TRACE_ERROR("ncpus is not provided");
+        return;
+    }
+    long long mem = res->GetNumber() * GetSize();
+    p_rl->AddResource("mem",mem);
 }
 
 //==============================================================================

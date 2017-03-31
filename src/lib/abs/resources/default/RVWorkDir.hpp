@@ -34,7 +34,8 @@ public:
         CRVWorkDir(void);
 
 // information methods ---------------------------------------------------------
-    virtual void TestValue(std::ostream& sout,bool& rstatus);
+    /// test value if it is in expected range
+    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 };
 
 // -----------------------------------------------------------------------------

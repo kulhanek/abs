@@ -1,5 +1,5 @@
-#ifndef RVMemPerCPUH
-#define RVMemPerCPUH
+#ifndef RVWalltimeH
+#define RVWalltimeH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -29,17 +29,17 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CRVMemPerCPU : public CResourceValue {
+class ABS_PACKAGE CRVWalltime : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CRVMemPerCPU(void);
+        CRVWalltime(void);
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
     virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
-    /// resolve dynamic resource
-    virtual void ResolveDynamicResource(CResourceList* p_rl);
+    /// get batch attribute
+    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
 };
 
 // -----------------------------------------------------------------------------
