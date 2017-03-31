@@ -1536,15 +1536,7 @@ CSmallString CJob::GetInfoFileVersion(void)
 
 const CSmallString CJob::GetServerName(void)
 {
-    CXMLElement* p_rele = GetElementByPath("infinity",false);
-    if( p_rele == NULL ){
-        ES_ERROR("infinity element was not found");
-        return("");
-    }
-
-    CSmallString mode;
-    p_rele->GetAttribute("server",mode);
-    return(mode);
+    return(GetItem("specific/resources","INF_SERVER"));
 }
 
 //------------------------------------------------------------------------------
@@ -2851,18 +2843,19 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     PrintResourceTokens(sout,"All resources    : ",tmp);
 
     sout << "----------------------------------------" << endl;
-
+    sout << " NCPUs / NGPUs / NNodes / Memory        " << endl;
     tmp = GetItem("specific/resources","INF_FIN_NCPU");
-    sout << "Number of CPUs   : " << tmp << endl;
-
-    tmp = GetItem("specific/resources","INF_FIN_NGPU");
-    sout << "Number of GPUs   : " << tmp << endl;
-
+    sout << setw(6) << tmp;
+    sout << "  ";
+    tmp = GetItem("specific/resources","INF_FIN_NCPU");
+    sout << setw(6) << tmp;
+    sout << "  ";
     tmp = GetItem("specific/resources","INF_FIN_NNODE");
-    sout << "Number of nodes  : " << tmp << endl;
-
+    sout << setw(7) << tmp;
+    sout << "  ";
     tmp = GetItem("specific/resources","INF_FIN_MEMORY");
-    sout << "Memory           : " << tmp << endl;
+    sout << setw(7) << tmp;
+    sout << endl;
 
     sout << "----------------------------------------" << endl;
 
