@@ -40,7 +40,7 @@ CResourceValue::CResourceValue(CPluginObject* p_objectinfo)
     : CComObject(p_objectinfo)
 {
     if( p_objectinfo ){
-        p_objectinfo->GetObjectUUID().GetName();
+        Name = p_objectinfo->GetObjectUUID().GetName();
     }
 }
 
