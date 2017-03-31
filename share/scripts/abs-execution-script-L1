@@ -85,9 +85,10 @@ fi
 # ------------------------------------------------------------------------------
 # AMS/ABS co-operation
 
-export AMS_NCPU=$INF_NCPU
+#FIXME
+export AMS_NCPU=$PBS_NCPUS
 export AMS_NGPU=$INF_NGPU
-export AMS_NNODE=$INF_NNODE
+export AMS_NNODE=$PBS_NCPUS
 export INF_NODEFILE=$PBS_NODEFILE
 export AMS_NODEFILE=$INF_NODEFILE
 
@@ -110,11 +111,6 @@ if [ "$INF_EXPORTED_MODULES" != "" ]; then
     amsmodule --reexported add $INF_EXPORTED_MODULES
 else
     echo ""
-fi
-
-if [ "$INF_JOB_MACHINE" != "$INF_SURROGATE_MACHINE" ]; then
-    echo "INFO: overriding INF_JOB_MACHINE by INF_SURROGATE_MACHINE"
-    INF_JOB_MACHINE="$INF_SURROGATE_MACHINE"
 fi
 
 # ------------------------------------------------------------------------------

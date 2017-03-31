@@ -98,12 +98,12 @@ case $INF_SYNC_MODE in
         fi
     ;;
     sync | nosync )
-        SCRATCH_DIR="`$ABS_ROOT/sbin/abs-get-scratch-dir --type main $INF_SCRATCH_TYPE`"
-        echo " Scratch dir        : $SCRATCH_DIR"
+        INF_WORK_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type main $INF_WORK_DIR_TYPE`"
+        echo " Scratch dir        : $INF_WORK_DIR"
         if [ $? -ne -0 ]; then
             return 1
         fi
-        INF_WORK_DIR="`eval echo "$SCRATCH_DIR"`"
+        INF_WORK_DIR="`eval echo "$INF_WORK_DIR"`"
     ;;
 esac
 

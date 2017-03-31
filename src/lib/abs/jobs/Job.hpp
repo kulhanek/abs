@@ -343,9 +343,6 @@ public:
     /// is job dir local
     bool IsJobDirLocal(bool no_deep=false);
 
-    /// get surrogate machine
-    const CSmallString GetSurrogateMachine(void);
-
     /// set simple job identification
     void SetSimpleJobIdentification(const CSmallString& name, const CSmallString& machine,
                                     const CSmallString& path);

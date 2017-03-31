@@ -35,7 +35,6 @@ echo " Job name             : $INF_JOB_NAME"
 echo " Job name suffix      : $INF_JOB_NAME_SUFFIX"
 echo " Job input path       : $INF_JOB_PATH"
 echo " Job input machine    : $INF_JOB_MACHINE"
-echo " Job surrogate machine: $INF_SURROGATE_MACHINE"
 echo " Job key              : $INF_JOB_KEY"
 echo " ABS Root             : $ABS_ROOT"
 echo "------------------------------------------------------"
@@ -47,11 +46,6 @@ echo " AMS boot script      : $INF_BOOT_SCRIPT"
 echo " User group           : $INF_UGROUP"
 echo " Umask                : $INF_UMASK"
 echo ""
-
-if [ "$INF_JOB_MACHINE" != "$INF_SURROGATE_MACHINE" ]; then
-    echo "INFO: overriding INF_JOB_MACHINE by INF_SURROGATE_MACHINE"
-    INF_JOB_MACHINE="$INF_SURROGATE_MACHINE"
-fi
 
 echo "#-------------------------------------------------------------------------------"
 echo "# L0.0 Booting into the first execution layer ..."

@@ -478,12 +478,12 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
     // set final resources
-    SetItem("specific/resources","INF_NCPU",ResourceList.GetNumOfCPUs());
-    SetItem("specific/resources","INF_NGPU",ResourceList.GetNumOfGPUs());
-    SetItem("specific/resources","INF_NNODE",ResourceList.GetNumOfNodes());
-    SetItem("specific/resources","INF_MEMORY",ResourceList.GetMemoryString());
-    SetItem("specific/resources","INF_WALLTIME",ResourceList.GetWalltimeString());
-    SetItem("specific/resources","INF_RESOURCES",ResourceList.ToString(false));
+    SetItem("specific/resources","INF_REQ_NCPU",ResourceList.GetNumOfCPUs());
+    SetItem("specific/resources","INF_REQ_NGPU",ResourceList.GetNumOfGPUs());
+    SetItem("specific/resources","INF_REQ_NNODE",ResourceList.GetNumOfNodes());
+    SetItem("specific/resources","INF_REQ_MEMORY",ResourceList.GetMemoryString());
+    SetItem("specific/resources","INF_REQ_WALLTIME",ResourceList.GetWalltimeString());
+    SetItem("specific/resources","INF_REQ_RESOURCES",ResourceList.ToString(false));
 
     return(true);
 }
@@ -1717,15 +1717,6 @@ bool CJob::IsJobDirLocal(bool no_deep)
 
 //------------------------------------------------------------------------------
 
-const CSmallString CJob::GetSurrogateMachine(void)
-{
-    CSmallString surrogate = GetItem("specific/resources","INF_SURROGATE_MACHINE",true);
-    if( surrogate == NULL ) surrogate =  GetItem("basic/jobinput","INF_JOB_MACHINE");
-    return( surrogate );
-}
-
-//------------------------------------------------------------------------------
-
 void CJob::SetSimpleJobIdentification(const CSmallString& name, const CSmallString& machine,
                                       const CSmallString& path)
 {
@@ -2846,31 +2837,31 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     sout << "-------------------------------------------" << endl;
     sout << "NCPUs NGPUs NNodes Memory WorkSize WallTime" << endl;
-    tmp = GetItem("specific/resources","INF_NCPU");
+    tmp = GetItem("specific/resources","INF_REQ_NCPU");
     sout << setw(5) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_NGPU");
+    tmp = GetItem("specific/resources","INF_REQ_NGPU");
     sout << setw(5) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_NNODE");
+    tmp = GetItem("specific/resources","INF_REQ_NNODE");
     sout << setw(6) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_MEMORY");
+    tmp = GetItem("specific/resources","INF_REQ_MEMORY");
     sout << setw(6) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_WORKSIZE");
+    tmp = GetItem("specific/resources","INF_REQ_WORKSIZE");
     sout << setw(8) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_WALLTIME");
+    tmp = GetItem("specific/resources","INF_REQ_WALLTIME");
     sout << setw(8) << tmp;
     sout << endl;
 
     sout << "-------------------------------------------" << endl;
 
-    tmp = GetItem("specific/resources","INF_WORKDIR");
+    tmp = GetItem("specific/resources","INF_WORK_DIR_TYPE");
     sout << "Work directory   : " << tmp << endl;
 
-    tmp = GetItem("specific/resources","INF_WORKSIZE");
+    tmp = GetItem("specific/resources","INF_WORK_SIZE");
     sout << "Work dir size    : " << tmp << endl;
 
     CSmallString fs_type = GetItem("specific/resources","INF_FS_TYPE",true);

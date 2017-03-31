@@ -46,7 +46,7 @@ echo "# ------------------------------------------------------------------------
 
 cd
 
-CLEAN_DIR="`$ABS_ROOT/sbin/abs-get-scratch-dir --type clean $INF_SCRATCH_TYPE`"
+CLEAN_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type clean $INF_WORK_DIR_TYPE`"
 if [ $? -ne -0 ]; then
     echo ""
     echo " >>> ERROR: Unable to get clean scratch dir!"
