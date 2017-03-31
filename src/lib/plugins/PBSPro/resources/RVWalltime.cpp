@@ -198,8 +198,8 @@ void CRVWalltime::TransformWallTimeShortNotation(void)
 
 void CRVWalltime::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    name = Name;
-    resource = "";
+    name = "Resource_List";
+    resource = Name;
     value = Value;
 }
 
