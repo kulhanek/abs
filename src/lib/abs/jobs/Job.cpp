@@ -2764,18 +2764,18 @@ void CJob::PrintBasicV3(std::ostream& sout)
     sout << "Job directory    : " << GetItem("basic/jobinput","INF_JOB_MACHINE");
     sout << ":" << GetItem("basic/jobinput","INF_JOB_PATH") << endl;
 
-    col = GetItem("basic/collection","INF_COLLECTION_NAME",true);
-    if( col == NULL ) col = "-none-";
-    tmp = GetItem("basic/jobinput","INF_JOB_PROJECT");
-    if( tmp == NULL ) tmp = "-none-";
-    sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
-
     sout << "Job key          : " << GetItem("basic/jobinput","INF_JOB_KEY") << endl;
 
     tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX",true);
     if( tmp != NULL ) {
     sout << "Parametric job   : " << tmp << endl;
     }
+
+    col = GetItem("basic/collection","INF_COLLECTION_NAME",true);
+    if( col == NULL ) col = "-none-";
+    tmp = GetItem("basic/jobinput","INF_JOB_PROJECT");
+    if( tmp == NULL ) tmp = "-none-";
+    sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
 
     sout << "========================================================" << endl;
 }
@@ -2823,7 +2823,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Req destination  : " << tmp << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
-    PrintResourceTokens(sout,"Req resources    :",tmp);
+    PrintResourceTokens(sout,"Req resources    : ",tmp);
 
     sout << "----------------------------------------" << endl;
     sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
@@ -2846,25 +2846,22 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_QUEUE");
     sout << "Queue            : " << tmp << endl;
 
-    tmp = GetItem("specific/resources","INF_RESOURCES");
+    tmp = GetItem("specific/resources","INF_FIN_RESOURCES");
     PrintResourceTokens(sout,"All resources    : ",tmp);
 
     sout << "----------------------------------------" << endl;
 
-    tmp = GetItem("specific/resources","INF_NCPU");
+    tmp = GetItem("specific/resources","INF_FIN_NCPU");
     sout << "Number of CPUs   : " << tmp << endl;
 
-    tmp = GetItem("specific/resources","INF_NGPU");
+    tmp = GetItem("specific/resources","INF_FIN_NGPU");
     sout << "Number of GPUs   : " << tmp << endl;
 
-    tmp = GetItem("specific/resources","INF_NNODE");
+    tmp = GetItem("specific/resources","INF_FIN_NNODE");
     sout << "Number of nodes  : " << tmp << endl;
 
-    tmp = GetItem("specific/resources","INF_MEMORY");
+    tmp = GetItem("specific/resources","INF_FIN_MEMORY");
     sout << "Memory           : " << tmp << endl;
-
-    tmp = GetItem("specific/resources","INF_BATCH_RESOURCES");
-    PrintResourceTokens(sout,"Batch resources  : ",tmp);
 
     sout << "----------------------------------------" << endl;
 
@@ -3091,7 +3088,7 @@ void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, con
 
     sout << title;
 
-    if(items.size() == 0 ){
+    if(res_list == NULL ){
         sout << "-none-" << endl;
         return;
     }
