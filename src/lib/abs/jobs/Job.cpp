@@ -2843,18 +2843,24 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     PrintResourceTokens(sout,"All resources    : ",tmp);
 
     sout << "----------------------------------------" << endl;
-    sout << " NCPUs / NGPUs / NNodes / Memory        " << endl;
+    sout << "NCPUs NGPUs NNodes Memory WorkSize WallTime" << endl;
     tmp = GetItem("specific/resources","INF_FIN_NCPU");
-    sout << setw(6) << tmp;
-    sout << "  ";
-    tmp = GetItem("specific/resources","INF_FIN_NCPU");
-    sout << setw(6) << tmp;
-    sout << "  ";
+    sout << setw(5) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_FIN_NGPU");
+    sout << setw(5) << tmp;
+    sout << " ";
     tmp = GetItem("specific/resources","INF_FIN_NNODE");
-    sout << setw(7) << tmp;
-    sout << "  ";
+    sout << setw(6) << tmp;
+    sout << " ";
     tmp = GetItem("specific/resources","INF_FIN_MEMORY");
-    sout << setw(7) << tmp;
+    sout << setw(6) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_FIN_WORKSIZE");
+    sout << setw(8) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_FIN_WALLTIME");
+    sout << setw(8) << tmp;
     sout << endl;
 
     sout << "----------------------------------------" << endl;
