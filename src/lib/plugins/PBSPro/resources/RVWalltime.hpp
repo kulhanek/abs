@@ -40,6 +40,9 @@ public:
 
     /// get batch attribute
     virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
+
+    /// short notation
+    void TransformWallTimeShortNotation(void);
 };
 
 // -----------------------------------------------------------------------------

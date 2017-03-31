@@ -151,21 +151,21 @@ CSmallString CResourceValue::GetSizeString(void)
 
     munit = "kb";
 
-    if( size > 1024 ){
+    if( size >= 1024 ){
         msize = size % 1024;
         if( msize == 0 ){
             munit = "mb";
             size /= 1024;
         }
     }
-    if( size > 1024 ){
+    if( size >= 1024 ){
         msize = size % 1024;
         if( msize == 0 ){
             munit = "gb";
             size /= 1024;
         }
     }
-    if( size > 1024 ){
+    if( size >= 1024 ){
         msize = size % 1024;
         if( msize == 0 ){
             munit = "tb";

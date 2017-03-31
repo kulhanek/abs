@@ -365,8 +365,17 @@ long long CResourceList::GetMemory(void) const
 const CSmallString CResourceList::GetMemoryString(void) const
 {
     const CResourceValuePtr p_rv = FindResource("mem");
-    if( p_rv == NULL ) return("-not provided-");
+    if( p_rv == NULL ) return("n.a.");
     return(p_rv->GetSizeString());
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CResourceList::GetWalltimeString(void) const
+{
+    const CResourceValuePtr p_rv = FindResource("walltime");
+    if( p_rv == NULL ) return("n.a.");
+    return(p_rv->GetValue());
 }
 
 //------------------------------------------------------------------------------

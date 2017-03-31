@@ -99,6 +99,9 @@ public:
     /// get memory in variable unit
     const CSmallString GetMemoryString(void) const;
 
+    /// get walltime
+    const CSmallString GetWalltimeString(void) const;
+
 // section of private data -----------------------------------------------------
 private:
     /// helper method

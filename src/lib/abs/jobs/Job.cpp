@@ -478,11 +478,12 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
     // set final resources
-    SetItem("specific/resources","INF_FIN_NCPU",ResourceList.GetNumOfCPUs());
-    SetItem("specific/resources","INF_FIN_NGPU",ResourceList.GetNumOfGPUs());
-    SetItem("specific/resources","INF_FIN_NNODE",ResourceList.GetNumOfNodes());
-    SetItem("specific/resources","INF_FIN_MEMORY",ResourceList.GetMemoryString());
-    SetItem("specific/resources","INF_FIN_RESOURCES",ResourceList.ToString(false));
+    SetItem("specific/resources","INF_NCPU",ResourceList.GetNumOfCPUs());
+    SetItem("specific/resources","INF_NGPU",ResourceList.GetNumOfGPUs());
+    SetItem("specific/resources","INF_NNODE",ResourceList.GetNumOfNodes());
+    SetItem("specific/resources","INF_MEMORY",ResourceList.GetMemoryString());
+    SetItem("specific/resources","INF_WALLTIME",ResourceList.GetWalltimeString());
+    SetItem("specific/resources","INF_RESOURCES",ResourceList.ToString(false));
 
     return(true);
 }
@@ -2835,7 +2836,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     PrintResourceTokens(sout,"Alias resources  : ",tmp);
     }
 
-    tmp = GetItem("specific/resources","INF_FIN_RESOURCES");
+    tmp = GetItem("specific/resources","INF_RESOURCES");
     PrintResourceTokens(sout,"All resources    : ",tmp);
 
     sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
@@ -2844,22 +2845,22 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     sout << "-------------------------------------------" << endl;
     sout << "NCPUs NGPUs NNodes Memory WorkSize WallTime" << endl;
-    tmp = GetItem("specific/resources","INF_FIN_NCPU");
+    tmp = GetItem("specific/resources","INF_NCPU");
     sout << setw(5) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_FIN_NGPU");
+    tmp = GetItem("specific/resources","INF_NGPU");
     sout << setw(5) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_FIN_NNODE");
+    tmp = GetItem("specific/resources","INF_NNODE");
     sout << setw(6) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_FIN_MEMORY");
+    tmp = GetItem("specific/resources","INF_MEMORY");
     sout << setw(6) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_FIN_WORKSIZE");
+    tmp = GetItem("specific/resources","INF_WORKSIZE");
     sout << setw(8) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_FIN_WALLTIME");
+    tmp = GetItem("specific/resources","INF_WALLTIME");
     sout << setw(8) << tmp;
     sout << endl;
 
