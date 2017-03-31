@@ -23,6 +23,8 @@
 #include <ErrorSystem.hpp>
 #include <TerminalStr.hpp>
 #include <ABSConfig.hpp>
+#include <XMLElement.hpp>
+#include <ErrorSystem.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -65,22 +67,26 @@ bool CGetWorkDir::Run(void)
     while( p_wele != NULL ){
         CSmallString name;
         p_wele->GetAttribute("name",name);
-        if( lname == Options.GetArgWorkDir() ) break;
+        if( name == Options.GetArgWorkDir() ) break;
         p_wele = p_wele->GetNextSiblingElement("workdir");
     }
 
-    p_mele = p_wele->GetFirstChildElement(Options.GetOptMode());
+    CXMLElement* p_mele = NULL;
+
+    if( p_wele ){
+        p_mele = p_wele->GetFirstChildElement(Options.GetOptMode());
+    }
 
     if( p_mele == NULL ){
         // fallback defaults
         if( Options.GetOptMode() == "main" ){
-            std::cout << "/scratch/$USER/$INF_JOB_ID/main" <<  endl;
+            std::cout << "/scratch/$USER/$INF_JOB_ID/main";
         } else if ( Options.GetOptMode() == "ijob" ){
-            std::cout << "/scratch/$USER/$INF_JOB_ID/$INF_IJOB_ID" <<  endl;
+            std::cout << "/scratch/$USER/$INF_JOB_ID/$INF_IJOB_ID";
         } else if ( Options.GetOptMode() == "clean" ){
-            std::cout << "/scratch/$USER/$INF_JOB_ID" <<  endl;
+            std::cout << "/scratch/$USER/$INF_JOB_ID";
         } else {
-            RUNTIME_ERROR("unsupported scratch mode " + mode);
+            RUNTIME_ERROR("unsupported scratch mode " + Options.GetOptMode());
         }
     }
     CSmallString value;

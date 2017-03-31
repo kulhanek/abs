@@ -57,7 +57,7 @@ public:
     CSO_MAP_BEGIN
  // description of arguments ---------------------------------------------------
         CSO_MAP_ARG(CSmallString,                   /* argument type */
-                    ScratchType,                          /* argument name */
+                    WorkDir,                          /* argument name */
                     NULL,                           /* default value */
                     true,                           /* is argument mandatory */
                     "type",                        /* parametr name */
