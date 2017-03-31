@@ -19,56 +19,87 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include "GetScratchDirOptions.hpp"
+#include "GetWorkDir.hpp"
 #include <ErrorSystem.hpp>
+#include <TerminalStr.hpp>
+#include <ABSConfig.hpp>
+
+//------------------------------------------------------------------------------
+
+MAIN_ENTRY(CGetWorkDir)
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CGetScratchDirOptions::CGetScratchDirOptions(void)
+CGetWorkDir::CGetWorkDir(void)
 {
-    SetShowMiniUsage(true);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+int CGetWorkDir::Init(int argc,char* argv[])
+{
+// encode program options
+    int result = Options.ParseCmdLine(argc,argv);
+
+// should we exit or was it error?
+    return(result);
 }
 
 //------------------------------------------------------------------------------
 
-int CGetScratchDirOptions::CheckOptions(void)
+bool CGetWorkDir::Run(void)
 {
-    return(SO_CONTINUE);
-}
-
-//------------------------------------------------------------------------------
-
-int CGetScratchDirOptions::FinalizeOptions(void)
-{
-    bool ret_opt = false;
-
-    if( GetOptHelp() == true ){
-        PrintUsage();
-        ret_opt = true;
+    // load system and optionaly user configuration
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load system config");
+        return(false);
     }
 
-    if( GetOptVersion() == true ){
-        PrintVersion();
-        ret_opt = true;
+    CXMLElement* p_sele = ABSConfig.GetWorkDirConfig();
+
+    CXMLElement* p_wele = p_sele->GetFirstChildElement("workdir");
+    while( p_wele != NULL ){
+        CSmallString name;
+        p_wele->GetAttribute("name",name);
+        if( lname == Options.GetArgWorkDir() ) break;
+        p_wele = p_wele->GetNextSiblingElement("workdir");
     }
 
-    if( ret_opt == true ){
-        printf("\n");
-        return(SO_EXIT);
-    }
+    p_mele = p_wele->GetFirstChildElement(Options.GetOptMode());
 
-    return(SO_CONTINUE);
+    if( p_mele == NULL ){
+        // fallback defaults
+        if( Options.GetOptMode() == "main" ){
+            std::cout << "/scratch/$USER/$INF_JOB_ID/main" <<  endl;
+        } else if ( Options.GetOptMode() == "ijob" ){
+            std::cout << "/scratch/$USER/$INF_JOB_ID/$INF_IJOB_ID" <<  endl;
+        } else if ( Options.GetOptMode() == "clean" ){
+            std::cout << "/scratch/$USER/$INF_JOB_ID" <<  endl;
+        } else {
+            RUNTIME_ERROR("unsupported scratch mode " + mode);
+        }
+    }
+    CSmallString value;
+    p_mele->GetAttribute("path",value);
+    std::cout << value;
+
+    return(true);
 }
 
 //------------------------------------------------------------------------------
 
-int CGetScratchDirOptions::CheckArguments(void)
+void CGetWorkDir::Finalize(void)
 {
-    return(SO_CONTINUE);
+    if( Options.GetOptVerbose() || ErrorSystem.IsError() ) {
+        ErrorSystem.PrintErrors(stderr);
+    }
 }
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
+

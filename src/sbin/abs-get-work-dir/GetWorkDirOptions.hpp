@@ -1,5 +1,5 @@
-#ifndef GetScratchDirOptionsH
-#define GetScratchDirOptionsH
+#ifndef GetWorkDirOptionsH
+#define GetWorkDirOptionsH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -26,18 +26,18 @@
 
 //------------------------------------------------------------------------------
 
-class CGetScratchDirOptions : public CSimpleOptions {
+class CGetWorkDirOptions : public CSimpleOptions {
 public:
         // constructor - tune option setup
-        CGetScratchDirOptions(void);
+        CGetWorkDirOptions(void);
 
  // program name and description -----------------------------------------------
     CSO_PROG_NAME_BEGIN
-        "abs-get-scratch-dir"
+        "abs-get-work-dir"
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Return the scratch directory specification according to the scratch type."
+        "Return the work directory specification according to the workdir type."
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN
@@ -46,7 +46,7 @@ public:
 
  // list of all options and arguments ------------------------------------------
     CSO_LIST_BEGIN
-        CSO_ARG(CSmallString,ScratchType)
+        CSO_ARG(CSmallString,WorkDir)
         // options ------------------------------
         CSO_OPT(CSmallString,Mode)
         CSO_OPT(bool,Help)
@@ -61,7 +61,7 @@ public:
                     NULL,                           /* default value */
                     true,                           /* is argument mandatory */
                     "type",                        /* parametr name */
-                    "requested scratch type")   /* argument description */
+                    "requested workdir")   /* argument description */
  // description of options -----------------------------------------------------
         CSO_MAP_OPT(CSmallString,                           /* option type */
                     Mode,                        /* option name */
@@ -70,7 +70,7 @@ public:
                     't',                           /* short option name */
                     "type",                      /* long option name */
                     "STRING",                           /* parametr name */
-                    "scratch mode, supported: main, ijobs, clean")   /* option description */
+                    "workdir mode, supported: main, ijobs, clean")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */

@@ -24,7 +24,7 @@ case "$INF_KILL_JOB_NAME" in
         if [ -n "$INF_KILL_MAIN_NODE" ] && [ -n "$INF_KILL_JOB_KEY" ]; then
             echo ""
             echo "Terminating the job CLI terminal ..."
-            ssh -t "$INF_KILL_MAIN_NODE" screen -d -r "T$INF_KILL_JOB_KEY -X quit"
+            ssh -x -t "$INF_KILL_MAIN_NODE" screen -d -r "T$INF_KILL_JOB_KEY -X quit"
             echo ""
         fi
         ;;
@@ -39,7 +39,7 @@ case "$INF_KILL_JOB_NAME" in
         # send TERM signal to user script
         echo ""
         echo "Sending TERM signal to "$INF_KILL_MAIN_NODE:$INF_KILL_WORK_DIR" ..."
-        ssh $INF_KILL_MAIN_NODE "cd $INF_KILL_WORK_DIR; \
+        ssh -x $INF_KILL_MAIN_NODE "cd $INF_KILL_WORK_DIR; \
                 if ! [ -f ___JOB_IS_RUNNING___ ]; then \
                    echo \"\"; \
                    echo \"ERROR: The user script has not been started or it has already been terminated!\"; \

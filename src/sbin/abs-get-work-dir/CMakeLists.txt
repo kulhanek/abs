@@ -4,17 +4,17 @@
 
 # program objects --------------------------------------------------------------
 SET(CONFIG_SRC
-        GetScratchDir.cpp
-        GetScratchDirOptions.cpp
+        GetWorkDir.cpp
+        GetWorkDirOptions.cpp
         )
 
 # final build ------------------------------------------------------------------
-ADD_EXECUTABLE(abs-get-scratch-dir ${CONFIG_SRC})
+ADD_EXECUTABLE(abs-get-work-dir ${CONFIG_SRC})
 
-TARGET_LINK_LIBRARIES(abs-get-scratch-dir ${ABS_LIBS})
+TARGET_LINK_LIBRARIES(abs-get-work-dir ${ABS_LIBS})
 
 INSTALL(TARGETS
-            abs-get-scratch-dir
+            abs-get-work-dir
         RUNTIME DESTINATION
             sbin
         )

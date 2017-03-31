@@ -56,7 +56,7 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
             for NODE_NAME in `cat $INF_IJOB_NODEFILE | sort -u`; do
                 echo ""
                 echo "     >>> $NODE_NAME:$INF_IJOB_WORK_DIR"
-                ssh -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; rm -rf $INF_IJOB_WORK_DIR" | awk '{ printf("     %s\n",$0); }'
+                ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; rm -rf $INF_IJOB_WORK_DIR" | awk '{ printf("     %s\n",$0); }'
             done
             ;;
         jobdir | nosync )

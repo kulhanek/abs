@@ -23,7 +23,7 @@
 
 echo "List of files in working directory:"
 echo "========================================================"
-ssh $INF_SYNC_MAIN_NODE "cd $INF_SYNC_WORK_DIR; if [ \$? -ne 0 ]; then echo; exit 1; fi; \ls -l *"
+ssh -x $INF_SYNC_MAIN_NODE "cd $INF_SYNC_WORK_DIR; if [ \$? -ne 0 ]; then echo; exit 1; fi; \ls -l *"
 
 if [ $? -ne 0 ]; then
     exit 1

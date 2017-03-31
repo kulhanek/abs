@@ -1,5 +1,5 @@
-#ifndef GetScratchDirH
-#define GetScratchDirH
+#ifndef GetWorkDirH
+#define GetWorkDirH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -21,15 +21,15 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include "GetScratchDirOptions.hpp"
-#include <GlobalConfig.hpp>
+#include "GetWorkDirOptions.hpp"
+#include <ABSConfig.hpp>
 
 // -----------------------------------------------------------------------------
 
-class CGetScratchDir{
+class CGetWorkDir{
     public:
 // constructor -----------------------------------------------------------------
-        CGetScratchDir(void);
+        CGetWorkDir(void);
 
 // main methods ----------------------------------------------------------------
     //! init options
@@ -43,7 +43,7 @@ class CGetScratchDir{
 
 // section of private data -----------------------------------------------------
     private:
-    CGetScratchDirOptions  Options;
+    CGetWorkDirOptions  Options;
 };
 
 // -----------------------------------------------------------------------------

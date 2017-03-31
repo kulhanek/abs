@@ -126,7 +126,7 @@ case $INF_SYNC_MODE in
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
-            ssh -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; mkdir -p $INF_WORK_DIR"
+            ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; mkdir -p $INF_WORK_DIR"
 
             if [ $? -ne 0 ]; then
                 echo "" >&2
@@ -233,7 +233,7 @@ case $INF_SYNC_MODE in
         for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME ----------------------------------"
-            ssh -o "StrictHostKeyChecking=no" $NODE_NAME "top -b -n 1"
+            ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "top -b -n 1"
         done
     ;;
 esac

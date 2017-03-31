@@ -19,62 +19,56 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include "GetScratchDir.hpp"
+#include "GetWorkDirOptions.hpp"
 #include <ErrorSystem.hpp>
-#include <TerminalStr.hpp>
-#include <ABSConfig.hpp>
-
-//------------------------------------------------------------------------------
-
-MAIN_ENTRY(CGetScratchDir)
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CGetScratchDir::CGetScratchDir(void)
+CGetWorkDirOptions::CGetWorkDirOptions(void)
 {
-}
-
-//==============================================================================
-//------------------------------------------------------------------------------
-//==============================================================================
-
-int CGetScratchDir::Init(int argc,char* argv[])
-{
-// encode program options, all check procedures are done inside of CABFIntOpts
-    int result = Options.ParseCmdLine(argc,argv);
-
-// should we exit or was it error?
-    return(result);
+    SetShowMiniUsage(true);
 }
 
 //------------------------------------------------------------------------------
 
-bool CGetScratchDir::Run(void)
+int CGetWorkDirOptions::CheckOptions(void)
 {
-    // load system and optionaly user configuration
-    if( ABSConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load system config");
-        return(false);
+    return(SO_CONTINUE);
+}
+
+//------------------------------------------------------------------------------
+
+int CGetWorkDirOptions::FinalizeOptions(void)
+{
+    bool ret_opt = false;
+
+    if( GetOptHelp() == true ){
+        PrintUsage();
+        ret_opt = true;
     }
 
-    CSmallString value = ABSConfig.GetScratchDir(Options.GetArgScratchType(),Options.GetOptMode());
-    std::cout << value;
-
-    return(true);
-}
-
-//------------------------------------------------------------------------------
-
-void CGetScratchDir::Finalize(void)
-{
-    if( Options.GetOptVerbose() || ErrorSystem.IsError() ) {
-        ErrorSystem.PrintErrors(stderr);
+    if( GetOptVersion() == true ){
+        PrintVersion();
+        ret_opt = true;
     }
+
+    if( ret_opt == true ){
+        printf("\n");
+        return(SO_EXIT);
+    }
+
+    return(SO_CONTINUE);
+}
+
+//------------------------------------------------------------------------------
+
+int CGetWorkDirOptions::CheckArguments(void)
+{
+    return(SO_CONTINUE);
 }
 
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
-

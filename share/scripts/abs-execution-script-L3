@@ -40,7 +40,7 @@ case $INF_SYNC_MODE in
         if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
             echo " Copy mode     : remote rsync"
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-            rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -o \"StrictHostKeyChecking=no\"" "$INF_JOB_MACHINE:$INF_JOB_PATH/" "$INF_WORK_DIR/"
+            rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x -o \"StrictHostKeyChecking=no\"" "$INF_JOB_MACHINE:$INF_JOB_PATH/" "$INF_WORK_DIR/"
 
             if [ $? -ne 0 ]; then
                 echo "" >&2
