@@ -2789,7 +2789,7 @@ void CJob::PrintBasicV2(std::ostream& sout)
 
 void CJob::PrintResourcesV3(std::ostream& sout)
 {
-    CSmallString tmp;
+    CSmallString tmp,tmp1,tmp2;
 
     tmp = GetItem("basic/arguments","INF_ARG_DESTINATION");
     sout << "Req destination  : " << tmp << endl;
@@ -2851,6 +2851,10 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_WORK_SIZE");
     sout << "Work dir size    : " << tmp << endl;
 
+    tmp1 = GetItem("specific/resources","INF_DATAIN");
+    tmp2 = GetItem("specific/resources","INF_DATAIN");
+    sout << "Data IN/OUT      : " << tmp1 << "/" << tmp2 << endl;
+
     CSmallString fs_type = GetItem("specific/resources","INF_FS_TYPE",true);
     if( fs_type == NULL ) fs_type = "consistent";
     sout << "Input FS type    : " << fs_type << endl;
@@ -2860,10 +2864,10 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     if( fs_type == "inconsistent" ) sout << "<blue>";
 
     tmp = GetItem("specific/resources","INF_UGROUP");
-    sout << "User group       : " <<  tmp;
+    sout << "User group       : " <<  tmp << endl;
 
     tmp = GetItem("specific/resources","INF_UMASK");
-    sout << "User file mask   : " << tmp << endl;
+    sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" <<  endl;
 
     if( fs_type == "inconsistent" ) sout << "</blue>";
 
