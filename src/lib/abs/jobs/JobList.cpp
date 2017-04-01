@@ -589,8 +589,8 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
                 break;
 
             case EJS_FINISHED:
-                if( p_job->GetSyncMode() == "nosync" ){
-                    sout << "<b><green>INFO: The job was finished but it was not synchronized.</green></b>" << endl;
+                if( p_job->GetDataOut() == "keep" ){
+                    sout << "<b><green>INFO: The job was finished but the job data were kept in the working directory.</green></b>" << endl;
                     sout << "<b><green>      The pgo command might not succeed.</green></b>" << endl;
                     sout << endl;
                     it++;
@@ -723,15 +723,14 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
             case EJS_NONE:
             case EJS_PREPARED:
             case EJS_SUBMITTED:
-                sout << "<b><blue>WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
+                sout << "<b><blue>WARNING: The job was not started therefore it does not have the working directory.</blue></b>" << endl;
                 sout << "<b><blue>         The psync command cannot be used.</blue></b>" << endl;
                 sout << endl;
                 it = erase(it);
                 break;
             case EJS_RUNNING:
-                if( p_job->GetSyncMode() == "jobdir" ){
-                    sout << "<b><blue>WARNING: The running job found but it uses jobdir synchronization mode.</blue></b>" << endl;
-                    sout << "<b><blue>         It means that you are already in the job working directory!</blue></b>" << endl;
+                if( p_job->GetWorkDir() == "jobdir" ){
+                    sout << "<b><blue>WARNING: The running job found but it seems you are already in the working directory (workdir=jobdir).</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
@@ -739,9 +738,9 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
                 }
                 break;
             case EJS_FINISHED:
-                if( p_job->GetSyncMode() == "nosync" ){
-                    sout << "<b><green>INFO: The job was finished but it was not synchronized.</green></b>" << endl;
-                    sout << "<b><green>      psync command might not succeed.</green></b>" << endl;
+                if( p_job->GetDataOut() == "keep" ){
+                    sout << "<b><green>INFO: The job was finished but the job data were left on the working directory (dataout=keep).</green></b>" << endl;
+                    sout << "<b><green>      The psync command might not succeed.</green></b>" << endl;
                     sout << endl;
                     it++;
                 } else {
@@ -774,7 +773,7 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
     }
 
     if( size() > 1 ){
-        sout << "<b><red>ERROR: psync action cannot be applied to more than one job.</red></b>" << endl;
+        sout << "<b><red>ERROR: The psync command cannot be applied to more than one job.</red></b>" << endl;
         sout << endl;
         return(false);
     }

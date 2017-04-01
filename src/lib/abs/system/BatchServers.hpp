@@ -61,6 +61,9 @@ public:
     /// return name of the generic resource
     const CSmallString GetGenericResourceName(void);
 
+    /// get batch server group namespace
+    const CSmallString GetBatchGroupNS(void);
+
     /// decode queue name
     bool DecodeQueueName(const CSmallString& input,CSmallString& srv_name,CSmallString& srv_short,CSmallString& queue);
 

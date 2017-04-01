@@ -371,7 +371,7 @@ const CSmallString CResourceList::GetMemoryString(void) const
 
 //------------------------------------------------------------------------------
 
-const CSmallString CResourceList::GetWorksizeString(void) const
+const CSmallString CResourceList::GetWorkSizeString(void) const
 {
     const CResourceValuePtr p_rv = FindResource("worksize");
     if( p_rv == NULL ) return("n.a.");
@@ -380,7 +380,7 @@ const CSmallString CResourceList::GetWorksizeString(void) const
 
 //------------------------------------------------------------------------------
 
-const CSmallString CResourceList::GetWalltimeString(void) const
+const CSmallString CResourceList::GetWallTimeString(void) const
 {
     const CResourceValuePtr p_rv = FindResource("walltime");
     if( p_rv == NULL ) return("n.a.");

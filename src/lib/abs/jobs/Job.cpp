@@ -50,6 +50,8 @@
 #include <AMSGlobalConfig.hpp>
 #include <BatchServers.hpp>
 #include <ResourceList.hpp>
+#include <sys/types.h>
+#include <grp.h>
 
 //------------------------------------------------------------------------------
 
@@ -144,13 +146,17 @@ bool CJob::SaveInfoFileWithPerms(void)
     bool result = SaveInfoFile(name);
     if( result == false ) return(false);
 
+// permissions
+    // FIXME
+    CSmallString sumask = GetItem("specific/resources","INF_UMASK");
+    mode_t umask = CUser::GetUMaskMode(sumask);
+
     int mode = 0666;
-    int umask = GetUMaskNumber();
     int fmode = (mode & (~ umask)) & 0777;
     CFileSystem::SetPosixMode(name,fmode);
 
-   // uid_t owner = User.GetUserID();
-    gid_t group = User.GetGroupID(GetUserGroupWithRealm());
+    CSmallString sgroup = GetItem("specific/resources","INF_UGROUP");
+    gid_t group = User.GetGroupID(sgroup);
     int ret = chown(name,-1,group);
     if( ret != 0 ){
         CSmallString warning;
@@ -400,6 +406,12 @@ ERetStatus CJob::JobInput(std::ostream& sout)
 
 bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 {
+    // input directory
+    if( InputDirectory() == false ){
+        ES_TRACE_ERROR("unable to setup resources for the input directory");
+        return(false);
+    }
+
     // input from user
     CSmallString dest = GetItem("basic/arguments","INF_ARG_DESTINATION");
     CSmallString sres = GetItem("basic/arguments","INF_ARG_RESOURCES");
@@ -478,12 +490,18 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
     // set final resources
-    SetItem("specific/resources","INF_REQ_NCPU",ResourceList.GetNumOfCPUs());
-    SetItem("specific/resources","INF_REQ_NGPU",ResourceList.GetNumOfGPUs());
-    SetItem("specific/resources","INF_REQ_NNODE",ResourceList.GetNumOfNodes());
-    SetItem("specific/resources","INF_REQ_MEMORY",ResourceList.GetMemoryString());
-    SetItem("specific/resources","INF_REQ_WALLTIME",ResourceList.GetWalltimeString());
-    SetItem("specific/resources","INF_REQ_RESOURCES",ResourceList.ToString(false));
+    SetItem("specific/resources","INF_NCPU",ResourceList.GetNumOfCPUs());
+    SetItem("specific/resources","INF_NGPU",ResourceList.GetNumOfGPUs());
+    SetItem("specific/resources","INF_NNODE",ResourceList.GetNumOfNodes());
+    SetItem("specific/resources","INF_MEMORY",ResourceList.GetMemoryString());
+    SetItem("specific/resources","INF_WALLTIME",ResourceList.GetWallTimeString());
+    SetItem("specific/resources","INF_RESOURCES",ResourceList.ToString(false));
+
+    // setup working directory
+    if( WorkDirectory() == false ){
+        ES_TRACE_ERROR("unable to setup resources for the working directory");
+        return(false);
+    }
 
     return(true);
 }
@@ -492,23 +510,53 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
 bool CJob::InputDirectory(void)
 {
-    // file system -----------------------------------
-        // set default user group and umask
-        SetItem("specific/resources","INF_UGROUP",User.GetEGroup());
-        SetItem("specific/resources","INF_UMASK",User.GetUMask());
+    // FIXME
+    // this is minimalist setup with possible future improvements
+    // it should resolve:
+    // group name space conflicts on input machine / input directory / batch system
+    // resolve FS inconsitencies (local, nfs-krb, nfs-sys, ...)
 
-        // check job input FS consistency
-        CSmallString job_dir = GetItem("basic/jobinput","INF_JOB_PATH");
+    CSmallString input_groupns = CShell::GetSystemVariable("AMS_GROUPNS");
+    CSmallString batch_groupns = BatchServers.GetBatchGroupNS();
 
-        struct stat job_dir_stat;
-        stat(job_dir,&job_dir_stat);
+    if( input_groupns != batch_groupns ){
+        CSmallString error;
+        error << "inconsisten group namespaces of input machine (" << input_groupns
+              << ") and batch server("<< batch_groupns <<") are not supported yet!";
+        ES_ERROR(error);
+        return(false);
+    }
 
-        if( job_dir_stat.st_uid == User.GetUserID() ){
-            SetItem("specific/resources","INF_FS_TYPE","consistent");
-        } else {
-            SetItem("specific/resources","INF_FS_TYPE","inconsistent");
+    CSmallString input_machine = GetItem("basic/jobinput","INF_JOB_MACHINE");
+    CSmallString input_dir = GetItem("basic/jobinput","INF_JOB_PATH");
+
+// input storage - currently the same as input machine
+    SetItem("specific/resources","INF_STORAGE_MACHINE",input_machine);
+    SetItem("specific/resources","INF_STORAGE_PATH",input_dir);
+
+// check job input FS consistency and setup default group and umask
+    struct stat job_dir_stat;
+    stat(input_dir,&job_dir_stat);
+
+    if( job_dir_stat.st_uid == User.GetUserID() ){
+        SetItem("specific/resources","INF_FS_TYPE","consistent");
+        struct group * p_group = getgrgid(job_dir_stat.st_gid);
+        if( p_group != NULL ){
+            ResourceList.AddResource("group",p_group->gr_name);
         }
 
+    } else {
+        SetItem("specific/resources","INF_FS_TYPE","inconsistent");
+        ES_ERROR("inconsistent FS are not supported yet");
+        return(false);
+    }
+    // setup umask from the input directory
+    mode_t umask = (job_dir_stat.st_mode ^ 0x777) & 0x777;
+    ResourceList.AddResource("umask",User.GetUMask(umask));
+
+    // set default user group and umask
+    SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));
+    SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
     return(true);
 }
 
@@ -516,6 +564,11 @@ bool CJob::InputDirectory(void)
 
 bool CJob::WorkDirectory(void)
 {
+    // setup specific items for working directory
+    SetItem("specific/resources","INF_DATAIN",ResourceList.GetResourceValue("datain"));
+    SetItem("specific/resources","INF_DATAOUT",ResourceList.GetResourceValue("dataout"));
+    SetItem("specific/resources","INF_WORK_DIR_TYPE",ResourceList.GetResourceValue("workdir"));
+    SetItem("specific/resources","INF_WORK_SIZE",ResourceList.GetWorkSizeString());
     return(true);
 }
 
@@ -611,14 +664,17 @@ bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
     user_script = GetItem("basic/jobinput","INF_JOB_NAME",true);
 
     if( ! siblings ) {
-        // setup correct permissions
+        // FIXME
+        CSmallString sumask = GetItem("specific/resources","INF_UMASK");
+        mode_t umask = CUser::GetUMaskMode(sumask);
+
         int mode = 0766;
-        int umask = GetUMaskNumber();
         int fmode = (mode & (~ umask)) & 0777;
         CFileSystem::SetPosixMode(job_script,fmode);
 
-        // uid_t owner = User.GetUserID();
-        gid_t group = User.GetGroupID(GetUserGroupWithRealm());
+        CSmallString sgroup = GetItem("specific/resources","INF_UGROUP");
+        gid_t group = User.GetGroupID(sgroup);
+
         int ret = chown(job_script,-1,group);
         if( ret != 0 ){
             CSmallString warning;
@@ -1542,6 +1598,13 @@ const CSmallString CJob::GetServerName(void)
 
 //------------------------------------------------------------------------------
 
+const CSmallString CJob::GetShortServerName(void)
+{
+    return(ShortServerName);
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallString CJob::GetServerNameV2(void)
 {
     CXMLElement* p_rele = GetElementByPath("infinity",false);
@@ -1623,82 +1686,6 @@ int CJob::GetNCPU(void)
 {
     CSmallString ncpu = GetItem("specific/resources","INF_NCPU");
     return(ncpu.ToInt());
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CJob::GetUMask(void)
-{
-    CSmallString umask = GetItem("specific/resources","INF_UMASK",true);
-    if( umask == NULL ) umask = User.GetUMask();
-    return( umask );
-}
-
-//------------------------------------------------------------------------------
-
-mode_t CJob::GetUMaskNumber(void)
-{
-    CSmallString umask = GetUMask();
-    mode_t lmask = strtol(umask,NULL,8);
-    return(lmask);
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CJob::GetUMaskPermissions(void)
-{
-    mode_t mumask = GetUMaskNumber();
-
-    stringstream str;
-    char c1 = (mumask & 0007);
-    char c2 = ((mumask & 0070) >> 3);
-    char c3 = ((mumask & 0700) >> 6);
-
-    str << "files: ";
-    if( (c3 & 04) == 0 ) str << "r"; else str << "-";
-    if( (c3 & 02) == 0 ) str << "w"; else str << "-";
-    str << "-";
-    if( (c2 & 04) == 0 ) str << "r"; else str << "-";
-    if( (c2 & 02) == 0 ) str << "w"; else str << "-";
-    str << "-";
-    if( (c1 & 04) == 0 ) str << "r"; else str << "-";
-    if( (c1 & 02) == 0 ) str << "w"; else str << "-";
-    str << "-";
-
-    str << " dirs: ";
-    if( (c3 & 04) == 0 ) str << "r"; else str << "-";
-    if( (c3 & 02) == 0 ) str << "w"; else str << "-";
-    if( (c3 & 01) == 0 ) str << "x"; else str << "-";
-    if( (c2 & 04) == 0 ) str << "r"; else str << "-";
-    if( (c2 & 02) == 0 ) str << "w"; else str << "-";
-    if( (c2 & 01) == 0 ) str << "x"; else str << "-";
-    if( (c1 & 04) == 0 ) str << "r"; else str << "-";
-    if( (c1 & 02) == 0 ) str << "w"; else str << "-";
-    if( (c1 & 01) == 0 ) str << "x"; else str << "-";
-
-    return(str.str());
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CJob::GetUserGroup(void)
-{
-    CSmallString group = GetItem("specific/resources","INF_UGROUP",true);
-    if( group == NULL ) group = User.GetEGroup();
-    return( group );
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CJob::GetUserGroupWithRealm(void)
-{
-    CSmallString group = GetItem("specific/resources","INF_UGROUP",true);
-    if( group == NULL ) group = User.GetEGroup();
-    CSmallString group_realm = GetItem("specific/resources","INF_UGROUP_REALM",true);
-    if( group_realm != NULL ){
-        group << "@" << group_realm;
-    }
-    return( group );
 }
 
 //------------------------------------------------------------------------------
@@ -1786,8 +1773,8 @@ void CJob::PrepareGoWorkingDirEnv(bool noterm)
         ShellProcessor.SetVariable("INF_GO_JOB_NAME",GetItem("basic/jobinput","INF_JOB_NAME"));
     }
     ShellProcessor.SetVariable("INF_GO_JOB_KEY",GetItem("basic/jobinput","INF_JOB_KEY"));
-    ShellProcessor.SetVariable("INF_GO_UGROUP",GetUserGroup());
-    ShellProcessor.SetVariable("INF_GO_UMASK",GetUMask());
+    ShellProcessor.SetVariable("INF_GO_UGROUP",GetItem("specific/resources","INF_GROUP"));
+    ShellProcessor.SetVariable("INF_GO_UMASK",GetItem("specific/resources","INF_UMASK"));
 }
 
 //------------------------------------------------------------------------------
@@ -2837,22 +2824,22 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     sout << "-------------------------------------------" << endl;
     sout << "NCPUs NGPUs NNodes Memory WorkSize WallTime" << endl;
-    tmp = GetItem("specific/resources","INF_REQ_NCPU");
+    tmp = GetItem("specific/resources","INF_NCPU");
     sout << setw(5) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_REQ_NGPU");
+    tmp = GetItem("specific/resources","INF_NGPU");
     sout << setw(5) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_REQ_NNODE");
+    tmp = GetItem("specific/resources","INF_NNODE");
     sout << setw(6) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_REQ_MEMORY");
+    tmp = GetItem("specific/resources","INF_MEMORY");
     sout << setw(6) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_REQ_WORKSIZE");
+    tmp = GetItem("specific/resources","INF_WORKSIZE");
     sout << setw(8) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_REQ_WALLTIME");
+    tmp = GetItem("specific/resources","INF_WALLTIME");
     sout << setw(8) << tmp;
     sout << endl;
 
@@ -2892,7 +2879,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
         tmp = "-not specified-";
     sout << "User file mask   : " << tmp << endl;
     } else {
-    sout << "User file mask   : " << tmp << " [" << GetUMaskPermissions() << "]" << endl;
+    sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" << endl;
     }
 
     if( fs_type == "inconsistent" ) sout << "</blue>";
@@ -3032,7 +3019,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
         tmp = "-not specified-";
     sout << "User file mask   : " << tmp << endl;
     } else {
-    sout << "User file mask   : " << tmp << " [" << GetUMaskPermissions() << "]" << endl;
+    sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" << endl;
     }
 
     if( fs_type == "inconsistent" ) sout << "</blue>";
@@ -3413,6 +3400,22 @@ const CSmallString CJob::GetJobMachine(void)
 
 //------------------------------------------------------------------------------
 
+const CSmallString CJob::GetStoragePath(void)
+{
+    CSmallString rv = GetItem("basic/jobinput","INF_STORAGE_MACHINE");
+    return(rv);
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CJob::GetStorageMachine(void)
+{
+    CSmallString rv = GetItem("basic/jobinput","INF_STORAGE_MACHINE");
+    return(rv);
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallString CJob::GetJobID(void)
 {
     CSmallString rv = GetItem("submit/job","INF_JOB_ID",true);
@@ -3432,17 +3435,17 @@ const CSmallString CJob::GetJobKey(void)
 
 //------------------------------------------------------------------------------
 
-const CSmallString CJob::GetSyncMode(void)
+const CSmallString CJob::GetWorkDir(void)
 {
-    CSmallString ver = GetInfoFileVersion();
-    CSmallString rv;
-    if( ver == "INFINITY_INFO_v_2_0"){
-        rv = GetItem("specific/resources","INF_SYNC_MODE");
-    }  else if( ver == "INFINITY_INFO_v_1_0" ){
-        rv = GetItem("specific/resources","INF_SYNCMODE");
-    } else {
-        ES_ERROR("unsupported version");
-    }
+    CSmallString rv = GetItem("basic/jobinput","INF_WORK_DIR_TYPE");
+    return(rv);
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CJob::GetDataOut(void)
+{
+    CSmallString rv = GetItem("basic/jobinput","INF_DATAOUT");
     return(rv);
 }
 
@@ -3656,14 +3659,18 @@ bool CJob::SaveJobKey(void)
 
     ofs.close();
 
-    // setup correct permissions
+// setup correct permissions
+    // FIXME
+    CSmallString sumask = GetItem("specific/resources","INF_UMASK");
+    mode_t umask = CUser::GetUMaskMode(sumask);
+
     int mode = 0666;
-    int umask = GetUMaskNumber();
     int fmode = (mode & (~ umask)) & 0777;
     CFileSystem::SetPosixMode(keyname,fmode);
 
-//    uid_t owner = User.GetUserID();
-    gid_t group = User.GetGroupID(GetUserGroupWithRealm());
+    CSmallString sgroup = GetItem("specific/resources","INF_UGROUP");
+    gid_t group = User.GetGroupID(sgroup);
+
     int ret = chown(keyname,-1,group);
     if( ret != 0 ){
         CSmallString warning;
@@ -3918,13 +3925,6 @@ CFileName CJob::GetJobInputPath(void)
     }
 
     return(cwd);
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CJob::GetShortServerName(void)
-{
-    return(ShortServerName);
 }
 
 //==============================================================================

@@ -650,9 +650,10 @@ bool CPBSProServer::SubmitJob(CJob& job)
     variables << ",INF_JOB_NAME_SUFFIX=" << job.GetJobNameSuffix();
     variables << ",INF_JOB_PATH=" << job.GetJobPath();
     variables << ",INF_JOB_MACHINE=" << job.GetJobMachine();
+    variables << ",INF_STORAGE_PATH=" << job.GetStoragePath();
+    variables << ",INF_STORAGE_MACHINE=" << job.GetStorageMachine();
     variables << ",INF_JOB_KEY=" << job.GetJobKey();
     variables << ",ABS_ROOT=" << CShell::GetSystemVariable("ABS_ROOT");
-    variables << ",AMS_ROOT=" << CShell::GetSystemVariable("AMS_ROOT");
 
     if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",item) ){
         variables << ",INF_BOOT_SCRIPT=" << item;
@@ -660,8 +661,6 @@ bool CPBSProServer::SubmitJob(CJob& job)
 
     variables << ",INF_SITE_ID=" << AMSGlobalConfig.GetActiveSiteID();
     variables << ",INF_ABS_VERSION=" << ABSConfig.GetABSModuleVersion();
-    variables << ",INF_UGROUP=" << job.GetUserGroup();
-    variables << ",INF_UMASK=" << job.GetUMask();
 
     if( job.GetExternalVariables() != NULL ){
         string sl = string(job.GetExternalVariables());

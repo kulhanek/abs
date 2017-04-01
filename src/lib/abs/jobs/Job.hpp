@@ -196,20 +196,11 @@ public:
     /// get job name suffix
     const CSmallString GetJobNameSuffix(void);
 
-    /// get job path
-    const CSmallString GetJobPath(void);
-
-    /// get job machine
-    const CSmallString GetJobMachine(void);
-
     /// get job id
     const CSmallString GetJobID(void);
 
     /// get job key
     const CSmallString GetJobKey(void);
-
-    /// get job sync mode
-    const CSmallString GetSyncMode(void);
 
     /// get job main script stadard output file name
     const CFileName GetInfoutName(void);
@@ -325,23 +316,34 @@ public:
     /// get number of CPUs
     int GetNCPU(void);
 
-    /// get umask
-    const CSmallString GetUMask(void);
+// FS related ------------------------------------------------------------------
+    /// get job path
+    const CSmallString GetJobPath(void);
 
-    /// get umask number
-    mode_t GetUMaskNumber(void);
+    /// get job machine
+    const CSmallString GetJobMachine(void);
 
-    /// get umask bits
-    const CSmallString GetUMaskPermissions(void);
+    /// get storage path
+    const CSmallString GetStoragePath(void);
 
-    /// get user group
-    const CSmallString GetUserGroup(void);
+    /// get storage machine
+    const CSmallString GetStorageMachine(void);
 
-    /// get user group with realm
-    const CSmallString GetUserGroupWithRealm(void);
+    /// get job workdir type
+    const CSmallString GetWorkDir(void);
+
+    /// get job dataout mode
+    const CSmallString GetDataOut(void);
+
+    /// get job input directory - either PWD or CurrentDir
+    static CFileName GetJobInputPath(void);
 
     /// is job dir local
     bool IsJobDirLocal(bool no_deep=false);
+
+// -----------------------------------------------------------------------------
+
+// collections and special job types
 
     /// set simple job identification
     void SetSimpleJobIdentification(const CSmallString& name, const CSmallString& machine,
@@ -376,9 +378,6 @@ public:
 
     /// is job interactive terminal ready?
     bool IsTerminalReady(void);
-
-    /// get job input directory - either PWD or CurrentDir
-    static CFileName GetJobInputPath(void);
 
 // section of private data -----------------------------------------------------
 protected:

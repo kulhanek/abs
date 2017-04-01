@@ -100,10 +100,10 @@ public:
     const CSmallString GetMemoryString(void) const;
 
     /// get worksize
-    const CSmallString GetWorksizeString(void) const;
+    const CSmallString GetWorkSizeString(void) const;
 
     /// get walltime
-    const CSmallString GetWalltimeString(void) const;
+    const CSmallString GetWallTimeString(void) const;
 
 // section of private data -----------------------------------------------------
 private:

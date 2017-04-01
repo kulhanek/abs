@@ -123,6 +123,21 @@ const CSmallString CBatchServers::GetGenericResourceName(void)
 
 //------------------------------------------------------------------------------
 
+const CSmallString CBatchServers::GetBatchGroupNS(void)
+{
+    CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
+    if( p_ele == NULL ) {
+        ES_ERROR("no servers");
+        return(false);
+    }
+
+    CSmallString groupns;
+    p_ele->GetAttribute("groupns",groupns);
+    return(groupns);
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServers::Init(const CSmallString& srv)
 {
     CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
