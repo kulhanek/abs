@@ -2789,7 +2789,7 @@ void CJob::PrintBasicV2(std::ostream& sout)
 
 void CJob::PrintResourcesV3(std::ostream& sout)
 {
-    CSmallString tmp,tmp1,tmp2;
+    CSmallString tmp;
 
     tmp = GetItem("basic/arguments","INF_ARG_DESTINATION");
     sout << "Req destination  : " << tmp << endl;
@@ -2797,7 +2797,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
     sout << "Req resources    : " << tmp << endl;
 
-    sout << "----------------------------------------" << endl;
+    sout << "--------------------------------------------" << endl;
 
     sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
 
@@ -2822,8 +2822,8 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_QUEUE");
     sout << "Queue            : " << tmp << endl;
 
-    sout << "-------------------------------------------" << endl;
-    sout << "NCPUs NGPUs NNodes Memory WorkSize WallTime" << endl;
+    sout << "--------------------------------------------" << endl;
+    sout << "NCPUs NGPUs NNodes Memory WorkSize  WallTime" << endl;
     tmp = GetItem("specific/resources","INF_NCPU");
     sout << setw(5) << tmp;
     sout << " ";
@@ -2836,14 +2836,14 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_MEMORY");
     sout << setw(6) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_WORKSIZE");
+    tmp = GetItem("specific/resources","INF_WORK_SIZE");
     sout << setw(8) << tmp;
     sout << " ";
     tmp = GetItem("specific/resources","INF_WALLTIME");
-    sout << setw(8) << tmp;
+    sout << setw(9) << tmp;
     sout << endl;
 
-    sout << "-------------------------------------------" << endl;
+    sout << "--------------------------------------------" << endl;
 
     tmp = GetItem("specific/resources","INF_WORK_DIR_TYPE");
     sout << "Work directory   : " << tmp << endl;
@@ -2859,28 +2859,11 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     if( fs_type == "inconsistent" ) sout << "<blue>";
 
-    tmp = GetItem("specific/resources","INF_UGROUP",true);
-    tmp1 = GetItem("specific/resources","INF_UGROUP_REALM",true);
-    tmp2 = GetItem("specific/resources","INF_UGROUP_ORIG",true);
-    if( tmp == NULL ) tmp = "-not specified-";
-    sout << "User group       : ";
-    if( tmp2 != NULL ){
-        sout << tmp2 << " -> ";
-    }
-    sout << tmp;
-    if( tmp1 != NULL ){
-        sout << "@" << tmp1 << endl;
-    } else {
-        sout << endl;
-    }
+    tmp = GetItem("specific/resources","INF_UGROUP");
+    sout << "User group       : " <<  tmp;
 
-    tmp = GetItem("specific/resources","INF_UMASK",true);
-    if( tmp == NULL ){
-        tmp = "-not specified-";
+    tmp = GetItem("specific/resources","INF_UMASK");
     sout << "User file mask   : " << tmp << endl;
-    } else {
-    sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" << endl;
-    }
 
     if( fs_type == "inconsistent" ) sout << "</blue>";
 
