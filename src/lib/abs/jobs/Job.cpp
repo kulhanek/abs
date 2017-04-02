@@ -565,7 +565,7 @@ bool CJob::InputDirectory(void)
     size_t p2 = 0;
     bool   nonopt = false;
     vector<string>::iterator it = items.begin();
-    vector<string>::iterator ie = items.begin();
+    vector<string>::iterator ie = items.end();
 
     string dest, fstype, src, opts;
 
@@ -3143,6 +3143,8 @@ void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, con
 {
     string          svalue = string(res_list);
     vector<string>  items;
+    int             nrow, ncolumns = 80;
+    CTerminal::GetSize(nrow,ncolumns);
 
     // split to items
     split(items,svalue,is_any_of(","));
@@ -3170,7 +3172,7 @@ void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, con
             int tlen = len;
             tlen += sres.size();
             tlen++;
-            if( tlen > 80 ){
+            if( tlen > ncolumns ){
                 sout << "," << endl;
                 for(unsigned int i=0; i < title.GetLength(); i++){
                     sout << " ";
