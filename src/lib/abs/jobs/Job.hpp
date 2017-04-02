@@ -451,9 +451,6 @@ protected:
     /// prepare data about input directory - called by DecodeResources
     bool InputDirectory(void);
 
-    /// prepare data about work directory - called by DecodeResources
-    bool WorkDirectory(void);
-
     bool                                DoNotSave;
 
     // job status --------------------------------------------------------------

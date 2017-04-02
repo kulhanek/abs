@@ -491,7 +491,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
         return(false);
     }
 
-    // set final resources
+// setup specific items derived from resources
     SetItem("specific/resources","INF_NCPU",ResourceList.GetNumOfCPUs());
     SetItem("specific/resources","INF_NGPU",ResourceList.GetNumOfGPUs());
     SetItem("specific/resources","INF_NNODE",ResourceList.GetNumOfNodes());
@@ -499,11 +499,15 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_WALLTIME",ResourceList.GetWallTimeString());
     SetItem("specific/resources","INF_RESOURCES",ResourceList.ToString(false));
 
-    // setup working directory
-    if( WorkDirectory() == false ){
-        ES_TRACE_ERROR("unable to setup resources for the working directory");
-        return(false);
-    }
+// umask and group
+    SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));
+    SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
+
+// setup specific items for working directory
+    SetItem("specific/resources","INF_DATAIN",ResourceList.GetResourceValue("datain"));
+    SetItem("specific/resources","INF_DATAOUT",ResourceList.GetResourceValue("dataout"));
+    SetItem("specific/resources","INF_WORK_DIR_TYPE",ResourceList.GetResourceValue("workdir"));
+    SetItem("specific/resources","INF_WORK_SIZE",ResourceList.GetWorkSizeString());
 
     return(true);
 }
@@ -527,9 +531,8 @@ bool CJob::InputDirectory(void)
         return(false);
     }
 
-//    mode_t input_path_umask = (job_dir_stat.st_mode ^ 0x777) & 0x777;
-//    gid_t  input_path_uid = job_dir_stat.st_uid;
-//    gid_t  input_path_gid = job_dir_stat.st_gid;
+    mode_t input_path_umask = (job_dir_stat.st_mode ^ 0x777) & 0x777;
+    gid_t  input_path_gid = job_dir_stat.st_gid;
 
     unsigned int minid = minor(job_dir_stat.st_dev);
     unsigned int majid = major(job_dir_stat.st_dev);
@@ -617,6 +620,27 @@ bool CJob::InputDirectory(void)
         storage_path = spath;
     }
 
+// default umask is derived from the input directory permission
+    ResourceList.AddResource("umask",CUser::GetUMask(input_path_umask));
+
+// default group name - derived from the input directory group
+    // if the file system is compatible with the batch server
+    if( storage_machine_groupns == storage_machine_groupns ){
+        string gname;
+        struct group* p_grp = getgrgid(input_path_gid);
+        if( p_grp != NULL ){
+            gname = string(p_grp->gr_name);
+        }
+        // does it contain realm?
+        if( gname.find("@") != string::npos ){
+            string realm = gname.substr(gname.find("@")+1,string::npos);
+            // consistency check
+            if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
+                ResourceList.AddResource("group",gname.substr(0,gname.find("@")));
+            }
+        }
+    }
+
 // input storage
     SetItem("specific/resources","INF_INPUT_PATH_FSTYPE",fstype);
 
@@ -627,21 +651,10 @@ bool CJob::InputDirectory(void)
     SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
     SetItem("specific/resources","INF_BATCH_SERVER_GROUPNS",batch_server_groupns);
 
-    // set default user group and umask
-    SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));
-    SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
-    return(true);
-}
-
-//------------------------------------------------------------------------------
-
-bool CJob::WorkDirectory(void)
-{
-    // setup specific items for working directory
-    SetItem("specific/resources","INF_DATAIN",ResourceList.GetResourceValue("datain"));
-    SetItem("specific/resources","INF_DATAOUT",ResourceList.GetResourceValue("dataout"));
-    SetItem("specific/resources","INF_WORK_DIR_TYPE",ResourceList.GetResourceValue("workdir"));
-    SetItem("specific/resources","INF_WORK_SIZE",ResourceList.GetWorkSizeString());
+// do not set here - it might be modifed later
+//    // set default user group and umask
+//    SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));
+//    SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
     return(true);
 }
 
