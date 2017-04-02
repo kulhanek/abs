@@ -583,9 +583,9 @@ bool CJob::InputDirectory(void)
 // fix fstype for nfs4
     if( fstype == "nfs4" ){
         if( opts.find("krb5") != string::npos ){
-            fstype = "nfs4krb";
+            fstype = "nfs4:krb5";
         } else {
-            fstype = "nfs4sys";
+            fstype = "nfs4:sys";
         }
     }
 
@@ -598,7 +598,7 @@ bool CJob::InputDirectory(void)
     CSmallString storage_machine = input_machine;
     CSmallString storage_path = input_path;
 
-    if( (fstype == "nfs4krb") || (fstype == "nfs4sys") ){
+    if( (fstype == "nfs4:krb5") || (fstype == "nfs4:sys") ){
         // determine server name and data directory
         string smach = src.substr(0,src.find(":"));
         string spath = src.substr(src.find(":")+1,string::npos);
@@ -2916,26 +2916,17 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << setw(9) << tmp;
     sout << endl;
 
-    sout << "- Input machine and data -------------------" << endl;
+    sout << "--------------------------------------------" << endl;
+    tmp = GetItem("basic/jobinput","INF_JOB_PATH");
+    sout << "Input directory  : " << tmp << endl;
 
     tmp = GetItem("specific/resources","INF_INPUT_PATH_FSTYPE");
     sout << "File system type : " << tmp << endl;
 
     tmp = GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS");
-    sout << "Group namespace  : " << tmp << endl;
+    sout << "Input data storag: " << GetItem("specific/resources","INF_STORAGE_MACHINE") << ":" << GetItem("specific/resources","INF_STORAGE_PATH") << endl;
 
-    sout << "- Storage machine and data -----------------" << endl;
-
-    tmp = GetItem("specific/resources","INF_STORAGE_MACHINE");
-    sout << "Storage machine  : " << tmp << endl;
-
-    tmp = GetItem("specific/resources","INF_STORAGE_PATH");
-    sout << "Storage directory: " << tmp << endl;
-
-    tmp = GetItem("specific/resources","INF_STORAGE_GROUPNS");
-    sout << "Group namespace  : " << tmp << endl;
-
-    sout << "- Working directory ------------------------" << endl;
+    sout << "--------------------------------------------" << endl;
 
     tmp = GetItem("specific/resources","INF_WORK_DIR_TYPE");
     sout << "Work directory   : " << tmp << endl;
@@ -2947,9 +2938,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp2 = GetItem("specific/resources","INF_DATAIN");
     sout << "Data IN/OUT      : " << tmp1 << "/" << tmp2 << endl;
 
-    tmp = GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS");
-    sout << "Group namespace  : " << tmp << endl;
-
+    sout << "--------------------------------------------" << endl;
 
 
     CSmallString fs_type = GetItem("specific/resources","INF_FS_TYPE",true);
