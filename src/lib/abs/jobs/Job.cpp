@@ -534,7 +534,7 @@ bool CJob::InputDirectory(void)
     unsigned int minid = minor(job_dir_stat.st_dev);
     unsigned int majid = major(job_dir_stat.st_dev);
     stringstream sdev;
-    sdev << minid << ":" << majid;
+    sdev << majid << ":" << minid;
 
 // find mount point
     ifstream mountinfo("/proc/self/mountinfo");
