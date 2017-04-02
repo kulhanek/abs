@@ -83,8 +83,11 @@ public:
     //! is queue allowed for the user
     bool IsAllowed(CUser& user) const;
 
-    //! get walltime
+    //! get max walltime
     const CSmallTime& GetMaxWallTime(void) const;
+
+    //! get default walltime
+    const CSmallTime& GetDefaultWallTime(void) const;
 
 // section of private data -----------------------------------------------------
 protected:
@@ -104,6 +107,7 @@ protected:
     CSmallString                Comment;
 
     CSmallTime                  MaxWallTime;
+    CSmallTime                  DefaultWallTime;
     CSmallString                RouteDestinations;
     CSmallString                RouteQueue;
 

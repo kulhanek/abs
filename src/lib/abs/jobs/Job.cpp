@@ -460,32 +460,48 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_QUEUE",queue);
     SetItem("specific/resources","INF_SERVER",BatchServerName);
 
-    // decode user resources
+// decode user resources
     ResourceList.AddResources(sres,sout,result,expertmode);
     if( result == false ){
         ES_TRACE_ERROR("user resources are invalid");
         return(false);
     }
 
-    // resolve conflicts
+// resolve conflicts
     ResourceList.ResolveConflicts();
 
-    // test resources
+// test resources
     ResourceList.TestResourceValues(sout,result);
     if( result == false ){
         ES_TRACE_ERROR("some resource value is invalid");
         return(false);
     }
 
-    // calculate dynamic resources
+// calculate dynamic resources
     ResourceList.ResolveDynamicResources();
 
-    // determine batch resources
+// determine batch resources
     CBatchServerPtr srv_ptr = BatchServers.FindBatchServer(BatchServerName,true);
     if( srv_ptr == NULL ){
         ES_TRACE_ERROR("unable to init batch server");
         return(false);
     }
+
+// find queue and determine walltime if not specified by the user
+    if( ResourceList.FindResource("walltime") == NULL ){
+        // init queues
+        srv_ptr->GetQueues(QueueList);
+        // get queue default resource
+        CQueuePtr que_ptr = QueueList.FindQueue(queue);
+        if( que_ptr == NULL ){
+            if( result == true ) sout << endl;
+            sout << "<b><red> ERROR: Unable to find the specified queue '" << queue << "' at the batch server!" << endl;
+            return(false);
+        }
+        ResourceList.AddResource("walltime",que_ptr->GetDefaultWallTime().GetSTime());
+    }
+
+// init batch specific resources
     if( srv_ptr->InitBatchResources(&ResourceList) == false ){
         ES_TRACE_ERROR("unable to init batch resources");
         return(false);
@@ -615,9 +631,11 @@ bool CJob::InputDirectory(void)
         spath = spath + input_path_raw.substr(dest.length(),string::npos);
         storage_machine_groupns = Host.GetGroupNS(smach);
 
-        // FIXME
-        storage_machine = smach;
-        storage_path = spath;
+        // FIXME ?
+        if( ABSConfig.GetSystemConfigItem("INF_USE_NFS4_STORAGES") == "YES" ){
+            storage_machine = smach;
+            storage_path = spath;
+        }
     }
 
 // default umask is derived from the input directory permission
