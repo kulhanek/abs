@@ -99,6 +99,7 @@ bool CSubmit::Run(void)
 
     User.InitUser();
     Host.InitGlobalSetup();
+    Host.InitHostFile();
 
     if( AliasList.LoadConfig() == false ){
         ES_TRACE_ERROR("unable to load aliases");
