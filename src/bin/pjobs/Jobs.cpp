@@ -133,6 +133,9 @@ bool CJobs::Run(void)
         free_mask_tree();
     }
 
+    // this is important in the multibatch environment
+    JobList.SortByBatchSubmitDateAndTime();
+
     // print info about jobs
     JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
 

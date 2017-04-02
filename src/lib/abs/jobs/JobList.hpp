@@ -153,6 +153,9 @@ public:
     /// sort by prepare date
     void SortByPrepareDateAndTime(void);
 
+    /// sort by submut date from batch manager
+    void SortByBatchSubmitDateAndTime(void);
+
     /// sort by prepare date
     void SortByFinishDateAndTime(void);
 
@@ -197,6 +200,8 @@ private:
     static bool SortByPrepareDateAndTimeA(const CJobPtr& p_left,const CJobPtr& p_right);
 
     static bool SortByFinishDateAndTimeA(const CJobPtr& p_left,const CJobPtr& p_right);
+
+    static bool SortByBatchSubmitDateAndTimeA(const CJobPtr& p_left,const CJobPtr& p_right);
 
     /// load collection header
     bool LoadCollectionHeader(CXMLElement* p_ele);

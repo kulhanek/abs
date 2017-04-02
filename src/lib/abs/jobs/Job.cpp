@@ -52,6 +52,8 @@
 #include <ResourceList.hpp>
 #include <sys/types.h>
 #include <grp.h>
+#include <sstream>
+#include <Host.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -510,49 +512,115 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
 bool CJob::InputDirectory(void)
 {
-    // FIXME
-    // this is minimalist setup with possible future improvements
-    // it should resolve:
-    // group name space conflicts on input machine / input directory / batch system
-    // resolve FS inconsitencies (local, nfs-krb, nfs-sys, ...)
-
-    CSmallString input_groupns = CShell::GetSystemVariable("AMS_GROUPNS");
-    CSmallString batch_groupns = BatchServers.GetBatchGroupNS();
-
-    if( input_groupns != batch_groupns ){
-        CSmallString error;
-        error << "inconsisten group namespaces of input machine (" << input_groupns
-              << ") and batch server("<< batch_groupns <<") are not supported yet!";
-        ES_ERROR(error);
-        return(false);
-    }
-
     CSmallString input_machine = GetItem("basic/jobinput","INF_JOB_MACHINE");
-    CSmallString input_dir = GetItem("basic/jobinput","INF_JOB_PATH");
+    CSmallString input_path = GetItem("basic/jobinput","INF_JOB_PATH");
+    CSmallString cwd;
+    CFileSystem::GetCurrentDir(cwd);
+    string       input_path_raw(cwd);     // use cwd instead of PWD
 
-// input storage - currently the same as input machine
-    SetItem("specific/resources","INF_STORAGE_MACHINE",input_machine);
-    SetItem("specific/resources","INF_STORAGE_PATH",input_dir);
+// determine FS type of input directory and group namespace,
+// storage name and storage directory
 
-// check job input FS consistency and setup default group and umask
     struct stat job_dir_stat;
-    stat(input_dir,&job_dir_stat);
-
-    if( job_dir_stat.st_uid == User.GetUserID() ){
-        SetItem("specific/resources","INF_FS_TYPE","consistent");
-        struct group * p_group = getgrgid(job_dir_stat.st_gid);
-        if( p_group != NULL ){
-            ResourceList.AddResource("group",p_group->gr_name);
-        }
-
-    } else {
-        SetItem("specific/resources","INF_FS_TYPE","inconsistent");
-        ES_ERROR("inconsistent FS are not supported yet");
+    if( stat(input_path_raw.c_str(),&job_dir_stat) != 0 ){
+        ES_ERROR("unable to stat CWD");
         return(false);
     }
-    // setup umask from the input directory
-    mode_t umask = (job_dir_stat.st_mode ^ 0x777) & 0x777;
-    ResourceList.AddResource("umask",User.GetUMask(umask));
+
+//    mode_t input_path_umask = (job_dir_stat.st_mode ^ 0x777) & 0x777;
+//    gid_t  input_path_uid = job_dir_stat.st_uid;
+//    gid_t  input_path_gid = job_dir_stat.st_gid;
+
+    unsigned int minid = minor(job_dir_stat.st_dev);
+    unsigned int majid = major(job_dir_stat.st_dev);
+    stringstream sdev;
+    sdev << minid << ":" << majid;
+
+// find mount point
+    ifstream mountinfo("/proc/self/mountinfo");
+    string   mntpoint;
+    getline(mountinfo,mntpoint);
+    bool    found = false;
+    while( ! mountinfo ){
+        stringstream smntpoint(mntpoint);
+        string n1,n2,s1;
+        smntpoint >> n1 >> n2 >> s1;
+        if( s1 == sdev.str() ){
+            found = true;
+            break;
+        }
+        mntpoint = "";
+        getline(mountinfo,mntpoint);
+    }
+
+    if( ! found ){
+        ES_ERROR("unable to find mount point");
+        return(false);
+    }
+
+// parse mntpoint
+    vector<string> items;
+    split(items,mntpoint,is_any_of(" "),boost::token_compress_on);
+    size_t p1 = 0;
+    size_t p2 = 0;
+    bool   nonopt = false;
+    vector<string>::iterator it = items.begin();
+    vector<string>::iterator ie = items.begin();
+
+    string dest, fstype, src, opts;
+
+    while( it != ie ){
+        p1++;
+        if( nonopt ) p2++;
+        if( p1 == 4 ) dest = *it;
+        if( p2 == 1 ) fstype = *it;
+        if( p2 == 2 ) src = *it;
+        if( p2 == 3 ) opts = *it;
+        if( *it == "-" ) nonopt = true;
+        it++;
+    }
+
+// fix fstype for nfs4
+    if( fstype == "nfs4" ){
+        if( opts.find("krb5") != string::npos ){
+            fstype = "nfs4krb";
+        } else {
+            fstype = "nfs4sys";
+        }
+    }
+
+// determine input machine, storage machine and batch system group namespaces
+    CSmallString input_machine_groupns      = Host.GetGroupNS();
+    CSmallString storage_machine_groupns    = Host.GetGroupNS();
+    CSmallString batch_server_groupns       = BatchServers.GetBatchGroupNS();
+
+// determine storage machine and storage path
+    CSmallString storage_machine = input_machine;
+    CSmallString storage_path = input_path;
+
+    if( (fstype == "nfs4krb") || (fstype == "nfs4sys") ){
+        // determine server name and data directory
+        string smach = src.substr(0,src.find(":"));
+        string spath = src.substr(src.find(":")+1,string::npos);
+        if( input_path_raw.find(dest) == string::npos ){
+            CSmallString error;
+            error << "mnt dest (" << dest << ") is not root of cwd (" << input_path_raw << ")";
+            ES_ERROR(error);
+            return(false);
+        }
+        if( spath == "/" ) spath = ""; // remove root '/' character
+        spath = spath + input_path_raw.substr(dest.length(),string::npos);
+        storage_machine_groupns = Host.GetGroupNS(smach);
+
+        // FIXME
+        storage_machine = smach;
+        storage_path = spath;
+    }
+
+// input storage
+    SetItem("specific/resources","INF_STORAGE_MACHINE",storage_machine);
+    SetItem("specific/resources","INF_STORAGE_PATH",storage_path);
+
 
     // set default user group and umask
     SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));

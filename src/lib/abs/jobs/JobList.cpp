@@ -861,6 +861,34 @@ void CJobList::SortByPrepareDateAndTime(void)
 
 //------------------------------------------------------------------------------
 
+bool CJobList::SortByBatchSubmitDateAndTimeA(const CJobPtr& p_left,const CJobPtr& p_right)
+{
+    CSmallTimeAndDate lt(p_left->GetItem("batch/job","INF_SUBMIT_TIME").ToLInt());
+    CSmallTimeAndDate rt(p_right->GetItem("batch/job","INF_SUBMIT_TIME").ToLInt());
+
+    // if from the same batch server then use job id
+    if( p_left->ShortServerName == p_right->ShortServerName){
+        int n1 = 0;
+        stringstream s1(string(p_left->GetJobID()));
+        s1 >> n1;
+        int n2 = 0;
+        stringstream s2(string(p_right->GetJobID()));
+        s2 >> n2;
+        return( n1 <= n2 );
+    }
+
+    return( lt <= rt );
+}
+
+//------------------------------------------------------------------------------
+
+void CJobList::SortByBatchSubmitDateAndTime(void)
+{
+    sort(SortByBatchSubmitDateAndTimeA);
+}
+
+//------------------------------------------------------------------------------
+
 bool CJobList::SortByFinishDateAndTimeA(const CJobPtr& p_left,const CJobPtr& p_right)
 {
     CSmallTimeAndDate lt(p_left->GetItem("batch/job","INF_FINISH_TIME").ToLInt());
