@@ -625,7 +625,7 @@ bool CJob::InputDirectory(void)
 
 // default group name - derived from the input directory group
     // if the file system is compatible with the batch server
-    if( storage_machine_groupns == storage_machine_groupns ){
+    if( storage_machine_groupns == batch_server_groupns ){
         string gname;
         struct group* p_grp = getgrgid(input_path_gid);
         if( p_grp != NULL ){
@@ -638,6 +638,8 @@ bool CJob::InputDirectory(void)
             if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
                 ResourceList.AddResource("group",gname.substr(0,gname.find("@")));
             }
+        } else {
+            ResourceList.AddResource("group",gname);
         }
     }
 
@@ -2965,7 +2967,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS") << " (batch server)" <<  endl;
 
     tmp = GetItem("specific/resources","INF_UGROUP");
-    if( tmp == NULL ) tmp = "-default server user group-";
+    if( tmp == NULL ) tmp = "-default server group-";
     sout << "User group       : " <<  tmp << endl;
 
     tmp = GetItem("specific/resources","INF_UMASK");
