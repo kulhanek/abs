@@ -536,18 +536,15 @@ bool CJob::InputDirectory(void)
     stringstream sdev;
     sdev << majid << ":" << minid;
 
-    cout << sdev.str() << endl;
-
 // find mount point
     ifstream mountinfo("/proc/self/mountinfo");
     string   mntpoint;
     getline(mountinfo,mntpoint);
     bool    found = false;
-    while( ! mountinfo ){
+    while( mountinfo ){
         stringstream smntpoint(mntpoint);
         string n1,n2,s1;
         smntpoint >> n1 >> n2 >> s1;
-        cout << "s1= " << s1 << endl;
         if( s1 == sdev.str() ){
             found = true;
             break;
