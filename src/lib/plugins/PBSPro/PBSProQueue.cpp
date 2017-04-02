@@ -58,7 +58,8 @@ bool CPBSProQueue::Init(const CSmallString& short_srv_name,struct batch_status* 
     get_attribute(p_queue->attribs,ATTR_total,NULL,TotalJobs);
     get_attribute(p_queue->attribs,ATTR_rescmax,"walltime",MaxWallTime);
 
-    if( get_attribute(p_queue->attribs,ATTR_rescdflt,"walltime",DefaultWallTime,true) == false ){
+    get_attribute(p_queue->attribs,ATTR_rescdflt,"walltime",DefaultWallTime);
+    if( DefaultWallTime.GetSecondsFromBeginning() == 0 ){
         DefaultWallTime = MaxWallTime;
     }
 

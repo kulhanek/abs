@@ -3503,7 +3503,7 @@ const CSmallString CJob::GetJobMachine(void)
 
 const CSmallString CJob::GetStoragePath(void)
 {
-    CSmallString rv = GetItem("basic/jobinput","INF_STORAGE_MACHINE");
+    CSmallString rv = GetItem("specific/resources","INF_STORAGE_PATH");
     return(rv);
 }
 
@@ -3511,7 +3511,7 @@ const CSmallString CJob::GetStoragePath(void)
 
 const CSmallString CJob::GetStorageMachine(void)
 {
-    CSmallString rv = GetItem("basic/jobinput","INF_STORAGE_MACHINE");
+    CSmallString rv = GetItem("specific/resources","INF_STORAGE_MACHINE");
     return(rv);
 }
 
