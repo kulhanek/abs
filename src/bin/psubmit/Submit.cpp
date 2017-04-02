@@ -27,6 +27,7 @@
 #include <JobList.hpp>
 #include <FileSystem.hpp>
 #include <BatchServers.hpp>
+#include <Host.hpp>
 
 using namespace std;
 
@@ -97,17 +98,7 @@ bool CSubmit::Run(void)
     }
 
     User.InitUser();
-
-    if( BatchServers.GetQueues() == false ){
-        ES_ERROR("unable to get queues");
-        return(false);
-    }
-
-    QueueList.RemoveDisabledQueues();
-    QueueList.RemoveStoppedQueues();
-    QueueList.RemoveInaccesibleQueues(User);
-    QueueList.RemoveNonexecutiveQueues();
-    QueueList.SortByName();
+    Host.InitGlobalSetup();
 
     if( AliasList.LoadConfig() == false ){
         ES_TRACE_ERROR("unable to load aliases");
