@@ -498,7 +498,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
             sout << "<b><red> ERROR: Unable to find the specified queue '" << queue << "' at the batch server!</red></b>" << endl;
             return(false);
         }
-        ResourceList.AddResource("walltime",que_ptr->GetDefaultWallTime().GetSTime());
+        ResourceList.AddResource("walltime",que_ptr->GetDefaultWallTime().GetSTimeFull());
     }
 
 // init batch specific resources
@@ -2903,7 +2903,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
     sout << "Req resources    : " << tmp << endl;
 
-    sout << "--------------------------------------------" << endl;
+    sout << "-----------------------------------------------" << endl;
 
     sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
 
@@ -2928,8 +2928,8 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_QUEUE");
     sout << "Queue            : " << tmp << endl;
 
-    sout << "--------------------------------------------" << endl;
-    sout << "NCPUs NGPUs NNodes Memory WorkSize  WallTime" << endl;
+    sout << "-----------------------------------------------" << endl;
+    sout << "NCPUs NGPUs NNodes Memory WorkSize     WallTime" << endl;
     tmp = GetItem("specific/resources","INF_NCPU");
     sout << setw(5) << tmp;
     sout << " ";
@@ -2946,10 +2946,12 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << setw(8) << tmp;
     sout << " ";
     tmp = GetItem("specific/resources","INF_WALLTIME");
-    sout << setw(9) << tmp;
+    CSmallTime wtime;
+    wtime.SetFromString(tmp);
+    sout << setw(12) << wtime.GetSTimeAndDay();
     sout << endl;
 
-    sout << "--------------------------------------------" << endl;
+    sout << "-----------------------------------------------" << endl;
     tmp = GetItem("basic/jobinput","INF_JOB_PATH");
     sout << "Input directory  : " << tmp << endl;
 
@@ -2958,7 +2960,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     sout << "Input storage    : " << GetItem("specific/resources","INF_STORAGE_MACHINE") << ":" << GetItem("specific/resources","INF_STORAGE_PATH") << endl;
 
-    sout << "--------------------------------------------" << endl;
+    sout << "-----------------------------------------------" << endl;
 
     tmp = GetItem("specific/resources","INF_WORK_DIR_TYPE");
     sout << "Work directory   : " << tmp << endl;
@@ -2978,7 +2980,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Excluded files   : " << tmp << endl;
     }
 
-    sout << "--------------------------------------------" << endl;
+    sout << "-----------------------------------------------" << endl;
     sout << "Group namespaces : ";
     sout << GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") << " (input machine) | ";
     sout << GetItem("specific/resources","INF_STORAGE_GROUPNS") << " (storage machine) | ";
@@ -2991,7 +2993,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_UMASK");
     sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" <<  endl;
 
-    sout << "-------------------------------------------" << endl;
+    sout << "-----------------------------------------------" << endl;
 
     tmp = GetItem("basic/external","INF_EXTERNAL_START_AFTER");
     if( tmp == NULL ){
