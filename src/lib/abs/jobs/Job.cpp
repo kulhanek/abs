@@ -495,7 +495,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
         CQueuePtr que_ptr = QueueList.FindQueue(queue);
         if( que_ptr == NULL ){
             if( result == true ) sout << endl;
-            sout << "<b><red> ERROR: Unable to find the specified queue '" << queue << "' at the batch server!" << endl;
+            sout << "<b><red> ERROR: Unable to find the specified queue '" << queue << "' at the batch server!</red></b>" << endl;
             return(false);
         }
         ResourceList.AddResource("walltime",que_ptr->GetDefaultWallTime().GetSTime());
