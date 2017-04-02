@@ -15,9 +15,6 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L1: Restore job environment ..."
 echo "# ------------------------------------------------------------------------------"
-echo "User identity ..."
-echo "UID   : `id`"
-echo "Umask : `umask`"
 echo
 
 echo " Current directory  : `pwd` (Not used in restore process.)"
@@ -26,7 +23,7 @@ echo " Current directory  : `pwd` (Not used in restore process.)"
 export TMPDIR=`$ABS_ROOT/sbin/abs-get-setup-item INF_TMP_DIR`
 
 if [ $? -ne 0 ]; then
-    return 1
+    exit 1
 fi
 
 export INF_WHOLE_NAME="${INF_JOB_NAME}${INF_JOB_NAME_SUFFIX}"
@@ -54,19 +51,25 @@ export _TNAME_="$$.$USER"
 
 if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
     cp "$INF_JOB_PATH/${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
+    if [ $? -ne 0 ]; then
+        echo ""  >&2
+        echo " ERROR: Unable to get the job info file!"  >&2
+        echo "        Source      : '$INF_JOB_PATH/${INF_WHOLE_NAME}.info'"  >&2
+        echo "        Destination : '$TMPDIR/${_TNAME_}.info'" >&2
+        echo "" >&2
+        exit 1
+    fi
 else
     /usr/bin/scp -o "StrictHostKeyChecking=no" \
-        "$INF_JOB_MACHINE:$INF_JOB_PATH/${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
-fi
-
-if [ $? -ne 0 ]; then
-    echo ""  >&2
-    echo " ERROR: Unable to get the job info file!"  >&2
-    echo "        Source machine: '$INF_JOB_MACHINE'"  >&2
-    echo "        Source file   : '$INF_JOB_PATH/${INF_WHOLE_NAME}.info'"  >&2
-    echo "        Dest file     : '$TMPDIR/${_TNAME_}.info'" >&2
-    echo "" >&2
-    return 1
+        "$INF_STORAGE_MACHINE:$INF_STORAGE_PATH/${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
+    if [ $? -ne 0 ]; then
+        echo ""  >&2
+        echo " ERROR: Unable to get the job info file!"  >&2
+        echo "        Source      : '$INF_STORAGE_MACHINE:$INF_STORAGE_PATH/${INF_WHOLE_NAME}.info'"  >&2
+        echo "        Destination : '$TMPDIR/${_TNAME_}.info'" >&2
+        echo "" >&2
+        exit 1
+    fi
 fi
 
 # ------------------------------------------------------------------------------
@@ -79,16 +82,16 @@ eval $EVAL_STRING
 
 if [ $? -ne 0 ] || [ $ABS_EXIT_CODE != "0" ]; then
     rm -f "$TMPDIR/${_TNAME_}.info"
-    return 1
+    exit 1
 fi
 
 # ------------------------------------------------------------------------------
 # AMS/ABS co-operation
 
 #FIXME
-export AMS_NCPU=$PBS_NCPUS
+export AMS_NCPU=$INF_NCPU
 export AMS_NGPU=$INF_NGPU
-export AMS_NNODE=$PBS_NCPUS
+export AMS_NNODE=$INF_NNODE
 export INF_NODEFILE=$PBS_NODEFILE
 export AMS_NODEFILE=$INF_NODEFILE
 

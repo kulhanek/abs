@@ -17,22 +17,17 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L2.1: Resources files ..."
 echo "# ------------------------------------------------------------------------------"
-echo "User identity ..."
-echo "UID   : `id`"
-echo "Umask : `umask`"
 echo
 
 
 # we need PBS_NODEFILE if it does not exist we create placebo with hostname
-# this happen on condor queue systems or when pstart is used
 
 if ! [ -f "$PBS_NODEFILE" ]; then
-    PBS_NODEFILE=$TMPDIR/pbs_nodes_placebo.${_TNAME_}
-    export PBS_NODEFILE_REMOVE=1
-    export PBS_NODEFILE
-    for((I=0;I<$INF_NCPU;I++)); do
-        hostname -f >> "$PBS_NODEFILE"
-    done
+    echo ""  >&2
+    echo " ERROR: PBS_NODEFILE does not exist!"  >&2
+    echo "        File path : '$PBS_NODEFILE'"  >&2
+    echo "" >&2
+    exit 1
 fi
 
 echo ""
@@ -77,7 +72,7 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L2.2: Prepare working directory ..."
 echo "# ------------------------------------------------------------------------------"
-echo " Sync mode          : $INF_SYNC_MODE"
+echo " Data IN copy mode  : $INF_DATAIN"
 export INF_MAIN_NODE=`hostname -f`
 echo " Main node          : $INF_MAIN_NODE"
 echo " Job ID             : $INF_JOB_ID"
@@ -86,26 +81,12 @@ echo " Scratch type       : $INF_SCRATCH_TYPE"
 # ------------------------------------------------------------------------------
 # set working directory
 
-case $INF_SYNC_MODE in
-    jobdir)
-        INF_WORK_DIR=$INF_JOB_PATH
-        if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
-            echo "" >&2
-            echo " ERROR: The job input directory must be available locally on the computational node" >&2
-            echo "        if the 'jobdir' synchronization mode is used!" >&2
-            echo "" >&2
-            return 1
-        fi
-    ;;
-    sync | nosync )
-        INF_WORK_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type main $INF_WORK_DIR_TYPE`"
-        echo " Scratch dir        : $INF_WORK_DIR"
-        if [ $? -ne -0 ]; then
-            return 1
-        fi
-        INF_WORK_DIR="`eval echo "$INF_WORK_DIR"`"
-    ;;
-esac
+INF_WORK_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type main $INF_WORK_DIR_TYPE`"
+echo " Scratch dir        : $INF_WORK_DIR"
+if [ $? -ne -0 ]; then
+    return 1
+fi
+INF_WORK_DIR="`eval echo "$INF_WORK_DIR"`"
 
 echo " Working directory  : $INF_WORK_DIR"
 echo ""
@@ -113,15 +94,15 @@ echo ""
 # ------------------------------------------------------------------------------
 # create working directories if necessary
 
-case $INF_SYNC_MODE in
-    jobdir)
+case $INF_DATAIN in
+    keep)
         echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
         timeout 30 df -h
         if [ $? -ne 0 ]; then
             echo ">>> WARNING: df command was not completed due to error or timeout."
         fi
     ;;
-    sync | nosync )
+    copy)
         echo " Create working directories on nodes:"
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
@@ -132,7 +113,7 @@ case $INF_SYNC_MODE in
                 echo "" >&2
                 echo " ERROR: Unable to create the working directory on the specified node!" >&2
                 echo "" >&2
-                return 1
+                exit 1
             fi
         done
     ;;
@@ -150,7 +131,7 @@ if [ $? -ne 0 ]; then
     echo "" >&2
     echo " ERROR: Unable to change the current directory to the working directory." >&2
     echo "" >&2
-    return 1
+    exit 1
 fi
 echo " Success."
 
@@ -193,7 +174,7 @@ if [ $? -ne 0 ]; then
     echo "" >&2
     echo " ERROR: Unable to move the job info file into the working directory!" >&2
     echo "" >&2
-    return 1
+    exit 1
 fi
 
 # ------------------------------------------------------------------------------
@@ -208,17 +189,22 @@ if [ $? -ne 0 ]; then
     echo "" >&2
     echo " ERROR: Unable to update job status in the job info file!" >&2
     echo "" >&2
-    return 1
+    exit 1
 fi
 
-if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
-    if [ "$INF_SYNC_MODE" != "jobdir" ]; then
+case $INF_DATAIN in
+    copy)
+    if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
         cp "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+    else
+        /usr/bin/scp -o "StrictHostKeyChecking=no" \
+            "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_STORAGE_MACHINE:$INF_STORAGE_PATH/${INF_WHOLE_NAME}.info"
     fi
-else
-    /usr/bin/scp -o "StrictHostKeyChecking=no" \
-        "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_MACHINE:$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
-fi
+    echo "" >&2
+    echo " ERROR: Unable to update info file in the job input directory!" >&2
+    echo "" >&2
+    exit 1
+esac
 
 echo " Date = `date`"
 echo " Success."
@@ -228,15 +214,11 @@ echo "# ------------------------------------------------------------------------
 echo "# L2.3: Current node utilizations ..."
 echo "# ------------------------------------------------------------------------------"
 
-case $INF_SYNC_MODE in
-    jobdir | sync | nosync )
-        for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
-            echo ""
-            echo ">>> $NODE_NAME ----------------------------------"
-            ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "top -b -n 1"
-        done
-    ;;
-esac
+for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    echo ""
+    echo ">>> $NODE_NAME ----------------------------------"
+    ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "top -b -n 1"
+done
 
 echo ""
 echo "# ------------------------------------------------------------------------------"

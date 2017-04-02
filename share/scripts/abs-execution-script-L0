@@ -33,36 +33,98 @@ echo " Initial job information (recovered from transmitted environment):"
 echo "--------------------------------------------------------------------------------"
 echo " Job name             : $INF_JOB_NAME"
 echo " Job name suffix      : $INF_JOB_NAME_SUFFIX"
-echo " Job input path       : $INF_JOB_PATH"
 echo " Job input machine    : $INF_JOB_MACHINE"
+echo " Job input path       : $INF_JOB_PATH"
+echo " Job storage machine  : $INF_STORAGE_MACHINE"
+echo " Job storage path     : $INF_STORAGE_PATH"
+echo " Data IN copy mode    : $INF_DATAIN"
+echo " Data OUT copy mode   : $INF_DATAOUT"
 echo " Job key              : $INF_JOB_KEY"
-echo " ABS Root             : $ABS_ROOT"
 echo "------------------------------------------------------"
 echo " Hostname             : `hostname -f`"
 echo " Site support         : $AMS_SITE_SUPPORT"
 echo " Site ID              : $INF_SITE_ID"
 echo " ABS module version   : $INF_ABS_VERSION"
+echo " ABS Root             : $ABS_ROOT"
 echo " AMS boot script      : $INF_BOOT_SCRIPT"
-echo " User group           : $INF_UGROUP"
-echo " Umask                : $INF_UMASK"
 echo ""
 
+echo ""
 echo "#-------------------------------------------------------------------------------"
-echo "# L0.0 Booting into the first execution layer ..."
+echo "# L0 First execution layer ..."
 echo "#-------------------------------------------------------------------------------"
-# set umask
-echo ">>> Setting umask: $INF_UMASK"
-umask "0$INF_UMASK"
 
-# run under different group?
-if [ "$INF_UGROUP" != "`id -ng`" ]; then
-    echo ">>> Entering new user group: $INF_UGROUP"
-    echo ""
-    sg "$INF_UGROUP" -c "$ABS_ROOT/share/scripts/abs-execution-script-L0.1"
-else
-    echo ">>> Keeping current user group: `id -ng`"
-    $ABS_ROOT/share/scripts/abs-execution-script-L0.1
+# boot AMS ---------------------------------------------------------------------
+echo "User identity ..."
+echo "UID   : `id`"
+echo "Umask : `umask`"
+echo
+
+if [ -f "$INF_BOOT_SCRIPT" ]; then
+    # boot AMS system
+    source $INF_BOOT_SCRIPT
 fi
+
+echo "$ site -v activate $INF_SITE_ID"
+
+site -v activate $INF_SITE_ID
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to activate site ($INF_SITE_ID)!" >&2
+    echo "        Please send contents of this file to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
+fi
+
+# destroy ams host cache
+echo "$ ams-host --nocache"
+
+ams-host --nocache
+
+echo "$ amsmodule --system add abs:$INF_ABS_VERSION"
+
+# here we should use the same version as it was used for job submision
+amsmodule --system add abs:$INF_ABS_VERSION
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to add 'abs:$INF_MODULE_VERS' module!" >&2
+    echo "        Please send contents of this file to the site support: $AMS_SITE_SUPPORT" >&2
+
+    echo "" >&2
+    exit 1
+fi
+
+# =============================================================================
+# Stage 01 - execute wrapper script +++++++++++++++++++++++++++++++++++++++++++
+# =============================================================================
+
+# Restore job environment ...
+source $ABS_ROOT/share/scripts/abs-execution-script-L1
+if [ $? -ne 0 ]; then exit 1; fi
+
+# Prepare working directory ...
+source $ABS_ROOT/share/scripts/abs-execution-script-L2
+if [ $? -ne 0 ]; then exit 1; fi
+
+# Copy input job data ...
+$ABS_ROOT/share/scripts/abs-execution-script-L3
+if [ $? -ne 0 ]; then exit 1; fi
+
+# Start job ...
+source $ABS_ROOT/share/scripts/abs-execution-script-L4
+if [ $? -ne 0 ]; then exit 1; fi
+
+# Sync data ...
+$ABS_ROOT/share/scripts/abs-execution-script-L5
+if [ $? -ne 0 ]; then exit 1; fi
+
+# Clean ...
+$ABS_ROOT/share/scripts/abs-execution-script-L6
+if [ $? -ne 0 ]; then exit 1; fi
+
+# =============================================================================
 
 echo
 echo "################################################################################"

@@ -14,9 +14,6 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L3: Copy input job data ..."
 echo "# ------------------------------------------------------------------------------"
-echo "User identity ..."
-echo "UID   : `id`"
-echo "Umask : `umask`"
 echo
 
 if [ -n "$INF_EXCLUDED_FILES" ]; then
@@ -35,12 +32,12 @@ echo " Final exclusion list:"
 cat $TMPDIR/${_TNAME_}.excluded | awk '{ printf("   %s\n",$0); }'
 echo ""
 
-case $INF_SYNC_MODE in
-    sync | nosync )
+case $INF_DATAIN in
+    copy )
         if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
             echo " Copy mode     : remote rsync"
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-            rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x -o \"StrictHostKeyChecking=no\"" "$INF_JOB_MACHINE:$INF_JOB_PATH/" "$INF_WORK_DIR/"
+            rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x -o \"StrictHostKeyChecking=no\"" "$INF_STORAGE_MACHINE:$INF_STORAGE_PATH/" "$INF_WORK_DIR/"
 
             if [ $? -ne 0 ]; then
                 echo "" >&2
@@ -63,8 +60,8 @@ case $INF_SYNC_MODE in
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         fi
     ;;
-    jobdir )
-        echo " The job will be executed in the input job directory, no data are copied ..."
+    keep )
+        echo " Data left in the working directory, which is presumably the input directory ..."
     ;;
 esac
 

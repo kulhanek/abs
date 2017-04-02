@@ -76,14 +76,19 @@ case $INF_JOB_NAME in
             return 1
         fi
 
-        if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
-            if [ "$INF_SYNC_MODE" != "jobdir" ]; then
+        case $INF_DATAIN in
+            copy)
+            if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
                 cp "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
+            else
+                /usr/bin/scp -o "StrictHostKeyChecking=no" \
+                    "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_STORAGE_MACHINE:$INF_STORAGE_PATH/${INF_WHOLE_NAME}.info"
             fi
-        else
-            /usr/bin/scp -o "StrictHostKeyChecking=no" \
-                "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_MACHINE:$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
-        fi
+            echo "" >&2
+            echo " ERROR: Unable to update info file in the job input directory!" >&2
+            echo "" >&2
+            exit 1
+        esac
 
         # notify user if requested
         if [ -n "$INF_EMAIL" ]; then

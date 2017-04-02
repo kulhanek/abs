@@ -734,7 +734,7 @@ bool CJob::ShouldSubmitJob(std::ostream& sout,bool assume_yes)
 
 
     sout << endl;
-    sout << "Do you want to submit the job to the Torque server (YES/NO)?" << endl;
+    sout << "Do you want to submit the job to the batch server (YES/NO)?" << endl;
     sout << "> ";
 
     string answer;
@@ -745,7 +745,7 @@ bool CJob::ShouldSubmitJob(std::ostream& sout,bool assume_yes)
 
     if( sanswer == "YES" ) return(true);
 
-    sout << "Job was NOT submited to the Torque server!" << endl;
+    sout << "Job was NOT submited to the batch server!" << endl;
 
     return(false);
 }
