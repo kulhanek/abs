@@ -618,9 +618,14 @@ bool CJob::InputDirectory(void)
     }
 
 // input storage
+    SetItem("specific/resources","INF_INPUT_PATH_FSTYPE",fstype);
+
     SetItem("specific/resources","INF_STORAGE_MACHINE",storage_machine);
     SetItem("specific/resources","INF_STORAGE_PATH",storage_path);
+    SetItem("specific/resources","INF_STORAGE_GROUPNS",storage_machine_groupns);
 
+    SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
+    SetItem("specific/resources","INF_BATCH_SERVER_GROUPNS",batch_server_groupns);
 
     // set default user group and umask
     SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));
@@ -2911,7 +2916,26 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << setw(9) << tmp;
     sout << endl;
 
-    sout << "--------------------------------------------" << endl;
+    sout << "- Input machine and data -------------------" << endl;
+
+    tmp = GetItem("specific/resources","INF_INPUT_PATH_FSTYPE");
+    sout << "File system type : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS");
+    sout << "Group namespace  : " << tmp << endl;
+
+    sout << "- Storage machine and data -----------------" << endl;
+
+    tmp = GetItem("specific/resources","INF_STORAGE_MACHINE");
+    sout << "Storage machine  : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_STORAGE_PATH");
+    sout << "Storage directory: " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_STORAGE_GROUPNS");
+    sout << "Group namespace  : " << tmp << endl;
+
+    sout << "- Working directory ------------------------" << endl;
 
     tmp = GetItem("specific/resources","INF_WORK_DIR_TYPE");
     sout << "Work directory   : " << tmp << endl;
@@ -2922,6 +2946,11 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp1 = GetItem("specific/resources","INF_DATAIN");
     tmp2 = GetItem("specific/resources","INF_DATAIN");
     sout << "Data IN/OUT      : " << tmp1 << "/" << tmp2 << endl;
+
+    tmp = GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS");
+    sout << "Group namespace  : " << tmp << endl;
+
+
 
     CSmallString fs_type = GetItem("specific/resources","INF_FS_TYPE",true);
     if( fs_type == NULL ) fs_type = "consistent";
