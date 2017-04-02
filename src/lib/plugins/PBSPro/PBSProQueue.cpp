@@ -57,9 +57,14 @@ bool CPBSProQueue::Init(const CSmallString& short_srv_name,struct batch_status* 
     get_attribute(p_queue->attribs,ATTR_p,NULL,Priority);
     get_attribute(p_queue->attribs,ATTR_total,NULL,TotalJobs);
     get_attribute(p_queue->attribs,ATTR_rescmax,"walltime",MaxWallTime);
+
     if( get_attribute(p_queue->attribs,ATTR_rescdflt,"walltime",DefaultWallTime) == false ){
         DefaultWallTime = MaxWallTime;
+        cout << "here " << endl;
     }
+
+        cout << "defa walltime = " << DefaultWallTime.GetSTime() << endl;
+
     get_attribute(p_queue->attribs,ATTR_routedest,NULL,RouteDestinations);
     get_attribute(p_queue->attribs,ATTR_comment,NULL,Comment);
     get_attribute(p_queue->attribs,ATTR_fromroute,NULL,OnlyRoutable);
