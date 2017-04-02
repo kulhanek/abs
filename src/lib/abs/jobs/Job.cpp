@@ -2965,6 +2965,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS") << " (batch server)" <<  endl;
 
     tmp = GetItem("specific/resources","INF_UGROUP");
+    if( tmp == NULL ) tmp = "-default server user group-";
     sout << "User group       : " <<  tmp << endl;
 
     tmp = GetItem("specific/resources","INF_UMASK");
