@@ -572,7 +572,7 @@ bool CJob::InputDirectory(void)
     while( it != ie ){
         p1++;
         if( nonopt ) p2++;
-        if( p1 == 4 ) dest = *it;
+        if( p1 == 5 ) dest = *it;
         if( p2 == 1 ) fstype = *it;
         if( p2 == 2 ) src = *it;
         if( p2 == 3 ) opts = *it;
@@ -2923,8 +2923,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_INPUT_PATH_FSTYPE");
     sout << "File system type : " << tmp << endl;
 
-    tmp = GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS");
-    sout << "Input data storag: " << GetItem("specific/resources","INF_STORAGE_MACHINE") << ":" << GetItem("specific/resources","INF_STORAGE_PATH") << endl;
+    sout << "Input storage    : " << GetItem("specific/resources","INF_STORAGE_MACHINE") << ":" << GetItem("specific/resources","INF_STORAGE_PATH") << endl;
 
     sout << "--------------------------------------------" << endl;
 
@@ -2938,27 +2937,6 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp2 = GetItem("specific/resources","INF_DATAIN");
     sout << "Data IN/OUT      : " << tmp1 << "/" << tmp2 << endl;
 
-    sout << "--------------------------------------------" << endl;
-
-
-    CSmallString fs_type = GetItem("specific/resources","INF_FS_TYPE",true);
-    if( fs_type == NULL ) fs_type = "consistent";
-    sout << "Input FS type    : " << fs_type << endl;
-
-// ----------------------
-
-    if( fs_type == "inconsistent" ) sout << "<blue>";
-
-    tmp = GetItem("specific/resources","INF_UGROUP");
-    sout << "User group       : " <<  tmp << endl;
-
-    tmp = GetItem("specific/resources","INF_UMASK");
-    sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" <<  endl;
-
-    if( fs_type == "inconsistent" ) sout << "</blue>";
-
-// ----------------------
-
     tmp = GetItem("basic/jobinput","INF_EXCLUDED_FILES");
     if( tmp == NULL ){
     sout << "Excluded files   : -none-" << endl;
@@ -2966,6 +2944,18 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     else{
     sout << "Excluded files   : " << tmp << endl;
     }
+
+    sout << "--------------------------------------------" << endl;
+    sout << "Group namespaces : ";
+    sout << GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") << " (input machine) | ";
+    sout << GetItem("specific/resources","INF_STORAGE_GROUPNS") << " (storage machine) | ";
+    sout << GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS") << " (batch server)" <<  endl;
+
+    tmp = GetItem("specific/resources","INF_UGROUP");
+    sout << "User group       : " <<  tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_UMASK");
+    sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" <<  endl;
 
     sout << "-------------------------------------------" << endl;
 
