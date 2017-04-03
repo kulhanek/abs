@@ -77,7 +77,7 @@ function inf-copy-to-inputdir()
 {
     echo "= inf-copy-to-inputdir: $1 $2"
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
-        echo -n "  > copy the data to the local mount via cp ... "
+        echo "  > copy the data to the local mount via cp ... "
         cp  "$1" "$INF_INPUT_DIR/$2"
         if [ $? -eq 0 ]; then
             return 0

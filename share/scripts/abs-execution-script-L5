@@ -55,7 +55,6 @@ if [ $? -ne 0 ]; then
 fi
 
 inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
-echo $?
 if [ $? -ne 0 ]; then exit 1; fi
 
 # notify user about the job end
@@ -74,6 +73,3 @@ case $INF_JOB_NAME in
         ;;
 esac
 
-# ------------------------------------------------------------------------------
-
-exit 0
