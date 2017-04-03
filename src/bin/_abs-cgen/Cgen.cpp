@@ -21,8 +21,8 @@
 
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <Completion.hpp>
-#include <GlobalConfig.hpp>
+#include <ABSCompletion.hpp>
+#include <ABSConfig.hpp>
 #include "Cgen.hpp"
 
 //------------------------------------------------------------------------------

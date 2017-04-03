@@ -22,12 +22,10 @@
 #include "InfoGo.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <PluginDatabase.hpp>
-#include <GlobalConfig.hpp>
-#include <Torque.hpp>
 #include <ABSConfig.hpp>
 #include <ShellProcessor.hpp>
 #include <FileSystem.hpp>
+#include <BatchServers.hpp>
 
 using namespace std;
 
@@ -89,24 +87,12 @@ bool CInfoGo::Run(void)
         return(false);
     }
 
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
-        return(false);
-    }
-
     vout << low;    
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         vout << endl;        
         ES_TRACE_ERROR("user does not have valid ticket");
         ExitCode = 1;
-        return(false);
-    }
-
-    // we need ticket here
-    if( Torque.Init() == false ){
-        ES_ERROR("unable to init torque");
         return(false);
     }
 
@@ -217,7 +203,7 @@ bool CInfoGo::GoByInfoFiles(void)
 
 bool CInfoGo::GoByJobID(void)
 {
-    Torque.GetJob(Jobs,Options.GetProgArg(0));
+    BatchServers.GetJob(Options.GetProgArg(0));
 
     vout << endl;
 
@@ -240,9 +226,6 @@ bool CInfoGo::GoByJobID(void)
 
 bool CInfoGo::Finalize(void)
 {
-    // unload plugins
-    PluginDatabase.UnloadPlugins();
-
     if( ErrorSystem.IsError() || (ExitCode > 0) ){
         ShellProcessor.RollBack();
         ShellProcessor.SetExitCode(1);        

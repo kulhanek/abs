@@ -22,9 +22,6 @@
 #include "Kill.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <PluginDatabase.hpp>
-#include <GlobalConfig.hpp>
-#include <Torque.hpp>
 #include <ABSConfig.hpp>
 #include <ShellProcessor.hpp>
 
@@ -87,22 +84,11 @@ bool CKill::Run(void)
         return(false);
     }
 
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
-        return(false);
-    }
-
     vout << low;
 
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
-        return(false);
-    }
-
-    if( Torque.Init() == false ){
-        ES_ERROR("unable to init torque");
         return(false);
     }
 
@@ -206,8 +192,6 @@ bool CKill::Run(void)
 
 bool CKill::Finalize(void)
 {
-    // unload plugins
-    PluginDatabase.UnloadPlugins();
 
     if( ! ErrorSystem.IsError() ){
         ShellProcessor.SetExitCode(0);

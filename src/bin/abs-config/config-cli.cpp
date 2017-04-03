@@ -25,16 +25,16 @@
 #include <TerminalStr.hpp>
 #include <Shell.hpp>
 #include <ctype.h>
-#include <GlobalConfig.hpp>
 #include <ABSConfig.hpp>
 #include <Site.hpp>
 #include <AliasList.hpp>
 #include <PluginDatabase.hpp>
-#include <Torque.hpp>
 #include <User.hpp>
 #include <QueueList.hpp>
 #include <CategoryUUID.hpp>
 #include <list>
+#include <AMSGlobalConfig.hpp>
+#include <BatchServers.hpp>
 
 using namespace std;
 
@@ -140,14 +140,8 @@ int Init(int argc, char* argv[])
 bool Run(void)
 {
     // check if site is active
-    if( GlobalConfig.GetActiveSiteID() == NULL ) {
+    if( AMSGlobalConfig.GetActiveSiteID() == NULL ) {
         ES_ERROR("no site is active");
-        return(false);
-    }
-
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
         return(false);
     }
 
@@ -164,21 +158,9 @@ bool Run(void)
         return(false);
     }
 
-    if( Torque.Init() == false ){
-        ES_ERROR("unable to init torque");
-        return(false);
-    }
+    User.InitUser();
 
-    if( User.InitUser() == false ){
-        ES_ERROR("unable to init current user");
-        return(false);
-    }
-
-    if( Torque.GetQueues(QueueList) == false ){
-        ES_ERROR("unable to get list of queues");
-        return(false);
-    }
-
+    BatchServers.GetQueues();
     QueueList.RemoveDisabledQueues();
     QueueList.RemoveStoppedQueues();
     QueueList.RemoveInaccesibleQueues(User);
@@ -726,7 +708,6 @@ void CreateOrModifyAlias(void)
 {
     CSmallString    name;
     CSmallString    queue;
-    CSmallString    smode;
     CSmallString    res;
 
     printf("\n");
@@ -743,15 +724,13 @@ void CreateOrModifyAlias(void)
     printf("\n");
     printf("##### Allowed destinations ...\n");
     printf(" queue\n");
-    printf(" node@queue\n");
-
-    printf("\n");
-    printf("##### Allowed synchronization modes ...\n ");
-    ABSConfig.PrintAllowedSyncModes(tout);
+    printf(" queue[@S]\n");
+    printf(" queue[@server]\n");
 
     printf("\n");
     printf("##### Allowed resource tokens ...\n ");
-    ABSConfig.PrintAllowedResTokens(tout);
+    // FIXME
+    // ABSConfig.PrintAllowedResTokens(tout);
     printf("\n\n");
     printf(" Multiple resources: resource1=value1,resource2=value2,...\n");
 
@@ -760,10 +739,10 @@ void CreateOrModifyAlias(void)
     if( name == NULL ) return;
 
     GetTextValue(" Type destination : ",queue);
-    GetTextValue(" Type syncmode    : ",smode);
     GetTextValue(" Type resources   : ",res);
 
-    if( AliasList.AddAlias(tout,name,queue,smode,res) == true ){
+    bool result = true;
+    if( AliasList.AddAlias(tout,result,name,queue,res) == true ){
         printf("\n");
         printf(" The alias was successfully created!\n");
         AliasSetupChanged = true;

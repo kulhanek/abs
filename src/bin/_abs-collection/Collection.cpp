@@ -22,10 +22,8 @@
 #include "Collection.hpp"
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
-#include <PluginDatabase.hpp>
-#include <GlobalConfig.hpp>
-#include <Torque.hpp>
 #include <ABSConfig.hpp>
+#include <AMSGlobalConfig.hpp>
 #include <ShellProcessor.hpp>
 
 using namespace std;
@@ -87,12 +85,6 @@ bool CCollection::Run(void)
         return(false);
     }
 
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
-        return(false);
-    }
-
     vout << low;
 
     // check if user has valid ticket
@@ -101,15 +93,7 @@ bool CCollection::Run(void)
         return(false);
     }
 
-    if( Torque.Init() == false ){
-        ES_ERROR("unable to init torque");
-        return(false);
-    }
-
-    if( User.InitUser() == false ){
-        ES_ERROR("unable to init current user");
-        return(false);
-    }
+    User.InitUser();
 
     // if no arguments try to print info about collection
     if( Options.GetNumberOfProgArgs() == 0 ){
@@ -186,10 +170,10 @@ bool CCollection::Run(void)
             }
         }
 
-        if( Jobs.GetCollectionSiteName() != GlobalConfig.GetActiveSiteName() ){
+        if( Jobs.GetCollectionSiteName() != AMSGlobalConfig.GetActiveSiteName() ){
             vout << endl;
             vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSiteName();
-            vout << " does not match with the active site '" << GlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
+            vout << " does not match with the active site '" << AMSGlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
             return(false);
         }
 
@@ -216,10 +200,10 @@ bool CCollection::Run(void)
         // print info
         Jobs.PrintCollectionInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
 
-        if( Jobs.GetCollectionSiteName() != GlobalConfig.GetActiveSiteName() ){
+        if( Jobs.GetCollectionSiteName() != AMSGlobalConfig.GetActiveSiteName() ){
             vout << endl;
             vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSiteName();
-            vout << " does not match with the active site '" << GlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
+            vout << " does not match with the active site '" << AMSGlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
             return(false);
         }
 
@@ -245,10 +229,10 @@ bool CCollection::Run(void)
         // print info
         Jobs.PrintCollectionInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
 
-        if( Jobs.GetCollectionSiteName() != GlobalConfig.GetActiveSiteName() ){
+        if( Jobs.GetCollectionSiteName() != AMSGlobalConfig.GetActiveSiteName() ){
             vout << endl;
             vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSiteName();
-            vout << " does not match with the active site '" << GlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
+            vout << " does not match with the active site '" << AMSGlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
             return(false);
         }
 
@@ -380,9 +364,6 @@ bool CCollection::Run(void)
 
 bool CCollection::Finalize(void)
 {
-    // unload plugins
-    PluginDatabase.UnloadPlugins();
-
     if( ! ErrorSystem.IsError() ){
         ShellProcessor.SetExitCode(0);
     } else {

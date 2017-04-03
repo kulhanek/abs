@@ -158,12 +158,14 @@ bool CJob::SaveInfoFileWithPerms(void)
     CFileSystem::SetPosixMode(name,fmode);
 
     CSmallString sgroup = GetItem("specific/resources","INF_UGROUP");
-    gid_t group = User.GetGroupID(sgroup);
-    int ret = chown(name,-1,group);
-    if( ret != 0 ){
-        CSmallString warning;
-        warning << "unable to set owner and group of file '" << name << "' (" << ret << ")";
-        ES_WARNING(warning);
+    if( sgroup != NULL ){
+        gid_t group = User.GetGroupID(sgroup);
+        int ret = chown(name,-1,group);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set owner and group of file '" << name << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
     }
 
     return(true);
@@ -631,7 +633,6 @@ bool CJob::InputDirectory(void)
         spath = spath + input_dir_raw.substr(dest.length(),string::npos);
         storage_machine_groupns = Host.GetGroupNS(smach);
 
-        // FIXME ?
         if( ABSConfig.GetSystemConfigItem("INF_USE_NFS4_STORAGES") == "YES" ){
             storage_machine = smach;
             storage_dir = spath;
@@ -779,22 +780,24 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
         CFileSystem::SetPosixMode(job_script,fmode);
 
         CSmallString sgroup = GetItem("specific/resources","INF_UGROUP");
-        gid_t group = User.GetGroupID(sgroup);
+        if( sgroup != NULL ){
+            gid_t group = User.GetGroupID(sgroup);
 
-        int ret = chown(job_script,-1,group);
-        if( ret != 0 ){
-            CSmallString warning;
-            warning << "unable to set owner and group of file '" << job_script << "' (" << ret << ")";
-            ES_WARNING(warning);
-        }
-
-        if( IsInteractiveJob() == false ){
-            CFileSystem::SetPosixMode(user_script,fmode);
-            int ret = chown(user_script,-1,group);
+            int ret = chown(job_script,-1,group);
             if( ret != 0 ){
                 CSmallString warning;
-                warning << "unable to set owner and group of file '" << user_script << "' (" << ret << ")";
+                warning << "unable to set owner and group of file '" << job_script << "' (" << ret << ")";
                 ES_WARNING(warning);
+            }
+
+            if( IsInteractiveJob() == false ){
+                CFileSystem::SetPosixMode(user_script,fmode);
+                int ret = chown(user_script,-1,group);
+                if( ret != 0 ){
+                    CSmallString warning;
+                    warning << "unable to set owner and group of file '" << user_script << "' (" << ret << ")";
+                    ES_WARNING(warning);
+                }
             }
         }
     }
@@ -1170,50 +1173,6 @@ bool CJob::CheckJobName(std::ostream& sout)
 const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& sout)
 {
     CSmallString outpath = inpath;
-
-// FIXME
-//    string inrules;
-//    inrules = ABSConfig.GetSystemConfigItem("INF_JOB_PATH_CHECK");
-
-//    if( ! inrules.empty() ){
-//        // try to remove specified prefixies until success
-//        vector<string> rules;
-//        split(rules,inrules,is_any_of(";"));
-
-//        vector<string>::iterator it = rules.begin();
-//        vector<string>::iterator ie = rules.end();
-//        string sinpath(inpath);
-
-//        while( it != ie ){
-//            string rule = *it;
-//            it++;
-//            if( rule.empty() ) continue;
-
-//            string::iterator ipos = find(rule.begin(), rule.end(), '|');
-//            string prefix;
-//            string substi;
-//            if( ipos != rule.end() ){
-//                prefix = string(rule.begin(), ipos);
-//                substi = string(ipos + 1, rule.end());
-//            } else {
-//                prefix = rule;
-//            }
-
-//            size_t pos = sinpath.find(prefix);
-//            if( pos == 0 ){
-//                // strip down prefix
-//                string new_path = sinpath.substr(prefix.size());
-//                if( ! substi.empty() ){
-//                    new_path = substi + new_path;
-//                }
-//                // does it exist?
-//                if( CFileSystem::IsDirectory(new_path.c_str()) == true ){
-//                    outpath = new_path;
-//                    break;
-//                }
-//            }
-//        }
-//    }
 
     string legall_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_+-.#/";
     string legall_char_short = "a-z A-Z 0-9 _+-.#/";

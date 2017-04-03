@@ -29,14 +29,12 @@
 #include <fnmatch.h>
 #include <DirectoryEnum.hpp>
 #include <string.h>
-#include <PluginDatabase.hpp>
-#include <ABSConfig.hpp>
 #include <ABSConfig.hpp>
 #include <User.hpp>
-#include <Torque.hpp>
 #include <QueueList.hpp>
 #include <FileSystem.hpp>
 #include <AliasList.hpp>
+#include <BatchServers.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -182,38 +180,17 @@ bool CABSCompletion::AddQueueSuggestions(void)
         ES_TRACE_ERROR("unable to load ABSConfig config");
         return(false);
     }
-    PluginDatabase.SetPluginPath(ABSConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(ABSConfig.GetPluginsConfigDir()) == false ){
-        ES_TRACE_ERROR("unable to load plugins");
-        return(false);
-    }
 
     // check if user has valid ticket
     std::stringstream vout;
     if( ABSConfig.IsUserTicketValid(vout) == false ){
-        PluginDatabase.UnloadPlugins();
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
 
-    // we need ticket here
-    if( Torque.Init() == false ){
-        ES_TRACE_ERROR("unable to init torque");
-        return(false);
-    }
+    User.InitUser();
 
-    if( User.InitUser() == false ){
-        PluginDatabase.UnloadPlugins();
-        ES_TRACE_ERROR("unable to init user");
-        return(false);
-    }
-
-    if( Torque.GetQueues(QueueList) == false ){
-        PluginDatabase.UnloadPlugins();
-        ES_TRACE_ERROR("unable to get queues");
-        return(false);
-    }
-
+    BatchServers.GetQueues();
     QueueList.RemoveDisabledQueues();
     QueueList.RemoveStoppedQueues();
     QueueList.RemoveInaccesibleQueues(User);
@@ -228,8 +205,6 @@ bool CABSCompletion::AddQueueSuggestions(void)
         Suggestions.push_back((*it)->GetName());
         it++;
     }
-
-    PluginDatabase.UnloadPlugins();
 
     return(true);
 }

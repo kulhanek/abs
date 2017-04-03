@@ -23,8 +23,6 @@
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
 #include <PluginDatabase.hpp>
-#include <GlobalConfig.hpp>
-#include <Torque.hpp>
 #include <ABSConfig.hpp>
 #include <ShellProcessor.hpp>
 #include <FileSystem.hpp>
@@ -89,24 +87,12 @@ bool CSync::Run(void)
         return(false);
     }
 
-    PluginDatabase.SetPluginPath(GlobalConfig.GetPluginsDir());
-    if( PluginDatabase.LoadPlugins(GlobalConfig.GetPluginsConfigDir()) == false ){
-        ES_ERROR("unable to load plugins");
-        return(false);
-    }
-
     vout << low;
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         vout << endl;        
         ES_TRACE_ERROR("user does not have valid ticket");
         ExitCode = 1;
-        return(false);
-    }
-
-    // we need ticket here
-    if( Torque.Init() == false ){
-        ES_ERROR("unable to init torque");
         return(false);
     }
 
@@ -161,9 +147,6 @@ bool CSync::SyncByInfoFiles(void)
 
 bool CSync::Finalize(void)
 {
-    // unload plugins
-    PluginDatabase.UnloadPlugins();
-
     if( Options.GetOptSyncAll() ){
         ShellProcessor.SetVariable("INF_SYNC_ALL","YES");
     }

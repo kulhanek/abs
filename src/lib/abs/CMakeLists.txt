@@ -9,7 +9,7 @@ SET(ABS_SRC
 
     # system -------------------------------------
         system/ABSConfig.cpp
-    #    system/ABSCompletion.cpp
+        system/ABSCompletion.cpp
         system/CategoryUUID.cpp
         system/TicketChecker.cpp
         system/JobType.cpp
