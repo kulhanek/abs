@@ -2934,8 +2934,8 @@ const CSmallString CJob::GetDataOut(void)
 
 const CFileName CJob::GetInfoutName(void)
 {
-    CFileName host = GetItem("specific/resources","INF_INPUT_MACHINE");
-    CFileName path = GetItem("specific/resources","INF_INPUT_DIR");
+    CFileName host = GetItem("basic/jobinput","INF_INPUT_MACHINE");
+    CFileName path = GetItem("basic/jobinput","INF_INPUT_DIR");
     CFileName infout;
     infout = host + ":" + path / GetFullJobName() + ".infout";
     return(infout);
