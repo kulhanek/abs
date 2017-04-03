@@ -195,7 +195,7 @@ bool CInfoGo::GoByInfoFiles(void)
 
 bool CInfoGo::GoByJobID(void)
 {
-    BatchServers.GetJob(Options.GetProgArg(0));
+    BatchServers.GetJob(JobList,Options.GetProgArg(0));
 
     vout << endl;
 
