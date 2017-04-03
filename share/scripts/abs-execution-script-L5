@@ -37,7 +37,6 @@ case $INF_DATAOUT in
     copy)
         echo "# Data are copied from the main working node only ..."
         inf-retry-cmd inf-rsync-to-inputdir
-        echo $?
         if [ $? -ne 0 ]; then exit 1; fi
     ;;
 esac
@@ -56,6 +55,7 @@ if [ $? -ne 0 ]; then
 fi
 
 inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
+echo $?
 if [ $? -ne 0 ]; then exit 1; fi
 
 # notify user about the job end
