@@ -47,6 +47,9 @@ public:
     //! get name
     const CSmallString& GetName(void) const;
 
+    //! get name@S
+    const CSmallString& GetNameWithShortServer(void) const;
+
     //! get chunk queue name
     const CSmallString& GetChunkQueueName(void) const;
 
@@ -61,6 +64,9 @@ public:
 
     //! is enabled?
     bool IsEnabled(void) const;
+
+    //! is only routable?
+    bool IsOnlyRoutable(void) const;
 
     //! is route queue
     bool IsRouteQueue(void) const;

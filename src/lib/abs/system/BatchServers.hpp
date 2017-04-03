@@ -54,6 +54,9 @@ public:
     /// get batch server - srv_name can be full or short name
     const CBatchServerPtr FindBatchServer(const CSmallString& srv_name,bool init=false);
 
+    /// return number of batch servers
+    size_t GetNumberOfServers(void) const;
+
 // -----------------------------------------------------------------------------
     /// print batch systems
     void PrintServerOverview(std::ostream& vout);

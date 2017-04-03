@@ -111,6 +111,20 @@ void CQueueList::RemoveNonexecutiveQueues(void)
 
 //------------------------------------------------------------------------------
 
+bool CQueueList::RemoveIfOnlyRoutable(const CQueuePtr& p_queue)
+{
+    return( p_queue->IsOnlyRoutable() == true );
+}
+
+//------------------------------------------------------------------------------
+
+void CQueueList::RemoveOnlyRoutable(void)
+{
+    remove_if(RemoveIfOnlyRoutable);
+}
+
+//------------------------------------------------------------------------------
+
 bool CQueueList::SortCompName(const CQueuePtr& p_left,const CQueuePtr& p_right)
 {
     if( p_left->GetShortServerName() == p_right->GetShortServerName()  ){

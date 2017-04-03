@@ -72,6 +72,13 @@ bool CQueue::IsRouteQueue(void) const
 
 //------------------------------------------------------------------------------
 
+bool CQueue::IsOnlyRoutable(void) const
+{
+    return(OnlyRoutable);
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallString CQueue::GetRouteDestinations(void) const
 {
     return(RouteDestinations);
@@ -103,6 +110,15 @@ void CQueue::SetRouteQueueName(const CSmallString& name)
 const CSmallString& CQueue::GetName(void) const
 {
     return(Name);
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString& GetNameWithShortServer(void) const
+{
+    CSmallString name;
+    name << Name << "@" << ShortServerName;
+    return(name);
 }
 
 //------------------------------------------------------------------------------

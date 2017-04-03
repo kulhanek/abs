@@ -195,6 +195,7 @@ bool CABSCompletion::AddQueueSuggestions(void)
     QueueList.RemoveStoppedQueues();
     QueueList.RemoveInaccesibleQueues(User);
     QueueList.RemoveNonexecutiveQueues();
+    QueueList.RemoveOnlyRoutable();
 
     QueueList.SortByName();
 
@@ -202,7 +203,11 @@ bool CABSCompletion::AddQueueSuggestions(void)
     std::list<CQueuePtr>::iterator ie = QueueList.end();
 
     while( it != ie ){
-        Suggestions.push_back((*it)->GetName());
+        if( BatchServers.GetNumberOfServers() > 1 ){
+            Suggestions.push_back((*it)->GetNameWithShortServer());
+        } else {
+            Suggestions.push_back((*it)->GetName());
+        }
         it++;
     }
 

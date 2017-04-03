@@ -45,6 +45,9 @@ public:
     //! remove nonexecutive queues
     void RemoveNonexecutiveQueues(void);
 
+    //! remove only routable queues
+    void RemoveOnlyRoutable(void);
+
     //! sort queues by name
     void SortByName(void);
 
@@ -77,6 +80,9 @@ private:
 
     //! remove if nonexecutive
     static bool RemoveIfNonexecutive(const CQueuePtr& p_queue);
+
+    //! remove if only routable
+    static bool RemoveIfOnlyRoutable(const CQueuePtr& p_queue);
 
     //! map route queues
     void MapRouteQueues(void);
