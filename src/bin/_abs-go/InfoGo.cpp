@@ -197,9 +197,8 @@ bool CInfoGo::GoByJobID(void)
 {
     BatchServers.GetJob(JobList,Options.GetProgArg(0));
 
-    vout << endl;
-
     if( JobList.GetNumberOfJobs() == 0 ){
+        vout << endl;
         vout << "<b><red> ERROR: No job with the specified job ID was found!</red></b>" << endl;
         vout << endl;
         return(false);
