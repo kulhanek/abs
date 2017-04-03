@@ -53,10 +53,6 @@ export INF_SSH_OPTIONS="StrictHostKeyChecking=no"
 echo " SSH Options          : $INF_SSH_OPTIONS"
 echo ""
 
-# backward compatibility setup
-export INF_JOB_MACHINE=$INF_INPUT_MACHINE
-export INF_JOB_PATH=$INF_INPUT_PATH
-
 echo ""
 echo "#-------------------------------------------------------------------------------"
 echo "# L0 Booting execution layer ..."

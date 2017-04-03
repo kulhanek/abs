@@ -2958,7 +2958,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_INPUT_PATH_FSTYPE");
     sout << "File system type : " << tmp << endl;
 
-    sout << "Input storage    : " << GetItem("specific/resources","INF_STORAGE_MACHINE") << ":" << GetItem("specific/resources","INF_STORAGE_PATH") << endl;
+    sout << "Input storage    : " << GetItem("specific/resources","INF_STORAGE_MACHINE") << ":" << GetItem("specific/resources","INF_STORAGE_DIR") << endl;
 
     sout << "-----------------------------------------------" << endl;
 
@@ -3442,7 +3442,7 @@ const CFileName CJob::GetFullJobName(void)
 
 const CFileName CJob::GetMainScriptName(void)
 {
-    CFileName path = GetItem("basic/jobinput","INF_JOB_PATH");
+    CFileName path = GetItem("basic/jobinput","INF_INPUT_DIR");
     CFileName job_script;
     job_script =  path / GetFullJobName() + ".infex";
     return(job_script);
@@ -3554,12 +3554,8 @@ const CSmallString CJob::GetDataOut(void)
 
 const CFileName CJob::GetInfoutName(void)
 {
-    CFileName host;
-    host = GetItem("specific/resources","INF_SURROGATE_MACHINE",true);
-    if( host == NULL ) {
-        host = GetItem("basic/jobinput","INF_JOB_MACHINE");
-    }
-    CFileName path = GetItem("basic/jobinput","INF_JOB_PATH");
+    CFileName host = GetItem("specific/resources","INF_STORAGE_MACHINE");
+    CFileName path = GetItem("specific/resources","INF_STORAGE_DIR");
     CFileName infout;
     infout = host + ":" + path / GetFullJobName() + ".infout";
     return(infout);
@@ -3890,9 +3886,9 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
                 sout << "     <blue>> Interactive job </blue>" << endl;
         } else {
             if( IsJobDirLocal(true) ){
-                sout << "     <blue>> " << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
+                sout << "     <blue>> " << GetItem("basic/jobinput","INF_INPUT_DIR") << "</blue>" << endl;
             } else {
-                sout << "     <blue>> " << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
+                sout << "     <blue>> " << GetItem("basic/jobinput","INF_INPUT_MACHINE") << ":" << GetItem("basic/jobinput","INF_INPUT_DIR") << "</blue>" << endl;
             }
         }
     }
