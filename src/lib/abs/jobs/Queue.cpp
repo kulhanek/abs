@@ -114,7 +114,7 @@ const CSmallString& CQueue::GetName(void) const
 
 //------------------------------------------------------------------------------
 
-const CSmallString& GetNameWithShortServer(void) const
+const CSmallString CQueue::GetNameIncludingShortServerName(void) const
 {
     CSmallString name;
     name << Name << "@" << ShortServerName;

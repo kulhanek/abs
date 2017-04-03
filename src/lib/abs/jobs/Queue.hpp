@@ -48,7 +48,7 @@ public:
     const CSmallString& GetName(void) const;
 
     //! get name@S
-    const CSmallString& GetNameWithShortServer(void) const;
+    const CSmallString GetNameIncludingShortServerName(void) const;
 
     //! get chunk queue name
     const CSmallString& GetChunkQueueName(void) const;

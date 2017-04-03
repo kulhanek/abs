@@ -204,7 +204,7 @@ bool CABSCompletion::AddQueueSuggestions(void)
 
     while( it != ie ){
         if( BatchServers.GetNumberOfServers() > 1 ){
-            Suggestions.push_back((*it)->GetNameWithShortServer());
+            Suggestions.push_back((*it)->GetNameIncludingShortServerName());
         } else {
             Suggestions.push_back((*it)->GetName());
         }
