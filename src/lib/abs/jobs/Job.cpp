@@ -2102,6 +2102,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     }
     if( GetItem("submit/job","INF_JOB_ID",true) != NULL ){
     CSmallString id = GetItem("submit/job","INF_JOB_ID");
+    CSmallString srv = ShortServerName;
     string stmp(id);
     vector<string> items;
     split(items,stmp,is_any_of("."));
@@ -2111,10 +2112,12 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     if( id.GetLength() > 20 ){
         id = id.GetSubStringFromTo(0,19);
     }
+    id << srv;
     sout << " " << left << setw(20) << id;
     } else {
     sout << "                     ";
     }
+
     CSmallString title = GetItem("basic/jobinput","INF_JOB_TITLE");
     sout << " " << setw(15) << title;
     CSmallString queue = GetItem("specific/resources","INF_QUEUE");
