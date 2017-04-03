@@ -2469,7 +2469,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << endl;
 
     sout << "-----------------------------------------------" << endl;
-    tmp = GetItem("basic/jobinput","INF_JOB_PATH");
+    tmp = GetItem("basic/jobinput","INF_INPUT_DIR");
     sout << "Input directory  : " << tmp << endl;
 
     tmp = GetItem("specific/resources","INF_INPUT_PATH_FSTYPE");
