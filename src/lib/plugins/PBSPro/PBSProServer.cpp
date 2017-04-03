@@ -733,7 +733,7 @@ bool CPBSProServer::SubmitJob(CJob& job)
     }
 
 //  DEBUG
-//    PrintAttributes(cout,p_first);
+    PrintAttributes(cout,p_first);
 
     // submit jobs
     char* p_jobid = pbspro_submit(ServerID,p_first,script,queue,NULL);
