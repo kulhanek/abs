@@ -48,8 +48,11 @@ echo "ABS module version   : $INF_ABS_VERSION"
 echo "ABS Root             : $ABS_ROOT"
 echo "------------------------------------------------------"
 export INF_SSH_OPTIONS="StrictHostKeyChecking=no"
+export INF_RETRY_COUNT="3"
+export INF_RETRY_TIME="600"
 echo "SSH Options          : $INF_SSH_OPTIONS"
-
+echo "Retry count          : $INF_RETRY_COUNT"
+echo "Retry time           : $INF_RETRY_TIME"
 
 echo ""
 echo "#-------------------------------------------------------------------------------"

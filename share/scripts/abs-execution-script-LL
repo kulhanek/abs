@@ -55,14 +55,14 @@ function inf-copy-from-inputdir()
         echo "  !failure"
     else
         echo "  > copy the data from the input storage machine via scp ... "
-        /usr/bin/scp -o "$INF_SCP_OPTIONS" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
+        /usr/bin/scp -o "$INF_SSH_OPTIONS" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
             return 0
         fi
         echo "  !failure"
     fi
     echo "  > copy the data from the input machine via scp ... "
-    /usr/bin/scp -o "$INF_SCP_OPTIONS" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
+    /usr/bin/scp -o "$INF_SSH_OPTIONS" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
     
     if [ $? -eq 0 ]; then
         return 0
@@ -85,14 +85,14 @@ function inf-copy-to-inputdir()
         echo "  !failure"
     else
         echo "  > copy the data to the input storage machine via scp ... "
-        /usr/bin/scp -o "$INF_SCP_OPTIONS" "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
+        /usr/bin/scp -o "$INF_SSH_OPTIONS" "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
         if [ $? -eq 0 ]; then
             return 0
         fi
         echo "  !failure"
     fi
     echo "  > copy the data to the input machine via scp ... "
-    /usr/bin/scp -o "$INF_SCP_OPTIONS" "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"    
+    /usr/bin/scp -o "$INF_SSH_OPTIONS" "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"    
     if [ $? -eq 0 ]; then
         return 0
     fi
