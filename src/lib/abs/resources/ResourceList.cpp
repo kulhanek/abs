@@ -132,7 +132,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
 
     // plugin object was not found
     if( rstatus == true ) sout << endl;
-    sout << "<red>ERROR: Resource '" << name << "' is not supported!</red>" << endl;
+    sout << "<b><red> ERROR: Resource '" << name << "' is not supported!</red></b>" << endl;
     rstatus = false;
 }
 
