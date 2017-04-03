@@ -17,25 +17,23 @@ echo "# L5.1: Data in the working directory ..."
 echo "# ------------------------------------------------------------------------------"
 echo
 
-ls -l
+ls -la
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L5.2: Copy the working directory to the input directory ..."
 echo "# ------------------------------------------------------------------------------"
-echo " Data OUT copy mode : $INF_DATAOUT"
-
-# setup rsync options
-if [ "$INF_FS_TYPE" == "inconsistent" ]; then
-    RSYNC_OPTS="--no-g"
-fi
+echo "Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
+echo "Storage directory  : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
+echo "Working directory  : $INF_WORK_DIR"
+echo "Data OUT copy mode : $INF_DATAOUT"
 
 case $INF_DATAOUT in
     keep )
-        echo " Data left in the working directory, which is presumably the input directory ..."
+        echo "Data are left in the working directory, which is presumably the input directory ..."
     ;;
     copy)
-        echo " Data from the main working node are only copied ..."
+        echo "Data are copied from the main working node only ..."
         inf-retry-cmd inf-rsync-from-inputdir
         if [ $? -ne 0 ]; then exit 1; fi
     ;;
@@ -44,7 +42,7 @@ esac
 # -----------------------------------------------------------------------------
 
 echo ""
-echo " Write the job end info and update the info file ..."
+echo "Write the job end and update the info file ..."
 
 $ABS_ROOT/sbin/abs-update-infofile stop
 if [ $? -ne 0 ]; then

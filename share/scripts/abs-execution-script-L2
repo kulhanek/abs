@@ -98,7 +98,7 @@ case $INF_DATAIN in
         fi
     ;;
     copy)
-        echo "Create the working directories on the working nodes:"
+        echo "Create working directories on the working nodes:"
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
@@ -219,6 +219,26 @@ if [ $? -eq 0 ]; then
     numactl --show
 else
     echo ">>> INFO: the numactl command not available ... skipping"
+fi
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.5: Machine hardware info ..."
+echo "# ------------------------------------------------------------------------------"
+
+echo
+echo "# CPU info"
+echo "# ============================================================================="
+awk '{ if( NF == 0 ) exit; print $0; }'  /proc/cpuinfo
+
+if [ $INF_NGPU -gt 0 ]; then
+    echo ""
+    echo "# GPU info"
+    echo "# ============================================================================="
+    type nvidia-smi &> /dev/null
+    if [ $? -eq 0 ]; then
+        nvidia-smi
+    fi
 fi
 
 # ------------------------------------------------------------------------------

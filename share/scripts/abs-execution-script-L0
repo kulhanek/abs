@@ -53,7 +53,7 @@ echo "SSH Options          : $INF_SSH_OPTIONS"
 
 echo ""
 echo "#-------------------------------------------------------------------------------"
-echo "# L0 Booting the AMS/ABS environments ..."
+echo "# L0: Booting the AMS/ABS environments ..."
 echo "#-------------------------------------------------------------------------------"
 echo ""
 echo "User identity ..."

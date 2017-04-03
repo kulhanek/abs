@@ -16,23 +16,25 @@ echo "# ------------------------------------------------------------------------
 echo "# L3: Copy the input data to the working directory ..."
 echo "# ------------------------------------------------------------------------------"
 echo
-echo " Data IN copy mode  : $INF_DATAIN"
+echo "Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
+echo "Storage directory  : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
+echo "Working directory  : $INF_WORK_DIR"
+echo "Data IN copy mode  : $INF_DATAIN"
 if [ -n "$INF_EXCLUDED_FILES" ]; then
-echo " Excluded files     : $INF_EXCLUDED_FILES"
+echo "Excluded files     : $INF_EXCLUDED_FILES"
 else
-echo " Excluded files     : -none-"
+echo "Excluded files     : -none-"
 fi
 
 case $INF_DATAIN in
     keep )
-        echo " Data left in the working directory, which is presumably the input directory ..."
+        echo " Data are left in the working directory, which is presumably the input directory ..."
     ;;
     copy )
-        echo " Data to the main working node are only copied ..."
+        echo " Data are copied to the main working node only ..."
         inf-retry-cmd inf-rsync-from-inputdir
         if [ $? -ne 0 ]; then exit 1; fi
     ;;
-
 esac
 
 

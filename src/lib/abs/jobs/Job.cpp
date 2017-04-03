@@ -817,7 +817,7 @@ bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
             return(false);
         }
         if( ! siblings ){
-            sout << "Job was sucessfully submited to the Torque server!" << endl;
+            sout << "Job was sucessfully submited to the batch server!" << endl;
             sout << "  > Job ID: " << low << GetJobID() << endl << medium;
 
             if( user_script == "cli" ){
