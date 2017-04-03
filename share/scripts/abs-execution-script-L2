@@ -230,7 +230,13 @@ echo "# ------------------------------------------------------------------------
 echo
 echo "# CPU info"
 echo "# ============================================================================="
-awk '{ if( NF == 0 ) exit; print $0; }'  /proc/cpuinfo
+type lscpu &> /dev/null
+
+if [ $? -eq 0 ]; then
+    lscpu
+else
+    echo ">>> INFO: the lscpu command not available ... skipping"
+fi
 
 if [ $INF_NGPUS -gt 0 ]; then
     echo ""
