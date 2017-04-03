@@ -4,6 +4,7 @@
 
 INSTALL(FILES
             abs-cleanipcs
+            abs-execution-script-LL
             abs-execution-script-L0
             abs-execution-script-L1
             abs-execution-script-L2
