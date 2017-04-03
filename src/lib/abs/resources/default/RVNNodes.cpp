@@ -68,6 +68,7 @@ void CRVNNodes::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
         sout <<         "        At least one node must be requested but '" << size << "' is specified!</red></b>" << endl;
         rstatus = false;
+        return;
     }
 }
 

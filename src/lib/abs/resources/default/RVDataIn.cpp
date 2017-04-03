@@ -61,7 +61,7 @@ CRVDataIn::CRVDataIn(void)
 
 void CRVDataIn::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-
+    if( TestKeyValue(sout,rstatus,"keep,copy") == false ) return;
 }
 
 //==============================================================================

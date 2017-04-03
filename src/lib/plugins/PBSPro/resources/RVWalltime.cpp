@@ -68,12 +68,12 @@ void CRVWalltime::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus
 {
     string svalue(Value);
 
-    string legall_characters = "01234567890:dhms";
+    string legall_characters = "01234567890:dhmsw";
 
     if( svalue.find_first_not_of(legall_characters) != string::npos ){
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal 'walltime' resource specification!" << endl;
-        sout <<         "        Supported types: hh:mm:ss, NUMBERd, NUMBERh, HUMBERm, or NUMBERs</red></b>" << endl;
+        sout <<         "        Supported types: hh:mm:ss, NUMBERw, NUMBERd, NUMBERh, HUMBERm, or NUMBERs</red></b>" << endl;
         rstatus = false;
         return;
     }

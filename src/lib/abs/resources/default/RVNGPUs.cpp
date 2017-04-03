@@ -23,6 +23,7 @@
 #include <RVNGPUs.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -68,6 +69,15 @@ void CRVNGPUs::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
         sout <<         "        Number of GPUs must be zero or positive number but '" << size << "' is specified!</red></b>" << endl;
         rstatus = false;
+        return;
+    }
+    int nnodes = p_rl->GetNumOfNodes();
+    if( size % nnodes != 0 ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+        sout <<         "        ngpus=" << size << " must be divisible by nnodes=" << nnodes << "!</red></b>" << endl;
+        rstatus = false;
+        return;
     }
 }
 

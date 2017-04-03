@@ -61,6 +61,7 @@ CRVDataOut::CRVDataOut(void)
 
 void CRVDataOut::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
+    if( TestKeyValue(sout,rstatus,"keep,copy") == false ) return;
 }
 
 //==============================================================================
