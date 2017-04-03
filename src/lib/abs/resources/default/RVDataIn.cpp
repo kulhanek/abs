@@ -23,6 +23,7 @@
 #include <RVDataIn.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -62,6 +63,24 @@ CRVDataIn::CRVDataIn(void)
 void CRVDataIn::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestKeyValue(sout,rstatus,"keep,copy") == false ) return;
+
+    CResourceValuePtr val_ptr = p_rl->FindResource("workdir");
+    if( val_ptr != NULL ){
+        if( (val_ptr->GetValue() == "jobdir") && (Value != "keep") ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout << "<b><red>        workdir=jobdir must have datain=keep!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+        if( (val_ptr->GetValue() != "jobdir") && (Value != "copy") ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout << "<b><red>        workdir!=jobdir must have datain=copy!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+    }
 }
 
 //==============================================================================

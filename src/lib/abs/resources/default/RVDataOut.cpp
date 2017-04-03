@@ -23,6 +23,7 @@
 #include <RVDataOut.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -62,6 +63,17 @@ CRVDataOut::CRVDataOut(void)
 void CRVDataOut::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestKeyValue(sout,rstatus,"keep,copy") == false ) return;
+
+    CResourceValuePtr val_ptr = p_rl->FindResource("workdir");
+    if( val_ptr != NULL ){
+        if( (val_ptr->GetValue() == "jobdir") && (Value != "keep") ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout << "<b><red>        workdir=jobdir must have dataout=keep!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+    }
 }
 
 //==============================================================================
