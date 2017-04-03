@@ -20,6 +20,7 @@ SET(PBSPRO_SRC
         resources/RVPBSProGeneric.cpp
         resources/RVGroup.cpp
         resources/RVUMask.cpp
+        resources/RVPlace.cpp
         )
 
 # create shared library --------------------------------------------------------

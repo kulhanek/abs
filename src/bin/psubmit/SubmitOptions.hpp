@@ -116,7 +116,7 @@ class CSubmitOptions : public CSimpleOptions {
                 'e',                           /* short option name */
                 "expert",                      /* long option name */
                 NULL,                           /* parametr name */
-                "it enables expert mode, in which you can define any batch resource")   /* option description */
+                "it enables the expert mode, in which you can define any batch resource")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
