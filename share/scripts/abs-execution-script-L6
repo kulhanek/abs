@@ -16,17 +16,15 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L6.1: Full job info from the batch system ..."
 echo "# ------------------------------------------------------------------------------"
-echo "User identity ..."
-echo "UID   : `id`"
-echo "Umask : `umask`"
 echo
 
 pqstat -j "$INF_JOB_ID"
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L6.2: Clean up ijobs nodes [$INF_SYNC_MODE] if any ..."
+echo "# L6.2: Clean up ijobs nodes if any ..."
 echo "# ------------------------------------------------------------------------------"
+echo " Data OUT copy mode : $INF_DATAOUT"
 
 # get number of ijobs
 INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
@@ -40,10 +38,11 @@ fi
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L6.3: Clean up nodes [$INF_SYNC_MODE] ..."
+echo "# L6.3: Clean up nodes ..."
 echo "# ------------------------------------------------------------------------------"
-# switch to HOME directory because next commands can remove current directory
+echo " Data OUT copy mode : $INF_DATAOUT"
 
+# switch to HOME directory because next commands can remove current directory
 cd
 
 CLEAN_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type clean $INF_WORK_DIR_TYPE`"
@@ -55,17 +54,17 @@ if [ $? -ne -0 ]; then
 fi
 INF_CLEAN_DIR="`eval echo "$CLEAN_DIR"`"
 
-case $INF_SYNC_MODE in
-    sync )
-        echo " Sync mode: $INF_SYNC_MODE, removing working directories on nodes ..."
+case $INF_DATAOUT in
+    copy)
+        echo " Removing working directories on nodes ..."
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_CLEAN_DIR ---"
             ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: df command was not completed due to error or timeout.\"; fi; rm -rf $INF_CLEAN_DIR"
         done
         ;;
-    jobdir | nosync )
-        echo " Sync mode: $INF_SYNC_MODE, no directories will be removed ..."
+    keep)
+        echo " No directories will be removed ..."
         echo ""
         echo ">>> $INF_MAIN_NODE ------------------------------"
         timeout 30 df -h
@@ -93,42 +92,22 @@ echo "# ------------------------------------------------------------------------
 echo "# L6.4: Current node utilizations ..."
 echo "# ------------------------------------------------------------------------------"
 
-case $INF_SYNC_MODE in
-    jobdir | sync | nosync )
-        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-            echo ""
-            echo ">>> $NODE_NAME ----------------------------------"
-            ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "top -b -n 1"
-        done
-    ;;
-esac
+for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+    echo ""
+    echo ">>> $NODE_NAME ----------------------------------"
+    ssh -x -o "$SSH_OPTIONS" $NODE_NAME "top -b -n 1"
+done
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L6.5: Current node kernel states ..."
 echo "# ------------------------------------------------------------------------------"
 
-case $INF_SYNC_MODE in
-    jobdir | sync | nosync )
-        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-            echo ""
-            echo ">>> $NODE_NAME ----------------------------------"
-            ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "uname -a; dmesg -T | tail -1000"
-        done
-    ;;
-esac
-
-# ------------------------------------------------------------------------------
-
-# delete placebo PBS_NODEFILE and PBS_GPUFILE
-
-if [ -n "$PBS_NODEFILE_REMOVE" ]; then
-    rm -f $PBS_NODEFILE
-fi
-
-if [ -n "$PBS_GPUFILE_REMOVE" ]; then
-    rm -f $PBS_GPUFILE
-fi
+for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+    echo ""
+    echo ">>> $NODE_NAME ----------------------------------"
+    ssh -x -o "$SSH_OPTIONS" $NODE_NAME "uname -a; dmesg -T | tail -1000"
+done
 
 # ------------------------------------------------------------------------------
 

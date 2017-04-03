@@ -648,10 +648,10 @@ bool CPBSProServer::SubmitJob(CJob& job)
     // setup variables
     variables <<  "INF_JOB_NAME=" << job.GetJobName();
     variables << ",INF_JOB_NAME_SUFFIX=" << job.GetJobNameSuffix();
-    variables << ",INF_JOB_PATH=" << job.GetJobPath();
-    variables << ",INF_JOB_MACHINE=" << job.GetJobMachine();
-    variables << ",INF_STORAGE_PATH=" << job.GetStoragePath();
+    variables << ",INF_INPUT_MACHINE=" << job.GetInputMachine();
+    variables << ",INF_INPUT_DIR=" << job.GetInputDir();
     variables << ",INF_STORAGE_MACHINE=" << job.GetStorageMachine();
+    variables << ",INF_STORAGE_DIR=" << job.GetStorageDir();
     variables << ",INF_JOB_KEY=" << job.GetJobKey();
     variables << ",ABS_ROOT=" << CShell::GetSystemVariable("ABS_ROOT");
 

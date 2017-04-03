@@ -1,6 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # ABS
+# (c) 2017, Petr Kulhanek, kulhanek@chemi.muni.cz
 # (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
 # (c) 2008, Petr Kulhanek, kulhanek@chemi.muni.cz
 # Charon Extension Layer v0.9
@@ -78,16 +79,8 @@ case $INF_JOB_NAME in
 
         case $INF_DATAIN in
             copy)
-            if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
-                cp "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_JOB_PATH/${INF_WHOLE_NAME}.info"
-            else
-                /usr/bin/scp -o "StrictHostKeyChecking=no" \
-                    "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "$INF_STORAGE_MACHINE:$INF_STORAGE_PATH/${INF_WHOLE_NAME}.info"
-            fi
-            echo "" >&2
-            echo " ERROR: Unable to update info file in the job input directory!" >&2
-            echo "" >&2
-            exit 1
+                inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
+            ;;
         esac
 
         # notify user if requested
@@ -107,7 +100,7 @@ case $INF_JOB_NAME in
 
         ;;
     gui )
-        echo ">>> ERROR: gui interactive mode is not currently supported!"
+        echo ">>> ERROR: the gui interactive mode is not currently supported!"
         export INF_JOB_EXIT_CODE=1
         ;;
     * )

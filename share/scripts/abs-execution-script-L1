@@ -1,6 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # ABS
+# (c) 2017, Petr Kulhanek, kulhanek@chemi.muni.cz
 # (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
 # (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
 # Charon Extension Layer v0.9
@@ -15,72 +16,56 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L1: Restore job environment ..."
 echo "# ------------------------------------------------------------------------------"
-echo
 
-echo " Current directory  : `pwd` (Not used in restore process.)"
+echo
+echo " Current directory  : `pwd`"
 
 # get name of temporary directory
 export TMPDIR=`$ABS_ROOT/sbin/abs-get-setup-item INF_TMP_DIR`
-
 if [ $? -ne 0 ]; then
     exit 1
 fi
-
+# the full name of the job service files
 export INF_WHOLE_NAME="${INF_JOB_NAME}${INF_JOB_NAME_SUFFIX}"
 
 # ------------------------------------------------------------------------------
-# is job directory on remote machine?
-INF_REMOTE_JOBDIR="YES"
+echo " Is the input directory local?"
+
+export INF_LOCAL_INPUT_DATA="NO"
 if [ -d "$INF_JOB_PATH" ]; then
     # compare keys
     grep "$INF_JOB_KEY" "$INF_JOB_PATH/${INF_WHOLE_NAME}.infkey" &> /dev/null
     if [ $? -eq 0 ]; then
-        INF_REMOTE_JOBDIR="NO"
-        echo " Info               : the job dir is local and keys match."
+        INF_REMOTE_JOBDIR="YES"
+        echo " > the input dir is local and keys match!"
     else
-        echo " Info               : the job dir is local but keys do not match."
+        echo " > the input dir is local but keys do not match, the remote storage or input machine will be used!"
     fi
+else
+        echo " > the input dir is on the remote storage or input machine!"   
 fi
-
-echo " Remote job dir     : $INF_REMOTE_JOBDIR"
-export INF_REMOTE_JOBDIR
 
 # ------------------------------------------------------------------------------
 # copy job info to temporary directory
 export _TNAME_="$$.$USER"
 
-if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
-    cp "$INF_JOB_PATH/${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
-    if [ $? -ne 0 ]; then
-        echo ""  >&2
-        echo " ERROR: Unable to get the job info file!"  >&2
-        echo "        Source      : '$INF_JOB_PATH/${INF_WHOLE_NAME}.info'"  >&2
-        echo "        Destination : '$TMPDIR/${_TNAME_}.info'" >&2
-        echo "" >&2
-        exit 1
-    fi
-else
-    /usr/bin/scp -o "StrictHostKeyChecking=no" \
-        "$INF_STORAGE_MACHINE:$INF_STORAGE_PATH/${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
-    if [ $? -ne 0 ]; then
-        echo ""  >&2
-        echo " ERROR: Unable to get the job info file!"  >&2
-        echo "        Source      : '$INF_STORAGE_MACHINE:$INF_STORAGE_PATH/${INF_WHOLE_NAME}.info'"  >&2
-        echo "        Destination : '$TMPDIR/${_TNAME_}.info'" >&2
-        echo "" >&2
-        exit 1
-    fi
-fi
+echo ""
+echo " Copy the job info file to the temporary directory ..."
+inf-retry-cmd inf-copy-from-inputdir "${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
+if [ $? -ne 0 ]; then exit 1; fi
 
 # ------------------------------------------------------------------------------
+echo ""
+echo " Restore the job environment variables ..."
+
 # restore job shell environment
-ABS_EXIT_CODE=0
+AMS_EXIT_CODE=0
 
 EVAL_STRING=`$ABS_ROOT/sbin/abs-restore-env "$TMPDIR/${_TNAME_}.info"`
 
 eval $EVAL_STRING
 
-if [ $? -ne 0 ] || [ $ABS_EXIT_CODE != "0" ]; then
+if [ $? -ne 0 ] || [ $AMS_EXIT_CODE!= "0" ]; then
     rm -f "$TMPDIR/${_TNAME_}.info"
     exit 1
 fi
@@ -102,7 +87,7 @@ export INF_MAX_WALLTIME=`pqstat -j $INF_JOB_ID | grep Resource_List.walltime | a
 # ------------------------------------------------------------------------------
 # restore exported modules
 
-if [ "$INF_EXPORTED_MODULES" != "" ]; then
+if [ -n "$INF_EXPORTED_MODULES" ]; then
     echo " Exported modules   : $INF_EXPORTED_MODULES"
 else
     echo " Exported modules   : -none-"
@@ -128,7 +113,6 @@ set | grep ^TORQUE_ | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF
 
 # ------------------------------------------------------------------------------
 
-return 0
 
 
 

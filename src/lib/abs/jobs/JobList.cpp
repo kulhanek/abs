@@ -368,9 +368,9 @@ bool CJobList::IsJobSelected(CJobPtr p_job,struct SSelection* p_sel)
         case T_PATH:
             switch(p_sel->Operator){
                 case O_EQ:
-                    return( fnmatch(p_sel->SValue,p_job->GetJobPath(),0) == 0 );
+                    return( fnmatch(p_sel->SValue,p_job->GetInputDir(),0) == 0 );
                 case O_NE:
-                    return( fnmatch(p_sel->SValue,p_job->GetJobPath(),0) != 0 );
+                    return( fnmatch(p_sel->SValue,p_job->GetInputDir(),0) != 0 );
                 default:
                     ES_ERROR("<- unknown selection operator");
                     return(false);
@@ -1220,8 +1220,8 @@ void CJobList::SaveCollectionJobs(CXMLElement* p_ele)
         CJobPtr p_job = *it;
         CXMLElement* p_jele = p_ele->CreateChildElement("job");
         p_jele->SetAttribute("name",p_job->GetJobName());
-        p_jele->SetAttribute("machine",p_job->GetJobMachine());
-        p_jele->SetAttribute("path",p_job->GetJobPath());
+        p_jele->SetAttribute("machine",p_job->GetInputMachine());
+        p_jele->SetAttribute("path",p_job->GetInputDir());
         it++;
     }
 }
@@ -1236,7 +1236,7 @@ void CJobList::AddJob(const CJobPtr& p_job)
 
     while( it != ie ){
         CJobPtr p_cjob = *it;
-        if( p_cjob->GetJobPath() == p_job->GetJobPath() ){
+        if( p_cjob->GetInputDir() == p_job->GetInputDir() ){
             // it is part of collection - remove it
             it = erase(it);
         } else {
@@ -1363,7 +1363,7 @@ void CJobList::PrintCollectionStat(std::ostream& sout,bool compact,bool includep
     list<CJobPtr>::iterator ie = end();
 
     while( it != ie ){
-        jobs.InitByInfoFiles((*it)->GetJobPath());
+        jobs.InitByInfoFiles((*it)->GetInputDir());
         it++;
     }
 

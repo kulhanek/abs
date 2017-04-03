@@ -115,15 +115,15 @@ bool CTurbomoleJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     if( nnodes <= 1 ) return(true);
 
-    CSmallString sync_mode = job.GetItem("specific/resources","INF_SYNC_MODE");
+    CSmallString workdir = job.GetItem("specific/resources","INF_WORK_DIR_TYPE");
 
-    if( sync_mode != "jobdir" ){
+    if( workdir != "jobdir" ){
         sout << endl;
         sout << "<b><red> ERROR: The parallel execution of turbomole job on more than one computational node</red></b>" << endl;
-        sout << "<b><red>        is allowed only when the jobdir synchronization mode is used!</red></b>" << endl;
+        sout << "<b><red>        is allowed only when the workdir is jobdir!</red></b>" << endl;
         sout << endl;
-        sout << "<b><red>        Currently requested synchronization mode    : " << sync_mode << "</red></b>" << endl;
         sout << "<b><red>        The number of requested computational nodes : " << nnodes << "</red></b>" << endl;
+        sout << "<b><red>        Currently requested workdir type            : " << workdir << "</red></b>" << endl;
         return(false);
     }
 

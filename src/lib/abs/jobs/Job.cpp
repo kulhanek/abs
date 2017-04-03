@@ -118,7 +118,7 @@ bool CJob::LoadInfoFile(const CSmallString& filename)
 
 bool CJob::LoadInfoFile(void)
 {
-    CFileName name = GetJobPath() / GetFullJobName() + ".info";
+    CFileName name = GetInputDir() / GetFullJobName() + ".info";
     if( CFileSystem::IsFile(name) == false ){
         DoNotSave = true;
         return(false);
@@ -135,7 +135,7 @@ bool CJob::LoadInfoFile(void)
 bool CJob::SaveInfoFile(void)
 {
     if( DoNotSave == true ) return(true);
-    CFileName name = GetJobPath() / GetFullJobName() + ".info";
+    CFileName name = GetInputDir() / GetFullJobName() + ".info";
     return( SaveInfoFile(name) );
 }
 
@@ -144,7 +144,7 @@ bool CJob::SaveInfoFile(void)
 bool CJob::SaveInfoFileWithPerms(void)
 {
     if( DoNotSave == true ) return(true);
-    CFileName name = GetJobPath() / GetFullJobName() + ".info";
+    CFileName name = GetInputDir() / GetFullJobName() + ".info";
     bool result = SaveInfoFile(name);
     if( result == false ) return(false);
 
@@ -323,10 +323,10 @@ ERetStatus CJob::JobInput(std::ostream& sout)
         ES_TRACE_ERROR("illegal job dir");
         return(ERS_FAILED);
     }   
-    SetItem("basic/jobinput","INF_JOB_PATH",tmp);
+    SetItem("basic/jobinput","INF_INPUT_DIR",tmp);
 
     tmp = CShell::GetSystemVariable("HOSTNAME");
-    SetItem("basic/jobinput","INF_JOB_MACHINE",tmp);
+    SetItem("basic/jobinput","INF_INPUT_MACHINE",tmp);
 
     // detect job type
     ERetStatus rstat = DetectJobType(sout);
@@ -532,23 +532,23 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
 bool CJob::InputDirectory(void)
 {
-    CSmallString input_machine = GetItem("basic/jobinput","INF_JOB_MACHINE");
-    CSmallString input_path = GetItem("basic/jobinput","INF_JOB_PATH");
+    CSmallString input_machine = GetItem("basic/jobinput","INF_INPUT_MACHINE");
+    CSmallString input_dir = GetItem("basic/jobinput","INF_INPUT_DIR");
     CSmallString cwd;
     CFileSystem::GetCurrentDir(cwd);
-    string       input_path_raw(cwd);     // use cwd instead of PWD
+    string       input_dir_raw(cwd);     // use cwd instead of PWD
 
 // determine FS type of input directory and group namespace,
 // storage name and storage directory
 
     struct stat job_dir_stat;
-    if( stat(input_path_raw.c_str(),&job_dir_stat) != 0 ){
+    if( stat(input_dir_raw.c_str(),&job_dir_stat) != 0 ){
         ES_ERROR("unable to stat CWD");
         return(false);
     }
 
-    mode_t input_path_umask = (job_dir_stat.st_mode ^ 0x777) & 0x777;
-    gid_t  input_path_gid = job_dir_stat.st_gid;
+    mode_t input_dir_umask = (job_dir_stat.st_mode ^ 0x777) & 0x777;
+    gid_t  input_dir_gid = job_dir_stat.st_gid;
 
     unsigned int minid = minor(job_dir_stat.st_dev);
     unsigned int majid = major(job_dir_stat.st_dev);
@@ -615,37 +615,37 @@ bool CJob::InputDirectory(void)
 
 // determine storage machine and storage path
     CSmallString storage_machine = input_machine;
-    CSmallString storage_path = input_path;
+    CSmallString storage_dir = input_dir;
 
     if( (fstype == "nfs4:krb5") || (fstype == "nfs4:sys") ){
         // determine server name and data directory
         string smach = src.substr(0,src.find(":"));
         string spath = src.substr(src.find(":")+1,string::npos);
-        if( input_path_raw.find(dest) == string::npos ){
+        if( input_dir_raw.find(dest) == string::npos ){
             CSmallString error;
-            error << "mnt dest (" << dest << ") is not root of cwd (" << input_path_raw << ")";
+            error << "mnt dest (" << dest << ") is not root of cwd (" << input_dir_raw << ")";
             ES_ERROR(error);
             return(false);
         }
         if( spath == "/" ) spath = ""; // remove root '/' character
-        spath = spath + input_path_raw.substr(dest.length(),string::npos);
+        spath = spath + input_dir_raw.substr(dest.length(),string::npos);
         storage_machine_groupns = Host.GetGroupNS(smach);
 
         // FIXME ?
         if( ABSConfig.GetSystemConfigItem("INF_USE_NFS4_STORAGES") == "YES" ){
             storage_machine = smach;
-            storage_path = spath;
+            storage_dir = spath;
         }
     }
 
 // default umask is derived from the input directory permission
-    ResourceList.AddResource("umask",CUser::GetUMask(input_path_umask));
+    ResourceList.AddResource("umask",CUser::GetUMask(input_dir_umask));
 
 // default group name - derived from the input directory group
     // if the file system is compatible with the batch server
     if( storage_machine_groupns == batch_server_groupns ){
         string gname;
-        struct group* p_grp = getgrgid(input_path_gid);
+        struct group* p_grp = getgrgid(input_dir_gid);
         if( p_grp != NULL ){
             gname = string(p_grp->gr_name);
         }
@@ -665,7 +665,7 @@ bool CJob::InputDirectory(void)
     SetItem("specific/resources","INF_INPUT_PATH_FSTYPE",fstype);
 
     SetItem("specific/resources","INF_STORAGE_MACHINE",storage_machine);
-    SetItem("specific/resources","INF_STORAGE_PATH",storage_path);
+    SetItem("specific/resources","INF_STORAGE_DIR",storage_dir);
     SetItem("specific/resources","INF_STORAGE_GROUPNS",storage_machine_groupns);
 
     SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
@@ -884,7 +884,7 @@ bool CJob::ResubmitJob(void)
     curr_dir = GetJobInputPath();
 
     // go to job directory
-    CFileSystem::SetCurrentDir(GetJobPath());
+    CFileSystem::SetCurrentDir(GetInputDir());
 
     // submit job to torque
     if( BatchServers.SubmitJob(*this) == false ){
@@ -1798,7 +1798,7 @@ int CJob::GetNCPU(void)
 
 bool CJob::IsJobDirLocal(bool no_deep)
 {
-    if( GetItem("basic/jobinput","INF_JOB_MACHINE",false) == ABSConfig.GetHostName() ){
+    if( GetItem("basic/jobinput","INF_INPUT_MACHINE",false) == ABSConfig.GetHostName() ){
         return(true);
     }
     if( no_deep ) return(false); // no deep checking
@@ -1815,8 +1815,8 @@ void CJob::SetSimpleJobIdentification(const CSmallString& name, const CSmallStri
 {
     SetItem("basic/jobinput","INF_JOB_TITLE",name);
     SetItem("basic/jobinput","INF_JOB_NAME",name);
-    SetItem("basic/jobinput","INF_JOB_MACHINE",machine);
-    SetItem("basic/jobinput","INF_JOB_PATH",path);
+    SetItem("basic/jobinput","INF_INPUT_MACHINE",machine);
+    SetItem("basic/jobinput","INF_INPUT_PATH",path);
 }
 
 //------------------------------------------------------------------------------
@@ -1888,8 +1888,8 @@ void CJob::PrepareGoWorkingDirEnv(bool noterm)
 void CJob::PrepareGoInputDirEnv(void)
 {
     ShellProcessor.SetVariable("INF_GO_MAIN_NODE","");
-    ShellProcessor.SetVariable("INF_GO_INPUT_MACHINE",GetItem("basic/jobinput","INF_JOB_MACHINE"));
-    ShellProcessor.SetVariable("INF_GO_INPUT_DIR",GetItem("basic/jobinput","INF_JOB_PATH"));
+    ShellProcessor.SetVariable("INF_GO_INPUT_MACHINE",GetItem("basic/jobinput","INF_INPUT_MACHINE"));
+    ShellProcessor.SetVariable("INF_GO_INPUT_DIR",GetItem("basic/jobinput","INF_INPUT_DIR"));
 }
 
 //------------------------------------------------------------------------------
@@ -1898,8 +1898,8 @@ void CJob::PrepareSyncWorkingDirEnv(void)
 {
     ShellProcessor.SetVariable("INF_SYNC_MAIN_NODE",GetItem("start/workdir","INF_MAIN_NODE"));
     ShellProcessor.SetVariable("INF_SYNC_WORK_DIR",GetItem("start/workdir","INF_WORK_DIR"));
-    ShellProcessor.SetVariable("INF_SYNC_JOB_MACHINE",GetItem("basic/jobinput","INF_JOB_MACHINE"));
-    ShellProcessor.SetVariable("INF_SYNC_JOB_PATH",GetItem("basic/jobinput","INF_JOB_PATH"));
+    ShellProcessor.SetVariable("INF_SYNC_INPUT_MACHINE",GetItem("basic/jobinput","INF_INPUT_MACHINE"));
+    ShellProcessor.SetVariable("INF_SYNC_INPUT_DIR",GetItem("basic/jobinput","INF_INPUT_DIR"));
 }
 
 //------------------------------------------------------------------------------
@@ -2097,9 +2097,9 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
 
     if( includepath ){
         if( IsJobDirLocal() ){
-            sout << "       <blue>" << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
+            sout << "       <blue>" << GetItem("basic/jobinput","INF_INPUT_DIR") << "</blue>" << endl;
         } else {
-            sout << "       <blue>" << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
+            sout << "       <blue>" << GetItem("basic/jobinput","INF_INPUT_MACHINE") << ":" << GetItem("basic/jobinput","INF_INPUT_DIR") << "</blue>" << endl;
         }
     }
 }
@@ -2194,9 +2194,9 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
 
     if( includepath ){
         if( IsJobDirLocal() ){
-            sout << "     <blue>> " << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
+            sout << "     <blue>> " << GetItem("basic/jobinput","INF_INPUT_DIR") << "</blue>" << endl;
         } else {
-            sout << "     <blue>> " << GetItem("basic/jobinput","INF_JOB_MACHINE") << ":" << GetItem("basic/jobinput","INF_JOB_PATH") << "</blue>" << endl;
+            sout << "     <blue>> " << GetItem("basic/jobinput","INF_INPUT_MACHINE") << ":" << GetItem("basic/jobinput","INF_INPUT_DIR") << "</blue>" << endl;
         }
     }
 
@@ -2839,8 +2839,8 @@ void CJob::PrintBasicV3(std::ostream& sout)
     sout << "Job title        : " << GetItem("basic/jobinput","INF_JOB_TITLE") << " (Job type: ";
     sout << GetItem("basic/jobinput","INF_JOB_TYPE") << ")" << endl;
 
-    sout << "Job directory    : " << GetItem("basic/jobinput","INF_JOB_MACHINE");
-    sout << ":" << GetItem("basic/jobinput","INF_JOB_PATH") << endl;
+    sout << "Job input dir    : " << GetItem("basic/jobinput","INF_INPUT_MACHINE");
+    sout << ":" << GetItem("basic/jobinput","INF_INPUT_DIR") << endl;
 
     sout << "Job key          : " << GetItem("basic/jobinput","INF_JOB_KEY") << endl;
 
@@ -3485,25 +3485,25 @@ const CSmallString CJob::GetJobNameSuffix(void)
 
 //------------------------------------------------------------------------------
 
-const CSmallString CJob::GetJobPath(void)
+const CSmallString CJob::GetInputDir(void)
 {
-    CSmallString rv = GetItem("basic/jobinput","INF_JOB_PATH");
+    CSmallString rv = GetItem("basic/jobinput","INF_INPUT_DIR");
     return(rv);
 }
 
 //------------------------------------------------------------------------------
 
-const CSmallString CJob::GetJobMachine(void)
+const CSmallString CJob::GetInputMachine(void)
 {
-    CSmallString rv = GetItem("basic/jobinput","INF_JOB_MACHINE");
+    CSmallString rv = GetItem("basic/jobinput","INF_INPUT_MACHINE");
     return(rv);
 }
 
 //------------------------------------------------------------------------------
 
-const CSmallString CJob::GetStoragePath(void)
+const CSmallString CJob::GetStorageDir(void)
 {
-    CSmallString rv = GetItem("specific/resources","INF_STORAGE_PATH");
+    CSmallString rv = GetItem("specific/resources","INF_STORAGE_DIR");
     return(rv);
 }
 

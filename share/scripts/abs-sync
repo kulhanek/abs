@@ -14,8 +14,8 @@
 # required input
 # INF_SYNC_MAIN_NODE
 # INF_SYNC_WORK_DIR
-# INF_SYNC_JOB_PATH
-# INF_SYNC_JOB_MACHINE
+# INF_SYNC_INPUT_DIR
+# INF_SYNC_INPUT_MACHINE
 
 #===============================================================================
 #-------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
     echo -n "All files will be synchronized by rsync "
     if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
         echo "from job working directory ..."
-        rsync -av --exclude "___JOB_IS_RUNNING___" "$INF_SYNC_WORK_DIR/" "$INF_SYNC_JOB_MACHINE:$INF_SYNC_JOB_PATH/" 2>&1 | awk '{ printf("   %s\n",$0); }'
+        rsync -av --exclude "___JOB_IS_RUNNING___" "$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
             echo ""
             echo " ERROR: Unable to copy all files!"
@@ -43,7 +43,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
         fi
     else
         echo "from job input directory ..."
-        rsync -av --exclude "___JOB_IS_RUNNING___" "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$INF_SYNC_JOB_PATH/" 2>&1 | awk '{ printf("   %s\n",$0); }'
+        rsync -av --exclude "___JOB_IS_RUNNING___" "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
             echo ""
             echo " ERROR: Unable to copy all files!"
@@ -92,7 +92,7 @@ for SFILE in $FILES; do
     if [ "$SFILE" == "___JOB_IS_RUNNING___" ]; then
         echo "Skipped."
     else
-        /usr/bin/scp -r $INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE $INF_SYNC_JOB_MACHINE:$INF_SYNC_JOB_PATH > /dev/null
+        /usr/bin/scp -r $INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE $INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR > /dev/null
         if [ $? -ne 0 ]; then
             echo ""
             echo " ERROR: Unable to copy the file!"

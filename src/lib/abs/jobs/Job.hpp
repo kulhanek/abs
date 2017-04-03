@@ -317,17 +317,17 @@ public:
     int GetNCPU(void);
 
 // FS related ------------------------------------------------------------------
-    /// get job path
-    const CSmallString GetJobPath(void);
-
     /// get job machine
-    const CSmallString GetJobMachine(void);
+    const CSmallString GetInputMachine(void);
 
-    /// get storage path
-    const CSmallString GetStoragePath(void);
+    /// get job path
+    const CSmallString GetInputDir(void);
 
     /// get storage machine
     const CSmallString GetStorageMachine(void);
+
+    /// get storage path
+    const CSmallString GetStorageDir(void);
 
     /// get job workdir type
     const CSmallString GetWorkDir(void);
