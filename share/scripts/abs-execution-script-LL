@@ -41,23 +41,23 @@ function inf-retry-cmd()
 
 function inf-copy-from-inputdir() 
 {
-    echo "= inf-copy-from-inputdir $1 $2"
+    echo "= inf-copy-from-inputdir: $1 $2"
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
-        echo "  > trying to copy from the local mount via cp ... "
+        echo "  > probing to copy the data from the local mount via cp ... "
         cp "$INF_INPUT_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
             return 0
         fi
         echo "  !failure"
     else
-        echo -n "  > trying to copy from the input storage machine via scp ... "
+        echo -n "  > probing to copy the data from the input storage machine via scp ... "
         /usr/bin/scp -o "$INF_SCP_OPTIONS" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
             return 0
         fi
         echo "  !failure"
     fi
-    echo -n "  > trying to copy from the input machine via scp ... "
+    echo -n "  > probing to copy the data from the input machine via scp ... "
     /usr/bin/scp -o "$INF_SCP_OPTIONS" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
     
     if [ $? -eq 0 ]; then
@@ -71,24 +71,24 @@ function inf-copy-from-inputdir()
 
 function inf-copy-to-inputdir() 
 {
-    echo "= inf-copy-to-inputdir $1 $2"
+    echo "= inf-copy-to-inputdir: $1 $2"
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
-        echo -n "  > trying to copy from the local mount via cp ... "
+        echo -n "  > probing to copy the data to the local mount via cp ... "
         cp  "$1" "$INF_INPUT_DIR/$2"
         if [ $? -eq 0 ]; then
             return 0
         fi
         echo "  !failure"
     else
-        echo -n "  > trying to copy from the input storage machine via scp ... "
+        echo "  > probing to copy the data to the input storage machine via scp ... "
         /usr/bin/scp -o "$INF_SCP_OPTIONS" "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
         if [ $? -eq 0 ]; then
             return 0
         fi
         echo "  !failure"
     fi
-    echo -n "  > trying to copy from the input machine via scp ... "
-    /usr/bin/scp -o "$INF_SCP_OPTIONS"  "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"    
+    echo "  > probing to copy the data to the input machine via scp ... "
+    /usr/bin/scp -o "$INF_SCP_OPTIONS" "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"    
     if [ $? -eq 0 ]; then
         return 0
     fi
@@ -122,7 +122,7 @@ function inf-rsync-from-inputdir()
         fi
         echo "  !failure"
     else
-        echo -n "  > trying to rsync from the input storage machine via scp ... "
+        echo "  > trying to rsync from the input storage machine via scp ... "
         rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x -o \"$INF_SSH_OPTIONS\"" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/" "$INF_WORK_DIR/"
         if [ $? -eq 0 ]; then
             rm -f $TMPDIR/${_TNAME_}.excluded
@@ -131,7 +131,7 @@ function inf-rsync-from-inputdir()
         echo "  !failure"
     fi
 
-    echo -n "  > trying to rsync from the input machine via scp ... "
+    echo "  > trying to rsync from the input machine via scp ... "
     rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x -o \"$INF_SSH_OPTIONS\"" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/" "$INF_WORK_DIR/"
     if [ $? -eq 0 ]; then
         rm -f $TMPDIR/${_TNAME_}.excluded
