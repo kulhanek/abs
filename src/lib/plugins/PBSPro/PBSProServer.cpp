@@ -470,6 +470,7 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
     p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,extend.GetBuffer());
 
     if( p_jobs == NULL ){
+                    cout << "FAIL" << endl;
         char* p_error = pbspro_geterrmsg(ServerID);
         if( p_jobs ) ES_TRACE_ERROR(p_error);
     }
@@ -478,7 +479,7 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 
     if( p_jobs != NULL ){
         CPBSProJob* p_job = new CPBSProJob;
-            cout << "OK" << endl;
+                    cout << "OK" << endl;
         if( p_job->Init(ShortName,p_jobs) == false ){
             delete p_job;
             ES_ERROR("unable to init job");
