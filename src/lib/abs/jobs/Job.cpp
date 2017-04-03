@@ -2450,7 +2450,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Work dir size    : " << tmp << endl;
 
     tmp1 = GetItem("specific/resources","INF_DATAIN");
-    tmp2 = GetItem("specific/resources","INF_DATAIN");
+    tmp2 = GetItem("specific/resources","INF_DATAOUT");
     sout << "Data IN/OUT      : " << tmp1 << "/" << tmp2 << endl;
 
     tmp = GetItem("basic/jobinput","INF_EXCLUDED_FILES");
