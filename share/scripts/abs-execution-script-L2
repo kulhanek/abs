@@ -242,6 +242,7 @@ if [ $INF_NGPUS -gt 0 ]; then
     echo ""
     echo "# GPU info"
     echo "# ============================================================================="
+    echo "# CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES"
     type nvidia-smi &> /dev/null
     if [ $? -eq 0 ]; then
         nvidia-smi

@@ -2993,10 +2993,10 @@ EJobStatus CJob::GetJobStatus(void)
     if( GetSiteID() != AMSGlobalConfig.GetActiveSiteID() ){
         switch( GetJobInfoStatus() ){
             case EJS_SUBMITTED:
-                BatchJobComment = "the job was submitted to batch system of different site";
+                BatchJobComment = "the job was submitted to the batch system of different site";
                 return(EJS_INCONSISTENT);
             case EJS_RUNNING:
-                BatchJobComment = "the job was submitted to batch system of different site";
+                BatchJobComment = "the job was submitted to the batch system of different site";
                 return(EJS_INCONSISTENT);
             default:
                 return( GetJobInfoStatus() );
@@ -3013,11 +3013,11 @@ EJobStatus CJob::GetJobStatus(void)
                 return(EJS_SUBMITTED);
             }
             if( BatchJobStatus == EJS_RUNNING ){
-                BatchJobComment = "the job is in submitted mode but the batch system shows it in running mode";
+                BatchJobComment = "the job is in the submitted mode but the batch system shows it in the running mode";
                 return(EJS_INCONSISTENT);
             }
             if( BatchJobStatus == EJS_FINISHED ){
-                BatchJobComment = "the job is in submitted mode but the batch system shows it finished";
+                BatchJobComment = "the job is in the submitted mode but the batch system shows it finished";
                 return(EJS_ERROR);
             }
             BatchJobComment = "the job was not found in the batch system";
@@ -3027,7 +3027,7 @@ EJobStatus CJob::GetJobStatus(void)
                 return(EJS_RUNNING);
             }
             if( BatchJobStatus == EJS_FINISHED ){
-                BatchJobComment = "the job is in running mode but the batch system shows it finished (walltime or resources exceeded?)";
+                BatchJobComment = "the job is in the running mode but the batch system shows it finished (walltime or resources exceeded?)";
                 return(EJS_ERROR);
             }
             BatchJobComment = "the job was not found in the batch system";
