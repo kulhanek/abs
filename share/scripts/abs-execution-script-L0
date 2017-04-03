@@ -110,16 +110,16 @@ source $ABS_ROOT/share/scripts/abs-execution-script-L1
 source $ABS_ROOT/share/scripts/abs-execution-script-L2
 
 # Copy input job data ...
-$ABS_ROOT/share/scripts/abs-execution-script-L3 || exit 1
+source $ABS_ROOT/share/scripts/abs-execution-script-L3
 
 # Start job ...
 source $ABS_ROOT/share/scripts/abs-execution-script-L4
 
 # Sync data ...
-$ABS_ROOT/share/scripts/abs-execution-script-L5 || exit 1
+source $ABS_ROOT/share/scripts/abs-execution-script-L5 
 
 # Clean ...
-$ABS_ROOT/share/scripts/abs-execution-script-L6 || exit 1
+source $ABS_ROOT/share/scripts/abs-execution-script-L6 
 
 # =============================================================================
 

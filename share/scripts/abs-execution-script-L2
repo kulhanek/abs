@@ -72,7 +72,7 @@ echo "# ------------------------------------------------------------------------
 export INF_MAIN_NODE=`hostname -f`
 echo "Job ID             : $INF_JOB_ID"
 echo "Main working node  : $INF_MAIN_NODE"
-echo "Working dir type   : $INF_WORK_DIR_TYPE"
+echo "Work directory type: $INF_WORK_DIR_TYPE"
 echo "Data IN copy mode  : $INF_DATAIN"
 
 # ------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ case $INF_DATAIN in
         fi
     ;;
     copy)
-        echo " Create the working directories on nodes:"
+        echo "Create the working directories on the working nodes:"
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
@@ -205,7 +205,7 @@ echo "# ------------------------------------------------------------------------
 for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
     echo ""
     echo ">>> $NODE_NAME ----------------------------------"
-    ssh -x -o "StrictHostKeyChecking=no" $NODE_NAME "top -b -n 1"
+    ssh -x -o "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /   PID USER/ { start = 1; }'"
 done
 
 echo ""
