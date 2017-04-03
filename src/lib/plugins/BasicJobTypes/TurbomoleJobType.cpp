@@ -110,7 +110,7 @@ ERetStatus CTurbomoleJobType::DetectJobType(CJob& job,bool& detected,std::ostrea
 bool CTurbomoleJobType::CheckInputFile(CJob& job,std::ostream& sout)
 {
     // if number of nodes is higher than 1 then sync mode must be jobdir
-    CSmallString snnodes = job.GetItem("specific/resources","INF_NNODE");
+    CSmallString snnodes = job.GetItem("specific/resources","INF_NNODES");
     int nnodes = snnodes.ToInt();
 
     if( nnodes <= 1 ) return(true);

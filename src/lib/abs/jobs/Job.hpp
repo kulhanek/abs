@@ -314,7 +314,7 @@ public:
     const CSmallTimeAndDate GetTimeOfLastChange(void);
 
     /// get number of CPUs
-    int GetNCPU(void);
+    int GetNCPUs(void);
 
 // FS related ------------------------------------------------------------------
     /// get job machine

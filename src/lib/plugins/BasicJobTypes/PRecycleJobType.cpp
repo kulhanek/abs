@@ -388,7 +388,7 @@ bool CPRecycleJobType::CheckInputFile(CJob& job,std::ostream& sout)
     if( Cache.DoesItNeedGPU(mname) == false ) return(true);
 
     // the module needs GPU, did we requested GPUs?
-    CSmallString sngpus = job.GetItem("specific/resources","INF_NGPU");
+    CSmallString sngpus = job.GetItem("specific/resources","INF_NGPUS");
     int ngpus = sngpus.ToInt();
 
     if( ngpus == 0 ){

@@ -508,9 +508,9 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
 // setup specific items derived from resources
-    SetItem("specific/resources","INF_NCPU",ResourceList.GetNumOfCPUs());
-    SetItem("specific/resources","INF_NGPU",ResourceList.GetNumOfGPUs());
-    SetItem("specific/resources","INF_NNODE",ResourceList.GetNumOfNodes());
+    SetItem("specific/resources","INF_NCPUS",ResourceList.GetNumOfCPUs());
+    SetItem("specific/resources","INF_NGPUS",ResourceList.GetNumOfGPUs());
+    SetItem("specific/resources","INF_NNODES",ResourceList.GetNumOfNodes());
     SetItem("specific/resources","INF_MEMORY",ResourceList.GetMemoryString());
     SetItem("specific/resources","INF_WALLTIME",ResourceList.GetWallTimeString());
     SetItem("specific/resources","INF_RESOURCES",ResourceList.ToString(false));
@@ -1788,9 +1788,9 @@ const CSmallTimeAndDate CJob::GetTimeOfLastChange(void)
 
 //------------------------------------------------------------------------------
 
-int CJob::GetNCPU(void)
+int CJob::GetNCPUs(void)
 {
-    CSmallString ncpu = GetItem("specific/resources","INF_NCPU");
+    CSmallString ncpu = GetItem("specific/resources","INF_NCPUS");
     return(ncpu.ToInt());
 }
 
@@ -2023,9 +2023,9 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
             queue = queue.GetSubStringFromTo(0,14);
         }
         sout << " " << setw(15) << queue;
-        sout << " " << setw(5) << GetItem("specific/resources","INF_NCPU");
-        sout << " " << setw(5) << GetItem("specific/resources","INF_NGPU");
-        sout << " " << setw(5) << GetItem("specific/resources","INF_NNODE");
+        sout << " " << setw(5) << GetItem("specific/resources","INF_NCPUS");
+        sout << " " << setw(5) << GetItem("specific/resources","INF_NGPUS");
+        sout << " " << setw(5) << GetItem("specific/resources","INF_NNODES");
 
         CSmallTimeAndDate   last_change;
         CSmallTimeAndDate   curr_time;
@@ -2161,9 +2161,9 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     }
     sout << " " << setw(15) << left << queue;
     sout << right;
-    sout << " " << setw(5) << GetItem("specific/resources","INF_NCPU");
-    sout << " " << setw(5) << GetItem("specific/resources","INF_NGPU");
-    sout << " " << setw(5) << GetItem("specific/resources","INF_NNODE");
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NCPUS");
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NGPUS");
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NNODES");
 
     CSmallTimeAndDate   last_change;
     CSmallTimeAndDate   curr_time;
@@ -2218,7 +2218,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
                 break;
             case EJS_RUNNING:
                 sout << "     <green>" << GetItem("start/workdir","INF_MAIN_NODE");
-                if( GetItem("specific/resources","INF_NNODE").ToInt() > 1 ){
+                if( GetItem("specific/resources","INF_NNODES").ToInt() > 1 ){
                     sout << ",+";
                 }
                 sout << "</green>" << endl;
@@ -2447,13 +2447,13 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     sout << "-----------------------------------------------" << endl;
     sout << "NCPUs NGPUs NNodes Memory WorkSize     WallTime" << endl;
-    tmp = GetItem("specific/resources","INF_NCPU");
+    tmp = GetItem("specific/resources","INF_NCPUS");
     sout << setw(5) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_NGPU");
+    tmp = GetItem("specific/resources","INF_NGPUS");
     sout << setw(5) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_NNODE");
+    tmp = GetItem("specific/resources","INF_NNODES");
     sout << setw(6) << tmp;
     sout << " ";
     tmp = GetItem("specific/resources","INF_MEMORY");
@@ -2599,7 +2599,7 @@ bool CJob::PrintExec(std::ostream& sout)
 
     ListNodes(sout);
 
-    if( (GetItem("specific/resources","INF_NGPU").ToInt() > 0) &&
+    if( (GetItem("specific/resources","INF_NGPUS").ToInt() > 0) &&
         (GetElementByPath("start/gpus",false) != NULL) ){
         sout << "----------------------------------------" << endl;
 
@@ -2954,7 +2954,7 @@ const CSmallString CJob::GetQueue(void)
 int CJob::GetNumOfCPUs(void)
 {
     CSmallString tmp;
-    tmp = GetItem("specific/resources","INF_NCPU");
+    tmp = GetItem("specific/resources","INF_NCPUS");
     return(tmp.ToInt());
 }
 
@@ -2963,7 +2963,7 @@ int CJob::GetNumOfCPUs(void)
 int CJob::GetNumOfGPUs(void)
 {
     CSmallString tmp;
-    tmp = GetItem("specific/resources","INF_NGPU");
+    tmp = GetItem("specific/resources","INF_NGPUS");
     return(tmp.ToInt());
 }
 
@@ -2972,7 +2972,7 @@ int CJob::GetNumOfGPUs(void)
 int CJob::GetNumOfNodes(void)
 {
     CSmallString tmp;
-    tmp = GetItem("specific/resources","INF_NNODE");
+    tmp = GetItem("specific/resources","INF_NNODES");
     return(tmp.ToInt());
 }
 
@@ -3210,11 +3210,11 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
     sout << left << setw(15) << queue;
 
     CSmallString tmp;
-    tmp = GetItem("specific/resources","INF_NCPU");
+    tmp = GetItem("specific/resources","INF_NCPUS");
     sout << " " << right << setw(5) << tmp;
-    tmp = GetItem("specific/resources","INF_NGPU");
+    tmp = GetItem("specific/resources","INF_NGPUS");
     sout << " " << right << setw(5) << tmp;
-    tmp = GetItem("specific/resources","INF_NNODE");
+    tmp = GetItem("specific/resources","INF_NNODES");
     sout << " " << right << setw(5) << tmp;
 
     CSmallTimeAndDate current_time;
@@ -3291,7 +3291,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
                 break;
             case EJS_RUNNING:
                 sout << "     <green>" << GetItem("start/workdir","INF_MAIN_NODE");
-                if( GetItem("specific/resources","INF_NNODE").ToInt() > 1 ){
+                if( GetItem("specific/resources","INF_NNODES").ToInt() > 1 ){
                     sout << ",+";
                 }
                 sout << "</green>" << endl;

@@ -192,15 +192,15 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_l,"ncpus",tmp);
     if( tmp == NULL ) tmp = "0";
-    SetItem("specific/resources","INF_NCPU",tmp);
+    SetItem("specific/resources","INF_NCPUS",tmp);
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_l,"ngpus",tmp);
     if( tmp == NULL ) tmp = "0";
-    SetItem("specific/resources","INF_NGPU",tmp);
+    SetItem("specific/resources","INF_NGPUS",tmp);
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_l,"nodect",tmp);
     if( tmp == NULL ) tmp = "1";
-    SetItem("specific/resources","INF_NNODE",tmp);
+    SetItem("specific/resources","INF_NNODES",tmp);
 
 // ------------------
     // this is optional - times

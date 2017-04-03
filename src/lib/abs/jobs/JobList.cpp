@@ -1683,7 +1683,7 @@ void CJobList::PrintStatistics(std::ostream& sout)
             qt = p_job->GetRunningTime();
             rtime += qt;
 
-            ctime += qt*p_job->GetNCPU();
+            ctime += qt*p_job->GetNCPUs();
 
             if( run_stat == 1 ){
                 rtimel = qt;
@@ -1811,9 +1811,9 @@ void CJobList::GetNumberOfResFromBatchSys(EJobStatus status,int& ncpus,int& ngpu
     while( it != ie ){
         if( (*it)->GetJobBatchStatus() == status ){
             CSmallString tmp;
-            tmp = (*it)->GetItem("specific/resources","INF_NCPU");
+            tmp = (*it)->GetItem("specific/resources","INF_NCPUS");
             ncpus += tmp.ToInt();
-            tmp = (*it)->GetItem("specific/resources","INF_NGPU");
+            tmp = (*it)->GetItem("specific/resources","INF_NGPUS");
             ngpus += tmp.ToInt();
         }
         it++;

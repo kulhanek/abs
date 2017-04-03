@@ -115,7 +115,7 @@ bool CMultiWfnJobType::CheckInputFile(CJob& job,std::ostream& sout)
     }
 
     // check if the input file contains correct number of CPUs
-    CSmallString sncpus = job.GetItem("specific/resources","INF_NCPU");
+    CSmallString sncpus = job.GetItem("specific/resources","INF_NCPUS");
     int ncpus = sncpus.ToInt();
     int uncpus = GetNThreads();
 

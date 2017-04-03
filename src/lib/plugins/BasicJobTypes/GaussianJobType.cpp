@@ -169,7 +169,7 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
 bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
 {
     // check if there is no more than one node request
-    CSmallString snnodes = job.GetItem("specific/resources","INF_NNODE");
+    CSmallString snnodes = job.GetItem("specific/resources","INF_NNODES");
     int nnodes = snnodes.ToInt();
 
     if( nnodes > 1 ){
@@ -182,7 +182,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
     }
 
     // check if the input file contains correct number of CPUs
-    CSmallString sncpus = job.GetItem("specific/resources","INF_NCPU");
+    CSmallString sncpus = job.GetItem("specific/resources","INF_NCPUS");
     int ncpus = sncpus.ToInt();
 
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");

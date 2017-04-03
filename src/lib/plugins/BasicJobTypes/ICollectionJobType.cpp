@@ -225,7 +225,7 @@ bool CICollectionJobType::CheckInputFile(CJob& job,std::ostream& sout)
     CSmallString stncpus = job.GetItem("basic/jobinput","INF_ISUBMIT_TOT_NCPUS");
     int tncpus = stncpus.ToInt();
 
-    CSmallString srcpus = job.GetItem("specific/resources","INF_NCPU");
+    CSmallString srcpus = job.GetItem("specific/resources","INF_NCPUS");
     int rncpus = srcpus.ToInt();
 
     if( tncpus != rncpus ) {
@@ -236,7 +236,7 @@ bool CICollectionJobType::CheckInputFile(CJob& job,std::ostream& sout)
     }
 
     // we do not support GPU
-    CSmallString srgpus = job.GetItem("specific/resources","INF_NGPU");
+    CSmallString srgpus = job.GetItem("specific/resources","INF_NGPUS");
     int rgpus = srgpus.ToInt();
 
     if( rgpus > 0 ){

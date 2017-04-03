@@ -159,7 +159,7 @@ ERetStatus CNWChemJobType::DetectJobType(CJob& job,bool& detected,std::ostream& 
 bool CNWChemJobType::CheckInputFile(CJob& job,std::ostream& sout)
 {
     // check if there is no more than one node request
-    CSmallString snnodes = job.GetItem("specific/resources","INF_NNODE");
+    CSmallString snnodes = job.GetItem("specific/resources","INF_NNODES");
     int nnodes = snnodes.ToInt();
 
     if( nnodes > 1 ){

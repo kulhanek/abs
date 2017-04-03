@@ -75,12 +75,23 @@ fi
 # ------------------------------------------------------------------------------
 # AMS/ABS co-operation
 
-#FIXME
-export AMS_NCPU=$INF_NCPU
-export AMS_NGPU=$INF_NGPU
-export AMS_NNODE=$INF_NNODE
+export AMS_NCPUS=$INF_NCPUS
+export AMS_NGPUS=$INF_NGPUS
+export AMS_NNODES=$INF_NNODES
 export INF_NODEFILE=$PBS_NODEFILE
 export AMS_NODEFILE=$INF_NODEFILE
+
+# FIXME - compatibility mode
+export AMS_NCPU=$AMS_NCPUS
+export AMS_NGPU=$AMS_NGPUS
+export AMS_NNODE=$AMS_NNODES
+
+export INF_NCPU=$AMS_NCPUS
+export INF_NGPU=$AMS_NGPUS
+export INF_NNODE=$AMS_NNODES
+
+export INF_JOB_PATH=$INF_INPUT_DIR
+export INF_JOB_MACHINE=$INF_INPUT_MACHINE
 
 # ------------------------------------------------------------------------------
 # determine INF_MAX_WALLTIME from the job stat

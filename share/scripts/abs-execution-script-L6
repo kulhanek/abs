@@ -31,7 +31,7 @@ echo "# Data OUT copy mode : $INF_DATAOUT"
 INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
 NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
 if [ $? -eq 0 ]; then
-    echo "# Number of ijobs : $NIJOBS"
+    echo "# Number of ijobs    : $NIJOBS"
     if [ "$NIJOBS" -gt 0 ]; then
         $ABS_ROOT/share/scripts/abs-execution-script-L6-ijobs
     fi
@@ -59,6 +59,7 @@ INF_CLEAN_DIR="`eval echo "$CLEAN_DIR"`"
 
 echo "# Clean directory    : $INF_CLEAN_DIR"
 
+echo ""
 case $INF_DATAOUT in
     copy)
         echo "# Removing working directories on nodes ..."
@@ -69,7 +70,7 @@ case $INF_DATAOUT in
         done
         ;;
     keep)
-        echo "# No directories will be removed ..."
+        echo "# No directory will be removed ..."
         echo ""
         echo ">>> $INF_MAIN_NODE ------------------------------"
         timeout 30 df -h
