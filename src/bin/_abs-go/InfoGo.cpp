@@ -128,17 +128,17 @@ bool CInfoGo::GoByInfoFiles(void)
     // get list of info files
     if( Options.GetNumberOfProgArgs() > 0 ){
         // actually only one can be loaded - see int CInfoGoOptions::CheckArguments(void)
-        if( Jobs.AddJob(Options.GetProgArg(0)) == false ){
+        if( JobList.AddJob(Options.GetProgArg(0)) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load job info file '" << Options.GetProgArg(0) << "'!</red></b>" << endl;
             vout << endl;
             return(false);
         }
     } else {
-        Jobs.InitByInfoFiles(".",false);
+        JobList.InitByInfoFiles(".",false);
     }
 
-    if( Jobs.GetNumberOfJobs() == 0 ){
+    if( JobList.GetNumberOfJobs() == 0 ){
         vout << endl;
         vout << "<b><red> ERROR: No job info files were found!</red></b>" << endl;
         vout << endl;
@@ -146,16 +146,16 @@ bool CInfoGo::GoByInfoFiles(void)
     }
 
     // update status of live jobs
-    Jobs.UpdateJobStatuses();
+    JobList.UpdateJobStatuses();
 
     // print final information
     vout << endl;
 
     if( Options.GetOptForce() == false ) {
         // analyze jobs for pgo action
-        if( Jobs.IsGoActionPossible(vout) == false ){
+        if( JobList.IsGoActionPossible(vout) == false ){
             if( Options.GetOptNoWait() == false ){
-                if( Jobs.WaitForRunningJob(vout) == false ){
+                if( JobList.WaitForRunningJob(vout) == false ){
                     ES_TRACE_ERROR("pgo action is not possible");
                     return(false);
                 }
@@ -165,12 +165,12 @@ bool CInfoGo::GoByInfoFiles(void)
             }
         }
     } else {
-        Jobs.PrintInfos(vout);
+        JobList.PrintInfos(vout);
         vout << endl;
 
-        if( Jobs.GetNumberOfJobs() > 1 ){
+        if( JobList.GetNumberOfJobs() > 1 ){
             vout << "<b><red> ERROR: The use of --force option with more than one job is not supported!</red></b>" << endl;
-            vout << "<b><red>        Specify the required job as argument of pgo command.</red></b>" << endl;
+            vout << "<b><red>        Specify the required job as argument of the pgo command.</red></b>" << endl;
             vout << endl;
             return(false);
         }
@@ -182,11 +182,11 @@ bool CInfoGo::GoByInfoFiles(void)
 
     // satisfying job
     vout << ">>> Job suitable for pgo action ..." << endl;
-    Jobs.PrintInfosCompact(vout,false,true);
+    JobList.PrintInfosCompact(vout,false,true);
     vout << endl;
 
     // get last job and prepare environment for pgo command
-    Jobs.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal());
+    JobList.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal());
 
     return(true);
 }
@@ -199,17 +199,17 @@ bool CInfoGo::GoByJobID(void)
 
     vout << endl;
 
-    if( Jobs.GetNumberOfJobs() == 0 ){
-        vout << "<b><red> ERROR: No job with specified job ID was found!</red></b>" << endl;
+    if( JobList.GetNumberOfJobs() == 0 ){
+        vout << "<b><red> ERROR: No job with the specified job ID was found!</red></b>" << endl;
         vout << endl;
         return(false);
     }
 
     // print info about jobs
-    Jobs.PrintBatchInfo(vout,true,true);
+    JobList.PrintBatchInfo(vout,true,true);
 
     // get last job and prepare environment for pgo command
-    Jobs.PrepareGoInputDirEnv();
+    JobList.PrepareGoInputDirEnv();
 
     return(true);
 }

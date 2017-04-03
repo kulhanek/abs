@@ -48,7 +48,6 @@ private:
     CInfoGoOptions  Options;
     CTerminalStr    Console;
     CVerboseStr     vout;
-    CJobList        Jobs;
     int             ExitCode;
 
     // go by info file
