@@ -1093,18 +1093,16 @@ bool CJob::KillJob(bool force)
 
     switch( GetJobStatus() ){
         case EJS_SUBMITTED:
-        case EJS_RUNNING:
+        case EJS_RUNNING:{
             // try to kill job
-            return(BatchServers.KillJob(*this));
+            bool result = BatchServers.KillJob(*this);
+            if( result == true ) CreateSection("kill");
+            return(result);
+            }
         default:
             ES_ERROR("unable to kill job that is not running or queued");
             return(false);
     }
-
-    // update info file
-    CreateSection("kill");
-
-    return(true);
 }
 
 //------------------------------------------------------------------------------
