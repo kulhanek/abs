@@ -124,7 +124,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     RemoveResource(name);
 
     // add resource
-    CResourceValuePtr res_ptr =  AddResource(name,true);
+    CResourceValuePtr res_ptr =  AddResource(name,expertmode);
     if( res_ptr != NULL ){
         res_ptr->Value = value;
         return;
