@@ -58,7 +58,7 @@ if [ $? -ne 0 ]; then exit 1; fi
 
 # ------------------------------------------------------------------------------
 echo ""
-echo " Restore the job environment variables ..."
+echo "Restore the job environment variables ..."
 
 # restore job shell environment
 AMS_EXIT_CODE=0
@@ -89,9 +89,9 @@ export INF_MAX_WALLTIME=`pqstat -j $INF_JOB_ID | grep Resource_List.walltime | a
 # restore exported modules
 
 if [ -n "$INF_EXPORTED_MODULES" ]; then
-    echo " Exported modules   : $INF_EXPORTED_MODULES"
+    echo "Exported modules   : $INF_EXPORTED_MODULES"
 else
-    echo " Exported modules   : -none-"
+    echo "Exported modules   : -none-"
 fi
 
 INF_EXPORTED_MODULES=`echo $INF_EXPORTED_MODULES | sed -e 's/|/ /g'`

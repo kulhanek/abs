@@ -18,7 +18,6 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L2.1: Resources files ..."
 echo "# ------------------------------------------------------------------------------"
-echo
 
 echo ""
 echo "# PBS_NODEFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -71,10 +70,10 @@ echo "# ------------------------------------------------------------------------
 echo "# L2.2: Prepare the working directory ..."
 echo "# ------------------------------------------------------------------------------"
 export INF_MAIN_NODE=`hostname -f`
-echo " Job ID             : $INF_JOB_ID"
-echo " Main working node  : $INF_MAIN_NODE"
-echo " Working dir type   : $INF_WORK_DIR_TYPE"
-echo " Data IN copy mode  : $INF_DATAIN"
+echo "Job ID             : $INF_JOB_ID"
+echo "Main working node  : $INF_MAIN_NODE"
+echo "Working dir type   : $INF_WORK_DIR_TYPE"
+echo "Data IN copy mode  : $INF_DATAIN"
 
 # ------------------------------------------------------------------------------
 # set working directory
@@ -83,9 +82,9 @@ INF_WORK_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type main $INF_WORK_DIR_TYPE`"
 if [ $? -ne -0 ]; then
     return 1
 fi
-echo " Working directory  : $INF_WORK_DIR"
+echo "Working directory  : $INF_WORK_DIR"
 INF_WORK_DIR="`eval echo "$INF_WORK_DIR"`"
-echo " Working directory  : $INF_WORK_DIR"
+echo "Working directory  : $INF_WORK_DIR"
 
 # ------------------------------------------------------------------------------
 # create working directories if necessary
@@ -120,7 +119,7 @@ export INF_WORK_DIR
 # ------------------------------------------------------------------------------
 # go to working directory
 echo ""
-echo " Changing the current directory to the working directory ..."
+echo "Changing the current directory to the working directory ..."
 cd "$INF_WORK_DIR"
 
 if [ $? -ne 0 ]; then
@@ -131,6 +130,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # ------------------------------------------------------------------------------
+echo ""
+echo "Create local copies of nodefile and gpufile ..."
+
 # create sorted node file
 INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
 export INF_NODEFILE
@@ -175,7 +177,7 @@ fi
 # update info file
 
 echo ""
-echo " Write the job start info ..."
+echo "Write the job start and update the info file in the input directory ..."
 
 $ABS_ROOT/sbin/abs-update-infofile start
 if [ $? -ne 0 ]; then
@@ -185,7 +187,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo " Update the info file in the input directory ..."
 case $INF_DATAIN in
     keep)
         echo " > already updated in the keep datain mode ..."

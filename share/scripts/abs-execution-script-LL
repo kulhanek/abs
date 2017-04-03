@@ -27,10 +27,14 @@ function inf-retry-cmd()
     fi
     for((INF_I=0; INF_I < $INF_RETRY_COUNT; INF_I++)); do
         eval "$*"
-        if [ $? -eq 0 ]; then return 0; fi
+        if [ $? -eq 0 ]; then
+            unset INF_I
+            return 0
+        fi
         echo "! command failed - it will be re-executed in $INF_RETRY_TIME seconds ..."
         sleep $INF_RETRY_TIME
     done
+    unset INF_I
     return 1
 }
 
