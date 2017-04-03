@@ -18,9 +18,9 @@ echo "# L1: Restore job environment ..."
 echo "# ------------------------------------------------------------------------------"
 
 echo
-echo "Current directory  : `pwd`"
-echo "Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
-echo "Storage directory  : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
+echo "# Current directory  : `pwd`"
+echo "# Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
+echo "# Storage directory  : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
 
 # get name of temporary directory
 export TMPDIR=`$ABS_ROOT/sbin/abs-get-setup-item INF_TMP_DIR`
@@ -31,7 +31,8 @@ fi
 export INF_WHOLE_NAME="${INF_JOB_NAME}${INF_JOB_NAME_SUFFIX}"
 
 # ------------------------------------------------------------------------------
-echo "Is the input directory local?"
+echo
+echo "# Is the input directory local?"
 
 export INF_LOCAL_INPUT_DATA="NO"
 if [ -d "$INF_JOB_PATH" ]; then
@@ -52,13 +53,13 @@ fi
 export _TNAME_="$$.$USER"
 
 echo ""
-echo "Copy the job info file to the temporary directory ..."
+echo "# Copy the job info file to the temporary directory ..."
 inf-retry-cmd inf-copy-from-inputdir "${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
 if [ $? -ne 0 ]; then exit 1; fi
 
 # ------------------------------------------------------------------------------
 echo ""
-echo "Restore the job environment variables ..."
+echo "# Restore the job environment variables ..."
 
 # restore job shell environment
 AMS_EXIT_CODE=0
@@ -89,9 +90,9 @@ export INF_MAX_WALLTIME=`pqstat -j $INF_JOB_ID | grep Resource_List.walltime | a
 # restore exported modules
 
 if [ -n "$INF_EXPORTED_MODULES" ]; then
-    echo "Exported modules   : $INF_EXPORTED_MODULES"
+    echo "# Exported modules   : $INF_EXPORTED_MODULES"
 else
-    echo "Exported modules   : -none-"
+    echo "# Exported modules   : -none-"
 fi
 
 INF_EXPORTED_MODULES=`echo $INF_EXPORTED_MODULES | sed -e 's/|/ /g'`
@@ -105,8 +106,8 @@ fi
 # ------------------------------------------------------------------------------
 # list environment
 
-echo " Variable                       Value "
-echo "------------------------------ --------------------------------------------------"
+echo "# Variable                    Value                                             "
+echo "# --------------------------- --------------------------------------------------"
 set | grep ^INF_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
 set | grep ^AMS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
 set | grep ^PBS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'

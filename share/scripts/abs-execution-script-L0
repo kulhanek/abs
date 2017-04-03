@@ -56,9 +56,9 @@ echo "#-------------------------------------------------------------------------
 echo "# L0: Booting the AMS/ABS environments ..."
 echo "#-------------------------------------------------------------------------------"
 echo ""
-echo "User identity ..."
-echo "UID   : `id`"
-echo "Umask : `umask`"
+echo "# User identity ..."
+echo "# UID   : `id`"
+echo "# Umask : `umask`"
 echo
 
 # boot AMS ---------------------------------------------------------------------
@@ -68,7 +68,7 @@ if [ -f "$INF_BOOT_SCRIPT" ]; then
     source $INF_BOOT_SCRIPT
 fi
 
-echo "$ site -v activate $INF_SITE_ID"
+echo "# site -v activate $INF_SITE_ID"
 
 site -v activate "$INF_SITE_ID"
 
@@ -81,7 +81,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # do not use the host chache as it can be outdated
-echo "$ ams-host --nocache"
+echo "# ams-host --nocache"
 
 ams-host --nocache
 

@@ -23,17 +23,19 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L5.2: Copy the working directory to the input directory ..."
 echo "# ------------------------------------------------------------------------------"
-echo "Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
-echo "Storage directory  : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
-echo "Working directory  : $INF_WORK_DIR"
-echo "Data OUT copy mode : $INF_DATAOUT"
+echo ""
+echo "# Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
+echo "# Storage directory  : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
+echo "# Working directory  : $INF_WORK_DIR"
+echo "# Data OUT copy mode : $INF_DATAOUT"
 
+echo ""
 case $INF_DATAOUT in
     keep )
-        echo "Data are left in the working directory, which is presumably the input directory ..."
+        echo "# Data are left in the working directory, which is presumably the input directory ..."
     ;;
     copy)
-        echo "Data are copied from the main working node only ..."
+        echo "# Data are copied from the main working node only ..."
         inf-retry-cmd inf-rsync-from-inputdir
         if [ $? -ne 0 ]; then exit 1; fi
     ;;
@@ -42,7 +44,7 @@ esac
 # -----------------------------------------------------------------------------
 
 echo ""
-echo "Write the job end and update the info file ..."
+echo "# Write the job end and update the info file ..."
 
 $ABS_ROOT/sbin/abs-update-infofile stop
 if [ $? -ne 0 ]; then
@@ -64,7 +66,8 @@ case $INF_JOB_NAME in
     * )
         # notify user if requested
         if [ -n "$INF_EMAIL" ]; then
-            echo "E-mail notification: $INF_EMAIL"
+            echo ""
+            echo "# E-mail notification: $INF_EMAIL"
             pinfo | mail -s "[INFINITY] Job $INF_JOB_ID was finished" "$INF_EMAIL"
         fi
         ;;
