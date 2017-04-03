@@ -1520,7 +1520,7 @@ bool CJobList::CollectionResubmitJobs(std::ostream& sout)
             case EJS_NONE:
             case EJS_PREPARED:
             case EJS_ERROR:{
-                result &= p_job->ResubmitJob();
+                result &= p_job->ResubmitJob(false);
                 sout << right << setw(6) << i;
                 if( p_job->GetJobID() != NULL ){
                 CSmallString id = p_job->GetJobID();
@@ -1861,6 +1861,31 @@ void CJobList::PrintLastJobStatus(std::ostream& sout)
     if( job != NULL ){
         job->PrintJobStatus(sout);
     }
+}
+
+//------------------------------------------------------------------------------
+
+const CJobPtr CJobList::FindJob(CJob* p_job)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    while( it != ie ){
+        CJobPtr p_jobptr = *it;
+        if( p_jobptr.get() == p_job ) return(p_jobptr);
+        it++;
+    }
+
+    return(CJobPtr());
+}
+
+//------------------------------------------------------------------------------
+
+const CJobPtr CJobList::CreateNewJob(void)
+{
+    CJobPtr job_ptr = CJobPtr(new CJob);
+    push_back(job_ptr);
+    return(job_ptr);
 }
 
 //==============================================================================

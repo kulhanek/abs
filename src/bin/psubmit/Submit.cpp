@@ -137,7 +137,7 @@ bool CSubmit::Run(void)
 
 bool CSubmit::SubmitJobFull(void)
 {
-    CJobPtr Job = CJobPtr(new CJob);
+    CJobPtr Job = JobList.CreateNewJob();
 
     // start job preparation
     Job->CreateHeader();
@@ -224,7 +224,7 @@ bool CSubmit::SubmitJobFull(void)
         ES_TRACE_ERROR("job submission was canceled by an user");
         return(false);
     }
-    if( Job->SubmitJob(Job,vout,false) == false ){
+    if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
         ES_TRACE_ERROR("unable to submit job");
         return(false);
     }
@@ -247,7 +247,7 @@ bool CSubmit::SubmitJobFull(void)
 
 bool CSubmit::SubmitJobHeader(void)
 {
-    CJobPtr Job = CJobPtr(new CJob);
+    CJobPtr Job = JobList.CreateNewJob();
 
     // start job preparation
     Job->CreateHeader();
@@ -324,7 +324,7 @@ bool CSubmit::SubmitJobHeader(void)
         ES_TRACE_ERROR("job submission was canceled by an user");
         return(false);
     }
-    if( Job->SubmitJob(Job,vout,false) == false ){
+    if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
         ES_TRACE_ERROR("unable to submit job");
         return(false);
     }
@@ -347,7 +347,7 @@ bool CSubmit::SubmitJobHeader(void)
 
 bool CSubmit::SubmitJobCopy(int i)
 {
-    CJobPtr Job = CJobPtr(new CJob);
+    CJobPtr Job = JobList.CreateNewJob();
 
     // start job preparation
     Job->CreateHeader();
@@ -388,7 +388,7 @@ bool CSubmit::SubmitJobCopy(int i)
     }
 
     // submit job
-    if( Job->SubmitJob(Job,vout,true) == false ){
+    if( Job->SubmitJob(vout,true,Options.GetOptVerbose()) == false ){
         ES_TRACE_ERROR("unable to submit job");
         return(false);
     }

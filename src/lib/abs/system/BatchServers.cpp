@@ -478,7 +478,7 @@ const CJobPtr CBatchServers::GetJob(const CSmallString& jobid)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchServers::SubmitJob(CJob& job)
+bool CBatchServers::SubmitJob(CJob& job,bool verbose)
 {
     CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName());
     if( srv_ptr == NULL ){
@@ -486,7 +486,7 @@ bool CBatchServers::SubmitJob(CJob& job)
         return(false);
     }
 
-    return(srv_ptr->SubmitJob(job));
+    return(srv_ptr->SubmitJob(job,verbose));
 }
 
 //------------------------------------------------------------------------------

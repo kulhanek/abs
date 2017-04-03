@@ -102,7 +102,7 @@ public:
     virtual bool InitBatchResources(CResourceList* p_rl);
 
     //! submit job
-    virtual bool SubmitJob(CJob& job);
+    virtual bool SubmitJob(CJob& job,bool verbose);
 
     //! get job status
     virtual bool GetJobStatus(CJob& job);

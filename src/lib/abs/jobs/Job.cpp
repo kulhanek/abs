@@ -752,7 +752,7 @@ bool CJob::ShouldSubmitJob(std::ostream& sout,bool assume_yes)
 
 //------------------------------------------------------------------------------
 
-bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
+bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
 {   
     CFileName job_script;
     job_script = GetFullJobName() + ".infex";
@@ -801,7 +801,7 @@ bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
 
     if( GetItem("basic/collection","INF_COLLECTION_NAME",true) == NULL ) {
         // submit job to torque
-        if( BatchServers.SubmitJob(*this) == false ){
+        if( BatchServers.SubmitJob(*this,verbose) == false ){
             if( ! siblings ){
                 sout << "<b><red>Job was NOT submited to the Torque server!</red></b>" << endl;
                 sout << "  > Reason: " << GetLastError() << endl;
@@ -850,7 +850,8 @@ bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
         }
 
         // add this job into collection
-        collection.AddJob(self);
+        CJobPtr job_ptr = JobList.FindJob(this);
+        collection.AddJob(job_ptr);
 
         // save collection file
         if( collection.SaveCollection() == false ){
@@ -870,7 +871,7 @@ bool CJob::SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings)
 
 //------------------------------------------------------------------------------
 
-bool CJob::ResubmitJob(void)
+bool CJob::ResubmitJob(bool verbose)
 {
     // destroy start/stop/kill sections
     DestroySection("submit");
@@ -887,7 +888,7 @@ bool CJob::ResubmitJob(void)
     CFileSystem::SetCurrentDir(GetInputDir());
 
     // submit job to torque
-    if( BatchServers.SubmitJob(*this) == false ){
+    if( BatchServers.SubmitJob(*this,verbose) == false ){
         ES_TRACE_ERROR("unable to resubmit job to torque");
         BatchJobComment = GetLastError();
         CFileSystem::SetCurrentDir(curr_dir);

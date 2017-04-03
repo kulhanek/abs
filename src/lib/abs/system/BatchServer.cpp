@@ -153,7 +153,7 @@ bool CBatchServer::InitBatchResources(CResourceList* p_rl)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::SubmitJob(CJob& job)
+bool CBatchServer::SubmitJob(CJob& job,bool verbose)
 {
     return(false);
 }

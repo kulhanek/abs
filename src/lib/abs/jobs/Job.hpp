@@ -116,10 +116,10 @@ public:
     bool ShouldSubmitJob(std::ostream& sout,bool assume_yes);
 
     /// submit job
-    bool SubmitJob(const CJobPtr& self,std::ostream& sout,bool siblings);
+    bool SubmitJob(std::ostream& sout,bool siblings,bool verbose);
 
     /// resubmit job
-    bool ResubmitJob(void);
+    bool ResubmitJob(bool verbose);
 
     /// write submit section
     void WriteSubmitSection(char* p_jobid);

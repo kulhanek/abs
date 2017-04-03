@@ -633,7 +633,7 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::SubmitJob(CJob& job)
+bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
 {
     CFileName script    = job.GetMainScriptName();
     CFileName infout    = job.GetInfoutName();
@@ -733,7 +733,9 @@ bool CPBSProServer::SubmitJob(CJob& job)
     }
 
 //  DEBUG
-    PrintAttributes(cout,p_first);
+    if( verbose ){
+        PrintAttributes(cout,p_first);
+    }
 
     // submit jobs
     char* p_jobid = pbspro_submit(ServerID,p_first,script,queue,NULL);

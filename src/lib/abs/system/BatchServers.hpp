@@ -91,7 +91,7 @@ public:
 
 // execution -------------------------------------------------------------------
     //! submit job
-    bool SubmitJob(CJob& job);
+    bool SubmitJob(CJob& job,bool verbose);
 
     //! get job status
     bool GetJobStatus(CJob& job);

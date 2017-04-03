@@ -159,6 +159,12 @@ public:
     /// sort by prepare date
     void SortByFinishDateAndTime(void);
 
+    /// create new job
+    const CJobPtr CreateNewJob(void);
+
+    /// find job
+    const CJobPtr FindJob(CJob* p_job);
+
 // information methods ---------------------------------------------------------
     /// print info about all jobs
     void PrintInfos(std::ostream& sout);
@@ -186,6 +192,8 @@ public:
 
     /// print short info for terminal caption
     void PrintTerminalJobStatus(std::ostream& sout);
+
+
 
 // section of private data -----------------------------------------------------
 private:
