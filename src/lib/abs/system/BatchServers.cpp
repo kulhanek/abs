@@ -470,7 +470,7 @@ const CJobPtr CBatchServers::GetJob(const CSmallString& jobid)
         return(job_ptr);
     }
 
-    job_ptr = srv_ptr->GetJob(jobid);
+    job_ptr = srv_ptr->GetJob(new_jobid);
     if( job_ptr == NULL ){
         CSmallString error;
         error << "unable to locate job '" << new_jobid << "'";
