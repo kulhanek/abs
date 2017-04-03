@@ -51,11 +51,11 @@ echo " ABS Root             : $ABS_ROOT"
 echo "------------------------------------------------------"
 export INF_SSH_OPTIONS="StrictHostKeyChecking=no"
 echo " SSH Options          : $INF_SSH_OPTIONS"
-echo ""
+
 
 echo ""
 echo "#-------------------------------------------------------------------------------"
-echo "# L0 Booting execution layer ..."
+echo "# L0 Booting the AMS/ABS environments ..."
 echo "#-------------------------------------------------------------------------------"
 echo "User identity ..."
 echo "UID   : `id`"

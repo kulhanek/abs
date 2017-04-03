@@ -389,6 +389,26 @@ const CSmallString CResourceList::GetWallTimeString(void) const
 
 //------------------------------------------------------------------------------
 
+const CSmallString CResourceList::GetVariables(void) const
+{
+    std::list<CResourceValuePtr>::const_iterator     it = begin();
+    std::list<CResourceValuePtr>::const_iterator     ie = end();
+
+    CSmallString vars;
+
+    while( it != ie ){
+        CSmallString name,value;
+        (*it)->GetVariable(name,value);
+        if( (it != begin()) && (name != NULL) ) vars << ",";
+        if( name != NULL ) vars << name << "=" << value;
+        it++;
+    }
+
+    return(vars);
+}
+
+//------------------------------------------------------------------------------
+
 bool CResourceList::SortCompName(const CResourceValuePtr& p_left,const CResourceValuePtr& p_right)
 {
     return( strcmp(p_left->Name,p_right->Name) < 0 );

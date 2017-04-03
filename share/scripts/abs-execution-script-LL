@@ -1,0 +1,162 @@
+#!/bin/bash
+# ==============================================================================
+# ABS
+# (c) 2017, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2012, Petr Kulhanek, kulhanek@chemi.muni.cz
+# (c) 2008-2009, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.9
+# (c) 2006, Petr Kulhanek, kulhanek@chemi.muni.cz
+# Charon Extension Layer v0.8
+# (c) 2005, Petr Kulhanek, kulhanek@chemi.muni.cz
+# based on LCC module v1 - v5
+# (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
+# ==============================================================================
+
+# ==============================================================================
+# retry execution of the command several times
+# INF_RETRY_COUNT - number of retries
+# INF_RETRY_TIME - time to repeat in seconds
+
+function inf-retry-cmd()
+{
+    if [ -z "$INF_RETRY_COUNT" ]; then
+        INF_RETRY_COUNT=3
+    fi
+    if [ -z "$INF_RETRY_TIME" ]; then
+        INF_RETRY_TIME=600
+    fi
+    for((INF_I=0; INF_I < $INF_RETRY_COUNT; INF_I++)); do
+        eval "$*"
+        if [ $? -eq 0 ]; then return 0; fi
+        echo "! command failed - it will be re-executed in $INF_RETRY_TIME seconds ..."
+        sleep $INF_RETRY_TIME
+    done
+    return 1
+}
+
+# ==============================================================================
+# copy data from the job input directory
+# $1 - name of the file in the job input directory
+# $2 - name of the destination file
+
+function inf-copy-from-inputdir() 
+{
+    echo "= inf-copy-from-inputdir $1 $2"
+    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
+        echo "  > trying to copy from the local mount via cp ... "
+        cp "$INF_INPUT_DIR/$1" "$2"
+        if [ $? -eq 0 ]; then
+            return 0
+        fi
+        echo "  !failure"
+    else
+        echo -n "  > trying to copy from the input storage machine via scp ... "
+        /usr/bin/scp -o "$INF_SCP_OPTIONS" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
+        if [ $? -eq 0 ]; then
+            return 0
+        fi
+        echo "  !failure"
+    fi
+    echo -n "  > trying to copy from the input machine via scp ... "
+    /usr/bin/scp -o "$INF_SCP_OPTIONS" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
+    
+    if [ $? -eq 0 ]; then
+        return 0
+    fi
+    echo "  !failure"
+    return 1
+}
+
+# ==============================================================================
+
+function inf-copy-to-inputdir() 
+{
+    echo "= inf-copy-to-inputdir $1 $2"
+    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
+        echo -n "  > trying to copy from the local mount via cp ... "
+        cp  "$1" "$INF_INPUT_DIR/$2"
+        if [ $? -eq 0 ]; then
+            return 0
+        fi
+        echo "  !failure"
+    else
+        echo -n "  > trying to copy from the input storage machine via scp ... "
+        /usr/bin/scp -o "$INF_SCP_OPTIONS" "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
+        if [ $? -eq 0 ]; then
+            return 0
+        fi
+        echo "  !failure"
+    fi
+    echo -n "  > trying to copy from the input machine via scp ... "
+    /usr/bin/scp -o "$INF_SCP_OPTIONS"  "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"    
+    if [ $? -eq 0 ]; then
+        return 0
+    fi
+    echo "  !failure"
+    return 1
+}
+
+# ==============================================================================
+
+function inf-rsync-from-inputdir()
+{
+    echo ""
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    echo "= inf-rsync-from-inputdir"
+    # create file with excluded files
+    # ${INF_WHOLE_NAME}.infout has to be excluded because of pstart
+    echo "${INF_WHOLE_NAME}.infout" > $TMPDIR/${_TNAME_}.excluded
+    echo "*#???.*"  >> $TMPDIR/${_TNAME_}.excluded
+    echo "pjob???" >> $TMPDIR/${_TNAME_}.excluded
+    echo "$INF_EXCLUDED_FILES" | tr ";" "\n" >> $TMPDIR/${_TNAME_}.excluded
+    echo "  > Final exclusion list:"
+    cat $TMPDIR/${_TNAME_}.excluded | awk '{ printf("    %s\n",$0); }'
+    echo ""
+
+    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
+        echo "  > trying to rsync from the local mount ... "
+        rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" "$INF_INPUT_DIR/" "$INF_WORK_DIR/"
+        if [ $? -eq 0 ]; then
+            rm -f $TMPDIR/${_TNAME_}.excluded
+            return 0
+        fi
+        echo "  !failure"
+    else
+        echo -n "  > trying to rsync from the input storage machine via scp ... "
+        rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x -o \"$INF_SSH_OPTIONS\"" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/" "$INF_WORK_DIR/"
+        if [ $? -eq 0 ]; then
+            rm -f $TMPDIR/${_TNAME_}.excluded
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
+    echo -n "  > trying to rsync from the input machine via scp ... "
+    rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x -o \"$INF_SSH_OPTIONS\"" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/" "$INF_WORK_DIR/"
+    if [ $? -eq 0 ]; then
+        rm -f $TMPDIR/${_TNAME_}.excluded
+        return 0
+    fi
+    echo "  !failure"
+    rm -f $TMPDIR/${_TNAME_}.excluded
+    return 1
+}
+
+# ==============================================================================
+
+function inf-rsync-to-inputdir()
+{
+    echo ""
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    echo "= inf-rsync-to-inputdir"
+
+    # do not copy info file
+    echo "${INF_WHOLE_NAME}.info" > $TMPDIR/${_TNAME_}.excluded
+    echo "  > Final exclusion list:"
+    cat $TMPDIR/${_TNAME_}.excluded | awk '{ printf("    %s\n",$0); }'
+    echo ""
+
+    rm -f $TMPDIR/${_TNAME_}.excluded
+}
+
+# ==============================================================================

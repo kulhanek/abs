@@ -105,6 +105,9 @@ public:
     /// get walltime
     const CSmallString GetWallTimeString(void) const;
 
+    /// get list of variables
+    const CSmallString GetVariables(void) const;
+
 // section of private data -----------------------------------------------------
 private:
     /// helper method

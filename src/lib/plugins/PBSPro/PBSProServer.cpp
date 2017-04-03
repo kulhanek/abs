@@ -677,7 +677,7 @@ bool CPBSProServer::SubmitJob(CJob& job)
             it++;
         }
     }
-
+    variables << job.ResourceList.GetVariables();
     variables << ",AMS_SITE_SUPPORT=" << CShell::GetSystemVariable("AMS_SITE_SUPPORT");
     // required for accounting?
     variables << ",PBS_O_LOGNAME=" << User.GetName();
