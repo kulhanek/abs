@@ -464,6 +464,8 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
     CSmallString full_job_id;
     full_job_id << jobid << "." << ServerName;
 
+    cout << full_job_id << endl;
+
     struct batch_status* p_jobs;
     p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,extend.GetBuffer());
 
