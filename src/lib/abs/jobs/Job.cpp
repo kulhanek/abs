@@ -2114,7 +2114,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
         id = id.GetSubStringFromTo(0,19);
     }
     id << srv;
-    sout << " " << left << setw(20) << id;
+    sout << " " << right << setw(20) << id;
     } else {
     sout << "                     ";
     }
