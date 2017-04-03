@@ -11,7 +11,7 @@
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 pgo(){
-    ABS_EXIT_CODE=1
+    AMS_EXIT_CODE=1
     unset INF_GO_MAIN_NODE
     unset INF_GO_INPUT_MACHINE
     unset INF_GO_INPUT_DIR
@@ -21,12 +21,12 @@ pgo(){
     unset INF_GO_UMASK
 
     eval `_abs-go $*`
-    if [ "$ABS_EXIT_CODE" -ne 0 ]; then
-        return "$ABS_EXIT_CODE"
+    if [ "$AMS_EXIT_CODE" -ne 0 ]; then
+        return "$AMS_EXIT_CODE"
     fi
 
     source $ABS_ROOT/share/scripts/abs-go
-    ABS_EXIT_CODE=$?
+    AMS_EXIT_CODE=$?
 
     unset INF_GO_MAIN_NODE
     unset INF_GO_INPUT_MACHINE
@@ -36,7 +36,7 @@ pgo(){
     unset INF_GO_UGROUP
     unset INF_GO_UMASK
 
-    return "$ABS_EXIT_CODE"
+    return "$AMS_EXIT_CODE"
 }
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -44,26 +44,26 @@ pgo(){
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 pkill(){
-    ABS_EXIT_CODE=1
+    AMS_EXIT_CODE=1
     unset INF_KILL_MAIN_NODE
     unset INF_KILL_WORK_DIR
     unset INF_KILL_JOB_NAME
     unset INF_KILL_JOB_KEY
 
     eval `_abs-kill $*`
-    if [ "$ABS_EXIT_CODE" -ne 0 ]; then
-        return "$ABS_EXIT_CODE"
+    if [ "$AMS_EXIT_CODE" -ne 0 ]; then
+        return "$AMS_EXIT_CODE"
     fi
 
     $ABS_ROOT/share/scripts/abs-kill
-    ABS_EXIT_CODE=$?
+    AMS_EXIT_CODE=$?
 
     unset INF_KILL_MAIN_NODE
     unset INF_KILL_WORK_DIR
     unset INF_KILL_JOB_NAME
     unset INF_KILL_JOB_KEY
 
-    return "$ABS_EXIT_CODE"
+    return "$AMS_EXIT_CODE"
 }
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -71,7 +71,7 @@ pkill(){
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 psync(){
-    ABS_EXIT_CODE=1
+    AMS_EXIT_CODE=1
     unset INF_SYNC_MAIN_NODE
     unset INF_SYNC_WORK_DIR
     unset INF_SYNC_JOB_PATH
@@ -79,12 +79,12 @@ psync(){
     unset INF_SYNC_ALL
 
     eval `_abs-sync $*`
-    if [ "$ABS_EXIT_CODE" -ne 0 ]; then
-        return "$ABS_EXIT_CODE"
+    if [ "$AMS_EXIT_CODE" -ne 0 ]; then
+        return "$AMS_EXIT_CODE"
     fi
 
     $ABS_ROOT/share/scripts/abs-sync $*
-    ABS_EXIT_CODE=$?
+    AMS_EXIT_CODE=$?
 
     unset INF_SYNC_MAIN_NODE
     unset INF_SYNC_WORK_DIR
@@ -92,7 +92,7 @@ psync(){
     unset INF_SYNC_JOB_MACHINE
     unset INF_SYNC_ALL
 
-    return "$ABS_EXIT_CODE"
+    return "$AMS_EXIT_CODE"
 }
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -100,11 +100,11 @@ psync(){
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 pcollection(){
-    ABS_EXIT_CODE=1
+    AMS_EXIT_CODE=1
 
     eval `_abs-collection $*`
-    if [ "$ABS_EXIT_CODE" -ne 0 ]; then
-        return "$ABS_EXIT_CODE"
+    if [ "$AMS_EXIT_CODE" -ne 0 ]; then
+        return "$AMS_EXIT_CODE"
     fi
 
     return 0

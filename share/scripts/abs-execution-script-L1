@@ -81,18 +81,6 @@ export AMS_NNODES=$INF_NNODES
 export INF_NODEFILE=$PBS_NODEFILE
 export AMS_NODEFILE=$INF_NODEFILE
 
-# FIXME - compatibility mode
-export AMS_NCPU=$AMS_NCPUS
-export AMS_NGPU=$AMS_NGPUS
-export AMS_NNODE=$AMS_NNODES
-
-export INF_NCPU=$AMS_NCPUS
-export INF_NGPU=$AMS_NGPUS
-export INF_NNODE=$AMS_NNODES
-
-export INF_JOB_PATH=$INF_INPUT_DIR
-export INF_JOB_MACHINE=$INF_INPUT_MACHINE
-
 # ------------------------------------------------------------------------------
 # determine INF_MAX_WALLTIME from the job stat
 export INF_MAX_WALLTIME=`pqstat -j $INF_JOB_ID | grep Resource_List.walltime | awk '{print $3;}' | tr ":" " " | awk '{ print $1*3600 + $2*60 + $3;}'`
@@ -125,6 +113,18 @@ set | grep ^PBS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF
 set | grep ^TORQUE_ | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
 
 # ------------------------------------------------------------------------------
+
+# FIXME - compatibility mode - set them here so they are not visible in the above lists
+export AMS_NCPU=$AMS_NCPUS
+export AMS_NGPU=$AMS_NGPUS
+export AMS_NNODE=$AMS_NNODES
+
+export INF_NCPU=$AMS_NCPUS
+export INF_NGPU=$AMS_NGPUS
+export INF_NNODE=$AMS_NNODES
+
+export INF_JOB_PATH=$INF_INPUT_DIR
+export INF_JOB_MACHINE=$INF_INPUT_MACHINE
 
 
 
