@@ -89,6 +89,8 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
         BatchJobStatus = EJS_RUNNING;
     } else if( status == "C" ) {
         BatchJobStatus = EJS_FINISHED;
+    } else if( status == "F" ) {
+        BatchJobStatus = EJS_FINISHED;
     } else if( status == "E" ) {
         BatchJobStatus = EJS_FINISHED;
     }
@@ -139,11 +141,10 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     }
 
 // -----------------
-    // FIXME
-//    CTorque::DecodeBatchJobComment(p_job->attribs,BatchJobComment);
-//    if( (status == "H") && (BatchJobComment == NULL) ){
-//        BatchJobComment = "Holded";
-//    }
+    DecodeBatchJobComment(p_job->attribs,BatchJobComment);
+    if( (status == "H") && (BatchJobComment == NULL) ){
+        BatchJobComment = "Holded";
+    }
     SetItem("batch/job","INF_JOB_COMMENT",BatchJobComment);
 
 // ------------------
@@ -229,6 +230,49 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     SetItem("batch/job","INF_WALL_TIME",time.GetSecondsFromBeginning());
 
     return(true);
+}
+
+//------------------------------------------------------------------------------
+
+void CPBSProJob::DecodeBatchJobComment(struct attrl* p_item,CSmallString& comment)
+{
+    comment = "";
+
+    while( p_item != NULL ){
+        // job comment
+        if( strcmp(p_item->name,ATTR_comment) == 0 ){
+            if( comment == NULL ) {
+                comment = p_item->value;
+            }
+        }
+
+// FIXME
+//        if( strcmp(p_item->name,ATTR_JOB_PLANNED_START) == 0 ){
+//            CSmallString tmp = p_item->value;
+
+//            CSmallTimeAndDate   date(tmp.ToLInt());
+//            CSmallTimeAndDate   cdate;
+//            CSmallTime          ddiff;
+//            cdate.GetActualTimeAndDate();
+//            ddiff = date - cdate;
+//            if( ddiff > 0 ){
+//                comment = "planned start within " + ddiff.GetSTimeAndDay();
+//            }
+//        }
+
+//        if( strcmp(p_item->name,ATTR_JOB_PLANNED_NODES) == 0 ){
+//            vector<string> nodes;
+//            string         list(p_item->value);
+//            split(nodes,list,is_any_of(" ,"),boost::token_compress_on);
+//            if( nodes.size() >= 1 ){
+//                comment += " (" + nodes[0];
+//                if( nodes.size() > 1 ) comment += ",+";
+//                comment += ")";
+//            }
+//        }
+
+        p_item = p_item->next;
+    }
 }
 
 //==============================================================================
