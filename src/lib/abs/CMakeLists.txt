@@ -42,6 +42,7 @@ SET(ABS_SRC
         jobs/Alias.cpp
         jobs/AliasList.cpp
         jobs/Job.cpp
+        jobs/JobCompat.cpp
         jobs/JobList.cpp
         jobs/Node.cpp
         jobs/NodeList.cpp
