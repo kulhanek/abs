@@ -461,6 +461,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
     SetItem("specific/resources","INF_QUEUE",queue);
     SetItem("specific/resources","INF_SERVER",BatchServerName);
+    SetItem("specific/resources","INF_SERVER_SHORT",ShortServerName);
 
 // decode user resources
     ResourceList.AddResources(sres,sout,result,expertmode);
@@ -2102,7 +2103,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     }
     if( GetItem("submit/job","INF_JOB_ID",true) != NULL ){
     CSmallString id = GetItem("submit/job","INF_JOB_ID");
-    CSmallString srv = ShortServerName;
+    CSmallString srv = SetItem("specific/resources","INF_SERVER_SHORT";
     string stmp(id);
     vector<string> items;
     split(items,stmp,is_any_of("."));
