@@ -457,11 +457,15 @@ bool CPBSProServer::GetJob(CJobList& jobs,const CSmallString& jobid)
 
 const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 {
+    // always use extend attribute
+    CSmallString extend;
+    extend << "x";
+
     CSmallString full_job_id;
     full_job_id << jobid << "." << ServerName;
 
     struct batch_status* p_jobs;
-    p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,NULL);
+    p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,extend);
 
     if( p_jobs == NULL ){
         char* p_error = pbspro_geterrmsg(ServerID);
