@@ -478,6 +478,7 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 
     if( p_jobs != NULL ){
         CPBSProJob* p_job = new CPBSProJob;
+            cout << "OK" << endl;
         if( p_job->Init(ShortName,p_jobs) == false ){
             delete p_job;
             ES_ERROR("unable to init job");
