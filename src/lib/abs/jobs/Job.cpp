@@ -1839,8 +1839,10 @@ void CJob::PrepareGoWorkingDirEnv(bool noterm)
         ShellProcessor.SetVariable("INF_GO_JOB_NAME",GetItem("basic/jobinput","INF_JOB_NAME"));
     }
     ShellProcessor.SetVariable("INF_GO_JOB_KEY",GetItem("basic/jobinput","INF_JOB_KEY"));
-    ShellProcessor.SetVariable("INF_GO_UGROUP",GetItem("specific/resources","INF_GROUP"));
-    ShellProcessor.SetVariable("INF_GO_UMASK",GetItem("specific/resources","INF_UMASK"));
+    // FIXME
+    // the group aand umask should be reset by the job in the infex script
+    // ShellProcessor.SetVariable("INF_GO_UGROUP",GetItem("specific/resources","INF_GROUP"));
+    // ShellProcessor.SetVariable("INF_GO_UMASK",GetItem("specific/resources","INF_UMASK"));
 }
 
 //------------------------------------------------------------------------------

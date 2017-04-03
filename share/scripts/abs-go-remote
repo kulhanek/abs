@@ -15,7 +15,8 @@ INF_SITE_ID=$INF_GO_SITE_ID
 INF_WORK_DIR=$INF_GO_WORK_DIR
 INF_SITE_EMODS=$INF_GO_EXPORTED_MODULES_1
 INF_JOB_EMODS=$INF_GO_EXPORTED_MODULES_2
-INF_UMASK=$INF_GO_UMASK
+# FIXME
+# INF_UMASK=$INF_GO_UMASK
 
 # activate bash profile
 # if [ -f /etc/profile ]; then . /etc/profile; fi
@@ -27,7 +28,8 @@ if [ -z "$AMS_ROOT" ]; then
 fi
 
 # set user umask
-umask "0$INF_GO_UMASK"
+# FIXME
+# umask "0$INF_GO_UMASK"
 
 site activate $INF_SITE_ID 2> /dev/null
 if [ $? -ne 0 ]; then
@@ -37,11 +39,11 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ "$AMS_ALTERNATIVE_BOOT" == "YES" ]; then
-    echo ">>> NOTE: Infinity has been booted using alternative approach,"
+    echo ">>> NOTE: Infinity has been booted using an alternative approach,"
     echo "          please report this to the site support: $AMS_SITE_SUPPORT"
     echo "          (Include the whole output beggining by the pgo command!)"
     echo ""
-    echo "          In alternative mode, some functionality might be limited!"
+    echo "          In the alternative mode, some functionality might be limited!"
     echo ""
 fi
 
