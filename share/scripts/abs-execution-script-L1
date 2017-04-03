@@ -64,10 +64,9 @@ echo " Restore the job environment variables ..."
 AMS_EXIT_CODE=0
 
 EVAL_STRING=`$ABS_ROOT/sbin/abs-restore-env "$TMPDIR/${_TNAME_}.info"`
-echo "$EVAL_STRING"
 
 eval $EVAL_STRING
-if [ $? -ne 0 ] || [ $AMS_EXIT_CODE!= "0" ]; then
+if [ $? -ne 0 ] || [ "$AMS_EXIT_CODE" != "0" ]; then
     rm -f "$TMPDIR/${_TNAME_}.info"
     exit 1
 fi
