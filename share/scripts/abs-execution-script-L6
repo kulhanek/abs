@@ -65,7 +65,7 @@ case $INF_DATAOUT in
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_CLEAN_DIR ---"
-            ssh -x -o "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi; rm -rf $INF_CLEAN_DIR"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi; rm -rf $INF_CLEAN_DIR"
         done
         ;;
     keep)
@@ -85,7 +85,7 @@ if [ -f "$IPC_SCRIPT" ]; then
     echo "# Cleaning IPC stuff on nodes:"
     for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
         echo "      $NODE_NAME"
-        ssh -x -o "$INF_SSH_OPTIONS" $NODE_NAME "$IPC_SCRIPT"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "$IPC_SCRIPT"
     done
 fi
 
@@ -99,7 +99,7 @@ echo "# ------------------------------------------------------------------------
 for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
     echo ""
     echo ">>> $NODE_NAME ----------------------------------"
-    ssh -x -o "$SSH_OPTIONS" $NODE_NAME "top -b -n 1"
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /   PID USER/ { start = 1; }'"
 done
 
 echo ""
@@ -110,7 +110,7 @@ echo "# ------------------------------------------------------------------------
 for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
     echo ""
     echo ">>> $NODE_NAME ----------------------------------"
-    ssh -x -o "$SSH_OPTIONS" $NODE_NAME "uname -a; dmesg -T | tail -1000"
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "uname -a; dmesg -T | tail -1000"
 done
 
 

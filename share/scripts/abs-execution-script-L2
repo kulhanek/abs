@@ -103,7 +103,7 @@ case $INF_DATAIN in
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
-            ssh -x -o "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi; mkdir -p $INF_WORK_DIR"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi; mkdir -p $INF_WORK_DIR"
 
             if [ $? -ne 0 ]; then
                 echo "" >&2
@@ -206,7 +206,7 @@ echo "# ------------------------------------------------------------------------
 for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
     echo ""
     echo ">>> $NODE_NAME ----------------------------------"
-    ssh -x -o "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /   PID USER/ { start = 1; }'"
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /   PID USER/ { start = 1; }'"
 done
 
 echo ""
