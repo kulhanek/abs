@@ -21,7 +21,7 @@ ls -la
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L5.2: Copy the working directory to the input directory ..."
+echo "# L5.2: Coping the working directory to the input directory ..."
 echo "# ------------------------------------------------------------------------------"
 echo ""
 echo "# Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
@@ -44,7 +44,7 @@ esac
 # -----------------------------------------------------------------------------
 
 echo ""
-echo "# Write the job end and update the info file ..."
+echo "# Writing the job end and update the info file ..."
 
 $ABS_ROOT/sbin/abs-update-infofile stop
 if [ $? -ne 0 ]; then

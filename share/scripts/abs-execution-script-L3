@@ -13,7 +13,7 @@
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L3: Copy the input data to the working directory ..."
+echo "# L3: Coping the input data to the working directory ..."
 echo "# ------------------------------------------------------------------------------"
 echo ""
 echo "# Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"

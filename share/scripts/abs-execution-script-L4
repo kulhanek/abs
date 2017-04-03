@@ -14,7 +14,7 @@
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L4: Start job ..."
+echo "# L4: Starting the job ..."
 echo "# ------------------------------------------------------------------------------"
 echo ""
 
@@ -83,7 +83,7 @@ case $INF_JOB_NAME in
     * )
         chmod u+x $INF_JOB_NAME
 
-        echo "======================== Begining of script execution =========================="
+        echo "====================== Begining of the script execution ========================"
         echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         echo " Started at    : `date`"
         echo " Script name   : $INF_JOB_NAME"
@@ -100,7 +100,7 @@ case $INF_JOB_NAME in
         echo " Finished at   : `date`"
         echo " Exit code     : $INF_JOB_EXIT_CODE"
         echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        echo "=========================== End of script execution ============================"
+        echo "========================= End of the script execution =========================="
         ;;
 esac
 
