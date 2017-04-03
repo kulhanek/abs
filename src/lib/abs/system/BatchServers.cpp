@@ -715,7 +715,7 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
         }
     }
 
-    // update joid name
+    // update jobid name
     jobid = new_jobid;
 
     // is it in short form?

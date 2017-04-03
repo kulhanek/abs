@@ -108,17 +108,9 @@ bool CInfoGo::Run(void)
         }
 
         if( CFileSystem::IsFile(info_file) == true ){
-            // no arguments - always by info file
             result = GoByInfoFiles();
         } else {
-            if( info_file.IsInt() == true ){
-                result = GoByJobID();
-            } else {
-                vout << endl;
-                vout << "<b><red> ERROR: The argument '" << Options.GetProgArg(0) << " is not either info file or job ID'!</red></b>" << endl;
-                vout << endl;
-                result = false;
-            }
+            result = GoByJobID();
         }
 
     } else {
