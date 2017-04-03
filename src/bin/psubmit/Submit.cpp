@@ -166,7 +166,7 @@ bool CSubmit::SubmitJobFull(void)
         vout << endl;
         vout << " <b><red>ERROR: Infinity runtime files were detected in the job input directory!</red></b>" << endl;
         vout << "" << endl;
-        vout << "<b><red>        The presence of runtime files indicates that another job</red></b>" << endl;
+        vout << "<b><red>        The presence of the runtime files indicates that another job</red></b>" << endl;
         vout << "<b><red>        has been started in this directory. Multiple job submission </red></b>" << endl;
         vout << "<b><red>        within the same directory is not permitted by the Infinity system.</red></b>" << endl;
 
@@ -178,12 +178,12 @@ bool CSubmit::SubmitJobFull(void)
             if( (jobs.GetNumberOfJobs(EJS_INCONSISTENT) > 0) || (jobs.GetNumberOfJobs(EJS_ERROR) > 0) ){
                 vout << "" << endl;
                 vout << "<blue>        At least one job is in inconsistent or error state (state: IN, ER),</blue>" << endl;
-                vout << "<blue>        thus it is potentially dangerous to blindly remove runtime files via:</blue>" << endl;
+                vout << "<blue>        thus it is potentially dangerous to blindly remove the runtime files via:</blue>" << endl;
                 vout << "<blue>        rm -f *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey ___JOB_IS_RUNNING___</blue>" << endl;
             } else {
                 vout << "" << endl;
                 vout << "        If you really want to submit the job, you have to remove runtime" << endl;
-                vout << "        files of previous one. Please, be very sure that previous job has " << endl;
+                vout << "        files from the previous run. Please, be very sure that the previous job has " << endl;
                 vout << "        been already terminated otherwise undefined behaviour can occur!" << endl;
                 vout << "" << endl;
                 vout << "        Type following to remove runtime files:" << endl;

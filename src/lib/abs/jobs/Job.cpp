@@ -2142,11 +2142,11 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
         case EJS_SUBMITTED:
         case EJS_RUNNING:
             from_last_change = curr_time - last_change;
-            sout << right << setw(20) << from_last_change.GetSTimeAndDay();
+            sout << right << setw(25) << from_last_change.GetSTimeAndDay();
             break;
         case EJS_FINISHED:
         case EJS_KILLED:
-            sout << right << setw(20) << last_change.GetSDateAndTime();
+            sout << right << setw(25) << last_change.GetSDateAndTime();
             break;
     }
 

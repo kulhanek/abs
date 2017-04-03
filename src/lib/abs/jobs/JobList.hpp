@@ -193,8 +193,6 @@ public:
     /// print short info for terminal caption
     void PrintTerminalJobStatus(std::ostream& sout);
 
-
-
 // section of private data -----------------------------------------------------
 private:
     CSmallString        CollectionSiteName;
