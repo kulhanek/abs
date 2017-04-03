@@ -729,7 +729,7 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
                 it = erase(it);
                 break;
             case EJS_RUNNING:
-                if( p_job->GetWorkDir() == "jobdir" ){
+                if( p_job->GetWorkDirType() == "jobdir" ){
                     sout << "<b><blue>WARNING: The running job found but it seems you are already in the working directory (workdir=jobdir).</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);

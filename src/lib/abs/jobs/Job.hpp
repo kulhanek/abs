@@ -330,7 +330,7 @@ public:
     const CSmallString GetStorageDir(void);
 
     /// get job workdir type
-    const CSmallString GetWorkDir(void);
+    const CSmallString GetWorkDirType(void);
 
     /// get job dataout mode
     const CSmallString GetDataOut(void);

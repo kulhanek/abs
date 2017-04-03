@@ -133,7 +133,7 @@ bool CSync::SyncByInfoFiles(void)
     }
 
     // satisfying job
-    vout << ">>> Satisfying job for psync action ..." << endl;
+    vout << ">>> Satisfying job for the psync action ..." << endl;
     Jobs.PrintInfosCompact(vout,false,true);
     vout << endl;
 

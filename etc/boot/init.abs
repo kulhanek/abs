@@ -74,8 +74,8 @@ psync(){
     AMS_EXIT_CODE=1
     unset INF_SYNC_MAIN_NODE
     unset INF_SYNC_WORK_DIR
-    unset INF_SYNC_JOB_PATH
-    unset INF_SYNC_JOB_MACHINE
+    unset INF_SYNC_INPUT_DIR
+    unset INF_SYNC_INPUT_MACHINE
     unset INF_SYNC_ALL
 
     eval `_abs-sync $*`
@@ -88,8 +88,8 @@ psync(){
 
     unset INF_SYNC_MAIN_NODE
     unset INF_SYNC_WORK_DIR
-    unset INF_SYNC_JOB_PATH
-    unset INF_SYNC_JOB_MACHINE
+    unset INF_SYNC_INPUT_DIR
+    unset INF_SYNC_INPUT_MACHINE
     unset INF_SYNC_ALL
 
     return "$AMS_EXIT_CODE"

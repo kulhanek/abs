@@ -2878,9 +2878,9 @@ const CSmallString CJob::GetJobKey(void)
 
 //------------------------------------------------------------------------------
 
-const CSmallString CJob::GetWorkDir(void)
+const CSmallString CJob::GetWorkDirType(void)
 {
-    CSmallString rv = GetItem("basic/jobinput","INF_WORK_DIR_TYPE");
+    CSmallString rv = GetItem("specific/resources","INF_WORK_DIR_TYPE");
     return(rv);
 }
 
