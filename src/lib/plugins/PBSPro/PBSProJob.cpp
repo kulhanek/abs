@@ -152,13 +152,13 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     // this is optional
     get_attribute(p_job->attribs,ATTR_o,NULL,tmp);
 
-    SetItem("basic/jobinput","INF_JOB_MACHINE",BatchVariables["INF_JOB_MACHINE"]);
-    SetItem("basic/jobinput","INF_JOB_PATH",BatchVariables["INF_JOB_PATH"]);
+    SetItem("basic/jobinput","INF_INPUT_MACHINE",BatchVariables["INF_INPUT_MACHINE"]);
+    SetItem("basic/jobinput","INF_INPUT_DIR",BatchVariables["INF_INPUT_DIR"]);
     SetItem("basic/jobinput","INF_JOB_NAME",BatchVariables["INF_JOB_NAME"]);
     SetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",BatchVariables["INF_JOB_NAME_SUFFIX"]);
 
-    if( (GetItem("basic/jobinput","INF_JOB_MACHINE") == NULL) ||
-        (GetItem("basic/jobinput","INF_JOB_PATH") == NULL) ){
+    if( (GetItem("basic/jobinput","INF_INPUT_MACHINE") == NULL) ||
+        (GetItem("basic/jobinput","INF_INPUT_DIR") == NULL) ){
         stmp = tmp;
         items.clear();
         split(items,stmp,is_any_of(":"));
@@ -166,11 +166,11 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
             CSmallString machine = items[0];
             CFileName path = CSmallString(items[1]);
             path = path.GetFileDirectory();
-            SetItem("basic/jobinput","INF_JOB_MACHINE",machine);
-            SetItem("basic/jobinput","INF_JOB_PATH",path);
+            SetItem("basic/jobinput","INF_INPUT_MACHINE",machine);
+            SetItem("basic/jobinput","INF_INPUT_DIR",path);
         } else {
-            SetItem("basic/jobinput","INF_JOB_MACHINE","-unknown-");
-            SetItem("basic/jobinput","INF_JOB_PATH","-unknown-");
+            SetItem("basic/jobinput","INF_INPUT_MACHINE","-unknown-");
+            SetItem("basic/jobinput","INF_INPUT_DIR","-unknown-");
         }
     }
 
