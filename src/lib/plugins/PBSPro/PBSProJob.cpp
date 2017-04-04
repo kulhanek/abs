@@ -249,9 +249,13 @@ void CPBSProJob::DecodeBatchJobComment(struct attrl* p_item,CSmallString& commen
     //            10485760kb)
     //        estimated.start_time = Mon Apr  3 23:38:32 2017
 
-    size_t start_time;
+    size_t          start_time;
+    CSmallString    exec_vnode;
+
     get_attribute(p_item,ATTR_estimated,"start_time",start_time);
-    if( start_time > 0 ){
+    get_attribute(p_item,ATTR_estimated,"exec_vnode",exec_vnode);
+
+    if( (start_time > 0) && (exec_vnode != NULL) ){
         CSmallTimeAndDate   date(start_time);
         CSmallTimeAndDate   cdate;
         CSmallTime          ddiff;
@@ -260,13 +264,14 @@ void CPBSProJob::DecodeBatchJobComment(struct attrl* p_item,CSmallString& commen
         if( ddiff > 0 ){
             comment = "planned start within " + ddiff.GetSTimeAndDay();
         }
-    }
 
-    CSmallString exec_vnode;
-    get_attribute(p_item,ATTR_estimated,"exec_vnode",exec_vnode);
-
-    if( exec_vnode != NULL ){
-        comment += exec_vnode;
+        vector<string> nodes;
+        string         list(exec_vnode);
+        split(nodes,list,is_any_of("+"),boost::token_compress_on);
+        if( nodes.size() >= 1 ){
+            comment += " " + nodes[0];
+            if( nodes.size() > 1 ) comment += ",+";
+        }
     }
 }
 
