@@ -128,7 +128,7 @@ for NODE in $HOSTNAME `cat "$INF_NODEFILE" | sort -u | grep -v "$HOSTNAME"`; do
 done 
 
 echo "# File: $INF_MPIFILE"
-cat "$INF_MPIFILEE"
+cat "$INF_MPIFILE"
 if [ $? -ne 0 ]; then exit 1; fi
 
 # ------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ if [ $? -ne 0 ]; then exit 1; fi
 if [ "$INF_NGPUS" -gt 0 ]; then
     export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
     rm -f "$INF_GPUFILE"
-    cat $MPI_NODEFILE | while read NODE MPISPEC; do
+    cat $INF_MPIFILE | while read NODE MPISPEC; do
         (
             CVD=`pbs_tmrsh "$NODE" "echo \$CUDA_VISIBLE_DEVICES"`
             echo "$NODE gpus=$CVD" >> "$INF_GPUFILE"
