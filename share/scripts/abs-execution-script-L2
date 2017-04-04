@@ -135,6 +135,7 @@ cat "$PBS_NODEFILE"
 # create copy of node file
 export INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
 cat "$PBS_NODEFILE"  > "$INF_NODEFILE"
+if [ $? -ne 0 ]; then exit 1; fi
 
 # ------------------------------------------------------------------------------
 
@@ -143,13 +144,14 @@ echo "# INF_MPIFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export INF_MPIFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.mpi"
 rm -f "$INF_MPIFILE"
 
-for NODE in $HOSTNAME `cat $INF_NODEFILE | sort -u | grep -v $HOSTNAME`; do
+for NODE in $HOSTNAME `cat "$INF_NODEFILE" | sort -u | grep -v "$HOSTNAME"`; do
     NCPUS="`cat $INF_NODEFILE | grep $NODE | wc -l`"
-    echo "$NODE slots=$NCPUS" >> $INF_MPIFILE
+    echo "$NODE slots=$NCPUS" >> "$INF_MPIFILE"
+    if [ $? -ne 0 ]; then exit 1; fi
 done 
 
-echo "# File: $MPI_NODEFILE"
-cat "$MPI_NODEFILE"
+echo "# File: $INF_MPIFILE"
+cat "$INF_MPIFILEE"
 
 # ------------------------------------------------------------------------------
 
@@ -158,8 +160,9 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     rm -f "$INF_GPUFILE"
     cat $MPI_NODEFILE | while read NODE MPISPEC; do
         (
-            CVD=`pbs_remsh $NODE "echo \$CUDA_VISIBLE_DEVICES"`
+            CVD=`pbs_tmrsh "$NODE" "echo \$CUDA_VISIBLE_DEVICES"`
             echo "$NODE gpus=$CVD" >> $INF_GPUFILE
+            if [ $? -ne 0 ]; then exit 1; fi
          ) < /dev/null
     done 
     echo ""
