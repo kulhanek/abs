@@ -32,37 +32,40 @@ fi
 
 cat "$PBS_NODEFILE"
 
+# create copy of node file
+export INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
+cat "$PBS_NODEFILE"  > "$INF_NODEFILE"
+
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# INF_MPIFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+export INF_MPIFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.mpi"
+rm -f "$INF_MPIFILE"
+
+for NODE in $HOSTNAME `cat $INF_NODEFILE | sort -u | grep -v $HOSTNAME`; do
+    NCPUS="`cat $INF_NODEFILE | grep $NODE | wc -l`"
+    echo "$NODE slots=$NCPUS" >> $INF_MPIFILE
+done 
+
+echo "# File: $MPI_NODEFILE"
+cat "$MPI_NODEFILE"
+
 # ------------------------------------------------------------------------------
 
 if [ "$INF_NGPUS" -gt 0 ]; then
-    if ! [ -f "$PBS_GPUFILE" ]; then
-        PBS_GPUFILE=$TMPDIR/pbs_gpus_placebo.${_TNAME_}
-        export PBS_GPUFILE_REMOVE=1
-        export PBS_GPUFILE
-        cat "$PBS_NODEFILE" > "$PBS_GPUFILE"
-
-        # MetaCentrum
-        # do we have /usr/sbin/list_cache?
-        # FIXME - this is correct only for single node configuration
-        if [ -f "/usr/sbin/list_cache" ]; then
-            /usr/sbin/list_cache $PBS_SERVER gpu_allocation | grep "$INF_JOB_ID" | awk '{ print $1;}' | awk -F '/' '{ print $3;}' | \
-                                 tr --delete [[:alpha:]] | awk -v host="$HOSTNAME" '{ printf("%s-gpu%d\n",host,$1); }' >> "$PBS_GPUFILE"
-        else
-            for((I=0;I<$INF_NGPUS;I++)); do
-                echo "`hostname -f`-gpu$I" >> "$PBS_GPUFILE"
-            done
-        fi
-    fi
+    export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
+    rm -f "$INF_GPUFILE"
+    cat $MPI_NODEFILE | while read NODE MPISPEC; do
+        (
+            CVD=`pbs_remsh $NODE "echo \$CUDA_VISIBLE_DEVICES"`
+            echo "$NODE gpus=$CVD" >> $INF_GPUFILE
+         ) < /dev/null
+    done 
     echo ""
-    echo "# PBS_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "# File: $PBS_GPUFILE"
-    cat "$PBS_GPUFILE"
-    # generate CUDA_VISIBLE_DEVICES if not defined
-    if [ -z "$CUDA_VISIBLE_DEVICES" ]; then
-        CUDA_VISIBLE_DEVICES=`cat "$PBS_GPUFILE" | sed -e 's/-gpu/ /g' | awk '{ if( NF == 2 ) { if( i > 0 ) printf(","); printf("%d",$2); i++; } }'`
-    fi
-    echo "# Cuda visible devices: $CUDA_VISIBLE_DEVICES"
-    export CUDA_VISIBLE_DEVICES
+    echo "# INF_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "# File: $INF_GPUFILE"
+    cat "$INF_GPUFILE"
 fi
 
 echo ""
@@ -128,39 +131,6 @@ if [ $? -ne 0 ]; then
     echo " ERROR: Unable to change the current directory to the working directory." >&2
     echo "" >&2
     exit 1
-fi
-
-# ------------------------------------------------------------------------------
-echo ""
-echo "# Create local copies of nodefile and gpufile ..."
-
-# create sorted node file
-INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
-export INF_NODEFILE
-AMS_NODEFILE=$INF_NODEFILE
-export AMS_NODEFILE
-
-$ABS_ROOT/sbin/abs-sort-nodes $PBS_NODEFILE $INF_MAIN_NODE > $INF_NODEFILE
-if [ $? -ne 0 ]; then
-    echo "" >&2
-    echo " ERROR: Unable to sort the computational nodes!" >&2
-    echo "" >&2
-    return 1
-fi
-
-if [ "`cat $INF_NODEFILE | wc -l`" -ne "$INF_NCPUS" ]; then
-    echo "" >&2
-    echo " ERROR: The number of lines in the node file differs from the number of requested CPUs." >&2
-    echo "" >&2
-    return 1
-fi
-
-if [ "$INF_NGPUS" -gt 0 ]; then
-    INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
-    export INF_GPUFILE
-    AMS_GPUFILE=$INF_GPUFILE
-    export AMS_GPUFILE
-    cat $PBS_GPUFILE > $INF_GPUFILE
 fi
 
 # ------------------------------------------------------------------------------

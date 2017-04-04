@@ -44,7 +44,7 @@ esac
 # -----------------------------------------------------------------------------
 
 echo ""
-echo "# Writing the job end and update the info file ..."
+echo "# Write the job end and update the info file in the input directory ..."
 
 $ABS_ROOT/sbin/abs-update-infofile stop
 if [ $? -ne 0 ]; then
