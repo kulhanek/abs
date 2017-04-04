@@ -71,7 +71,7 @@ function get_data_from_archive() {
         rsync -av $FILES "$PWD/"
     else
         echo "Data transfer: remote mode ..."
-        rsync -av -e "ssh $INF_SSH_OPTIONS" $FILES "$PWD/"
+        rsync -av -e "ssh -x $INF_SSH_OPTIONS" $FILES "$PWD/"
     fi
 
     if [ $? -ne 0 ]; then
@@ -98,7 +98,7 @@ function write_to_archive() {
         rsync -av $* "$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
     else
         echo "Data transfer: remote mode ..."
-        rsync -av -e "ssh -o \"StrictHostKeyChecking=no\"" $* "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
+        rsync -av -e "ssh -x $INF_SSH_OPTIONS" $* "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
     fi
 
     if [ $? -ne 0 ]; then
@@ -174,9 +174,10 @@ echo ""
 if  [ -z "$INF_JOB_NAME" ] || [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR" ] || [ -z "$INF_WORK_DIR" ] || \
     [ -z "$INF_SSH_OPTIONS" ] || [ -z "$INF_RETRY_COUNT" ] || \
     [ -z "$INF_RETRY_TIME" ] || [ -z "$INF_LOCAL_INPUT_DATA" ] || [ -z "$ABS_ROOT" ] || [ -z "$INF_ARCHIVE_DIR" ]; then
-    echo "ERROR: This command must be run in the Infinity environment!" 1>&2
-    echo "" 1>&2
+    echo "ERROR: This command must be run in the Infinity environment!"
+    echo ""
     exit 1
+fi
 
 if [ $# -eq 0 ]; then
     echo "ERROR: No files are specified for archiving!"
@@ -185,18 +186,21 @@ fi
 
 # ------------------------------------------------------------------------------
 
+# load ABS library
+source $ABS_ROOT/share/scripts/abs-execution-script-LL
+
 case $INF_MODE in
     runtime )
-        archive_runtime_files $*
+        inf-retry-cmd archive_runtime_files $*
         ;;
     get )
-        get_data_from_archive $*
+        inf-retry-cmd get_data_from_archive $*
         ;;
     write )
-        write_to_archive $*
+        inf-retry-cmd write_to_archive $*
         ;;
     move )
-        move_to_archive $*
+        inf-retry-cmd move_to_archive $*
         ;;
 esac
 
