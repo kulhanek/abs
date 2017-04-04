@@ -16,61 +16,7 @@
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.1: Resources files ..."
-echo "# ------------------------------------------------------------------------------"
-
-echo ""
-echo "# PBS_NODEFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo "# File: $PBS_NODEFILE"
-
-if ! [ -f "$PBS_NODEFILE" ]; then
-    echo ""  >&2
-    echo " ERROR: PBS_NODEFILE does not exist!"  >&2
-    echo "" >&2
-    exit 1
-fi
-
-cat "$PBS_NODEFILE"
-
-# create copy of node file
-export INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
-cat "$PBS_NODEFILE"  > "$INF_NODEFILE"
-
-# ------------------------------------------------------------------------------
-
-echo ""
-echo "# INF_MPIFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-export INF_MPIFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.mpi"
-rm -f "$INF_MPIFILE"
-
-for NODE in $HOSTNAME `cat $INF_NODEFILE | sort -u | grep -v $HOSTNAME`; do
-    NCPUS="`cat $INF_NODEFILE | grep $NODE | wc -l`"
-    echo "$NODE slots=$NCPUS" >> $INF_MPIFILE
-done 
-
-echo "# File: $MPI_NODEFILE"
-cat "$MPI_NODEFILE"
-
-# ------------------------------------------------------------------------------
-
-if [ "$INF_NGPUS" -gt 0 ]; then
-    export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
-    rm -f "$INF_GPUFILE"
-    cat $MPI_NODEFILE | while read NODE MPISPEC; do
-        (
-            CVD=`pbs_remsh $NODE "echo \$CUDA_VISIBLE_DEVICES"`
-            echo "$NODE gpus=$CVD" >> $INF_GPUFILE
-         ) < /dev/null
-    done 
-    echo ""
-    echo "# INF_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "# File: $INF_GPUFILE"
-    cat "$INF_GPUFILE"
-fi
-
-echo ""
-echo "# ------------------------------------------------------------------------------"
-echo "# L2.2: Prepare the working directory ..."
+echo "# L2.1: Prepare the working directory ..."
 echo "# ------------------------------------------------------------------------------"
 echo ""
 export INF_MAIN_NODE=`hostname -f`
@@ -167,6 +113,60 @@ case $INF_DATAIN in
         if [ $? -ne 0 ]; then exit 1; fi
     ;;
 esac
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.2: Resources files ..."
+echo "# ------------------------------------------------------------------------------"
+
+echo ""
+echo "# PBS_NODEFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "# File: $PBS_NODEFILE"
+
+if ! [ -f "$PBS_NODEFILE" ]; then
+    echo ""  >&2
+    echo " ERROR: PBS_NODEFILE does not exist!"  >&2
+    echo "" >&2
+    exit 1
+fi
+
+cat "$PBS_NODEFILE"
+
+# create copy of node file
+export INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
+cat "$PBS_NODEFILE"  > "$INF_NODEFILE"
+
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# INF_MPIFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+export INF_MPIFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.mpi"
+rm -f "$INF_MPIFILE"
+
+for NODE in $HOSTNAME `cat $INF_NODEFILE | sort -u | grep -v $HOSTNAME`; do
+    NCPUS="`cat $INF_NODEFILE | grep $NODE | wc -l`"
+    echo "$NODE slots=$NCPUS" >> $INF_MPIFILE
+done 
+
+echo "# File: $MPI_NODEFILE"
+cat "$MPI_NODEFILE"
+
+# ------------------------------------------------------------------------------
+
+if [ "$INF_NGPUS" -gt 0 ]; then
+    export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
+    rm -f "$INF_GPUFILE"
+    cat $MPI_NODEFILE | while read NODE MPISPEC; do
+        (
+            CVD=`pbs_remsh $NODE "echo \$CUDA_VISIBLE_DEVICES"`
+            echo "$NODE gpus=$CVD" >> $INF_GPUFILE
+         ) < /dev/null
+    done 
+    echo ""
+    echo "# INF_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "# File: $INF_GPUFILE"
+    cat "$INF_GPUFILE"
+fi
 
 echo ""
 echo "# ------------------------------------------------------------------------------"

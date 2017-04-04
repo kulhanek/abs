@@ -428,6 +428,9 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
     bool result = true;
+    // add required default resources
+    ResourceList.AddResource("ncpus","1");
+    ResourceList.AddResource("nnodes","1");
 
     // add default resources
     CSmallString  sdef_res;
