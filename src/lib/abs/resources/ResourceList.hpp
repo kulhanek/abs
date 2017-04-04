@@ -56,7 +56,7 @@ public:
     void AddResource(const CSmallString& name,const CSmallString& value);
 
     /// add a single resource
-    CResourceValuePtr AddResource(const CSmallString& name, bool expertmode);
+    CResourceValuePtr AddEmptyResource(const CSmallString& name, bool expertmode);
 
     /// find resource
     CResourceValuePtr FindResource(const CSmallString& name) const;

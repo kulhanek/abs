@@ -124,7 +124,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     RemoveResource(name);
 
     // add resource
-    CResourceValuePtr res_ptr =  AddResource(name,expertmode);
+    CResourceValuePtr res_ptr =  AddEmptyResource(name,expertmode);
     if( res_ptr != NULL ){
         res_ptr->Value = value;
         return;
@@ -140,7 +140,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
 
 void CResourceList::AddSizeResource(const CSmallString& name,long long value)
 {
-    CResourceValuePtr res_ptr =  AddResource(name,true);
+    CResourceValuePtr res_ptr =  AddEmptyResource(name,true);
     if( res_ptr != NULL ){
         res_ptr->SetSize(value);
     }
@@ -150,7 +150,7 @@ void CResourceList::AddSizeResource(const CSmallString& name,long long value)
 
 void CResourceList::AddResource(const CSmallString& name,const CSmallString& value)
 {
-    CResourceValuePtr res_ptr =  AddResource(name,true);
+    CResourceValuePtr res_ptr =  AddEmptyResource(name,true);
     if( res_ptr != NULL ){
         res_ptr->Value = value;
     }
@@ -158,7 +158,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
 
 //------------------------------------------------------------------------------
 
-CResourceValuePtr CResourceList::AddResource(const CSmallString& name,bool expertmode)
+CResourceValuePtr CResourceList::AddEmptyResource(const CSmallString& name,bool expertmode)
 {
     // be sure that the resource is unique
     RemoveResource(name);
@@ -190,7 +190,7 @@ CResourceValuePtr CResourceList::AddResource(const CSmallString& name,bool exper
     if( gen_name == NULL ) return(CResourceValuePtr());
 
     // must be always false to avoid infinite recursion
-    CResourceValuePtr gen_res = AddResource(gen_name,false);
+    CResourceValuePtr gen_res = AddEmptyResource(gen_name,false);
     // override resource name
     gen_res->Name = name;
 
