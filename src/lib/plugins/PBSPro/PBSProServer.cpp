@@ -576,7 +576,7 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
     if( ngpus > 0 ){
         str << ":ngpus=" << ngpus / nnodes;
     }
-    str << nnodes << ":mpiproc=" << ncpus / nnodes;
+    str << ":mpiproc=" << ncpus / nnodes;
 // ------------
     rv_ptr = p_rl->FindResource("mem");
     if( rv_ptr ){
