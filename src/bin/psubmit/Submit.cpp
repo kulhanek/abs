@@ -179,7 +179,7 @@ bool CSubmit::SubmitJobFull(void)
                 vout << "" << endl;
                 vout << "<blue>        At least one job is in inconsistent or error state (state: IN, ER),</blue>" << endl;
                 vout << "<blue>        thus it is potentially dangerous to blindly remove the runtime files via:</blue>" << endl;
-                vout << "<blue>        rm -f *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey ___JOB_IS_RUNNING___</blue>" << endl;
+                vout << "<blue>        rm -f *.info *.infex *.infout *.stdout *.nodes *.gpus *.mpinodes *.infkey ___JOB_IS_RUNNING___</blue>" << endl;
             } else {
                 vout << "" << endl;
                 vout << "        If you really want to submit the job, you have to remove runtime" << endl;
@@ -187,7 +187,7 @@ bool CSubmit::SubmitJobFull(void)
                 vout << "        been already terminated otherwise undefined behaviour can occur!" << endl;
                 vout << "" << endl;
                 vout << "        Type following to remove runtime files:" << endl;
-                vout << "        <b>rm -f *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey ___JOB_IS_RUNNING___</b>" << endl;
+                vout << "        <b>rm -f *.info *.infex *.infout *.stdout *.nodes *.gpus *.mpinodes *.infkey ___JOB_IS_RUNNING___</b>" << endl;
             }
         }
         ES_TRACE_ERROR("runtime files detected");

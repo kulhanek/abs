@@ -269,7 +269,7 @@ bool CJob::SetOutputNumber(std::ostream& sout,int number)
 bool CJob::CheckRuntimeFiles(std::ostream& sout,bool ignore)
 {
     bool            runtime_files = false;
-    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.infkey;___JOB_IS_RUNNING___";
+    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;___JOB_IS_RUNNING___";
     char*           p_filter;
     char*           p_buffer = NULL;
 
@@ -295,7 +295,7 @@ bool CJob::CheckRuntimeFiles(std::ostream& sout,bool ignore)
 
     if( (var == "YES") || (ignore == true) ){
         sout << endl;
-        sout << "<b><blue> WARNING: Input directory contains runtime files!</blue></b>" << endl;
+        sout << "<b><blue> WARNING: The input directory contains runtime files!</blue></b>" << endl;
         return(true);
     }
 

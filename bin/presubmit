@@ -4,7 +4,7 @@
 # (c) 2009,2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 # ==============================================================================
 
-if [ "$INF_ARG_DESTINATION" == "" ] || [ "$INF_ARG_JOB" == "" ]; then
+if [ -z "$INF_ARG_DESTINATION" ] || [ -z "$INF_ARG_JOB" ]; then
     echo "" >&2
     echo " >>> ERROR: INF_ARG_DESTINATION or INF_ARG_JOB variables are not set!" >&2
     echo "            The job was not resubmited!" >&2
@@ -12,11 +12,10 @@ if [ "$INF_ARG_DESTINATION" == "" ] || [ "$INF_ARG_JOB" == "" ]; then
     exit 1
 fi
 
-if [ "$INF_ARG_DESTINATION" == "pstart" ]; then
-    # pstart is not supported in presubmit because it would lead to recursion
+if [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR\" ]; then
     echo "" >&2
-    echo " >>> ERROR: Unable to submit the next job run to the simulated queue system via pstart!" >&2
-    echo "            Avoiding recursion." >&2
+    echo " >>> ERROR: INF_INPUT_MACHINE or INF_INPUT_DIR\ variables are not set!" >&2
+    echo "            The job was not resubmited!" >&2
     echo "" >&2
     exit 1
 fi
@@ -31,15 +30,15 @@ else
 fi
 
 # submit new run
-ssh -x -o "StrictHostKeyChecking=no" "$INF_JOB_MACHINE" "
+ssh -x -o "StrictHostKeyChecking=no" "$INF_INPUT_MACHINE" "
             if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
             site activate $INF_SITE_ID; \
             module add abs:$INF_ABS_VERSION &> /dev/null; \
             if [ -n \"$INF_EXPORTED_MODULES\" ]; then module add $INF_EXPORTED_MODULES &> /dev/null; fi; \
-            cd \"$INF_JOB_PATH\"; \
+            cd \"$INF_INPUT_DIR\"; \
             export INF_EXTERNAL_START_AFTER=$INF_JOB_ID;
             export INF_EXTERNAL_NAME_SUFFIX=\"$INF_EXTERNAL_NAME_SUFFIX\";
-            psubmit -y -i \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" \"$INF_ARG_RESOURCES\" \"$INF_ARG_SYNC_MODE\"; "
+            psubmit -y -i \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" \"$INF_ARG_RESOURCES\"; "
 
 if [ $? -ne 0 ]; then
     echo "" >&2

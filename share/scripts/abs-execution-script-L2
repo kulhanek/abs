@@ -117,7 +117,7 @@ if [ $? -ne 0 ]; then exit 1; fi
 
 echo ""
 echo "# INF_MPIFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-export INF_MPIFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.mpi"
+export INF_MPIFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.mpinodes"
 rm -f "$INF_MPIFILE"
 export HOSTNAME=`hostname -f`
 

@@ -4,7 +4,7 @@
 
 function archive_runtime_files() {
     if [ $# -ne 3 ]; then
-        echo "ERROR: Three arguments are required for 'runtime' mode!"
+        echo "ERROR: Three arguments are required for the 'runtime' mode!"
         echo "       parchive runtime <start> <current> <format>"
         return 1
     fi
@@ -21,14 +21,14 @@ function archive_runtime_files() {
     OLD="$INF_JOB_NAME#"`printf "%03d" "$(($INF_CURRENT-1))"`
     NEW=`printf "$INF_FORMAT" "$(($INF_CURRENT-1))"`
 
-    if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "Data transfer: local mode ..."
         echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
         echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
         echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
         echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes"
 
-        cd $INF_JOB_PATH
+        cd $INF_INPUT_DIR
         if [ $? -ne 0 ]; then exit 1; fi
         mv "${OLD}.info" "$INF_ARCHIVE_DIR/${NEW}.info"
         mv "${OLD}.stdout" "$INF_ARCHIVE_DIR/${NEW}.stdout"
@@ -41,8 +41,8 @@ function archive_runtime_files() {
         echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
         echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes"
 
-        ssh $INF_JOB_MACHINE \
-            "cd $INF_JOB_PATH; \
+        ssh $INF_INPUT_MACHINE \
+            "cd $INF_INPUT_DIR; \
             if [ $? -ne 0 ]; then exit 1; fi; \
             mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
             mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
@@ -62,16 +62,16 @@ function get_data_from_archive() {
 
     FILES=""
     while [ $# -ne 0 ]; do
-        FILES="$FILES $INF_JOB_PATH/$INF_ARCHIVE_DIR/$1"
+        FILES="$FILES $INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
         shift
     done
 
-    if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "Data transfer: local mode ..."
         rsync -av $FILES "$PWD/"
     else
         echo "Data transfer: remote mode ..."
-        rsync -av -e "ssh -o \"StrictHostKeyChecking=no\"" $FILES "$PWD/"
+        rsync -av -e "ssh $INF_SSH_OPTIONS" $FILES "$PWD/"
     fi
 
     if [ $? -ne 0 ]; then
@@ -91,19 +91,21 @@ function write_to_archive() {
         return 1
     fi
 
-    if [ "$INF_REMOTE_JOBDIR" == "NO" ]; then
+    inf-retry-cmd 
+
+    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "Data transfer: local mode ..."
-        rsync -av $* "$INF_JOB_PATH/$INF_ARCHIVE_DIR/"
+        rsync -av $* "$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
     else
         echo "Data transfer: remote mode ..."
-        rsync -av -e "ssh -o \"StrictHostKeyChecking=no\"" $* "$INF_JOB_MACHINE:$INF_JOB_PATH/$INF_ARCHIVE_DIR/"
+        rsync -av -e "ssh -o \"StrictHostKeyChecking=no\"" $* "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
     fi
 
     if [ $? -ne 0 ]; then
         echo ""
         echo ">>> ERROR: Unable to copy specified data to the archive!"
         echo ""
-        exit 1
+        return 1
     fi
 }
 
@@ -153,45 +155,37 @@ esac
 # remove the first argument from the stack
 shift
 
-# check input ------------------------------------------------------------------
-if [ -z "$INF_ARCHIVE_DIR" ]; then
-    echo "ERROR: INF_ARCHIVE_DIR variable is not defined!"
-    exit 1
-fi
+# write summary of job setup
+echo ""
+echo "# Job name            : $INF_JOB_NAME"
+echo "# Input directory     : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
+echo "# Storage directory   : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
+echo "# Working directory   : $INF_WORK_DIR"
+echo "# ABS root directory  : $ABS_ROOT"
+echo "# SSH Options         : $INF_SSH_OPTIONS"
+echo "# Retry count         : $INF_RETRY_COUNT"
+echo "# Retry time          : $INF_RETRY_TIME"
+echo "# Local data mode     : $INF_LOCAL_INPUT_DATA"
+echo ""
+echo "# Archive directory   : $INF_ARCHIVE_DIR"
+echo "# Requested action    : $INF_MODE"
+echo "# Arguments           : $*"
+echo ""
 
-if [ -z "$INF_REMOTE_JOBDIR" ]; then
-    echo "ERROR: INF_REMOTE_JOBDIR variable is not defined!"
+if  [ -z "$INF_JOB_NAME" ] || [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR" ] || [ -z "$INF_STORAGE_MACHINE" ] || \
+    [ -z "$INF_STORAGE_DIR" ] || [ -z "$INF_WORK_DIR" ] || [ -z "$INF_SSH_OPTIONS" ] || [ -z "$INF_RETRY_COUNT" ] || \
+    [ -z "$INF_RETRY_TIME" ] || [ -z "$INF_LOCAL_INPUT_DATA" ] || [ -z "$ABS_ROOT" ] || [ -z "$INF_ARCHIVE_DIR" ]; then
+    echo "ERROR: This command must be run in the Infinity environment!" 1>&2
+    echo "" 1>&2
     exit 1
-fi
-
-if [ -z "$INF_JOB_PATH" ]; then
-    echo "ERROR: INF_JOB_PATH variable is not defined!"
-    exit 1
-fi
-
-if [ -z "$INF_JOB_MACHINE" ]; then
-    echo "ERROR: INF_JOB_MACHINE variable is not defined!"
-    exit 1
-fi
-
-if [ -z "$INF_JOB_NAME" ]; then
-    echo "ERROR: INF_JOB_NAME variable is not defined!"
-    exit 1
-fi
 
 if [ $# -eq 0 ]; then
     echo "ERROR: No files are specified for archiving!"
     exit 1
 fi
 
-echo "Job name            : $INF_JOB_NAME"
-echo "Job input directory : $INF_JOB_PATH"
-echo "Job input machine   : $INF_JOB_MACHINE"
-echo "Archive directory   : $INF_ARCHIVE_DIR"
-echo "Remote mode         : $INF_REMOTE_JOBDIR"
-echo "Requested action    : $INF_MODE"
-echo "Arguments           : $*"
-echo ""
+# load ABS library
+source $ABS_ROOT/share/scripts/abs-execution-script-LL
 
 # ------------------------------------------------------------------------------
 
