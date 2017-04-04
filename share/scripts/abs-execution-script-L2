@@ -138,7 +138,7 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     rm -f "$INF_GPUFILE"
     cat $INF_MPIFILE | while read NODE MPISPEC; do
         (
-            CVD=`pbs_tmrsh "$NODE" "echo \$CUDA_VISIBLE_DEVICES"`
+            CVD=`pbs_tmrsh "$NODE" sh -c 'echo $CUDA_VISIBLE_DEVICES'`
             echo "$NODE gpus=$CVD" >> "$INF_GPUFILE"
             if [ $? -ne 0 ]; then exit 1; fi
          ) < /dev/null
