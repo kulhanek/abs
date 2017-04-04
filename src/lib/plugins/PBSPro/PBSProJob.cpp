@@ -249,10 +249,10 @@ void CPBSProJob::DecodeBatchJobComment(struct attrl* p_item,CSmallString& commen
     //            10485760kb)
     //        estimated.start_time = Mon Apr  3 23:38:32 2017
 
-    CSmallTime start_time;
+    size_t start_time;
     get_attribute(p_item,ATTR_estimated,"start_time",start_time);
     if( start_time > 0 ){
-        CSmallTimeAndDate   date(start_time.GetSecondsFromBeginning());
+        CSmallTimeAndDate   date(start_time);
         CSmallTimeAndDate   cdate;
         CSmallTime          ddiff;
         cdate.GetActualTimeAndDate();
