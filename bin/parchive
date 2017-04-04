@@ -159,7 +159,6 @@ shift
 echo ""
 echo "# Job name            : $INF_JOB_NAME"
 echo "# Input directory     : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
-echo "# Storage directory   : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
 echo "# Working directory   : $INF_WORK_DIR"
 echo "# ABS root directory  : $ABS_ROOT"
 echo "# SSH Options         : $INF_SSH_OPTIONS"
@@ -172,8 +171,8 @@ echo "# Requested action    : $INF_MODE"
 echo "# Arguments           : $*"
 echo ""
 
-if  [ -z "$INF_JOB_NAME" ] || [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR" ] || [ -z "$INF_STORAGE_MACHINE" ] || \
-    [ -z "$INF_STORAGE_DIR" ] || [ -z "$INF_WORK_DIR" ] || [ -z "$INF_SSH_OPTIONS" ] || [ -z "$INF_RETRY_COUNT" ] || \
+if  [ -z "$INF_JOB_NAME" ] || [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR" ] || [ -z "$INF_WORK_DIR" ] || \
+    [ -z "$INF_SSH_OPTIONS" ] || [ -z "$INF_RETRY_COUNT" ] || \
     [ -z "$INF_RETRY_TIME" ] || [ -z "$INF_LOCAL_INPUT_DATA" ] || [ -z "$ABS_ROOT" ] || [ -z "$INF_ARCHIVE_DIR" ]; then
     echo "ERROR: This command must be run in the Infinity environment!" 1>&2
     echo "" 1>&2
@@ -183,9 +182,6 @@ if [ $# -eq 0 ]; then
     echo "ERROR: No files are specified for archiving!"
     exit 1
 fi
-
-# load ABS library
-source $ABS_ROOT/share/scripts/abs-execution-script-LL
 
 # ------------------------------------------------------------------------------
 

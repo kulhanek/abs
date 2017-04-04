@@ -553,7 +553,7 @@ bool CJob::InputDirectory(void)
         return(false);
     }
 
-    mode_t input_dir_umask = (job_dir_stat.st_mode ^ 0x777) & 0x777;
+    mode_t input_dir_umask = (job_dir_stat.st_mode ^ 0777) & 0777;
     gid_t  input_dir_gid = job_dir_stat.st_gid;
 
     unsigned int minid = minor(job_dir_stat.st_dev);
