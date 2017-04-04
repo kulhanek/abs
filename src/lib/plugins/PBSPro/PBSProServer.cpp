@@ -579,7 +579,10 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
 // ------------
     rv_ptr = p_rl->FindResource("mem");
     if( rv_ptr ){
-        str << ":mem=" << rv_ptr->GetSizeString();
+        // memory in kb
+        long long mem = rv_ptr->GetSize();
+        mem = mem / nnodes;
+        str << ":mem=" << CResourceValue::GetSizeString(mem);
     }
 // ------------
     rv_ptr = p_rl->FindResource("workdir");
@@ -601,7 +604,9 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
                 if( p_rele != NULL ){
                     CSmallString name;
                     p_rele->GetAttribute("name",name);
-                    str << ":" << name << "=" << rvs_ptr->GetSizeString();
+                    long long scratch_size = rvs_ptr->GetSize();
+                    scratch_size = scratch_size / nnodes;
+                    str << ":" << name << "=" << CResourceValue::GetSizeString(scratch_size);
                 }
             }
         }

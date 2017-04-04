@@ -64,6 +64,9 @@ public:
     /// get size in variable unit
     CSmallString GetSizeString(void);
 
+    /// get size in variable unit
+    static CSmallString GetSizeString(long long size);
+
     /// set size in kB
     void SetSize(long long size);
 

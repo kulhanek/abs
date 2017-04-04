@@ -132,7 +132,7 @@ long long CResourceValue::GetSize(void)
 
     to_lower(munit);
 
-    if( munit == "kb" ) size = size;
+//    if( munit == "kb" ) size = size;
     if( munit == "mb" ) size = size * 1024;
     if( munit == "gb" ) size = size * 1024 * 1024;
     if( munit == "tb" ) size = size * 1024 * 1024 * 1024;
@@ -142,10 +142,8 @@ long long CResourceValue::GetSize(void)
 
 //------------------------------------------------------------------------------
 
-CSmallString CResourceValue::GetSizeString(void)
+CSmallString CResourceValue::GetSizeString(long long size)
 {
-    long long size = GetSize();
-
     string          munit;
     long long       msize;
 
@@ -177,6 +175,13 @@ CSmallString CResourceValue::GetSizeString(void)
     str << size << munit;
 
     return(str.str().c_str());
+}
+
+//------------------------------------------------------------------------------
+
+CSmallString CResourceValue::GetSizeString(void)
+{
+    return(GetSizeString(GetSize()));
 }
 
 //------------------------------------------------------------------------------

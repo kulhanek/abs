@@ -238,40 +238,35 @@ void CPBSProJob::DecodeBatchJobComment(struct attrl* p_item,CSmallString& commen
 {
     comment = "";
 
-    while( p_item != NULL ){
-        // job comment
-        if( strcmp(p_item->name,ATTR_comment) == 0 ){
-            if( comment == NULL ) {
-                comment = p_item->value;
-            }
+    // get job comment
+    CSmallString job_comment;
+    get_attribute(p_item,ATTR_comment,NULL,job_comment);
+    if( job_comment ){
+        comment = job_comment;
+    }
+
+    //        estimated.exec_vnode = (doom5:ncpus=1:ngpus=1:mem=10485760kb:scratch_local=
+    //            10485760kb)
+    //        estimated.start_time = Mon Apr  3 23:38:32 2017
+
+    CSmallTime start_time;
+    get_attribute(p_item,ATTR_estimated,"start_time",start_time);
+    if( start_time > 0 ){
+        CSmallTimeAndDate   date(start_time.GetSecondsFromBeginning());
+        CSmallTimeAndDate   cdate;
+        CSmallTime          ddiff;
+        cdate.GetActualTimeAndDate();
+        ddiff = date - cdate;
+        if( ddiff > 0 ){
+            comment = "planned start within " + ddiff.GetSTimeAndDay();
         }
+    }
 
-// FIXME
-//        if( strcmp(p_item->name,ATTR_JOB_PLANNED_START) == 0 ){
-//            CSmallString tmp = p_item->value;
+    CSmallString exec_vnode;
+    get_attribute(p_item,ATTR_estimated,"exec_vnode",exec_vnode);
 
-//            CSmallTimeAndDate   date(tmp.ToLInt());
-//            CSmallTimeAndDate   cdate;
-//            CSmallTime          ddiff;
-//            cdate.GetActualTimeAndDate();
-//            ddiff = date - cdate;
-//            if( ddiff > 0 ){
-//                comment = "planned start within " + ddiff.GetSTimeAndDay();
-//            }
-//        }
-
-//        if( strcmp(p_item->name,ATTR_JOB_PLANNED_NODES) == 0 ){
-//            vector<string> nodes;
-//            string         list(p_item->value);
-//            split(nodes,list,is_any_of(" ,"),boost::token_compress_on);
-//            if( nodes.size() >= 1 ){
-//                comment += " (" + nodes[0];
-//                if( nodes.size() > 1 ) comment += ",+";
-//                comment += ")";
-//            }
-//        }
-
-        p_item = p_item->next;
+    if( exec_vnode != NULL ){
+        comment += exec_vnode;
     }
 }
 
