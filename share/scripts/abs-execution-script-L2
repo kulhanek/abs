@@ -90,30 +90,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# ------------------------------------------------------------------------------
-# update info file
-
-echo ""
-echo "# Write the job start and update the info file in the input directory ..."
-
-$ABS_ROOT/sbin/abs-update-infofile start
-if [ $? -ne 0 ]; then
-    echo "" >&2
-    echo " ERROR: Unable to update job status in the job info file!" >&2
-    echo "" >&2
-    exit 1
-fi
-
-case $INF_DATAIN in
-    keep)
-        echo " > already updated in the keep datain mode ..."
-    ;;
-    copy)
-        inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
-        if [ $? -ne 0 ]; then exit 1; fi
-    ;;
-esac
-
 echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L2.2: Resources files ..."
@@ -170,6 +146,32 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     echo "# File: $INF_GPUFILE"
     cat "$INF_GPUFILE"
 fi
+
+
+# ------------------------------------------------------------------------------
+# update info file
+
+echo ""
+echo "# Write the job start and update the info file in the input directory ..."
+
+$ABS_ROOT/sbin/abs-update-infofile start
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to update job status in the job info file!" >&2
+    echo "" >&2
+    exit 1
+fi
+
+case $INF_DATAIN in
+    keep)
+        echo " > already updated in the keep datain mode ..."
+    ;;
+    copy)
+        inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
+        if [ $? -ne 0 ]; then exit 1; fi
+    ;;
+esac
+
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
