@@ -1742,7 +1742,7 @@ void CJobList::PrintStatistics(std::ostream& sout)
     }
     sout << " "        << right << setw(17) << art.GetSTimeAndDay() << endl;
     sout << endl;
-    sout << "Total CPU time = " << ctime.GetSTimeAndDay() << endl;
+    sout << "Total CPU time = " << ctime.GetSTimeAndDay() << " (" << ctime.GetSTimeFull() << ")" << endl;
 }
 
 //------------------------------------------------------------------------------

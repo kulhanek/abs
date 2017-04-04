@@ -25,20 +25,20 @@ function archive_runtime_files() {
         echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
         echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
         echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
-        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes"
+        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
 
         cd $INF_INPUT_DIR
         if [ $? -ne 0 ]; then exit 1; fi
         mv "${OLD}.info" "$INF_ARCHIVE_DIR/${NEW}.info"
         mv "${OLD}.stdout" "$INF_ARCHIVE_DIR/${NEW}.stdout"
         mv "${OLD}.infout" "$INF_ARCHIVE_DIR/${NEW}.infout"
-        rm -f "${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes"
+        rm -f "${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
     else
         echo "Data transfer: remote mode ..."
         echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
         echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
         echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
-        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes"
+        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
 
         ssh $INF_INPUT_MACHINE \
             "cd $INF_INPUT_DIR; \
@@ -46,7 +46,7 @@ function archive_runtime_files() {
             mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
             mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
             mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
-            rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\""
+            rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\" \"${OLD}.mpinodes\""
     fi
 }
 
