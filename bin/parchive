@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/usr/bin/env infinity-env
 # ------------------------------------------------------------------------------
 
 function archive_runtime_files() {
@@ -156,7 +155,6 @@ esac
 shift
 
 # write summary of job setup
-echo ""
 echo "# Job name            : $INF_JOB_NAME"
 echo "# Input directory     : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
 echo "# Working directory   : $INF_WORK_DIR"
@@ -165,7 +163,6 @@ echo "# SSH Options         : $INF_SSH_OPTIONS"
 echo "# Retry count         : $INF_RETRY_COUNT"
 echo "# Retry time          : $INF_RETRY_TIME"
 echo "# Local data mode     : $INF_LOCAL_INPUT_DATA"
-echo ""
 echo "# Archive directory   : $INF_ARCHIVE_DIR"
 echo "# Requested action    : $INF_MODE"
 echo "# Arguments           : $*"

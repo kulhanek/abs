@@ -12,9 +12,9 @@ if [ -z "$INF_ARG_DESTINATION" ] || [ -z "$INF_ARG_JOB" ]; then
     exit 1
 fi
 
-if [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR\" ]; then
+if [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR" ]; then
     echo "" >&2
-    echo " >>> ERROR: INF_INPUT_MACHINE or INF_INPUT_DIR\ variables are not set!" >&2
+    echo " >>> ERROR: INF_INPUT_MACHINE or INF_INPUT_DIR variables are not set!" >&2
     echo "            The job was not resubmited!" >&2
     echo "" >&2
     exit 1
