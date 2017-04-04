@@ -93,7 +93,7 @@ bool CGetConfig::Run(void)
 
 void CGetConfig::Finalize(void)
 {
-    if( Options.GetOptVerbose() || ErrorSystem.IsError() ) {
+    if( Options.GetOptVerbose() ) {
         ErrorSystem.PrintErrors(stderr);
     }
 }

@@ -18,17 +18,21 @@ echo "# L1: Restore job environment ..."
 echo "# ------------------------------------------------------------------------------"
 
 # get configuration items
-export TMPDIR=`$ABS_ROOT/sbin/abs-get-setup-item INF_TMP_DIR`
+TMPDIR=`$ABS_ROOT/sbin/abs-get-setup-item INF_TMP_DIR`
 if [ $? -ne 0 ]; then TMPDIR="/tmp"; fi
+export TMPDIR
 
-export INF_SSH_OPTIONS=`$ABS_ROOT/sbin/abs-get-setup-item INF_SSH_OPTIONS`
+INF_SSH_OPTIONS=`$ABS_ROOT/sbin/abs-get-setup-item INF_SSH_OPTIONS`
 if [ $? -ne 0 ]; then INF_SSH_OPTIONS="-o StrictHostKeyChecking=no"; fi
+export INF_SSH_OPTIONS
 
-export INF_RETRY_COUNT=`$ABS_ROOT/sbin/abs-get-setup-item INF_RETRY_COUNT`
+INF_RETRY_COUNT=`$ABS_ROOT/sbin/abs-get-setup-item INF_RETRY_COUNT`
 if [ $? -ne 0 ]; then INF_RETRY_COUNT="3"; fi
+export INF_RETRY_COUNT
 
-export INF_RETRY_TIME=`$ABS_ROOT/sbin/abs-get-setup-item INF_RETRY_TIME`
+INF_RETRY_TIME=`$ABS_ROOT/sbin/abs-get-setup-item INF_RETRY_TIME`
 if [ $? -ne 0 ]; then INF_RETRY_TIME="600"; fi
+export INF_RETRY_TIME
 
 echo "Temporary directory  : $TMPDIR"
 echo "SSH Options          : $INF_SSH_OPTIONS"
@@ -90,8 +94,7 @@ fi
 export AMS_NCPUS=$INF_NCPUS
 export AMS_NGPUS=$INF_NGPUS
 export AMS_NNODES=$INF_NNODES
-export INF_NODEFILE=$PBS_NODEFILE
-export AMS_NODEFILE=$INF_NODEFILE
+export AMS_NODEFILE=$PBS_NODEFILE
 
 # ------------------------------------------------------------------------------
 # determine INF_MAX_WALLTIME from the job stat
