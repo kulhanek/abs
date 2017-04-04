@@ -119,6 +119,7 @@ echo ""
 echo "# INF_MPIFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 export INF_MPIFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.mpi"
 rm -f "$INF_MPIFILE"
+export HOSTNAME=`hostname -f`
 
 for NODE in $HOSTNAME `cat "$INF_NODEFILE" | sort -u | grep -v "$HOSTNAME"`; do
     NCPUS="`cat $INF_NODEFILE | grep $NODE | wc -l`"
@@ -128,6 +129,7 @@ done
 
 echo "# File: $INF_MPIFILE"
 cat "$INF_MPIFILEE"
+if [ $? -ne 0 ]; then exit 1; fi
 
 # ------------------------------------------------------------------------------
 
@@ -137,7 +139,7 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     cat $MPI_NODEFILE | while read NODE MPISPEC; do
         (
             CVD=`pbs_tmrsh "$NODE" "echo \$CUDA_VISIBLE_DEVICES"`
-            echo "$NODE gpus=$CVD" >> $INF_GPUFILE
+            echo "$NODE gpus=$CVD" >> "$INF_GPUFILE"
             if [ $? -ne 0 ]; then exit 1; fi
          ) < /dev/null
     done 
@@ -145,6 +147,7 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     echo "# INF_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "# File: $INF_GPUFILE"
     cat "$INF_GPUFILE"
+    if [ $? -ne 0 ]; then exit 1; fi
 fi
 
 
