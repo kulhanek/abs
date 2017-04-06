@@ -3205,10 +3205,15 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             CSmallTime diff = current_time - ptime;
             sout << setw(12) << right;
             sout << diff.GetSTimeAndDay();
+            string tmp1(diff.GetSTimeAndDay());
+            trim(tmp1);
+            sout << tmp1;
             sout << "/";
             CSmallTime wtime(GetItem("batch/job","INF_WALL_TIME").ToLInt());
             sout << setw(12) << right;
-            sout << wtime.GetSTimeAndDay();
+            string tmp2(wtime.GetSTimeAndDay());
+            trim(tmp2);
+            sout << tmp2;
             }
             break;
         case EJS_FINISHED:
