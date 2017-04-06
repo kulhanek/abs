@@ -47,8 +47,9 @@ class CNodesOptions : public CSimpleOptions {
         "<i>Braces:</i>               ( )\n"
         "The search token must be always on the left side of comparison operator. On the right side can be either\n"
         "integer number for <u>ncpus</u>, <u>nfreecpus</u>, <u>ngpus</u>, <u>nfreegpus</u> tokens\n"
-        "or string for <u>name</u>, <u>props</u>, <u>st</u>, <u>bs</u>, <u>mem</u>, and <u>freemem</u> tokens.\n"
-        "Memory values can be in kb, mb, gb, or tb.\n"
+        "or string for <u>name</u>, <u>props</u>, <u>st</u>, <u>bs</u>,\n"
+        "or size for <u>mem</u>, and <u>freemem</u> tokens.\n"
+        "Size can be in kb, mb, gb, or tb (the unit must be specified).\n"
         "String comparison can use a shell wildcard pattern and can employ  == or != comparison operators only (except of mem and freemem)."
     CSO_PROG_DESC_END
 
