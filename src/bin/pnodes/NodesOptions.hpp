@@ -41,7 +41,7 @@ class CNodesOptions : public CSimpleOptions {
         "\n"
         "<b>Search expressions:</b>\n"
         "<i>Search tokens:</i>        name, props, st (state code), bs (short name of batch server),\n"
-        "                             ncpus, nfreecpus, ngpus, nfreegpus, mem, freemem\n"
+           "                          ncpus, nfreecpus, ngpus, nfreegpus, mem, freemem\n"
         "<i>Comparison operators:</i> == (equal), != (not equal), <<, <<=, >, >=\n"
         "<i>Logical operators:</i>    ! (logical not), && (logical and), || (logical or)\n"
         "<i>Braces:</i>               ( )\n"
