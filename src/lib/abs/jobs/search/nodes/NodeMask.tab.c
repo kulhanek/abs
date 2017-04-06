@@ -414,7 +414,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  22
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   47
+#define YYLAST   46
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  27
@@ -520,7 +520,7 @@ static const yytype_int8 yypact[] =
       -5,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,
      -11,    -5,    -5,    17,    -4,   -11,   -11,   -11,     9,    15,
      -11,   -10,   -11,    -5,    -5,    11,    32,    33,    34,    35,
-      36,    37,    38,    39,    40,    41,    42,   -11,   -11,    25,
+      36,    18,    38,    39,    40,    41,    42,   -11,   -11,    24,
      -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,
      -11,   -11
 };
@@ -557,18 +557,18 @@ static const yytype_uint8 yytable[] =
 {
        1,     2,     3,     4,     5,     6,     7,     8,     9,    10,
       20,    21,    23,    24,    37,    40,    11,    22,    23,    24,
-      12,     0,    38,    39,    25,    26,    27,    28,    29,    30,
+      12,    46,    38,    39,    25,    26,    27,    28,    29,    30,
       31,    32,    33,    34,    35,    36,    41,    42,    43,    44,
-      45,    46,    47,    48,    49,    50,    51,    23
+      45,    47,    48,    49,    50,    51,    23
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       11,    12,    22,    23,    24,     4,    21,     0,    22,    23,
-      25,    -1,    23,    24,    15,    16,    17,    18,    19,    20,
+      25,     3,    23,    24,    15,    16,    17,    18,    19,    20,
       15,    16,    17,    18,    19,    20,     4,     4,     4,     4,
-       4,     4,     4,     4,     4,     4,     4,    22
+       4,     3,     3,     3,     3,     3,    22
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -579,8 +579,8 @@ static const yytype_uint8 yystos[] =
       14,    21,    25,    28,    29,    30,    31,    32,    33,    34,
       29,    29,     0,    22,    23,    15,    16,    17,    18,    19,
       20,    15,    16,    17,    18,    19,    20,    24,    29,    29,
-       4,     4,     4,     4,     4,     4,     4,     4,     4,     4,
-       4,     4
+       4,     4,     4,     4,     4,     4,     3,     3,     3,     3,
+       3,     3
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
@@ -1447,7 +1447,7 @@ yyreduce:
   case 16:
 #line 179 "NodeMask.y" /* yacc.c:1646  */
     {
-        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_LT,(yyvsp[0].iValue).String);
+        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_LT,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
             YYERROR;
@@ -1460,7 +1460,7 @@ yyreduce:
   case 17:
 #line 188 "NodeMask.y" /* yacc.c:1646  */
     {
-        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_LE,(yyvsp[0].iValue).String);
+        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_LE,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
             YYERROR;
@@ -1473,7 +1473,7 @@ yyreduce:
   case 18:
 #line 197 "NodeMask.y" /* yacc.c:1646  */
     {
-        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_GT,(yyvsp[0].iValue).String);
+        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_GT,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
             YYERROR;
@@ -1486,7 +1486,7 @@ yyreduce:
   case 19:
 #line 206 "NodeMask.y" /* yacc.c:1646  */
     {
-        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_GE,(yyvsp[0].iValue).String);
+        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_GE,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
             YYERROR;
@@ -1499,7 +1499,7 @@ yyreduce:
   case 20:
 #line 215 "NodeMask.y" /* yacc.c:1646  */
     {
-        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_EQ,(yyvsp[0].iValue).String);
+        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_EQ,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
             YYERROR;
@@ -1512,7 +1512,7 @@ yyreduce:
   case 21:
 #line 224 "NodeMask.y" /* yacc.c:1646  */
     {
-        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_NE,(yyvsp[0].iValue).String);
+        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_NE,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
             YYERROR;

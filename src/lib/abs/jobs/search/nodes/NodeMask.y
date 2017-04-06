@@ -176,7 +176,7 @@ iselection:
     ;
 
 sselection:
-    sselector LT INUMBER {
+    sselector LT STRING {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_LT,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -185,7 +185,7 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector LE INUMBER {
+    | sselector LE STRING {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_LE,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -194,7 +194,7 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector GT INUMBER {
+    | sselector GT STRING {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_GT,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -203,7 +203,7 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector GE INUMBER {
+    | sselector GE STRING {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_GE,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -212,7 +212,7 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector EQ INUMBER {
+    | sselector EQ STRING {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_EQ,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -221,7 +221,7 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector NE INUMBER {
+    | sselector NE STRING {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_NE,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
