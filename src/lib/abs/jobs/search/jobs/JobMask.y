@@ -235,6 +235,10 @@ sselector:
         enum SType selt = T_ST;
         $$ = selt;
         }
+    | BS {
+        enum SType selt = T_BS;
+        $$ = selt;
+        }
     ;
 
 %%

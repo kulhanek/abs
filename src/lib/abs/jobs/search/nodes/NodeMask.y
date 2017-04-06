@@ -212,6 +212,14 @@ iselector:
         enum SType selt = T_NFREEGPUS;
         $$ = selt;
         }
+    | MEM {
+        enum SType selt = T_MEM;
+        $$ = selt;
+        }
+    | FREEMEM {
+        enum SType selt = T_FREEMEM;
+        $$ = selt;
+        }
     ;
 
 sselector:
@@ -225,6 +233,10 @@ sselector:
         }
     | STATE {
         enum SType selt = T_STATE;
+        $$ = selt;
+        }
+    | BS {
+        enum SType selt = T_BS;
         $$ = selt;
         }
     ;
