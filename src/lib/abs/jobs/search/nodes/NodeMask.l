@@ -15,6 +15,7 @@ ABS Node Mask Lexical Analyzer
 newline       [\n]
 whitesp       [ \t]+
 inumber       [0-9]+
+isize         [0-9]+(kb|mb|gb|tb)
 string        [0-9a-zA-Z\/\#*?\[\].\-\+_]+[a-zA-Z0-9\/\#*?,.\[\]\-\+_]*
 
 /* rules ==================================================================== */
@@ -53,6 +54,17 @@ string        [0-9a-zA-Z\/\#*?\[\].\-\+_]+[a-zA-Z0-9\/\#*?,.\[\]\-\+_]*
 
 "("       { yynodelval.gValue.Position = LexPosition; LexPosition++; return LBRA; }
 ")"       { yynodelval.gValue.Position = LexPosition; LexPosition++; return RBRA; }
+
+{isize}  {
+    yynodelval.sValue.Position = LexPosition;
+    if( yynodeleng >= 100 ){
+        pperror("name is too long (max 100 characters)",LexPosition);
+        }
+    memset(yynodelval.sValue.String,0,100);
+    strncpy(yynodelval.sValue.String,yynodetext,yynodeleng);
+    LexPosition += yynodeleng;
+    return ISIZE;
+    }
 
 {string}  {
     yynodelval.sValue.Position = LexPosition;

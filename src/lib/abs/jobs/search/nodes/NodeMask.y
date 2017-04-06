@@ -24,6 +24,7 @@ ABS Node Mask Lexical Analyzer
 
 /* recognized tokens -------------------------------------------------------- */
 %token <sValue> STRING
+%token <sValue> ISIZE
 %token <iValue> INUMBER
 %token <gValue> NCPUS NFREECPUS NGPUS NFREEGPUS NAME PROPS MEM FREEMEM ST BS
 %token <gValue> LT LE GT GE NE EQ
@@ -33,8 +34,10 @@ ABS Node Mask Lexical Analyzer
 
 %type <tValue>    iselector
 %type <tValue>    sselector
+%type <tValue>    mselector
 %type <selValue>  iselection
 %type <selValue>  sselection
+%type <selValue>  mselection
 %type <selValue>  selection
 %type <exprValue> expr
 %type <exprValue> node_mask
@@ -117,6 +120,9 @@ selection:
     | sselection {
             $$ = $1;
         }
+    | mselection {
+            $$ = $1;
+        }
     ;
 
 iselection:
@@ -175,8 +181,8 @@ iselection:
         }
     ;
 
-sselection:
-    sselector LT STRING {
+mselection:
+    mselector LT ISIZE {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_LT,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -185,7 +191,7 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector LE STRING {
+    | mselector LE ISIZE {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_LE,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -194,7 +200,7 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector GT STRING {
+    | mselector GT ISIZE {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_GT,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -203,7 +209,7 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector GE STRING {
+    | mselector GE ISIZE {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_GE,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -212,7 +218,27 @@ sselection:
         $$ = p_selection;
         }
 
-    | sselector EQ STRING {
+    | mselector EQ ISIZE {
+        struct SSelection* p_selection = AllocateSelectionByString($1,O_EQ,$3.String);
+        if( p_selection == NULL ){
+            yyerror("unable to allocate memory for selection");
+            YYERROR;
+            }
+        $$ = p_selection;
+        }
+
+    | mselector NE ISIZE {
+        struct SSelection* p_selection = AllocateSelectionByString($1,O_NE,$3.String);
+        if( p_selection == NULL ){
+            yyerror("unable to allocate memory for selection");
+            YYERROR;
+            }
+        $$ = p_selection;
+        }
+    ;
+
+sselection:
+    sselector EQ STRING {
         struct SSelection* p_selection = AllocateSelectionByString($1,O_EQ,$3.String);
         if( p_selection == NULL ){
             yyerror("unable to allocate memory for selection");
@@ -250,6 +276,17 @@ iselector:
         }
     ;
 
+mselector:
+    MEM {
+        enum SType selt = T_MEM;
+        $$ = selt;
+        }
+    | FREEMEM {
+        enum SType selt = T_FREEMEM;
+        $$ = selt;
+        }
+    ;
+
 sselector:
     NAME {
         enum SType selt = T_NAME;
@@ -265,14 +302,6 @@ sselector:
         }
     | BS {
         enum SType selt = T_BS;
-        $$ = selt;
-        }
-    | MEM {
-        enum SType selt = T_MEM;
-        $$ = selt;
-        }
-    | FREEMEM {
-        enum SType selt = T_FREEMEM;
         $$ = selt;
         }
     ;

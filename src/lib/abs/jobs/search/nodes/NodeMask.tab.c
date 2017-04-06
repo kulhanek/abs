@@ -116,29 +116,30 @@ extern int yynodedebug;
   enum yytokentype
   {
     STRING = 258,
-    INUMBER = 259,
-    NCPUS = 260,
-    NFREECPUS = 261,
-    NGPUS = 262,
-    NFREEGPUS = 263,
-    NAME = 264,
-    PROPS = 265,
-    MEM = 266,
-    FREEMEM = 267,
-    ST = 268,
-    BS = 269,
-    LT = 270,
-    LE = 271,
-    GT = 272,
-    GE = 273,
-    NE = 274,
-    EQ = 275,
-    NOT = 276,
-    AND = 277,
-    OR = 278,
-    RBRA = 279,
-    LBRA = 280,
-    ERROR = 281
+    ISIZE = 259,
+    INUMBER = 260,
+    NCPUS = 261,
+    NFREECPUS = 262,
+    NGPUS = 263,
+    NFREEGPUS = 264,
+    NAME = 265,
+    PROPS = 266,
+    MEM = 267,
+    FREEMEM = 268,
+    ST = 269,
+    BS = 270,
+    LT = 271,
+    LE = 272,
+    GT = 273,
+    GE = 274,
+    NE = 275,
+    EQ = 276,
+    NOT = 277,
+    AND = 278,
+    OR = 279,
+    RBRA = 280,
+    LBRA = 281,
+    ERROR = 282
   };
 #endif
 
@@ -157,7 +158,7 @@ union YYSTYPE
     struct SExpression*     exprValue;
     
 
-#line 161 "NodeMask.tab.c" /* yacc.c:355  */
+#line 162 "NodeMask.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -172,7 +173,7 @@ int yynodeparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 176 "NodeMask.tab.c" /* yacc.c:358  */
+#line 177 "NodeMask.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -412,23 +413,23 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  22
+#define YYFINAL  24
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   46
+#define YYLAST   50
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  27
+#define YYNTOKENS  28
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  8
+#define YYNNTS  10
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  31
+#define YYNRULES  34
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  52
+#define YYNSTATES  58
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   281
+#define YYMAXUTOK   282
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -465,17 +466,17 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26
+      25,    26,    27
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    52,    52,    58,    70,    81,    92,   106,   114,   117,
-     123,   132,   141,   150,   159,   168,   179,   188,   197,   206,
-     215,   224,   235,   239,   243,   247,   254,   258,   262,   266,
-     270,   274
+       0,    55,    55,    61,    73,    84,    95,   109,   117,   120,
+     123,   129,   138,   147,   156,   165,   174,   185,   194,   203,
+     212,   221,   230,   241,   250,   261,   265,   269,   273,   280,
+     284,   291,   295,   299,   303
 };
 #endif
 
@@ -484,11 +485,12 @@ static const yytype_uint16 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "STRING", "INUMBER", "NCPUS",
+  "$end", "error", "$undefined", "STRING", "ISIZE", "INUMBER", "NCPUS",
   "NFREECPUS", "NGPUS", "NFREEGPUS", "NAME", "PROPS", "MEM", "FREEMEM",
   "ST", "BS", "LT", "LE", "GT", "GE", "NE", "EQ", "NOT", "AND", "OR",
   "RBRA", "LBRA", "ERROR", "$accept", "node_mask", "expr", "selection",
-  "iselection", "sselection", "iselector", "sselector", YY_NULLPTR
+  "iselection", "mselection", "sselection", "iselector", "mselector",
+  "sselector", YY_NULLPTR
 };
 #endif
 
@@ -499,14 +501,14 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280,   281
+     275,   276,   277,   278,   279,   280,   281,   282
 };
 # endif
 
-#define YYPACT_NINF -11
+#define YYPACT_NINF -12
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-11)))
+  (!!((Yystate) == (-12)))
 
 #define YYTABLE_NINF -1
 
@@ -517,12 +519,12 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -5,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,
-     -11,    -5,    -5,    17,    -4,   -11,   -11,   -11,     9,    15,
-     -11,   -10,   -11,    -5,    -5,    11,    32,    33,    34,    35,
-      36,    18,    38,    39,    40,    41,    42,   -11,   -11,    24,
-     -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,   -11,
-     -11,   -11
+      -6,   -12,   -12,   -12,   -12,   -12,   -12,   -12,   -12,   -12,
+     -12,    -6,    -6,    15,    -5,   -12,   -12,   -12,   -12,    10,
+      16,     1,   -12,   -11,   -12,    -6,    -6,    12,    18,    33,
+      34,    35,    36,    38,    39,    40,    41,    42,    43,    45,
+      46,   -12,   -12,    27,   -12,   -12,   -12,   -12,   -12,   -12,
+     -12,   -12,   -12,   -12,   -12,   -12,   -12,   -12
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -530,24 +532,24 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,    22,    23,    24,    25,    26,    27,    30,    31,    28,
-      29,     0,     0,     0,     2,     3,     8,     9,     0,     0,
-       6,     0,     1,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     7,     4,     5,
-      10,    11,    12,    13,    15,    14,    16,    17,    18,    19,
-      21,    20
+       0,    25,    26,    27,    28,    31,    32,    29,    30,    33,
+      34,     0,     0,     0,     2,     3,     8,    10,     9,     0,
+       0,     0,     6,     0,     1,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     7,     4,     5,    11,    12,    13,    14,    16,    15,
+      17,    18,    19,    20,    22,    21,    24,    23
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,   -11,    -1,   -11,   -11,   -11,   -11,   -11
+     -12,   -12,    -1,   -12,   -12,   -12,   -12,   -12,   -12,   -12
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,    13,    14,    15,    16,    17,    18,    19
+      -1,    13,    14,    15,    16,    17,    18,    19,    20,    21
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -556,49 +558,51 @@ static const yytype_int8 yydefgoto[] =
 static const yytype_uint8 yytable[] =
 {
        1,     2,     3,     4,     5,     6,     7,     8,     9,    10,
-      20,    21,    23,    24,    37,    40,    11,    22,    23,    24,
-      12,    46,    38,    39,    25,    26,    27,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    41,    42,    43,    44,
-      45,    47,    48,    49,    50,    51,    23
+      22,    23,    25,    26,    41,    24,    11,    44,    25,    26,
+      12,    39,    40,    45,    42,    43,    27,    28,    29,    30,
+      31,    32,    33,    34,    35,    36,    37,    38,    46,    47,
+      48,    49,    50,    51,    52,    53,    54,    55,    56,    57,
+      25
 };
 
 static const yytype_uint8 yycheck[] =
 {
-       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      11,    12,    22,    23,    24,     4,    21,     0,    22,    23,
-      25,     3,    23,    24,    15,    16,    17,    18,    19,    20,
-      15,    16,    17,    18,    19,    20,     4,     4,     4,     4,
-       4,     3,     3,     3,     3,     3,    22
+       6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
+      11,    12,    23,    24,    25,     0,    22,     5,    23,    24,
+      26,    20,    21,     5,    25,    26,    16,    17,    18,    19,
+      20,    21,    16,    17,    18,    19,    20,    21,     5,     5,
+       5,     5,     4,     4,     4,     4,     4,     4,     3,     3,
+      23
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     5,     6,     7,     8,     9,    10,    11,    12,    13,
-      14,    21,    25,    28,    29,    30,    31,    32,    33,    34,
-      29,    29,     0,    22,    23,    15,    16,    17,    18,    19,
-      20,    15,    16,    17,    18,    19,    20,    24,    29,    29,
-       4,     4,     4,     4,     4,     4,     3,     3,     3,     3,
-       3,     3
+       0,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    22,    26,    29,    30,    31,    32,    33,    34,    35,
+      36,    37,    30,    30,     0,    23,    24,    16,    17,    18,
+      19,    20,    21,    16,    17,    18,    19,    20,    21,    20,
+      21,    25,    30,    30,     5,     5,     5,     5,     5,     5,
+       4,     4,     4,     4,     4,     4,     3,     3
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    27,    28,    29,    29,    29,    29,    29,    30,    30,
-      31,    31,    31,    31,    31,    31,    32,    32,    32,    32,
-      32,    32,    33,    33,    33,    33,    34,    34,    34,    34,
-      34,    34
+       0,    28,    29,    30,    30,    30,    30,    30,    31,    31,
+      31,    32,    32,    32,    32,    32,    32,    33,    33,    33,
+      33,    33,    33,    34,    34,    35,    35,    35,    35,    36,
+      36,    37,    37,    37,    37
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     1,     1,     3,     3,     2,     3,     1,     1,
-       3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1
+       1,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1
 };
 
 
@@ -1275,13 +1279,13 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 52 "NodeMask.y" /* yacc.c:1646  */
+#line 55 "NodeMask.y" /* yacc.c:1646  */
     { TopExpression = (yyvsp[0].exprValue); (yyval.exprValue) = (yyvsp[0].exprValue); }
-#line 1281 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1285 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 58 "NodeMask.y" /* yacc.c:1646  */
+#line 61 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SExpression* p_expr = AllocateExpression();
         if( p_expr == NULL ){
@@ -1291,11 +1295,11 @@ yyreduce:
         p_expr->Selection = (yyvsp[0].selValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1295 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1299 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 70 "NodeMask.y" /* yacc.c:1646  */
+#line 73 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SExpression* p_expr = AllocateExpression();
         if( p_expr == NULL ){
@@ -1307,11 +1311,11 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1311 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1315 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 81 "NodeMask.y" /* yacc.c:1646  */
+#line 84 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SExpression* p_expr = AllocateExpression();
         if( p_expr == NULL ){
@@ -1323,11 +1327,11 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1327 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1331 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 92 "NodeMask.y" /* yacc.c:1646  */
+#line 95 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SExpression* p_expr = AllocateExpression();
         if( p_expr == NULL ){
@@ -1339,35 +1343,43 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1343 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1347 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 106 "NodeMask.y" /* yacc.c:1646  */
+#line 109 "NodeMask.y" /* yacc.c:1646  */
     {
         (yyval.exprValue) = (yyvsp[-1].exprValue);
         }
-#line 1351 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1355 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 114 "NodeMask.y" /* yacc.c:1646  */
-    {
-            (yyval.selValue) = (yyvsp[0].selValue);
-        }
-#line 1359 "NodeMask.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 9:
 #line 117 "NodeMask.y" /* yacc.c:1646  */
     {
             (yyval.selValue) = (yyvsp[0].selValue);
         }
-#line 1367 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1363 "NodeMask.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 120 "NodeMask.y" /* yacc.c:1646  */
+    {
+            (yyval.selValue) = (yyvsp[0].selValue);
+        }
+#line 1371 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
 #line 123 "NodeMask.y" /* yacc.c:1646  */
+    {
+            (yyval.selValue) = (yyvsp[0].selValue);
+        }
+#line 1379 "NodeMask.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 129 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByNumber((yyvsp[-2].tValue),O_LT,(yyvsp[0].iValue).Number);
         if( p_selection == NULL ){
@@ -1376,11 +1388,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1380 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1392 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 11:
-#line 132 "NodeMask.y" /* yacc.c:1646  */
+  case 12:
+#line 138 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByNumber((yyvsp[-2].tValue),O_LE,(yyvsp[0].iValue).Number);
         if( p_selection == NULL ){
@@ -1389,11 +1401,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1393 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1405 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 12:
-#line 141 "NodeMask.y" /* yacc.c:1646  */
+  case 13:
+#line 147 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByNumber((yyvsp[-2].tValue),O_GT,(yyvsp[0].iValue).Number);
         if( p_selection == NULL ){
@@ -1402,11 +1414,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1406 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1418 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 13:
-#line 150 "NodeMask.y" /* yacc.c:1646  */
+  case 14:
+#line 156 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByNumber((yyvsp[-2].tValue),O_GE,(yyvsp[0].iValue).Number);
         if( p_selection == NULL ){
@@ -1415,11 +1427,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1419 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1431 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 14:
-#line 159 "NodeMask.y" /* yacc.c:1646  */
+  case 15:
+#line 165 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByNumber((yyvsp[-2].tValue),O_EQ,(yyvsp[0].iValue).Number);
         if( p_selection == NULL ){
@@ -1428,11 +1440,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1432 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1444 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 15:
-#line 168 "NodeMask.y" /* yacc.c:1646  */
+  case 16:
+#line 174 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByNumber((yyvsp[-2].tValue),O_NE,(yyvsp[0].iValue).Number);
         if( p_selection == NULL ){
@@ -1441,11 +1453,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1445 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1457 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 16:
-#line 179 "NodeMask.y" /* yacc.c:1646  */
+  case 17:
+#line 185 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_LT,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
@@ -1454,11 +1466,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1458 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1470 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 17:
-#line 188 "NodeMask.y" /* yacc.c:1646  */
+  case 18:
+#line 194 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_LE,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
@@ -1467,11 +1479,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1471 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1483 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 18:
-#line 197 "NodeMask.y" /* yacc.c:1646  */
+  case 19:
+#line 203 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_GT,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
@@ -1480,11 +1492,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1484 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1496 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 19:
-#line 206 "NodeMask.y" /* yacc.c:1646  */
+  case 20:
+#line 212 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_GE,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
@@ -1493,11 +1505,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1497 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1509 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 215 "NodeMask.y" /* yacc.c:1646  */
+  case 21:
+#line 221 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_EQ,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
@@ -1506,11 +1518,11 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1510 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1522 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 224 "NodeMask.y" /* yacc.c:1646  */
+  case 22:
+#line 230 "NodeMask.y" /* yacc.c:1646  */
     {
         struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_NE,(yyvsp[0].sValue).String);
         if( p_selection == NULL ){
@@ -1519,101 +1531,127 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1523 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1535 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 235 "NodeMask.y" /* yacc.c:1646  */
+  case 23:
+#line 241 "NodeMask.y" /* yacc.c:1646  */
+    {
+        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_EQ,(yyvsp[0].sValue).String);
+        if( p_selection == NULL ){
+            yyerror("unable to allocate memory for selection");
+            YYERROR;
+            }
+        (yyval.selValue) = p_selection;
+        }
+#line 1548 "NodeMask.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 250 "NodeMask.y" /* yacc.c:1646  */
+    {
+        struct SSelection* p_selection = AllocateSelectionByString((yyvsp[-2].tValue),O_NE,(yyvsp[0].sValue).String);
+        if( p_selection == NULL ){
+            yyerror("unable to allocate memory for selection");
+            YYERROR;
+            }
+        (yyval.selValue) = p_selection;
+        }
+#line 1561 "NodeMask.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 261 "NodeMask.y" /* yacc.c:1646  */
     {
         enum SType selt = T_NCPUS;
         (yyval.tValue) = selt;
         }
-#line 1532 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1570 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 239 "NodeMask.y" /* yacc.c:1646  */
+  case 26:
+#line 265 "NodeMask.y" /* yacc.c:1646  */
     {
         enum SType selt = T_NFREECPUS;
         (yyval.tValue) = selt;
         }
-#line 1541 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1579 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 243 "NodeMask.y" /* yacc.c:1646  */
+  case 27:
+#line 269 "NodeMask.y" /* yacc.c:1646  */
     {
         enum SType selt = T_NGPUS;
         (yyval.tValue) = selt;
         }
-#line 1550 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1588 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 25:
-#line 247 "NodeMask.y" /* yacc.c:1646  */
+  case 28:
+#line 273 "NodeMask.y" /* yacc.c:1646  */
     {
         enum SType selt = T_NFREEGPUS;
         (yyval.tValue) = selt;
         }
-#line 1559 "NodeMask.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 26:
-#line 254 "NodeMask.y" /* yacc.c:1646  */
-    {
-        enum SType selt = T_NAME;
-        (yyval.tValue) = selt;
-        }
-#line 1568 "NodeMask.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 27:
-#line 258 "NodeMask.y" /* yacc.c:1646  */
-    {
-        enum SType selt = T_PROPS;
-        (yyval.tValue) = selt;
-        }
-#line 1577 "NodeMask.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 28:
-#line 262 "NodeMask.y" /* yacc.c:1646  */
-    {
-        enum SType selt = T_ST;
-        (yyval.tValue) = selt;
-        }
-#line 1586 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1597 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 266 "NodeMask.y" /* yacc.c:1646  */
-    {
-        enum SType selt = T_BS;
-        (yyval.tValue) = selt;
-        }
-#line 1595 "NodeMask.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 30:
-#line 270 "NodeMask.y" /* yacc.c:1646  */
+#line 280 "NodeMask.y" /* yacc.c:1646  */
     {
         enum SType selt = T_MEM;
         (yyval.tValue) = selt;
         }
-#line 1604 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1606 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
-  case 31:
-#line 274 "NodeMask.y" /* yacc.c:1646  */
+  case 30:
+#line 284 "NodeMask.y" /* yacc.c:1646  */
     {
         enum SType selt = T_FREEMEM;
         (yyval.tValue) = selt;
         }
-#line 1613 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1615 "NodeMask.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 291 "NodeMask.y" /* yacc.c:1646  */
+    {
+        enum SType selt = T_NAME;
+        (yyval.tValue) = selt;
+        }
+#line 1624 "NodeMask.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 295 "NodeMask.y" /* yacc.c:1646  */
+    {
+        enum SType selt = T_PROPS;
+        (yyval.tValue) = selt;
+        }
+#line 1633 "NodeMask.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 299 "NodeMask.y" /* yacc.c:1646  */
+    {
+        enum SType selt = T_ST;
+        (yyval.tValue) = selt;
+        }
+#line 1642 "NodeMask.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 34:
+#line 303 "NodeMask.y" /* yacc.c:1646  */
+    {
+        enum SType selt = T_BS;
+        (yyval.tValue) = selt;
+        }
+#line 1651 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1617 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1655 "NodeMask.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1841,7 +1879,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 280 "NodeMask.y" /* yacc.c:1906  */
+#line 309 "NodeMask.y" /* yacc.c:1906  */
 
 /* ========================================================================== */
 

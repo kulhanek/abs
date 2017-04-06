@@ -46,29 +46,30 @@ extern int yynodedebug;
   enum yytokentype
   {
     STRING = 258,
-    INUMBER = 259,
-    NCPUS = 260,
-    NFREECPUS = 261,
-    NGPUS = 262,
-    NFREEGPUS = 263,
-    NAME = 264,
-    PROPS = 265,
-    MEM = 266,
-    FREEMEM = 267,
-    ST = 268,
-    BS = 269,
-    LT = 270,
-    LE = 271,
-    GT = 272,
-    GE = 273,
-    NE = 274,
-    EQ = 275,
-    NOT = 276,
-    AND = 277,
-    OR = 278,
-    RBRA = 279,
-    LBRA = 280,
-    ERROR = 281
+    ISIZE = 259,
+    INUMBER = 260,
+    NCPUS = 261,
+    NFREECPUS = 262,
+    NGPUS = 263,
+    NFREEGPUS = 264,
+    NAME = 265,
+    PROPS = 266,
+    MEM = 267,
+    FREEMEM = 268,
+    ST = 269,
+    BS = 270,
+    LT = 271,
+    LE = 272,
+    GT = 273,
+    GE = 274,
+    NE = 275,
+    EQ = 276,
+    NOT = 277,
+    AND = 278,
+    OR = 279,
+    RBRA = 280,
+    LBRA = 281,
+    ERROR = 282
   };
 #endif
 
@@ -87,7 +88,7 @@ union YYSTYPE
     struct SExpression*     exprValue;
     
 
-#line 91 "NodeMask.tab.h" /* yacc.c:1909  */
+#line 92 "NodeMask.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
