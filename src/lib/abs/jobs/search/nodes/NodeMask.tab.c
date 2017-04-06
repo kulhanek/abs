@@ -474,7 +474,7 @@ static const yytype_uint8 yyrline[] =
 {
        0,    52,    52,    58,    70,    81,    92,   106,   114,   117,
      123,   132,   141,   150,   159,   168,   179,   188,   199,   203,
-     207,   211,   215,   219,   226,   230,   234,   238
+     207,   211,   218,   222,   226,   230,   234,   238
 };
 #endif
 
@@ -528,8 +528,8 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,    18,    19,    20,    21,    24,    25,    22,    23,    26,
-      27,     0,     0,     0,     2,     3,     8,     9,     0,     0,
+       0,    18,    19,    20,    21,    22,    23,    26,    27,    24,
+      25,     0,     0,     0,     2,     3,     8,     9,     0,     0,
        6,     0,     1,     0,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     7,     4,     5,    10,    11,    12,    13,
       15,    14,    17,    16
@@ -582,7 +582,7 @@ static const yytype_uint8 yyr1[] =
 {
        0,    27,    28,    29,    29,    29,    29,    29,    30,    30,
       31,    31,    31,    31,    31,    31,    32,    32,    33,    33,
-      33,    33,    33,    33,    34,    34,    34,    34
+      33,    33,    34,    34,    34,    34,    34,    34
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1499,18 +1499,18 @@ yyreduce:
     break;
 
   case 22:
-#line 215 "NodeMask.y" /* yacc.c:1646  */
+#line 218 "NodeMask.y" /* yacc.c:1646  */
     {
-        enum SType selt = T_MEM;
+        enum SType selt = T_NAME;
         (yyval.tValue) = selt;
         }
 #line 1508 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 219 "NodeMask.y" /* yacc.c:1646  */
+#line 222 "NodeMask.y" /* yacc.c:1646  */
     {
-        enum SType selt = T_FREEMEM;
+        enum SType selt = T_PROPS;
         (yyval.tValue) = selt;
         }
 #line 1517 "NodeMask.tab.c" /* yacc.c:1646  */
@@ -1519,7 +1519,7 @@ yyreduce:
   case 24:
 #line 226 "NodeMask.y" /* yacc.c:1646  */
     {
-        enum SType selt = T_NAME;
+        enum SType selt = T_ST;
         (yyval.tValue) = selt;
         }
 #line 1526 "NodeMask.tab.c" /* yacc.c:1646  */
@@ -1528,7 +1528,7 @@ yyreduce:
   case 25:
 #line 230 "NodeMask.y" /* yacc.c:1646  */
     {
-        enum SType selt = T_PROPS;
+        enum SType selt = T_BS;
         (yyval.tValue) = selt;
         }
 #line 1535 "NodeMask.tab.c" /* yacc.c:1646  */
@@ -1537,7 +1537,7 @@ yyreduce:
   case 26:
 #line 234 "NodeMask.y" /* yacc.c:1646  */
     {
-        enum SType selt = T_ST;
+        enum SType selt = T_MEM;
         (yyval.tValue) = selt;
         }
 #line 1544 "NodeMask.tab.c" /* yacc.c:1646  */
@@ -1546,7 +1546,7 @@ yyreduce:
   case 27:
 #line 238 "NodeMask.y" /* yacc.c:1646  */
     {
-        enum SType selt = T_BS;
+        enum SType selt = T_FREEMEM;
         (yyval.tValue) = selt;
         }
 #line 1553 "NodeMask.tab.c" /* yacc.c:1646  */

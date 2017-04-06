@@ -41,7 +41,7 @@ class CJobsOptions : public CSimpleOptions {
         "\n"
         "<b>Search expressions:</b>\n"
         "<i>Search tokens:</i>        bs (short name of batch server), st (state), user, id (only numeric part), queue (only name), title, path,\n"
-           "                          ncpus, ngpus, nnodes\n"
+               "                      ncpus, ngpus, nnodes\n"
         "<i>Comparison operators:</i> == (equal), != (not equal), <<, <<=, >, >=\n"
         "<i>Logical operators:</i>    ! (logical not), && (logical and), || (logical or)\n"
         "<i>Braces:</i>               ( )\n"
