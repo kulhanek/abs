@@ -3205,7 +3205,6 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             CSmallTimeAndDate ptime(GetItem("batch/job","INF_START_TIME").ToLInt());
             CSmallTime diff = current_time - ptime;
             sout << setw(12) << right;
-            sout << diff.GetSTimeAndDay();
             string tmp1(diff.GetSTimeAndDay());
             trim(tmp1);
             sout << tmp1;
