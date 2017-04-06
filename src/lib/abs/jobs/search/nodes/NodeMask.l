@@ -14,8 +14,8 @@ ABS Node Mask Lexical Analyzer
 %option noyywrap
 newline       [\n]
 whitesp       [ \t]+
-string        [0-9a-zA-Z\/\#*?\[\].\-\+_]+[a-zA-Z0-9\/\#*?,.\[\]\-\+_]*
 inumber       [0-9]+
+string        [0-9a-zA-Z\/\#*?\[\].\-\+_]+[a-zA-Z0-9\/\#*?,.\[\]\-\+_]*
 
 /* rules ==================================================================== */
 %%
