@@ -193,11 +193,11 @@ bool CNodes::Run(void)
         NodeList.PrintStatistics(vout);
         return(true);
     }
-    if( Options.GetOptPrintNames() == false ){
+    if( Options.GetOptPrintNames() == true ){
         NodeList.PrintNames(vout);
         return(true);
     }
-    if( Options.GetOptPrintHosts() == false ){
+    if( Options.GetOptPrintHosts() == true ){
         NodeList.PrintHosts(vout);
         return(true);
     }
