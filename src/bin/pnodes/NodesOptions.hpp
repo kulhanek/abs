@@ -45,12 +45,13 @@ class CNodesOptions : public CSimpleOptions {
         "<i>Comparison operators:</i> == (equal), != (not equal), <<, <<=, >, >=\n"
         "<i>Logical operators:</i>    ! (logical not), && (logical and), || (logical or)\n"
         "<i>Braces:</i>               ( )\n"
-        "The search token must be always on the left side of comparison operator. On the right side can be either\n"
-        "integer number for <u>ncpus</u>, <u>nfreecpus</u>, <u>ngpus</u>, <u>nfreegpus</u> tokens\n"
-        "or string for <u>name</u>, <u>props</u>, <u>st</u>, <u>bs</u>,\n"
-        "or size for <u>mem</u>, and <u>freemem</u> tokens.\n"
-        "Size can be in kb, mb, gb, or tb (the unit must be specified).\n"
-        "String comparison can use a shell wildcard pattern and can employ  == or != comparison operators only (except of mem and freemem)."
+        "The search token must be always on the left side of comparison operator.\n"
+        "On the right side, it can be:\n"
+        "   = an integer number for <u>ncpus</u>, <u>nfreecpus</u>, <u>ngpus</u>, <u>nfreegpus</u> tokens\n"
+        "   = a string for <u>name</u>, <u>props</u>, <u>st</u>, <u>bs</u>\n"
+        "   = a size for <u>mem</u>, and <u>freemem</u> tokens\n"
+        "     Size can be in kb, mb, gb, or tb (the unit must be specified).\n"
+        "String comparison can use a shell wildcard pattern and can employ  == or != comparison operators only."
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN

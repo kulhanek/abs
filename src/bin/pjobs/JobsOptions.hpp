@@ -45,9 +45,10 @@ class CJobsOptions : public CSimpleOptions {
         "<i>Comparison operators:</i> == (equal), != (not equal), <<, <<=, >, >=\n"
         "<i>Logical operators:</i>    ! (logical not), && (logical and), || (logical or)\n"
         "<i>Braces:</i>               ( )\n"
-        "The search token must be always on the left side of comparison operator. On the right side can be either\n"
-        "an integer number for <u>id</u>, <u>ncpus</u>, <u>ngpus</u>, and <u>nnodes</u> tokens\n"
-        "or a string for <u>bs</u>, <u>st</u>, <u>user</u>, , <u>title</u>, and <u>path</u> tokens.\n"
+        "The search token must be always on the left side of comparison operator.\n"
+        "On the right side, it can be:\n"
+        "   an integer number for <u>id</u>, <u>ncpus</u>, <u>ngpus</u>, and <u>nnodes</u> tokens\n"
+        "   a string for <u>bs</u>, <u>st</u>, <u>user</u>, , <u>title</u>, and <u>path</u> tokens\n"
         "String comparisons can employ shell wildcard patterns and == or != comparison operators only."
     CSO_PROG_DESC_END
 
