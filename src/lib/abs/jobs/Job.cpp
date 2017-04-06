@@ -37,6 +37,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <JobList.hpp>
 #include <PluginDatabase.hpp>
 #include <PluginObject.hpp>
