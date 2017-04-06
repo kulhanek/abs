@@ -55,7 +55,7 @@ extern int yynodedebug;
     PROPS = 265,
     MEM = 266,
     FREEMEM = 267,
-    STATE = 268,
+    ST = 268,
     BS = 269,
     LT = 270,
     LE = 271,

@@ -654,31 +654,19 @@ bool CNodeList::IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel)
                     ES_ERROR("<- unknown selection operator");
                     return(false);
             }
+        case T_ST:
+            switch(p_sel->Operator){
+                case O_EQ:
+                    return( fnmatch(p_sel->SValue,CSmallString(p_node->GetStateCode()),0) == 0 );
+                case O_NE:
+                    return( fnmatch(p_sel->SValue,CSmallString(p_node->GetStateCode()),0) != 0 );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
         case T_PROPS:{
                 std::vector<std::string>::const_iterator it = p_node->GetPropertyList().begin();
                 std::vector<std::string>::const_iterator ie = p_node->GetPropertyList().end();
-                bool ok = false;
-                while( it != ie ){
-                    if( fnmatch(p_sel->SValue,(*it).c_str(),0) == 0 ){
-                        ok = true;
-                        break;
-                    }
-                    it++;
-                }
-                switch(p_sel->Operator){
-                    case O_EQ:
-                        return( ok );
-                    case O_NE:
-                        return( ! ok );
-                    default:
-                        ES_ERROR("<- unknown selection operator");
-                        return(false);
-                }
-            }
-        case T_STATE:{
-                std::vector<std::string> slist = p_node->GetStateList();
-                std::vector<std::string>::const_iterator it = slist.begin();
-                std::vector<std::string>::const_iterator ie = slist.end();
                 bool ok = false;
                 while( it != ie ){
                     if( fnmatch(p_sel->SValue,(*it).c_str(),0) == 0 ){

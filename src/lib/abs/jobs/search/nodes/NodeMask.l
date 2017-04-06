@@ -37,7 +37,7 @@ inumber       [0-9]+
 "freemem"   { yynodelval.gValue.Position = LexPosition; LexPosition += 7; return FREEMEM; }
 "name"      { yynodelval.gValue.Position = LexPosition; LexPosition += 4; return NAME; }
 "props"     { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return PROPS; }
-"state"     { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return STATE; }
+"st"        { yynodelval.gValue.Position = LexPosition; LexPosition += 2; return ST; }
 "bs"        { yynodelval.gValue.Position = LexPosition; LexPosition += 2; return BS; }
 
 "<"       { yynodelval.gValue.Position = LexPosition; LexPosition += 1; return LT; }

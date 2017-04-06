@@ -125,7 +125,7 @@ extern int yynodedebug;
     PROPS = 265,
     MEM = 266,
     FREEMEM = 267,
-    STATE = 268,
+    ST = 268,
     BS = 269,
     LT = 270,
     LE = 271,
@@ -485,7 +485,7 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "STRING", "INUMBER", "NCPUS",
   "NFREECPUS", "NGPUS", "NFREEGPUS", "NAME", "PROPS", "MEM", "FREEMEM",
-  "STATE", "BS", "LT", "LE", "GT", "GE", "NE", "EQ", "NOT", "AND", "OR",
+  "ST", "BS", "LT", "LE", "GT", "GE", "NE", "EQ", "NOT", "AND", "OR",
   "RBRA", "LBRA", "ERROR", "$accept", "node_mask", "expr", "selection",
   "iselection", "sselection", "iselector", "sselector", YY_NULLPTR
 };
@@ -1537,7 +1537,7 @@ yyreduce:
   case 26:
 #line 234 "NodeMask.y" /* yacc.c:1646  */
     {
-        enum SType selt = T_STATE;
+        enum SType selt = T_ST;
         (yyval.tValue) = selt;
         }
 #line 1544 "NodeMask.tab.c" /* yacc.c:1646  */
