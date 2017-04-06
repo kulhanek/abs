@@ -38,6 +38,7 @@ inumber       [0-9]+
 "user"      { yyjoblval.gValue.Position = LexPosition; LexPosition += 4; return USER; }
 "path"      { yyjoblval.gValue.Position = LexPosition; LexPosition += 4; return PATH; }
 "st"      { yyjoblval.gValue.Position = LexPosition; LexPosition += 2; return ST; }
+"bs"      { yyjoblval.gValue.Position = LexPosition; LexPosition += 2; return BS; }
 
 "<"       { yyjoblval.gValue.Position = LexPosition; LexPosition += 1; return LT; }
 "<="      { yyjoblval.gValue.Position = LexPosition; LexPosition += 2; return LE; }

@@ -70,6 +70,9 @@ public:
     /// print node names
     void PrintNames(std::ostream& sout);
 
+    /// print host names
+    void PrintHosts(std::ostream& sout);
+
     /// print defined node group names
     void PrintNodeGroupNames(std::ostream& sout);
 

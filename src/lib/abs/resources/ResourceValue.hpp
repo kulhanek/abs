@@ -61,6 +61,9 @@ public:
     /// get size in kB from Value
     long long GetSize(void);
 
+    /// get size in kB from Value
+    static long long GetSize(const CSmallString& value);
+
     /// get size in variable unit
     CSmallString GetSizeString(void);
 

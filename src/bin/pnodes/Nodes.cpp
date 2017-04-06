@@ -185,15 +185,23 @@ bool CNodes::Run(void)
 
     NodeList.FinalizeNodeGroups();
 
-    if( Options.GetOptPrintNames() == false ){
+    if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) ){
         // list individual nodes
         NodeList.PrintInfos(vout);
 
         // print final stats
         NodeList.PrintStatistics(vout);
-    } else {
-        NodeList.PrintNames(vout);
+        return(true);
     }
+    if( Options.GetOptPrintNames() == false ){
+        NodeList.PrintNames(vout);
+        return(true);
+    }
+    if( Options.GetOptPrintHosts() == false ){
+        NodeList.PrintHosts(vout);
+        return(true);
+    }
+
 
     return(true);
 }

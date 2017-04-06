@@ -50,6 +50,9 @@ public:
     /// get node name
     const CSmallString& GetName(void) const;
 
+    /// get host name
+    const CSmallString& GetHost(void) const;
+
     //! get short server name
     const CSmallString GetShortServerName(void);
 
@@ -64,6 +67,12 @@ public:
 
     /// return number of free GPUs
     int GetNumOfFreeGPUs(void) const;
+
+    /// return total memory in kb
+    long long GetMemory(void) const;
+
+    /// return free memory in kb
+    long long  GetFreeMemory(void) const;
 
     /// get property list
     const std::vector<std::string>& GetPropertyList(void) const;

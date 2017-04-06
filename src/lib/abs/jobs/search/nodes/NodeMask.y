@@ -25,7 +25,7 @@ ABS Node Mask Lexical Analyzer
 /* recognized tokens -------------------------------------------------------- */
 %token <sValue> STRING
 %token <iValue> INUMBER
-%token <gValue> NCPUS NFREECPUS NGPUS NFREEGPUS NAME PROPS STATE
+%token <gValue> NCPUS NFREECPUS NGPUS NFREEGPUS NAME PROPS MEM FREEMEM STATE BS
 %token <gValue> LT LE GT GE NE EQ
 %token <gValue> NOT AND OR
 %token <gValue> RBRA LBRA

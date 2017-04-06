@@ -32,6 +32,8 @@
 #include <ErrorSystem.hpp>
 #include <fnmatch.h>
 #include <ABSConfig.hpp>
+#include <ResourceValue.hpp>
+#include <set>
 
 //------------------------------------------------------------------------------
 
@@ -220,6 +222,39 @@ void CNodeList::PrintNames(std::ostream& sout)
         }
 
         git++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CNodeList::PrintHosts(std::ostream& sout)
+{
+    set<string>         hosts;
+
+    list<CNodeGroupPtr>::iterator git = NodeGroups.begin();
+    list<CNodeGroupPtr>::iterator get = NodeGroups.end();
+
+    while( git != get ){
+        CNodeGroupPtr p_group = *git;
+
+        list<CNodePtr>::iterator it = p_group->SortedNodes.begin();
+        list<CNodePtr>::iterator et = p_group->SortedNodes.end();
+
+        while( it != et ){
+            CNodePtr p_node = *it;
+            hosts.insert(string(p_node->GetHost()));
+            it++;
+        }
+
+        git++;
+    }
+
+    set<string>::iterator hit = hosts.begin();
+    set<string>::iterator het = hosts.end();
+
+    while( hit != het ){
+        sout << *hit << endl;
+        hit++;
     }
 }
 
@@ -563,12 +598,58 @@ bool CNodeList::IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel)
                     ES_ERROR("<- unknown selection operator");
                     return(false);
             }
+        case T_MEM:
+            switch(p_sel->Operator){
+                case O_LT:
+                    return( p_node->GetMemory() < CResourceValue::GetSize(p_sel->IValue) );
+                case O_LE:
+                    return( p_node->GetMemory() <= CResourceValue::GetSize(p_sel->IValue) );
+                case O_GT:
+                    return( p_node->GetMemory() > CResourceValue::GetSize(p_sel->IValue) );
+                case O_GE:
+                    return( p_node->GetMemory() >= CResourceValue::GetSize(p_sel->IValue) );
+                case O_EQ:
+                    return( p_node->GetMemory() == CResourceValue::GetSize(p_sel->IValue) );
+                case O_NE:
+                    return( p_node->GetMemory() != CResourceValue::GetSize(p_sel->IValue) );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
+        case T_FREEMEM:
+            switch(p_sel->Operator){
+                case O_LT:
+                    return( p_node->GetFreeMemory() < CResourceValue::GetSize(p_sel->IValue) );
+                case O_LE:
+                    return( p_node->GetFreeMemory() <= CResourceValue::GetSize(p_sel->IValue) );
+                case O_GT:
+                    return( p_node->GetFreeMemory() > CResourceValue::GetSize(p_sel->IValue) );
+                case O_GE:
+                    return( p_node->GetFreeMemory() >= CResourceValue::GetSize(p_sel->IValue) );
+                case O_EQ:
+                    return( p_node->GetFreeMemory() == CResourceValue::GetSize(p_sel->IValue) );
+                case O_NE:
+                    return( p_node->GetFreeMemory() != CResourceValue::GetSize(p_sel->IValue) );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
         case T_NAME:
             switch(p_sel->Operator){
                 case O_EQ:
                     return( fnmatch(p_sel->SValue,p_node->GetName(),0) == 0 );
                 case O_NE:
                     return( fnmatch(p_sel->SValue,p_node->GetName(),0) != 0 );
+                default:
+                    ES_ERROR("<- unknown selection operator");
+                    return(false);
+            }
+        case T_BS:
+            switch(p_sel->Operator){
+                case O_EQ:
+                    return( fnmatch(p_sel->SValue,p_node->GetShortServerName(),0) == 0 );
+                case O_NE:
+                    return( fnmatch(p_sel->SValue,p_node->GetShortServerName(),0) != 0 );
                 default:
                     ES_ERROR("<- unknown selection operator");
                     return(false);

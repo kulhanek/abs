@@ -61,6 +61,8 @@ enum SType {
     T_NFREECPUS,
     T_NGPUS,
     T_NFREEGPUS,
+    T_MEM,
+    T_FREEMEM,
     T_NAME,
     T_PROPS,
     T_STATE,
@@ -71,7 +73,8 @@ enum SType {
     T_NNODES,
     T_USER,
     T_PATH,
-    T_ST
+    T_ST,
+    T_BS
 };
 
 struct SSelection {

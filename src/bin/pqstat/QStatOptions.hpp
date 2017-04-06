@@ -40,14 +40,15 @@ class CQStatOptions : public CSimpleOptions {
         "Print info about jobs submitted to the batch system.\n"
         "\n"
         "<b>Search expressions:</b>\n"
-        "<i>Search tokens:</i>        st, id, user, title, queue, ncpus, ngpus, ngpus, path\n"
+        "<i>Search tokens:</i>        bs (short name of batch server), st (state), user, id (only numeric part), queue (only name), title, path,\n"
+        "                             ncpus, ngpus, nnodes\n"
         "<i>Comparison operators:</i> == (equal), != (not equal), <<, <<=, >, >=\n"
         "<i>Logical operators:</i>    ! (logical not), && (logical and), || (logical or)\n"
         "<i>Braces:</i>               ( )\n"
         "The search token must be always on the left side of comparison operator. On the right side can be either\n"
-        "integer number for <u>id</u>, <u>ncpus</u>, <u>ngpus</u>, and <u>nnodes</u> tokens\n"
-        "or string for <u>st</u>, <u>user</u>, <u>title</u>, and <u>path</u> tokens.\n"
-        "String comparison can employ only == or != comparison operators and can use a shell wildcard pattern."
+        "an integer number for <u>id</u>, <u>ncpus</u>, <u>ngpus</u>, and <u>nnodes</u> tokens\n"
+        "or a string for <u>bs</u>, <u>st</u>, <u>user</u>, , <u>title</u>, and <u>path</u> tokens.\n"
+        "String comparisons can employ shell wildcard patterns and == or != comparison operators only."
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN
@@ -126,40 +127,40 @@ class CQStatOptions : public CSimpleOptions {
                 "print job comment if possible")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Technical,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    't',                           /* short option name */
-                    "technical",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "print all jobs in technical format")   /* option description */
+                Technical,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                't',                           /* short option name */
+                "technical",                      /* long option name */
+                NULL,                           /* parametr name */
+                "print all jobs in technical format")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Verbose,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'v',                           /* short option name */
-                    "verbose",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "increase output verbosity")   /* option description */
+                Verbose,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'v',                           /* short option name */
+                "verbose",                      /* long option name */
+                NULL,                           /* parametr name */
+                "increase output verbosity")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Version,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    '\0',                           /* short option name */
-                    "version",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "output version information and exit")   /* option description */
+                Version,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                '\0',                           /* short option name */
+                "version",                      /* long option name */
+                NULL,                           /* parametr name */
+                "output version information and exit")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Help,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'h',                           /* short option name */
-                    "help",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "display this help and exit")   /* option description */
+                Help,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'h',                           /* short option name */
+                "help",                      /* long option name */
+                NULL,                           /* parametr name */
+                "display this help and exit")   /* option description */
     CSO_MAP_END
 
 // final operation with options ------------------------------------------------

@@ -36,7 +36,7 @@ class CStatusOptions : public CSimpleOptions {
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Print info about Infinity job status. Only the last job in the list is reported. Recognized job"
+        "Print status of the Infinity job. Only the last job (by time) in the list is reported. Recognized job"
         "statuses are: P - prepared, Q - queued, R - running, F - finished, K - killed, IN - inconsistent state, UN - unknown."
     CSO_PROG_DESC_END
 
@@ -46,7 +46,7 @@ class CStatusOptions : public CSimpleOptions {
 
     CSO_PROG_ARGS_LONG_DESC_BEGIN
         "<b>Arguments:</b>"
-        "   <u>info</u> name of job info file\n"
+        "   <u>info</u> name of the job info file\n"
     CSO_PROG_ARGS_LONG_DESC_END
 
     CSO_PROG_VERS_BEGIN

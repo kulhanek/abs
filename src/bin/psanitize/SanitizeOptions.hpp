@@ -37,7 +37,8 @@ class CSanitizeOptions : public CSimpleOptions {
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Update the job input file from autodetected jobs by provided computational resources."
+        "Update the job input file according to computational resources specified in the "
+        "job info file. The job type is either autodetected or specified as an option to this command."
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN
@@ -57,11 +58,11 @@ class CSanitizeOptions : public CSimpleOptions {
     CSO_MAP_BEGIN
  // description of arguments ---------------------------------------------------
             CSO_MAP_ARG(CSmallString,                   /* argument type */
-                JobInputName,                          /* argument name */
-                NULL,                           /* default value */
-                true,                           /* is argument mandatory */
-                "NAME",                           /* parametr name */
-                "job input name")   /* argument description */
+                    JobInputName,                          /* argument name */
+                    NULL,                           /* default value */
+                    true,                           /* is argument mandatory */
+                    "NAME",                           /* parametr name */
+                    "job input name")   /* argument description */
  // description of options -----------------------------------------------------
             CSO_MAP_OPT(CSmallString,                           /* option type */
                     JobType,                        /* option name */

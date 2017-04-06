@@ -25,7 +25,7 @@ ABS Node Mask Lexical Analyzer
 /* recognized tokens -------------------------------------------------------- */
 %token <sValue> STRING
 %token <iValue> INUMBER
-%token <gValue> ID NCPUS NGPUS NNODES TITLE QUEUE USER PATH ST
+%token <gValue> ID NCPUS NGPUS NNODES TITLE QUEUE USER PATH ST BS
 %token <gValue> LT LE GT GE NE EQ
 %token <gValue> NOT AND OR
 %token <gValue> RBRA LBRA

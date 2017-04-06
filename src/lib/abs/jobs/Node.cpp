@@ -247,6 +247,13 @@ const CSmallString& CNode::GetName(void) const
 
 //------------------------------------------------------------------------------
 
+const CSmallString& CNode::GetHost(void) const
+{
+    return(MOM);
+}
+
+//------------------------------------------------------------------------------
+
 int CNode::GetNumOfCPUs(void) const
 {
     return(NCPUs);
@@ -271,6 +278,20 @@ int CNode::GetNumOfGPUs(void) const
 int CNode::GetNumOfFreeGPUs(void) const
 {
     return(NGPUs-AssignedGPUs);
+}
+
+//------------------------------------------------------------------------------
+
+long long CNode::GetMemory(void) const
+{
+    return(Memory);
+}
+
+//------------------------------------------------------------------------------
+
+long long CNode::GetFreeMemory(void) const
+{
+    return(Memory-AssignedMemory);
 }
 
 //------------------------------------------------------------------------------

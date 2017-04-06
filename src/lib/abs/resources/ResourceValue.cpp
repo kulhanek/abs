@@ -123,7 +123,14 @@ bool CResourceValue::TestSizeValue(std::ostream& sout,bool& rstatus)
 
 long long CResourceValue::GetSize(void)
 {
-    string          svalue(Value);
+    return( GetSize(Value) );
+}
+
+//------------------------------------------------------------------------------
+
+long long CResourceValue::GetSize(const CSmallString& value)
+{
+    string          svalue(value);
     long long       size;
     string          munit;
     stringstream    str(svalue);

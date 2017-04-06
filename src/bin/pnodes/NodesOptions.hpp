@@ -40,7 +40,7 @@ class CNodesOptions : public CSimpleOptions {
         "Print info about batch system computational nodes.\n"
         "\n"
         "<b>Search expressions:</b>\n"
-        "<i>Search tokens:</i>        ncpus, nfreecpus, ngpus, nfreegpus, name, props, state\n"
+        "<i>Search tokens:</i>        ncpus, nfreecpus, ngpus, nfreegpus, mem, name, props, state, bs (short name of batch server)\n"
         "<i>Comparison operators:</i> == (equal), != (not equal), <<, <<=, >, >=\n"
         "<i>Logical operators:</i>    ! (logical not), && (logical and), || (logical or)\n"
         "<i>Braces:</i>               ( )\n"
@@ -65,6 +65,7 @@ class CNodesOptions : public CSimpleOptions {
         CSO_OPT(bool,KeepAll)   
         CSO_OPT(bool,Technical)
         CSO_OPT(bool,PrintNames)
+        CSO_OPT(bool,PrintHosts)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -143,6 +144,15 @@ class CNodesOptions : public CSimpleOptions {
                     "names",                      /* long option name */
                     NULL,                           /* parametr name */
                     "print only node names")   /* option description */
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                    PrintHosts,                        /* option name */
+                    false,                          /* default value */
+                    false,                          /* is option mandatory */
+                    0,                           /* short option name */
+                    "hosts",                      /* long option name */
+                    NULL,                           /* parametr name */
+                    "print only host names")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */

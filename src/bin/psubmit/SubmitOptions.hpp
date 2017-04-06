@@ -37,7 +37,7 @@ class CSubmitOptions : public CSimpleOptions {
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Submit a job into the Torque batch system."
+        "Submit a job into the batch system."
     CSO_PROG_DESC_END
 
     CSO_PROG_ARGS_SHORT_DESC_BEGIN
@@ -47,7 +47,7 @@ class CSubmitOptions : public CSimpleOptions {
     CSO_PROG_ARGS_LONG_DESC_BEGIN
         "<b>Arguments:</b>\n"
         "   <b><cyan>destination</cyan></b>\n"
-        "          torque queue or infinity resource alias\n\n"
+        "          name of batch queue or Infinity alias\n\n"
         "   <b><cyan>job</cyan></b>\n"
         "          job script or job input file\n\n"
         "   <b><cyan>resources</cyan></b>\n"
@@ -66,6 +66,7 @@ class CSubmitOptions : public CSimpleOptions {
         CSO_OPT(bool,AssumeYes)
         CSO_OPT(bool,Silent)
         CSO_OPT(bool,ExpertMode)
+        CSO_OPT(bool,ResubmitMode)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -74,31 +75,31 @@ class CSubmitOptions : public CSimpleOptions {
     CSO_MAP_BEGIN
  // description of options -----------------------------------------------------
         CSO_MAP_OPT(int,                           /* option type */
-                    NumOfCopies,                        /* option name */
-                    0,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'n',                           /* short option name */
-                    "numofcopies",                      /* long option name */
-                    "NUM",                           /* parametr name */
-                    "it lunches the job by NUM times")   /* option description */
+                NumOfCopies,                        /* option name */
+                0,                          /* default value */
+                false,                          /* is option mandatory */
+                'n',                           /* short option name */
+                "numofcopies",                      /* long option name */
+                "NUM",                           /* parametr name */
+                "it lunches the job by NUM times")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    IgnoreRuntimeFiles,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'i',                           /* short option name */
-                    "ignore",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "ignore run-time files")   /* option description */
+                IgnoreRuntimeFiles,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'i',                           /* short option name */
+                "ignore",                      /* long option name */
+                NULL,                           /* parametr name */
+                "ignore run-time files")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    AssumeYes,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'y',                           /* short option name */
-                    "yes",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "assume yes")   /* option description */
+                AssumeYes,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'y',                           /* short option name */
+                "yes",                      /* long option name */
+                NULL,                           /* parametr name */
+                "assume yes in the confirmation of the job submission")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                 Silent,                        /* option name */
@@ -116,34 +117,43 @@ class CSubmitOptions : public CSimpleOptions {
                 'e',                           /* short option name */
                 "expert",                      /* long option name */
                 NULL,                           /* parametr name */
-                "it enables the expert mode, in which you can define any batch resource")   /* option description */
+                "it disables some tests of input parameters allowing injection of unsupported resources directly to the batch server")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Verbose,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'v',                           /* short option name */
-                    "verbose",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "increase output verbosity")   /* option description */
+                ResubmitMode,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'r',                           /* short option name */
+                "repeat",                      /* long option name */
+                NULL,                           /* parametr name */
+                "repeat job submission in the case of the batch server error")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Version,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    '\0',                           /* short option name */
-                    "version",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "output version information and exit")   /* option description */
+                Verbose,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'v',                           /* short option name */
+                "verbose",                      /* long option name */
+                NULL,                           /* parametr name */
+                "increase output verbosity")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Help,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'h',                           /* short option name */
-                    "help",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "display this help and exit")   /* option description */
+                Version,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                '\0',                           /* short option name */
+                "version",                      /* long option name */
+                NULL,                           /* parametr name */
+                "output version information and exit")   /* option description */
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                Help,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'h',                           /* short option name */
+                "help",                      /* long option name */
+                NULL,                           /* parametr name */
+                "display this help and exit")   /* option description */
     CSO_MAP_END
 
 // final operation with options ------------------------------------------------

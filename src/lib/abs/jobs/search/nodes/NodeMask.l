@@ -33,9 +33,12 @@ inumber       [0-9]+
 "nfreecpus" { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return NFREECPUS; }
 "ngpus"     { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return NGPUS; }
 "nfreegpus" { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return NFREEGPUS; }
+"mem"       { yynodelval.gValue.Position = LexPosition; LexPosition += 3; return MEM; }
+"freemem"   { yynodelval.gValue.Position = LexPosition; LexPosition += 7; return FREEMEM; }
 "name"      { yynodelval.gValue.Position = LexPosition; LexPosition += 4; return NAME; }
 "props"     { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return PROPS; }
 "state"     { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return STATE; }
+"bs"        { yynodelval.gValue.Position = LexPosition; LexPosition += 2; return BS; }
 
 "<"       { yynodelval.gValue.Position = LexPosition; LexPosition += 1; return LT; }
 "<="      { yynodelval.gValue.Position = LexPosition; LexPosition += 2; return LE; }

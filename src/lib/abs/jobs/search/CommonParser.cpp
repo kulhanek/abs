@@ -40,25 +40,6 @@ struct SExpression* TopExpression   = NULL;
 vector<SSelection*>     SelectionAllocations;
 vector<SExpression*>    ExpressionAllocations;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-bool print_expression(FILE* p_fout,struct SExpression* p_expr);
-bool print_selection(FILE* p_fout,struct SSelection* p_sel);
-bool print_list(FILE* p_fout,struct SList* p_list);
-
-//==============================================================================
-//------------------------------------------------------------------------------
-//==============================================================================
-
-// int main(void)
-// {
-//  init_mask();
-//  parse_mask("(ncpus == 5)&&(props != cl_cluster)||(props == hyper*)");
-//  print_expression_tree(get_expression_tree());
-//  free_mask_tree();
-//  ErrorSystem.PrintErrors();
-// }
-
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
@@ -70,10 +51,6 @@ int init_mask(void)
     TopExpression = NULL;
     return(0);
 }
-
-//------------------------------------------------------------------------------
-
-// int parse_mask(const char* p_mask);
 
 //------------------------------------------------------------------------------
 
@@ -99,126 +76,6 @@ int free_mask_tree(void)
     TopExpression = NULL;
 
     return(0);
-}
-
-//------------------------------------------------------------------------------
-
-int print_expression_tree(struct SExpression* p_expr)
-{
-    if(print_expression(stdout,p_expr) != true) return(-1);
-    return(0);
-}
-
-//==============================================================================
-//------------------------------------------------------------------------------
-//==============================================================================
-
-bool print_expression(FILE* p_fout,struct SExpression* p_expr)
-{
-    if(p_expr == NULL) {
-        fprintf(p_fout,"<- NULL expr");
-        return(false);
-    }
-
-    fprintf(p_fout,"EXP(");
-    if(p_expr->Selection != NULL) {
-        if(print_selection(p_fout,p_expr->Selection) == false) return(false);
-    } else {
-        switch(p_expr->Operator) {
-            case O_AND:
-                if(print_expression(p_fout,p_expr->LeftExpression) == false) return(false);
-                fprintf(p_fout," && ");
-                if(print_expression(p_fout,p_expr->RightExpression) == false) return(false);
-                break;
-            case O_OR:
-                if(print_expression(p_fout,p_expr->LeftExpression) == false) return(false);
-                fprintf(p_fout," || ");
-                if(print_expression(p_fout,p_expr->RightExpression) == false) return(false);
-                break;
-            case O_NOT:
-                fprintf(p_fout,"! ");
-                if(print_expression(p_fout,p_expr->RightExpression) == false) return(false);
-                break;                
-
-            default:
-                fprintf(p_fout,"<- unknown operator");
-                return(false);
-        };
-    }
-    fprintf(p_fout,")");
-    return(true);
-}
-
-//------------------------------------------------------------------------------
-
-bool print_selection(FILE* p_fout,struct SSelection* p_sel)
-{
-    if(p_sel == NULL) {
-        fprintf(p_fout,"<- NULL selection");
-        return(false);
-    }
-
-    switch(p_sel->Type) {
-        case T_NCPUS:
-            fprintf(p_fout,"(ncpus");
-            break;
-        case T_NGPUS:
-            fprintf(p_fout,"(ngpus");
-            break;
-        case T_NAME:
-            fprintf(p_fout,"(name");
-            break;
-        case T_PROPS:
-            fprintf(p_fout,"(props");
-            break;
-        case T_STATE:
-            fprintf(p_fout,"(state");
-            break;
-        default:
-            fprintf(p_fout,"<- unknown selector type");
-            return(false);
-    };
-
-    switch(p_sel->Operator) {
-        case O_LT:
-            fprintf(p_fout," < ");
-            break;
-        case O_LE:
-            fprintf(p_fout," <= ");
-            break;
-        case O_GT:
-            fprintf(p_fout," > ");
-            break;
-        case O_GE:
-            fprintf(p_fout," >= ");
-            break;
-        case O_EQ:
-            fprintf(p_fout," == ");
-            break;
-        case O_NE:
-            fprintf(p_fout," != ");
-            break;
-        default:
-            fprintf(p_fout,"<- unknown selector operator");
-            return(false);
-    };
-
-    switch(p_sel->Type) {
-        case T_NCPUS:
-        case T_NGPUS:
-            fprintf(p_fout,"%d)",p_sel->IValue);
-            break;
-        case T_NAME:
-        case T_PROPS:
-        case T_STATE:
-            fprintf(p_fout,"%s)",p_sel->SValue);
-            break;
-        default:
-            fprintf(p_fout,"<- unknown selector value");
-            return(false);
-    };
-
-    return(true);
 }
 
 //==============================================================================

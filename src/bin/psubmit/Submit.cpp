@@ -224,9 +224,37 @@ bool CSubmit::SubmitJobFull(void)
         ES_TRACE_ERROR("job submission was canceled by an user");
         return(false);
     }
-    if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
-        ES_TRACE_ERROR("unable to submit job");
-        return(false);
+
+    CSmallString src = ABSConfig.GetSystemConfigItem("INF_RETRY_COUNT");
+    CSmallString srt = ABSConfig.GetSystemConfigItem("INF_RETRY_TIME");
+    int rc = 3;
+    if( src != NULL ){
+        rc = src.ToInt();
+    }
+    int rt = 600;
+    if( srt != NULL ){
+        rt = srt.ToInt();
+    }
+
+    if( Options.GetOptResubmitMode() ){
+        bool success = false;
+        for(int i = 0; i < rc; i++){
+            if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
+                success = true;
+                break;
+            }
+            vout << "ERROR: The job submission was not sucessfull! I will retry in " << rt << " seconds." << endl;
+            sleep(rt);
+        }
+        if( ! success ){
+            ES_TRACE_ERROR("unable to submit job");
+            return(false);
+        }
+    } else {
+        if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
+            ES_TRACE_ERROR("unable to submit job");
+            return(false);
+        }
     }
 
     // save job info

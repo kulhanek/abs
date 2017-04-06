@@ -387,6 +387,18 @@ bool CJobList::IsJobSelected(CJobPtr p_job,struct SSelection* p_sel)
                         return(false);
                 }
             }
+        case T_BS:{
+                CSmallString sstr = p_job->GetShortServerName();
+                switch(p_sel->Operator){
+                    case O_EQ:
+                        return( fnmatch(p_sel->SValue,sstr,0) == 0 );
+                    case O_NE:
+                        return( fnmatch(p_sel->SValue,sstr,0) != 0 );
+                    default:
+                        ES_ERROR("<- unknown selection operator");
+                        return(false);
+                }
+            }
         default:
             ES_ERROR("<- unsupported selector");
             return(false);
