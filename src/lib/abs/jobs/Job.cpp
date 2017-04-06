@@ -3002,8 +3002,8 @@ bool CJob::SaveJobKey(void)
 
 void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includecomment)
 {
-//    sout << "# ST       Job ID            Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
-//    sout << "# -- -------------------- --------------- --------------- ----- ----- ----- --------------------" << endl;
+//    sout << "# ST    Job ID                    Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
+//    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- --------------------" << endl;
 
     sout << "  ";
     switch( GetJobStatus() ){
@@ -3041,14 +3041,12 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     if( items.size() >= 1 ){
         id = items[0];
     }
-    if( id.GetLength() > 20 ){
-        id = id.GetSubStringFromTo(0,19);
-    }
     id << srv;
-    sout << " " << right << setw(20) << id;
+    sout << " " << right << setw(12) << id;
     } else {
-    sout << "                     ";
+    sout << "             ";
     }
+    sout << "             ";
 
     CSmallString title = GetItem("basic/jobinput","INF_JOB_TITLE");
     sout << " " << setw(15) << title;
