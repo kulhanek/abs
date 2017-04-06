@@ -3198,7 +3198,10 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
         case EJS_SUBMITTED:{
             CSmallTimeAndDate ptime(GetItem("batch/job","INF_SUBMIT_TIME").ToLInt());
             CSmallTime diff = current_time - ptime;
-            sout << diff.GetSTimeAndDay();
+            sout << setw(12) << right;
+            string tmp1(diff.GetSTimeAndDay());
+            trim(tmp1);
+            sout << tmp1;
             }
             break;
         case EJS_RUNNING:{
