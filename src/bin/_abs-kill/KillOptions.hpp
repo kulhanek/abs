@@ -37,7 +37,7 @@ class CKillOptions : public CSimpleOptions {
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Kill queued or running Infinity job(s)."
+        "Kill jobs in queued or running states."
     CSO_PROG_DESC_END
 
     CSO_PROG_ARGS_SHORT_DESC_BEGIN
@@ -94,31 +94,31 @@ class CKillOptions : public CSimpleOptions {
                 "assume yes")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Verbose,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'v',                           /* short option name */
-                    "verbose",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "increase output verbosity")   /* option description */
+                Verbose,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'v',                           /* short option name */
+                "verbose",                      /* long option name */
+                NULL,                           /* parametr name */
+                "increase output verbosity")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Version,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    '\0',                           /* short option name */
-                    "version",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "output version information and exit")   /* option description */
+                Version,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                '\0',                           /* short option name */
+                "version",                      /* long option name */
+                NULL,                           /* parametr name */
+                "output version information and exit")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Help,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'h',                           /* short option name */
-                    "help",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "display this help and exit")   /* option description */
+                Help,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'h',                           /* short option name */
+                "help",                      /* long option name */
+                NULL,                           /* parametr name */
+                "display this help and exit")   /* option description */
     CSO_MAP_END
 
 // final operation with options ------------------------------------------------

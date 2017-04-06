@@ -33,21 +33,22 @@ class CKillAllOptions : public CSimpleOptions {
 
  // program name and description -----------------------------------------------
     CSO_PROG_NAME_BEGIN
-        "pjobs"
+        "pkillall"
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Kill jobs in the batch system that are owned by an user.\n"
+        "Kill all jobs in the batch system that are owned by the user. The killed jobs can be limited by a search expression.\n"
         "\n"
         "<b>Search expressions:</b>\n"
-        "<i>Search tokens:</i>        st, id, user, title, queue, ncpus, ngpus, ngpus, path\n"
+        "<i>Search tokens:</i>        bs (short name of batch server), st (state), user, id (only numeric part), queue (only name), title, path,\n"
+        "                             ncpus, ngpus, nnodes\n"
         "<i>Comparison operators:</i> == (equal), != (not equal), <<, <<=, >, >=\n"
         "<i>Logical operators:</i>    ! (logical not), && (logical and), || (logical or)\n"
         "<i>Braces:</i>               ( )\n"
         "The search token must be always on the left side of comparison operator. On the right side can be either\n"
-        "integer number for <u>id</u>, <u>ncpus</u>, <u>ngpus</u>, and <u>nnodes</u> tokens\n"
-        "or string for <u>st</u>, <u>user</u>, <u>title</u>, and <u>path</u> tokens.\n"
-        "String comparison can employ only == or != comparison operators and can use a shell wildcard pattern."
+        "an integer number for <u>id</u>, <u>ncpus</u>, <u>ngpus</u>, and <u>nnodes</u> tokens\n"
+        "or a string for <u>bs</u>, <u>st</u>, <u>user</u>, , <u>title</u>, and <u>path</u> tokens.\n"
+        "String comparisons can employ shell wildcard patterns and == or != comparison operators only."
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN

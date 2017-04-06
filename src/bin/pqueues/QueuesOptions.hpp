@@ -37,7 +37,7 @@ class CQueuesOptions : public CSimpleOptions {
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Print info about batch system queues."
+        "Print info about queues of the batch systems."
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN

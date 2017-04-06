@@ -37,7 +37,7 @@ class CNodesOptions : public CSimpleOptions {
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Print info about batch system computational nodes.\n"
+        "Print info about computational nodes of the batch systems.\n"
         "\n"
         "<b>Search expressions:</b>\n"
         "<i>Search tokens:</i>        name, props, st (state code), bs (short name of batch server),\n"

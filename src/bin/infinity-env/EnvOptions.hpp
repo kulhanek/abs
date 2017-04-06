@@ -37,7 +37,7 @@ class CEnvOptions : public CSimpleOptions {
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Protects the execution of a job script in bash environment by an accident."
+        "Protects accidental execution of the job script in the bash environment."
     CSO_PROG_DESC_END
 
     CSO_PROG_ARGS_SHORT_DESC_BEGIN
@@ -45,7 +45,7 @@ class CEnvOptions : public CSimpleOptions {
     CSO_PROG_ARGS_SHORT_DESC_END
 
     CSO_PROG_ARGS_LONG_DESC_BEGIN
-        "argumets are arguments passed to bash command\n"
+        "argumets are arguments passed to the bash command\n"
     CSO_PROG_ARGS_LONG_DESC_END
 
     CSO_PROG_VERS_BEGIN

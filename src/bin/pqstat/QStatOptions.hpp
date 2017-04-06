@@ -37,7 +37,7 @@ class CQStatOptions : public CSimpleOptions {
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Print info about jobs submitted to the batch system.\n"
+        "Print info about jobs submitted to the batch systems.\n"
         "\n"
         "<b>Search expressions:</b>\n"
         "<i>Search tokens:</i>        bs (short name of batch server), st (state), user, id (only numeric part), queue (only name), title, path,\n"
