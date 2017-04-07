@@ -65,6 +65,7 @@ class CQStatOptions : public CSimpleOptions {
         CSO_OPT(bool,IncludePath)
         CSO_OPT(bool,IncludeComment)
         CSO_OPT(bool,KeepCompleted)
+        CSO_OPT(bool,Finished)
         CSO_OPT(bool,Technical)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)

@@ -384,7 +384,7 @@ bool CABSConfig::GetSystemConfigItem(CXMLElement* p_root, const CSmallString& it
 
     CSmallString error;
     error << "unable to find system config item '" << item_name << "'";
-    ES_ERROR(error);
+    ES_TRACE_ERROR(error);
     return(false);
 }
 
