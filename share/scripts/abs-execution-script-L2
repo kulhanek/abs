@@ -136,13 +136,9 @@ if [ $? -ne 0 ]; then exit 1; fi
 if [ "$INF_NGPUS" -gt 0 ]; then
     export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
     rm -f "$INF_GPUFILE"
-    cat $INF_MPIFILE | while read NODE MPISPEC; do
-        (
-            CVD="`pbs_tmrsh $NODE sh -c 'echo $CUDA_VISIBLE_DEVICES' 2>&1`"
-            echo "$NODE gpus=$CVD" >> "$INF_GPUFILE"
-            if [ $? -ne 0 ]; then exit 1; fi
-         ) < /dev/null
-    done 
+    pbsdsh -s -- sh -c 'echo $(hostname -f) gpus=$CUDA_VISIBLE_DEVICES' | sort -u > $TMPDIR/gpu_list.$$
+    grep    $HOSTNAME $TMPDIR/gpu_list.$$ > "$INF_GPUFILE"
+    grep -v $HOSTNAME $TMPDIR/gpu_list.$$ >> "$INF_GPUFILE"
     echo ""
     echo "# INF_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "# File: $INF_GPUFILE"
