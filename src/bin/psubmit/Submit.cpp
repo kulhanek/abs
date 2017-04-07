@@ -28,8 +28,14 @@
 #include <FileSystem.hpp>
 #include <BatchServers.hpp>
 #include <Host.hpp>
+#include <vector>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 using namespace std;
+using namespace boost;
 
 //------------------------------------------------------------------------------
 
@@ -149,7 +155,14 @@ bool CSubmit::SubmitJobFull(void)
     CSmallString qa,jn,rs;
     qa = Options.GetProgArg(0);
     jn = Options.GetProgArg(1);
-    if( Options.GetNumberOfProgArgs() >= 3 ) rs = Options.GetProgArg(2);
+
+    // generate list of resources
+    vector<string> resources;
+    for(int i=2; i < Options.GetNumberOfProgArgs(); i++){
+        string stm(Options.GetProgArg(i));
+        split(resources,stm,is_any_of(","),boost::token_compress_on);
+    }
+    rs = join(resources,",");
 
     if( Job->SetArguments(qa,jn,rs) == false ) return(false);
     if( Job->CheckRuntimeFiles(vout,Options.GetOptIgnoreRuntimeFiles()) == false ){
@@ -287,7 +300,14 @@ bool CSubmit::SubmitJobHeader(void)
     CSmallString qa,jn,rs;
     qa = Options.GetProgArg(0);
     jn = Options.GetProgArg(1);
-    if( Options.GetNumberOfProgArgs() >= 3 ) rs = Options.GetProgArg(2);
+
+    // generate list of resources
+    vector<string> resources;
+    for(int i=2; i < Options.GetNumberOfProgArgs(); i++){
+        string stm(Options.GetProgArg(i));
+        split(resources,stm,is_any_of(","),boost::token_compress_on);
+    }
+    rs = join(resources,",");
 
     if( Job->SetArguments(qa,jn,rs) == false ) return(false);
 
