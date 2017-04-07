@@ -116,7 +116,16 @@ class CQStatOptions : public CSimpleOptions {
                 'c',                           /* short option name */
                 "completed",                      /* long option name */
                 NULL,                           /* parametr name */
-                "keep completed jobs")   /* option description */
+                "keep finished jobs")   /* option description */
+//----------------------------------------------------------------------
+    CSO_MAP_OPT(bool,                           /* option type */
+                Finished,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'f',                           /* short option name */
+                "finished",                      /* long option name */
+                NULL,                           /* parametr name */
+                "same as -c, --completed")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                 IncludeComment,                        /* option name */

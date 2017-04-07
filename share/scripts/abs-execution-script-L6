@@ -108,11 +108,21 @@ echo "# ------------------------------------------------------------------------
 echo "# L6.5: Current node kernel states ..."
 echo "# ------------------------------------------------------------------------------"
 
-for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-    echo ""
-    echo ">>> $NODE_NAME ----------------------------------"
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "uname -a; dmesg -T | tail -1000"
-done
+# some machines do not have dmesg with -T option
+if dmesg -T 2> /dev/null 1> /dev/null; then
+    for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ----------------------------------"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "uname -a; dmesg -T | tail -1000"
+    done
+else
+    for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ----------------------------------"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "uname -a; dmesg | tail -1000"
+    done
+fi
+
 
 
 

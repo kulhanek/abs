@@ -117,12 +117,12 @@ bool CQStat::Run(void)
     vout << low;
 
     if( Options.IsOptQueueSet() ){
-        if( BatchServers.GetQueueJobs(Options.GetOptQueue(),Options.GetOptKeepCompleted()) == false ){
+        if( BatchServers.GetQueueJobs(Options.GetOptQueue(),Options.GetOptKeepCompleted() || Options.GetOptFinished()) == false ){
             ES_ERROR("unable to get queue jobs");
             return(false);
         }
     } else {
-        if( BatchServers.GetAllJobs(Options.GetOptKeepCompleted()) == false ){
+        if( BatchServers.GetAllJobs(Options.GetOptKeepCompleted() || Options.GetOptFinished()) == false ){
             ES_ERROR("unable to get all jobs");
             return(false);
         }

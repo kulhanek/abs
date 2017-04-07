@@ -115,7 +115,7 @@ class CJobsOptions : public CSimpleOptions {
                     'c',                           /* short option name */
                     "completed",                      /* long option name */
                     NULL,                           /* parametr name */
-                    "keep completed jobs")   /* option description */
+                    "keep finished jobs")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Finished,                        /* option name */
@@ -124,7 +124,7 @@ class CJobsOptions : public CSimpleOptions {
                     'f',                           /* short option name */
                     "finished",                      /* long option name */
                     NULL,                           /* parametr name */
-                    "show only completed jobs sorted by their termination time")   /* option description */
+                    "show only finished jobs sorted by their termination time")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
