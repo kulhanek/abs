@@ -139,7 +139,8 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     cat $INF_MPIFILE | while read NODE MPISPEC; do
         (
             # the is quite complicated but both pbsdsh and pbs_tmrsh write output directly to output and error files
-            # and not to the standard and error outputs 
+            # and not to the standard and error outputs
+            echo "# Scanning GPU node : $NODE"
             pbs_tmrsh $NODE sh -c "echo \$(hostname -f) gpus=\$CUDA_VISIBLE_DEVICES | ssh $HOSTNAME cat >> $INF_GPUFILE"
             if [ $? -ne 0 ]; then exit 1; fi
          ) < /dev/null
