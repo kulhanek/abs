@@ -136,10 +136,14 @@ if [ $? -ne 0 ]; then exit 1; fi
 if [ "$INF_NGPUS" -gt 0 ]; then
     export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
     rm -f "$INF_GPUFILE"
-    pbsdsh -s -- sh -c 'echo $(hostname -f) gpus=$CUDA_VISIBLE_DEVICES' | sort -u > "$TMPDIR/gpu_list.$$"
-    grep    $HOSTNAME $TMPDIR/gpu_list.$$ > "$INF_GPUFILE"
-    grep -v $HOSTNAME $TMPDIR/gpu_list.$$ >> "$INF_GPUFILE"
-    rm -f "$TMPDIR/gpu_list.$$"
+    cat $INF_MPIFILE | while read NODE MPISPEC; do
+        (
+            # the is quite complicated but both pbsdsh and pbs_tmrsh write output directly to output and error files
+            # and not to the standard and error outputs 
+            pbs_tmrsh $NODE sh -c "echo \$(hostname -f) gpus=\$CUDA_VISIBLE_DEVICES | ssh $HOSTNAME cat >> $INF_GPUFILE"
+            if [ $? -ne 0 ]; then exit 1; fi
+         ) < /dev/null
+    done 
     echo ""
     echo "# INF_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "# File: $INF_GPUFILE"
