@@ -266,6 +266,12 @@ bool CABSCompletion::AddJobScriptSuggestions(void)
 
 bool CABSCompletion::AddResourceSuggestions(void)
 {
+    // init all subsystems
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_TRACE_ERROR("unable to load ABSConfig config");
+        return(false);
+    }
+
     CSimpleIteratorC<CPluginObject> I(PluginDatabase.GetObjectList());
     CPluginObject* p_pobj;
     while( (p_pobj = I.Current()) ){
@@ -342,7 +348,7 @@ bool CABSCompletion::FilterSuggestions(void)
     // self suggestions
     if( Suggestions.size() == 1 ){
         if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
-        // FIXME - workaround for autocompetion in mc where "@" is wordk break?
+        // FIXME - workaround for autocompetion in mc where "@" is word break?
         CSmallString tmp = Suggestions.front() + "@";
         if( Words[CWord].FindSubString(tmp) == 0 ) Suggestions.clear();
     }
