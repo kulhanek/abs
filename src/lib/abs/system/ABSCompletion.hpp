@@ -67,6 +67,9 @@ private:
     // add job script suggestions
     bool AddJobScriptSuggestions(void);
 
+    // add resource suggestions
+    bool AddResourceSuggestions(void);
+
     // list collection files
     bool AddCollectionSuggestions(void);
 

@@ -35,6 +35,8 @@
 #include <FileSystem.hpp>
 #include <AliasList.hpp>
 #include <BatchServers.hpp>
+#include <PluginDatabase.hpp>
+#include <CategoryUUID.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -93,23 +95,27 @@ bool CABSCompletion::GetSuggestions(void)
 
     // get suggestions according to command ---------
     if( GetCommand() == "psubmit" ) {
-        // what part should be completed?
-        switch(CWord) {
-        case 1:
+        if( CWord == 1 ){
             AddQueueSuggestions();
             AddAliasSuggestions();
             FilterSuggestions();
             PrintSuggestions();
             return(true);
-        case 2:
+        }
+        if( CWord == 2 ){
             AddJobScriptSuggestions();
             FilterSuggestions();
             PrintSuggestions();
             return(true);
-        default:
-            // out of command requirements -> no suggestions
+        }
+        if( CWord >= 3 ){
+            AddResourceSuggestions();
+            FilterSuggestions();
+            PrintSuggestions();
             return(true);
         }
+        // nothing to do
+        return(true);
     // ----------------------------------------------
     } else if( GetCommand() == "pcollection" ) {
         // what part should be completed?
@@ -249,6 +255,26 @@ bool CABSCompletion::AddJobScriptSuggestions(void)
     }
     dir_enum.EndFindFile();
 
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSCompletion::AddResourceSuggestions(void)
+{
+    CSimpleIteratorC<CPluginObject> I(PluginDatabase.GetObjectList());
+    CPluginObject* p_pobj;
+    while( (p_pobj = I.Current()) ){
+        if( p_pobj->GetCategoryUUID() == RESOURCES_CAT ){
+            CSmallString res_name = p_pobj->GetObjectUUID().GetName();
+            Suggestions.push_back(res_name);
+            /*
+            CComObject* p_obj = p_pobj->CreateObject(NULL);
+            CResourceValue* p_res = dynamic_cast<CResourceValue*>(p_obj);
+            */
+        }
+        I++;
+    }
     return(true);
 }
 
