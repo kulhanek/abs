@@ -121,6 +121,11 @@ bool CSubmit::Run(void)
         return(false);
     }
 
+    if( (Options.GetOptNumOfCopies() > 0) && (Options.GetOptResubmitMode() == true) ){
+        ES_TRACE_ERROR("unsupported: numofcopies > 0 and resubmit == true");
+        return(false);
+    }
+
     // submit a single job
     if( Options.GetOptNumOfCopies() == 0 ){
         // single job
@@ -162,7 +167,7 @@ bool CSubmit::SubmitJobFull(void)
     for(int i=2; i < Options.GetNumberOfProgArgs(); i++){
         string stm(Options.GetProgArg(i));
         split(argres,stm,is_any_of(","),boost::token_compress_on);
-        allres.insert(allres.begin(),argres.begin(),argres.end());
+        allres.insert(allres.end(),argres.begin(),argres.end());
     }
     rs = join(allres,",");
 
@@ -240,21 +245,22 @@ bool CSubmit::SubmitJobFull(void)
         return(false);
     }
 
-    CSmallString src = ABSConfig.GetSystemConfigItem("INF_RETRY_COUNT");
-    CSmallString srt = ABSConfig.GetSystemConfigItem("INF_RETRY_TIME");
-    int rc = 3;
-    if( src != NULL ){
-        rc = src.ToInt();
-    }
-    int rt = 600;
-    if( srt != NULL ){
-        rt = srt.ToInt();
-    }
-
     if( Options.GetOptResubmitMode() ){
+
+        CSmallString src = ABSConfig.GetSystemConfigItem("INF_RETRY_COUNT");
+        CSmallString srt = ABSConfig.GetSystemConfigItem("INF_RETRY_TIME");
+        int rc = 3;
+        if( src != NULL ){
+            rc = src.ToInt();
+        }
+        int rt = 600;
+        if( srt != NULL ){
+            rt = srt.ToInt();
+        }
+
         bool success = false;
         for(int i = 0; i < rc; i++){
-            if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
+            if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == true ){
                 success = true;
                 break;
             }
@@ -309,7 +315,7 @@ bool CSubmit::SubmitJobHeader(void)
     for(int i=2; i < Options.GetNumberOfProgArgs(); i++){
         string stm(Options.GetProgArg(i));
         split(argres,stm,is_any_of(","),boost::token_compress_on);
-        allres.insert(allres.begin(),argres.begin(),argres.end());
+        allres.insert(allres.end(),argres.begin(),argres.end());
     }
     rs = join(allres,",");
 
