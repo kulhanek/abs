@@ -252,7 +252,7 @@ bool CResourceValue::TestNumberValue(std::ostream& sout,bool& rstatus)
 long long CResourceValue::GetNumber(void)
 {
     string          svalue(Value);
-    long long       size;
+    long long       size = 0;
     stringstream    str(svalue);
 
     str >> size;
