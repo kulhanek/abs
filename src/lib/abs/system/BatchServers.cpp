@@ -317,11 +317,20 @@ bool CBatchServers::DecodeQueueName(const CSmallString& input,CSmallString& srv_
         } else {
             queue = NULL;
         }
+    } else {
+        // list all queues - do not report any error
+        if( size() == 0 ) InitAll();
+        GetQueues();
     }
 
-    // not provided - use default server
+    // not provided - use default server or unique queue from all servers
     if( srv_name == NULL ){
-        srv_name = GetDefaultSrvName();
+        CQueuePtr q_ptr = QueueList.FindQueueUnique(queue);
+        if( q_ptr != NULL ){
+            srv_name = q_ptr->GetShortServerName();
+        } else {
+            srv_name = GetDefaultSrvName();
+        }
     }
 
     // check if server is supported by the site

@@ -64,6 +64,9 @@ public:
     //! find queue
     const CQueuePtr FindQueue(const CSmallString& name);
 
+    //! find queue - only if one exist
+    const CQueuePtr FindQueueUnique(const CSmallString& name);
+
     //! find queue
     const CQueuePtr FindQueue(const CSmallString& server,const CSmallString& name);
 

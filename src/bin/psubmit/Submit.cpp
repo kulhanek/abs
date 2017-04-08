@@ -266,6 +266,7 @@ bool CSubmit::SubmitJobFull(void)
             }
             vout << endl;
             vout << "ERROR: The job submission was not sucessfull! I will retry in " << rt << " seconds." << endl;
+            vout << endl;
             sleep(rt);
         }
         if( ! success ){

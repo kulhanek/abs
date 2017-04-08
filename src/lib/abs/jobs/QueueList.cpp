@@ -260,6 +260,26 @@ const CQueuePtr CQueueList::FindQueue(const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
+const CQueuePtr CQueueList::FindQueueUnique(const CSmallString& name)
+{
+    std::list<CQueuePtr>::iterator it = begin();
+    std::list<CQueuePtr>::iterator et = end();
+
+    CQueuePtr queue_ptr;
+
+    while( it != et ){
+        if( (*it)->GetName() == name ){
+            if( queue_ptr != NULL ) return(CQueuePtr());
+            queue_ptr = *it;
+        }
+        it++;
+    }
+
+    return(queue_ptr);
+}
+
+//------------------------------------------------------------------------------
+
 const CQueuePtr CQueueList::FindQueue(const CSmallString& server,const CSmallString& name)
 {
     std::list<CQueuePtr>::iterator it = begin();
