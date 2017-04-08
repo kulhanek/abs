@@ -40,6 +40,10 @@
 
 //------------------------------------------------------------------------------
 
+using namespace std;
+
+//------------------------------------------------------------------------------
+
 CABSCompletion Completion;
 
 //==============================================================================
@@ -267,7 +271,7 @@ bool CABSCompletion::AddResourceSuggestions(void)
     while( (p_pobj = I.Current()) ){
         if( p_pobj->GetCategoryUUID() == RESOURCES_CAT ){
             CSmallString res_name = p_pobj->GetObjectUUID().GetName();
-            Suggestions.push_back(res_name+"=");
+            Suggestions.push_back(res_name);
             /*
             CComObject* p_obj = p_pobj->CreateObject(NULL);
             CResourceValue* p_res = dynamic_cast<CResourceValue*>(p_obj);
@@ -323,11 +327,21 @@ bool CABSCompletion::FilterSuggestions(void)
     }
 
     // filter suggestions ---------------------------
-    for(unsigned int i=0; i < Suggestions.size(); i++) {
-        if( fnmatch(filter,Suggestions[i],0) != 0 ) {
+    std::list<CSmallString>::iterator it = Suggestions.begin();
+    std::list<CSmallString>::iterator ie = Suggestions.end();
+    while( it != ie ) {
+        CSmallString sg = *it;
+        if( fnmatch(filter,sg,0) != 0 ) {
             // does not match - remove suggestion
-            Suggestions[i] = NULL;
+            it = Suggestions.erase(it);
+        } else {
+            it++;
         }
+    }
+
+    // self suggestions
+    if( Suggestions.size() == 1 ){
+        if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
     }
 
     return(true);
@@ -337,21 +351,22 @@ bool CABSCompletion::FilterSuggestions(void)
 
 bool CABSCompletion::PrintSuggestions(void)
 {
-    // count number of suggestions
-    int scount = 0;
-    for(unsigned int i=0; i < Suggestions.size(); i++) {
-        if( Suggestions[i] != NULL) scount++;
-    }
-
-    // print suggestions
-    for(unsigned int i=0; i < Suggestions.size(); i++) {
-        if( scount == 1 ) {
-            if( Suggestions[i] != NULL) printf("%s \n",(const char*)Suggestions[i]);
+    std::list<CSmallString>::iterator it = Suggestions.begin();
+    std::list<CSmallString>::iterator ie = Suggestions.end();
+    while( it != ie ) {
+        if( (Suggestions.size() == 1) && (CWord < 3) ) {
+            // print only suggestion and move to the next argument
+            cout << *it << " " << endl;
+        } else if( (Suggestions.size() == 1) && (CWord < 3) ) {
+            // print only suggestion and move to the resource value
+            cout << *it << "=" << endl;
         } else {
             // print only suggestion
-            if( Suggestions[i] != NULL) printf("%s\n",(const char*)Suggestions[i]);
+            cout << *it << endl;
         }
+        it++;
     }
+
     return(true);
 }
 

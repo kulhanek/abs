@@ -24,7 +24,6 @@
 #include <ABSMainHeader.hpp>
 #include <Alias.hpp>
 #include <list>
-#include <vector>
 
 // -----------------------------------------------------------------------------
 
@@ -67,7 +66,7 @@ public:
     void PrintInfos(std::ostream& sout);
 
     /// get aliases suggestions
-    void GetAliasesSuggestions(std::vector<CSmallString>& suggestions);
+    void GetAliasesSuggestions(std::list<CSmallString>& suggestions);
 
 // section of private data ----------------------------------------------------
 private:

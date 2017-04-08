@@ -25,6 +25,7 @@
 #include <XMLDocument.hpp>
 #include <SmallString.hpp>
 #include <vector>
+#include <list>
 
 //------------------------------------------------------------------------------
 
@@ -47,7 +48,7 @@ private:
     unsigned int                CGenPosition;
     std::vector<CSmallString>   Words;              // command line splitted into words
     unsigned int                CWord;              // word to be completed
-    std::vector<CSmallString>   Suggestions;        // suggestions
+    std::list<CSmallString>     Suggestions;        // suggestions
 
     // add initial suggestions (for actions)
     bool AddSuggestions(const CSmallString& list);

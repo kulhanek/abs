@@ -294,7 +294,7 @@ void CAliasList::PrintInfos(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-void CAliasList::GetAliasesSuggestions(std::vector<CSmallString>& suggestions)
+void CAliasList::GetAliasesSuggestions(std::list<CSmallString>& suggestions)
 {
     std::list<CAliasPtr>::iterator it = begin();
     std::list<CAliasPtr>::iterator ie = end();
