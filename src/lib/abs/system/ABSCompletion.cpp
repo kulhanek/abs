@@ -342,8 +342,9 @@ bool CABSCompletion::FilterSuggestions(void)
     // self suggestions
     if( Suggestions.size() == 1 ){
         if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
-        string tmp = string(Words[CWord]) + "@";
-        if( Suggestions.front().FindSubString(tmp) == 0 ) Suggestions.clear();
+        // FIXME - workaround for autocompetion in mc where "@" is wordk break?
+        CSmallString tmp = Suggestions.front() + "@";
+        if( Words[CWord].FindSubString(tmp) == 0 ) Suggestions.clear();
     }
 
     return(true);
