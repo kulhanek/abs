@@ -277,7 +277,10 @@ bool CABSCompletion::AddResourceSuggestions(void)
     while( (p_pobj = I.Current()) ){
         if( p_pobj->GetCategoryUUID() == RESOURCES_CAT ){
             CSmallString res_name = p_pobj->GetObjectUUID().GetName();
-            Suggestions.push_back(res_name);
+            // FIXME
+            if( res_name != "pbsprogeneric" ){
+                Suggestions.push_back(res_name);
+            }
             /*
             CComObject* p_obj = p_pobj->CreateObject(NULL);
             CResourceValue* p_res = dynamic_cast<CResourceValue*>(p_obj);
@@ -349,6 +352,7 @@ bool CABSCompletion::FilterSuggestions(void)
     if( Suggestions.size() == 1 ){
         if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
         // FIXME - workaround for autocompetion in mc where "@" is word break?
+        // still does not work :-(
         CSmallString tmp = Suggestions.front() + "@";
         if( Words[CWord].FindSubString(tmp) == 0 ) Suggestions.clear();
     }
