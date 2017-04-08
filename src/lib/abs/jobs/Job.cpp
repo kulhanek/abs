@@ -1033,6 +1033,7 @@ bool CJob::WriteStart(void)
                 p_sele->SetAttribute("name",node);
                 p_sele->SetAttribute("id",id);
             }
+            it++;
         }
     }
 
