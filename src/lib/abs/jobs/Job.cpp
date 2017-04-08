@@ -1014,23 +1014,24 @@ bool CJob::WriteStart(void)
     }
 
     while( snodefile && getline(snodefile,node) ){
-        CXMLElement* p_sele = p_ele->CreateChildElement("gpu");
-        string node,gpus,gpuids;
+        string name,gpus;
         try{
             stringstream str(node);
-            str >> node >> gpus;
-            gpuids = gpus.substr(gpus.find("=")+1,string::npos);
+            string tmp;
+            str >> name >> tmp;
+            gpus = tmp.substr(gpus.find("=")+1,string::npos);
         } catch(...){
             // nothing to be here
         }
-        vector<string> ids;
-        split(ids,gpuids,is_any_of(","),boost::token_compress_on);
-        vector<string>::iterator it = ids.begin();
-        vector<string>::iterator ie = ids.end();
+        vector<string> gpuids;
+        split(gpuids,gpus,is_any_of(","),boost::token_compress_on);
+        vector<string>::iterator it = gpuids.begin();
+        vector<string>::iterator ie = gpuids.end();
         while( it != ie ){
             string id = *it;
             if( ! id.empty() ){
-                p_sele->SetAttribute("name",node);
+                CXMLElement* p_sele = p_ele->CreateChildElement("gpu");
+                p_sele->SetAttribute("name",name);
                 p_sele->SetAttribute("id",id);
             }
             it++;
@@ -2474,8 +2475,8 @@ bool CJob::PrintExec(std::ostream& sout)
 
 struct SNodeGroup {
     CSmallString    name;
-    int             from;       // CPU ID
-    int             to;         // CPU ID
+    int             from;       // CPU/GPU ID
+    int             to;         // CPU/GPU ID
     CXMLElement*    ijob;
 };
 
@@ -2502,13 +2503,12 @@ bool CJob::ListNodes(std::ostream& sout)
     CSmallString        node;
 
     // generate groups
-    int ncpus;
+    int ncpus = 0;
     if( p_iele == NULL ){
         while( (p_sele = I.GetNextChildElement("node")) != NULL ){
             p_sele->GetAttribute("name",node);
             if( (group_ptr == NULL) || (group_ptr->name != node) ){
-                SNodeGroupPtr group_ptr = SNodeGroupPtr(new(SNodeGroup));
-                ncpus = 0;
+                group_ptr = SNodeGroupPtr(new(SNodeGroup));
                 group_ptr->name = node;
                 group_ptr->from = ncpus;
                 group_ptr->to = ncpus;
@@ -2531,7 +2531,7 @@ bool CJob::ListNodes(std::ostream& sout)
                 }
                 p_sele->GetAttribute("name",node);
                 if( (group_ptr == NULL) || (group_ptr->name != node) || (group_ptr->ijob != p_jele) ){
-                    SNodeGroupPtr group_ptr = SNodeGroupPtr(new(SNodeGroup));
+                    group_ptr = SNodeGroupPtr(new(SNodeGroup));
                     if( group_ptr->name != node) ncpus = 0;
                     group_ptr->name = node;
                     group_ptr->from = ncpus;
@@ -2600,18 +2600,51 @@ bool CJob::ListGPUNodes(std::ostream& sout)
     CXMLIterator    I(p_rele);
     CXMLElement*    p_sele;
 
-    sout << setfill('0');
+    list<SNodeGroupPtr> groups;
+    SNodeGroupPtr       group_ptr;
+    CSmallString        node;
 
-    int index = 1;
+    int ngpus = 0;
     while( (p_sele = I.GetNextChildElement("gpu")) != NULL ){
-        CSmallString nodename,gpus;
-        p_sele->GetAttribute("name",nodename);
-        p_sele->GetAttribute("gpus",gpus);
-        sout << "GPU " << setw(3) << index << "          : " << setw(25) << nodename << " " << gpus << endl;
-        index++;
+        p_sele->GetAttribute("name",node);
+        if( (group_ptr == NULL) || (group_ptr->name != node) ){
+            group_ptr = SNodeGroupPtr(new(SNodeGroup));
+            group_ptr->name = node;
+            group_ptr->from = ngpus;
+            group_ptr->to = ngpus;
+            group_ptr->ijob = NULL;
+            groups.push_back(group_ptr);
+        } else {
+            group_ptr->to = ngpus;
+        }
+        ngpus++;
     }
 
-    sout << setfill(' ');
+    list<SNodeGroupPtr>::iterator git = groups.begin();
+    list<SNodeGroupPtr>::iterator gie = groups.end();
+
+    while( git != gie ){
+        group_ptr = *git;
+
+        if( group_ptr->ijob != NULL ){
+            ES_ERROR("ijobs and gpus are not supported");
+            return(false);
+        }
+
+        sout << "GPU " << setfill('0') << setw(4) << group_ptr->from;
+        if( group_ptr->from == group_ptr->to ) {
+            sout << setfill(' ') << "         : ";
+        } else {
+            sout << "-" << setw(4) << group_ptr->to << setfill(' ') << "    : ";
+        }
+        stringstream str;
+        str << group_ptr->name;
+        if( (group_ptr->to - group_ptr->from) > 0 ){
+            str << " (" << group_ptr->to - group_ptr->from + 1 << ")";
+        }
+        sout << setw(25) << left << str.str() << right << endl;
+        git++;
+    }
 
     return(true);
 }
