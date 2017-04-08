@@ -1014,10 +1014,26 @@ bool CJob::WriteStart(void)
     }
 
     while( snodefile && getline(snodefile,node) ){
-        if( node.find("-gpu") == string::npos ) continue;
-        // only gpu nodes
         CXMLElement* p_sele = p_ele->CreateChildElement("gpu");
-        p_sele->SetAttribute("name",node);
+        string node,gpus,gpuids;
+        try{
+            stringstream str(node);
+            str >> node >> gpus;
+            gpuids = gpus.substr(gpus.find("=")+1,string::npos);
+        } catch(...){
+            // nothing to be here
+        }
+        vector<string> ids;
+        split(ids,gpuids,is_any_of(","),boost::token_compress_on);
+        vector<string>::iterator it = ids.begin();
+        vector<string>::iterator ie = ids.end();
+        while( it != ie ){
+            string id = *it;
+            if( ! id.empty() ){
+                p_sele->SetAttribute("name",node);
+                p_sele->SetAttribute("id",id);
+            }
+        }
     }
 
     snodefile.close();
@@ -2453,22 +2469,16 @@ bool CJob::PrintExec(std::ostream& sout)
     return(true);
 }
 
-//------------------------------------------------------------------------------
-
-struct SNode {
-    std::string     name;
-    int             id;
-    CXMLElement*    ijob;
-};
-
 //----------------------------------------------
 
 struct SNodeGroup {
-    std::string     name;
-    int             from;
-    int             to;
+    CSmallString    name;
+    int             from;       // CPU ID
+    int             to;         // CPU ID
     CXMLElement*    ijob;
 };
+
+typedef boost::shared_ptr<SNodeGroup>  SNodeGroupPtr;
 
 //------------------------------------------------------------------------------
 
@@ -2480,29 +2490,35 @@ bool CJob::ListNodes(std::ostream& sout)
         return(false);
     }
 
-    CXMLElement* p_iele = GetElementByPath("specific/ijobs",false);
+    CXMLElement*    p_iele = GetElementByPath("specific/ijobs",false);
     CXMLIterator    I(p_rele);
     CXMLElement*    p_sele;
-    int             id = 1;
+    CXMLIterator    J(p_iele);
+    CXMLElement*    p_jele;
 
-    list<SNode> nodes;
+    list<SNodeGroupPtr> groups;
+    SNodeGroupPtr       group_ptr;
+    CSmallString        node;
 
-    // generate list of nodes
+    // generate groups
+    int ncpus;
     if( p_iele == NULL ){
         while( (p_sele = I.GetNextChildElement("node")) != NULL ){
-            SNode node;
-            string name;
-            p_sele->GetAttribute("name",name);
-            node.name = name;
-            node.id = id;
-            node.ijob = NULL;
-            nodes.push_back(node);
-            id++;
+            p_sele->GetAttribute("name",node);
+            if( (group_ptr == NULL) || (group_ptr->name != node) ){
+                SNodeGroupPtr group_ptr = SNodeGroupPtr(new(SNodeGroup));
+                ncpus = 0;
+                group_ptr->name = node;
+                group_ptr->from = ncpus;
+                group_ptr->to = ncpus;
+                group_ptr->ijob = NULL;
+                groups.push_back(group_ptr);
+            } else {
+                group_ptr->to = ncpus;
+            }
+            ncpus++;
         }
     } else {
-        CXMLIterator    J(p_iele);
-        CXMLElement*    p_jele;
-
         while( (p_jele = J.GetNextChildElement("ijob")) != NULL ){
             int ncpus = 0;
             p_jele->GetAttribute("ncpus",ncpus);
@@ -2512,82 +2528,36 @@ bool CJob::ListNodes(std::ostream& sout)
                     ES_ERROR("inconsistency between nodes and ijobs");
                     return(false);
                 }
-                SNode node;
-                string name;
-                p_sele->GetAttribute("name",name);
-                node.name = name;
-                node.id = id;
-                node.ijob = p_jele;
-                nodes.push_back(node);
-                id++;
+                p_sele->GetAttribute("name",node);
+                if( (group_ptr == NULL) || (group_ptr->name != node) || (group_ptr->ijob != p_jele) ){
+                    SNodeGroupPtr group_ptr = SNodeGroupPtr(new(SNodeGroup));
+                    if( group_ptr->name != node) ncpus = 0;
+                    group_ptr->name = node;
+                    group_ptr->from = ncpus;
+                    group_ptr->to = ncpus;
+                    group_ptr->ijob = p_jele;
+                    groups.push_back(group_ptr);
+                } else {
+                    group_ptr->to = ncpus;
+                }
+                ncpus++;
             }
         }
     }
 
-    // generate node groups
-    list<SNode>::iterator it = nodes.begin();
-    list<SNode>::iterator ie = nodes.end();
-
-    string          prev_node;
-    CXMLElement*    prev_ijob = NULL;
-    int             from = 0;
-    int             to = 0;
-
-    list<SNodeGroup> groups;
-
-    while( it != ie ){
-        SNode node = *it;
-        if( it == nodes.begin() ){
-            prev_node = node.name;
-            prev_ijob = node.ijob;
-            from = node.id;
-        }
-        it++;
-        if( (node.name != prev_node) || ((node.ijob != prev_ijob)) || (it == nodes.end()) ){
-            if( it == nodes.end() ){
-                to = node.id;
-            }
-            SNodeGroup group;
-            group.name = prev_node;
-            group.from = from;
-            group.to = to;
-            group.ijob = prev_ijob;
-            groups.push_back(group);
-
-            prev_node = node.name;
-            prev_ijob = node.ijob;
-            from = node.id;
-        }
-        to = node.id;
-    }
-
-    list<SNodeGroup>::iterator git = groups.begin();
-    list<SNodeGroup>::iterator gie = groups.end();
-
-    // group ijobs
-    prev_ijob = NULL;
-    while( git != gie ){
-        if( (*git).ijob == prev_ijob ){
-            (*git).ijob = NULL;
-        } else {
-            prev_ijob = (*git).ijob;
-        }
-        git++;
-    }
-
-    // print
-    git = groups.begin();
+    list<SNodeGroupPtr>::iterator git = groups.begin();
+    list<SNodeGroupPtr>::iterator gie = groups.end();
 
     while( git != gie ){
-        SNodeGroup group = *git;
+        group_ptr = *git;
         string ipath;
         string workdir;
         string mainnode;
 
-        if( group.ijob != NULL ){
-            group.ijob->GetAttribute("path",ipath);
-            group.ijob->GetAttribute("workdir",workdir);
-            group.ijob->GetAttribute("mainnode",mainnode);
+        if( group_ptr->ijob != NULL ){
+            group_ptr->ijob->GetAttribute("path",ipath);
+            group_ptr->ijob->GetAttribute("workdir",workdir);
+            group_ptr->ijob->GetAttribute("mainnode",mainnode);
         }
         if( ! ipath.empty() ){
             sout << left << "<blue>>>> ";
@@ -2598,16 +2568,16 @@ bool CJob::ListNodes(std::ostream& sout)
             sout << "</blue>" << right << endl;
         }
 
-        sout << "CPU " << setfill('0') << setw(4) << group.from;
-        if( group.from == group.to ) {
+        sout << "CPU " << setfill('0') << setw(4) << group_ptr->from;
+        if( group_ptr->from == group_ptr->to ) {
             sout << setfill(' ') << "         : ";
         } else {
-            sout << "-" << setw(4) << group.to << setfill(' ') << "    : ";
+            sout << "-" << setw(4) << group_ptr->to << setfill(' ') << "    : ";
         }
         stringstream str;
-        str << group.name;
-        if( (group.to - group.from) > 0 ){
-            str << " (" << group.to - group.from + 1 << ")";
+        str << group_ptr->name;
+        if( (group_ptr->to - group_ptr->from) > 0 ){
+            str << " (" << group_ptr->to - group_ptr->from + 1 << ")";
         }
         sout << setw(25) << left << str.str() << right << endl;
         git++;
@@ -2633,9 +2603,10 @@ bool CJob::ListGPUNodes(std::ostream& sout)
 
     int index = 1;
     while( (p_sele = I.GetNextChildElement("gpu")) != NULL ){
-        CSmallString nodename;
+        CSmallString nodename,gpus;
         p_sele->GetAttribute("name",nodename);
-        sout << "GPU " << setw(3) << index << "          : " << nodename << endl;
+        p_sele->GetAttribute("gpus",gpus);
+        sout << "GPU " << setw(3) << index << "          : " << setw(25) << nodename << " " << gpus << endl;
         index++;
     }
 

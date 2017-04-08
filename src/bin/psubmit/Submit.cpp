@@ -157,12 +157,14 @@ bool CSubmit::SubmitJobFull(void)
     jn = Options.GetProgArg(1);
 
     // generate list of resources
-    vector<string> resources;
+    vector<string> argres;
+    vector<string> allres;
     for(int i=2; i < Options.GetNumberOfProgArgs(); i++){
         string stm(Options.GetProgArg(i));
-        split(resources,stm,is_any_of(","),boost::token_compress_on);
+        split(argres,stm,is_any_of(","),boost::token_compress_on);
+        allres.insert(allres.begin(),argres.begin(),argres.end());
     }
-    rs = join(resources,",");
+    rs = join(allres,",");
 
     if( Job->SetArguments(qa,jn,rs) == false ) return(false);
     if( Job->CheckRuntimeFiles(vout,Options.GetOptIgnoreRuntimeFiles()) == false ){
@@ -302,12 +304,14 @@ bool CSubmit::SubmitJobHeader(void)
     jn = Options.GetProgArg(1);
 
     // generate list of resources
-    vector<string> resources;
+    vector<string> argres;
+    vector<string> allres;
     for(int i=2; i < Options.GetNumberOfProgArgs(); i++){
         string stm(Options.GetProgArg(i));
-        split(resources,stm,is_any_of(","),boost::token_compress_on);
+        split(argres,stm,is_any_of(","),boost::token_compress_on);
+        allres.insert(allres.begin(),argres.begin(),argres.end());
     }
-    rs = join(resources,",");
+    rs = join(allres,",");
 
     if( Job->SetArguments(qa,jn,rs) == false ) return(false);
 
