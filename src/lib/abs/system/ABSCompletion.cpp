@@ -357,7 +357,7 @@ bool CABSCompletion::PrintSuggestions(void)
         if( (Suggestions.size() == 1) && (CWord < 3) ) {
             // print only suggestion and move to the next argument
             cout << *it << " " << endl;
-        } else if( (Suggestions.size() == 1) && (CWord < 3) ) {
+        } else if( (Suggestions.size() == 1) && (CWord >= 3) ) {
             // print only suggestion and move to the resource value
             cout << *it << "=" << endl;
         } else {
