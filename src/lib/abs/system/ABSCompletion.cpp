@@ -342,6 +342,7 @@ bool CABSCompletion::FilterSuggestions(void)
     // self suggestions
     if( Suggestions.size() == 1 ){
         if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
+        if( Suggestions.front() == (Words[CWord] + "@") ) Suggestions.clear();
     }
 
     return(true);
