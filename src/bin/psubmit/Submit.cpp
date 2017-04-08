@@ -260,7 +260,7 @@ bool CSubmit::SubmitJobFull(void)
 
         bool success = false;
         for(int i = 0; i < rc; i++){
-            if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == true ){
+            if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
                 success = true;
                 break;
             }
