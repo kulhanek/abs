@@ -122,7 +122,7 @@ bool CSubmit::Run(void)
     }
 
     if( (Options.GetOptNumOfCopies() > 0) && (Options.GetOptResubmitMode() == true) ){
-        ES_TRACE_ERROR("unsupported: numofcopies > 0 and resubmit == true");
+        ES_TRACE_ERROR("unsupported: numofcopies > 0 and repeat == true");
         return(false);
     }
 
@@ -259,11 +259,12 @@ bool CSubmit::SubmitJobFull(void)
         }
 
         bool success = false;
-        for(int i = 0; i < rc; i++){
-            if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
+        for(int i = 0; i <= rc; i++){
+            if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == true ){
                 success = true;
                 break;
             }
+            vout << endl;
             vout << "ERROR: The job submission was not sucessfull! I will retry in " << rt << " seconds." << endl;
             sleep(rt);
         }

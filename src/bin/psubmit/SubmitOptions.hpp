@@ -126,7 +126,7 @@ class CSubmitOptions : public CSimpleOptions {
                 'r',                           /* short option name */
                 "repeat",                      /* long option name */
                 NULL,                           /* parametr name */
-                "repeat job submission in the case of the batch server error (only applicable to a single shot jobs)")   /* option description */
+                "repeat job submission in the case of the batch server error")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                 Verbose,                        /* option name */
