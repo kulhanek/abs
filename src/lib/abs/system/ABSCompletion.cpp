@@ -342,7 +342,8 @@ bool CABSCompletion::FilterSuggestions(void)
     // self suggestions
     if( Suggestions.size() == 1 ){
         if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
-        if( Suggestions.front() == (Words[CWord] + "@") ) Suggestions.clear();
+        string tmp = string(Words[CWord]) + "@";
+        if( Suggestions.front().FindSubString(tmp) == 0 ) Suggestions.clear();
     }
 
     return(true);
