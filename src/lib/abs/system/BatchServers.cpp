@@ -250,6 +250,7 @@ const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_nam
     while( it != ie ){
         CBatchServerPtr srv_ptr = *it;
         if( (srv_ptr->GetServerName() == srv_name) || (srv_ptr->GetShortName() == srv_name) ){
+            cout << "found " << srv_name << endl;
             return(srv_ptr);
         }
         it++;
