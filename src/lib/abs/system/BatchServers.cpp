@@ -81,7 +81,7 @@ bool CBatchServers::InitAll(void)
         // create plugin object
         CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(plugin));
         if( p_obj == NULL ){
-            ES_ERROR("unable to create checker object");
+            ES_ERROR("unable to create batch server object");
             return(false);
         }
 
@@ -95,7 +95,7 @@ bool CBatchServers::InitAll(void)
         if( plg_obj->Init(name,short_name) == false ){
             CSmallString error;
             error << "unable to init server '" << name << "' (" << short_name << ")";
-            ES_ERROR(error);
+            ES_TRACE_ERROR(error);
             return(false);
         }
 
@@ -275,6 +275,9 @@ size_t CBatchServers::GetNumberOfServers(void) const
 
 void CBatchServers::PrintServerOverview(std::ostream& vout)
 {
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
     vout << "# Site name     : " << AMSGlobalConfig.GetActiveSiteName() << endl;
     CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
     if( p_ele ){
@@ -287,11 +290,20 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
         CSmallString name, short_name;
         p_ele->GetAttribute("name",name);
         p_ele->GetAttribute("short",short_name);
-        if( default_srv == name ){
-            vout << "# -> * " << setw(1) << short_name << " " << name << endl;
-        } else {
-            vout << "# ->   " << setw(1) << short_name << " " << name << endl;
+        if( FindBatchServer(name,false) == NULL ){
+            // indicate that the server is not available
+            vout << "<red>";
         }
+        if( default_srv == name ){
+            vout << "# -> * " << setw(1) << short_name << " " << name;
+        } else {
+            vout << "# ->   " << setw(1) << short_name << " " << name;
+        }
+        if( FindBatchServer(name,false) == NULL ){
+            // indicate that the server is not available
+            vout << " - ERROR - unable to connect to the server</red>";
+        }
+        vout << endl;
         p_ele = p_ele->GetNextSiblingElement();
     }
 }

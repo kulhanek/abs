@@ -170,9 +170,8 @@ void CQueueList::PrintInfos(std::ostream& sout)
     sout << endl;
     sout << "# Legend:" << endl;
     sout << "# Pri - Priority,  T - Total, Q - Queued, R - Running jobs" << endl;
-    sout << "# O - Other (completed, exiting, hold) jobs" << endl;
-    sout << "# Max - Max running jobs, UMax - Max user running jobs" << endl;
-    sout << "# CMax - Max CPUs per job, MaxWall - Max wall time per job" << endl;
+    sout << "# O - Other (finished, exiting, hold) jobs" << endl;
+    sout << "# MaxWall - Max wall time per job" << endl;
     sout << low;
 }
 

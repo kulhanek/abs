@@ -28,7 +28,6 @@
 
 extern const char* LibConfigVersion_ABS;
 extern const char* LibBuildVersion_ABS;
-extern const char* LibBuildVersion_ABS_Web;
 
 //------------------------------------------------------------------------------
 

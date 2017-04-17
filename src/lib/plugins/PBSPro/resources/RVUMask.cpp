@@ -60,6 +60,51 @@ CRVUMask::CRVUMask(void)
 
 //------------------------------------------------------------------------------
 
+void CRVUMask::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+{
+    // FIXME
+//    if( Value == "current" ){
+//        Value = User.GetUMask();
+//    }  else if ( Value == "jobdir" ) {
+//        Value = User.GetUMask(); // fallback value
+//        struct stat info;
+//        CSmallString pwd;
+//        if( CFileSystem::GetCurrentDir(pwd) == true ){
+//            if( stat(pwd, &info) == 0 ){
+//                mode_t mode = info.st_mode;
+//                int u = (mode & 0700) >> 6;
+//                int g = (mode & 0070) >> 3;
+//                int o = mode & 0007;
+//                // invert mode
+//                u = (~u) & 0x7;
+//                g = (~g) & 0x7;
+//                o = (~o) & 0x7;
+//                stringstream str;
+//                str << u << g << o;
+//                Value = str.str().c_str();
+//            }
+//        }
+//    }
+
+    if( Value.GetLength() != 3 ){
+        if( rstatus == true ) sout << endl;
+        sout << "<b><red> ERROR: The user file creation mask (umask) must be composed from three numbers!</red></b>" << endl;
+        rstatus = false;
+        return;
+    }
+    for(int i=0; i < 3; i++){
+        if( (Value[i] < '0') || (Value[i] > '7') ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal number '" << Value[i] << "' at possition " << i+ 1 << " in the user file creation mask (umask)!" << endl;
+            sout <<         "        Allowed values: 0-7</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
 void CRVUMask::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
     name = Name;

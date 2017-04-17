@@ -138,7 +138,7 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
     ShortName = short_name;
 
     if( ConnectToServer() == false ){
-        ES_ERROR("unable to connect to server");
+        ES_TRACE_ERROR("unable to connect to server");
         return(false);
     }
 
@@ -228,8 +228,8 @@ bool CPBSProServer::ConnectToServer(void)
     ServerID = pbspro_connect(ServerName);
     if( ServerID <= 0 ){    
         CSmallString error;
-        error << "unable to connect to server";
-        ES_ERROR(error);
+        error << "unable to connect to server '" << ServerName << "'";
+        ES_TRACE_ERROR(error);
         return(false);
     }
     return(true);

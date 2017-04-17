@@ -22,11 +22,14 @@
 
 #include <ABSMainHeader.hpp>
 
+#define ABS_CONFIG_VERSION  "3.x"
+#define ABS_VERSION         "3.GITREVS.GITHASH"
+#define ABS_BUILDTIME       "DATE"
+
 //------------------------------------------------------------------------------
 
-const char* LibConfigVersion_ABS    = "3.x";
-const char* LibBuildVersion_ABS     = "3.x.SVNVERSION (DATE) [ABS]";
-const char* LibBuildVersion_ABS_Web = "3.x.SVNVERSION (DATE)";
+const char* LibConfigVersion_ABS    = ABS_CONFIG_VERSION;
+const char* LibBuildVersion_ABS     = ABS_VERSION "(" ABS_BUILDTIME ") [ABS]";
 
 //==============================================================================
 //------------------------------------------------------------------------------

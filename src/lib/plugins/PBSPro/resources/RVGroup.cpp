@@ -60,6 +60,31 @@ CRVGroup::CRVGroup(void)
 
 //------------------------------------------------------------------------------
 
+void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+{
+// FIXME
+//    if( Value == "current" ){
+//        Value = User.GetEGroup();
+//    } else if( Value == "jobdir" ){
+//        Value = User.GetEGroup(); // fallback value
+//        struct stat info;
+//        CSmallString pwd;
+//        if( CFileSystem::GetCurrentDir(pwd) == true ){
+//            if( stat(pwd, &info) == 0 ){
+//                struct group* p_gr = getgrgid(info.st_gid);
+//                if( p_gr ){
+//                    Value = p_gr->gr_name;
+//                }
+//            }
+//        }
+//    }
+
+//    // do not check the group here as surrogate option need to obe processed first
+//    return(true);
+}
+
+//------------------------------------------------------------------------------
+
 void CRVGroup::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
     name = "group_list";
