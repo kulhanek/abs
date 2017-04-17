@@ -71,6 +71,8 @@ bool CBatchServers::InitAll(void)
     CSmallString plugin;
     p_ele->GetAttribute("plugin",plugin);
 
+    bool result = true;
+
     CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
     while( p_sele != NULL ){
 
@@ -78,32 +80,36 @@ bool CBatchServers::InitAll(void)
         p_sele->GetAttribute("name",name);
         p_sele->GetAttribute("short",short_name);
 
+        p_sele = p_sele->GetNextSiblingElement();
+
         // create plugin object
         CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(plugin));
         if( p_obj == NULL ){
             ES_ERROR("unable to create batch server object");
-            return(false);
+            result = false;
+            continue;
         }
 
         CBatchServerPtr plg_obj(dynamic_cast<CBatchServer*>(p_obj));
         if( plg_obj == NULL ){
             delete p_obj;
             ES_ERROR("object is not of correct type");
-            return(false);
+            result = false;
+            continue;
         }
 
         if( plg_obj->Init(name,short_name) == false ){
             CSmallString error;
             error << "unable to init server '" << name << "' (" << short_name << ")";
             ES_TRACE_ERROR(error);
-            return(false);
+            result = false;
+            continue;
         }
 
         push_back(plg_obj);
-        p_sele = p_sele->GetNextSiblingElement();
     }
 
-    return(true);
+    return(result);
 }
 
 //------------------------------------------------------------------------------
@@ -179,12 +185,13 @@ bool CBatchServers::Init(const CSmallString& srv)
             }
 
             push_back(plg_obj);
+            return(true);
         }
 
         p_sele = p_sele->GetNextSiblingElement();
     }
 
-    return(true);
+    return(false);
 }
 
 //------------------------------------------------------------------------------
@@ -250,7 +257,6 @@ const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_nam
     while( it != ie ){
         CBatchServerPtr srv_ptr = *it;
         if( (srv_ptr->GetServerName() == srv_name) || (srv_ptr->GetShortName() == srv_name) ){
-            cout << "found " << srv_name << endl;
             return(srv_ptr);
         }
         it++;
