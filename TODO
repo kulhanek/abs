@@ -2,35 +2,7 @@ completition - final fixes
 ams-personal
 umask - test for empty value
 
-correct error reporting when any server is down
-[kulhanek@zuphux ~]$ pjobs 
-#
-# Site name     : metavo
-# Batch servers ...
-# -> * M arien-pro.ics.muni.cz
-# ->   C wagap-pro.cerit-sc.cz
-#
 
-# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change/Duration     
-# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------------
-
-# Queued:       0 Requested NCPUs:    0 NGPUs:    0
-# Running:      0 Allocated NCPUs:    0 NGPUs:    0
-# Finished:     0 Others:             0
-
-
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# Error and warning stack ...
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-> E  2017-04-09 07:39:01 in ConnectToServer
-  /abs/3.0/src/lib/plugins/PBSPro/PBSProServer.cpp:232
-  unable to connect to server
-> E  2017-04-09 07:39:01 in Init
-  /abs/3.0/src/lib/plugins/PBSPro/PBSProServer.cpp:141
-  unable to connect to server
-> E  2017-04-09 07:39:01 in InitAll
-  /abs/3.0/src/lib/abs/system/BatchServers.cpp:98
-  unable to init server 'wagap-pro.cerit-sc.cz' (C)
 
 
 
