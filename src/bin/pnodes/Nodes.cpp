@@ -210,6 +210,9 @@ bool CNodes::Run(void)
 
 void CNodes::Finalize(void)
 {
+    // were all server accessbible?
+    BatchServers.PrintWarningIfUnavailable(vout);
+
     CSmallTimeAndDate dt;
     dt.GetActualTimeAndDate();
 

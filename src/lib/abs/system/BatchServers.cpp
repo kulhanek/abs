@@ -318,6 +318,28 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
 
 //------------------------------------------------------------------------------
 
+void CBatchServers::PrintWarningIfUnavailable(std::ostream& vout)
+{
+// determine number of server configurations
+    size_t config_srv = 0;
+    CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
+    if( p_ele ){
+        p_ele = p_ele->GetFirstChildElement("server");
+    }
+
+    while( p_ele != NULL ){
+        config_srv++;
+        p_ele = p_ele->GetNextSiblingElement();
+    }
+// any discrepancy
+    if( size() != config_srv ) {
+        vout << endl;
+        vout << "<b><blue> WARNING: Incomplete results because some servers are not accessible!</blue></b>" << endl;
+    }
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServers::DecodeQueueName(const CSmallString& input,CSmallString& srv_name,CSmallString& srv_short,CSmallString& queue)
 {
     // queue            default server name

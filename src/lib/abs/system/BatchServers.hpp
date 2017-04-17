@@ -61,6 +61,9 @@ public:
     /// print batch systems
     void PrintServerOverview(std::ostream& vout);
 
+    /// print warning if any server is inaccessible
+    void PrintWarningIfUnavailable(std::ostream& vout);
+
     /// return name of the generic resource
     const CSmallString GetGenericResourceName(void);
 

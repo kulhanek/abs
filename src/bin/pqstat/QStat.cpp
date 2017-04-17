@@ -158,6 +158,9 @@ bool CQStat::Run(void)
 
 void CQStat::Finalize(void)
 {
+    // were all server accessbible?
+    BatchServers.PrintWarningIfUnavailable(vout);
+
     CSmallTimeAndDate dt;
     dt.GetActualTimeAndDate();
 

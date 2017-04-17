@@ -130,6 +130,9 @@ bool CQueues::Run(void)
 
 bool CQueues::Finalize(void)
 {
+    // were all server accessbible?
+    BatchServers.PrintWarningIfUnavailable(vout);
+
     CSmallTimeAndDate dt;
     dt.GetActualTimeAndDate();
 
