@@ -2095,7 +2095,7 @@ void CJob::PrintJobInfoV3(std::ostream& sout)
     PrintResourcesV3(sout);
 
     if( HasSection("start") == true ){
-        PrintExec(sout);
+        PrintExecV3(sout);
     }
 
     CSmallTimeAndDate ctad;
@@ -2443,7 +2443,7 @@ void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, con
 
 //------------------------------------------------------------------------------
 
-bool CJob::PrintExec(std::ostream& sout)
+bool CJob::PrintExecV3(std::ostream& sout)
 {
     CSmallString tmp;
 

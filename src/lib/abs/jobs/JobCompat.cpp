@@ -285,7 +285,7 @@ void CJob::PrintJobInfoV2(std::ostream& sout)
     PrintResourcesV2(sout);
 
     if( HasSection("start") == true ){
-        PrintExec(sout);
+        PrintExecV2(sout);
     }
 
     CSmallTimeAndDate ctad;
@@ -688,6 +688,37 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     }
 
     sout << "========================================================" << endl;
+}
+
+
+//------------------------------------------------------------------------------
+
+bool CJob::PrintExecV2(std::ostream& sout)
+{
+    CSmallString tmp;
+
+    tmp = GetItem("start/workdir","INF_MAIN_NODE");
+    sout << "Main node        : " << tmp << endl;
+    tmp = GetItem("start/workdir","INF_WORK_DIR");
+    sout << "Working directory: " << tmp << endl;
+    tmp = GetItem("stop/result","INF_JOB_EXIT_CODE",true);
+    if( tmp != NULL ){
+    sout << "Job exit code    : " << tmp << endl;
+    }
+    sout << "----------------------------------------" << endl;
+
+    ListNodes(sout);
+
+    if( (GetItem("specific/resources","INF_NGPU").ToInt() > 0) &&
+        (GetElementByPath("start/gpus",false) != NULL) ){
+        sout << "----------------------------------------" << endl;
+
+        ListGPUNodes(sout);
+    }
+
+    sout << "========================================================" << endl;
+
+    return(true);
 }
 
 //==============================================================================

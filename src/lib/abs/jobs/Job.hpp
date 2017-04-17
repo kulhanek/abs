@@ -179,7 +179,10 @@ public:
     void PrintResourcesV2(std::ostream& sout);
 
     /// print executive part
-    bool PrintExec(std::ostream& sout);
+    bool PrintExecV3(std::ostream& sout);
+
+    /// print executive part
+    bool PrintExecV2(std::ostream& sout);
 
     /// get job main script name
     const CFileName GetMainScriptName(void);
