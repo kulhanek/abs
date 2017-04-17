@@ -241,7 +241,8 @@ const CSmallString CBatchServers::GetDefaultSrvName(void)
 const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_name,bool create)
 {
     // init servers if not done already
-    if( size() == 0 ) InitAll();
+    // DO NOT INIT HERE - if( size() == 0 ) InitAll();
+    // only when requested by create
 
     std::list<CBatchServerPtr>::iterator    it = begin();
     std::list<CBatchServerPtr>::iterator    ie = end();
