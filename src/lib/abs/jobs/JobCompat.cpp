@@ -562,7 +562,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     sout << "Req destination  : " << tmp << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
-    PrintResourceTokens(sout,"Req resources    :",tmp);
+    PrintResourceTokens(sout,"Req resources    : ",tmp);
 
     tmp = GetItem("basic/arguments","INF_ARG_SYNC_MODE");
     if( tmp == NULL ){
