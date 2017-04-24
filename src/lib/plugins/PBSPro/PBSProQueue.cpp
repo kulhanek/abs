@@ -91,6 +91,9 @@ bool CPBSProQueue::Init(const CSmallString& short_srv_name,struct batch_status* 
         sscanf(count,"Transit:%d Queued:%d Held:%d Waiting:%d Running:%d Exiting:%d Begun:%d",&n,&QueuedJobs,&n,&n,&RunningJobs,&n,&n);
     }
 
+// BUG - FIXME - TotalJobs reported by PBSPro is incorrect
+    TotalJobs =  QueuedJobs + RunningJobs;
+
     return(true);
 }
 
