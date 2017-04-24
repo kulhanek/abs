@@ -138,7 +138,11 @@ bool CQueueList::SortCompName(const CQueuePtr& p_left,const CQueuePtr& p_right)
 
 bool CQueueList::SortCompWallTime(const CQueuePtr& p_left,const CQueuePtr& p_right)
 {
-    return( p_left->GetMaxWallTime() < p_right->GetMaxWallTime() );
+    if( p_left->GetShortServerName() == p_right->GetShortServerName()  ){
+        return( p_left->GetMaxWallTime() < p_right->GetMaxWallTime() );
+    } else {
+       return( strcmp(p_left->GetShortServerName(),p_right->GetShortServerName()) < 0 );
+    }
 }
 
 //------------------------------------------------------------------------------
