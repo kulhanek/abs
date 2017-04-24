@@ -225,7 +225,7 @@ void CQueue::PrintQueueComment(std::ostream& sout)
     vector<string>::iterator it = items.begin();
     vector<string>::iterator ie = items.end();
 
-    unsigned int title_len = 68;
+    unsigned int title_len = 67;
     unsigned len = title_len;
 
     while( it != ie ){
