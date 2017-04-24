@@ -121,6 +121,8 @@ protected:
 
     std::vector<CSmallString>   ACLUsers;
     std::vector<CSmallString>   ACLGroups;
+
+    void PrintQueueComment(std::ostream& sout);
 };
 
 // -----------------------------------------------------------------------------

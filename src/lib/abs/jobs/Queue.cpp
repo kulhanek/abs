@@ -21,9 +21,15 @@
 
 #include <Queue.hpp>
 #include <ErrorSystem.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <iomanip>
 
+//------------------------------------------------------------------------------
+
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -186,11 +192,66 @@ void CQueue::PrintLineInfo(std::ostream& sout)
     sout << " " << setw(5) << RunningJobs;
     sout << " " << setw(5) << TotalJobs - (RunningJobs+QueuedJobs);
     sout << " " << setw(13) << MaxWallTime.GetSTimeAndDay();
-    sout << " " << Comment << endl;
+
+    sout << " ";
+    PrintQueueComment(sout);
 
     if( ! OnlyRoutable ){
         sout << "</green></b>";
     }
+}
+
+//------------------------------------------------------------------------------
+
+void CQueue::PrintQueueComment(std::ostream& sout)
+{
+    string          svalue = string(Comment);
+    vector<string>  langs;
+    vector<string>  items;
+    int             nrow, ncolumns = 80;
+    CTerminal::GetSize(nrow,ncolumns);
+
+    // split to EN | CS comments
+    split(langs,svalue,is_any_of("|"));
+
+    if( langs.size() == 0 ){ // no comments
+        sout << endl;
+        return;
+    }
+
+    // split EN comment into words
+    split(items,langs[0],is_any_of("|"));
+
+    vector<string>::iterator it = items.begin();
+    vector<string>::iterator ie = items.end();
+
+    unsigned int title_len = 68;
+    unsigned len = title_len;
+
+    while( it != ie ){
+        string sres = *it;
+        sout << sres;
+        len += sres.size();
+        len++;
+        it++;
+        if( it != ie ){
+            string sres = *it;
+            int tlen = len;
+            tlen += sres.size();
+            tlen++;
+            if( tlen > ncolumns ){
+                sout << " " << endl;
+                for(unsigned int i=0; i < title_len; i++){
+                    sout << " ";
+                }
+                len = title_len;
+            } else {
+                sout << " ";
+                len += 1;
+            }
+        }
+    }
+    sout << endl;
 }
 
 //------------------------------------------------------------------------------
