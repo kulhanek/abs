@@ -220,7 +220,7 @@ void CQueue::PrintQueueComment(std::ostream& sout)
     }
 
     // split EN comment into words
-    split(items,langs[0],is_any_of(" "));
+    split(items,langs[0],is_any_of(" "),token_compress_on);
 
     vector<string>::iterator it = items.begin();
     vector<string>::iterator ie = items.end();
