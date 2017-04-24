@@ -51,6 +51,9 @@ public:
     //! sort queues by name
     void SortByName(void);
 
+    //! sort queues by walltime
+    void SortByWallTime(void);
+
 // information methods ---------------------------------------------------------
     //! print info about all queues
     void PrintInfos(std::ostream& sout);
@@ -74,6 +77,9 @@ public:
 private:
     //! compare two queues by name
     static bool SortCompName(const CQueuePtr& p_left,const CQueuePtr& p_right);
+
+    //! compare two queues by walltime
+    static bool SortCompWallTime(const CQueuePtr& p_left,const CQueuePtr& p_right);
 
     //! remove if dissabled
     static bool RemoveIfDisabled(const CQueuePtr& p_queue);

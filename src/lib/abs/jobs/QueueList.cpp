@@ -136,9 +136,23 @@ bool CQueueList::SortCompName(const CQueuePtr& p_left,const CQueuePtr& p_right)
 
 //------------------------------------------------------------------------------
 
+bool CQueueList::SortCompWallTime(const CQueuePtr& p_left,const CQueuePtr& p_right)
+{
+    return( p_left->GetMaxWallTime() < p_right->GetMaxWallTime() );
+}
+
+//------------------------------------------------------------------------------
+
 void CQueueList::SortByName(void)
 {
     sort(SortCompName);
+}
+
+//------------------------------------------------------------------------------
+
+void CQueueList::SortByWallTime(void)
+{
+    sort(SortCompWallTime);
 }
 
 //==============================================================================
@@ -151,6 +165,7 @@ void CQueueList::PrintInfos(std::ostream& sout)
     sout << "#       Name            Pri    T     Q     R     O      MaxWall     Comment          " << endl;
     sout << "# -------------------- ----- ----- ----- ----- ----- ------------- ------------------" << endl;
 
+    SortByWallTime();
     MapRouteQueues();
 
     std::list<CQueuePtr>::iterator it = begin();
