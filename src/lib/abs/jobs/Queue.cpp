@@ -240,6 +240,7 @@ void CQueue::PrintQueueComment(std::ostream& sout)
             tlen += sres.size();
             tlen++;
             if( tlen > ncolumns ){
+                sout << endl;
                 for(unsigned int i=0; i < title_len; i++){
                     sout << " ";
                 }
