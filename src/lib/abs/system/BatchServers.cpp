@@ -538,7 +538,7 @@ const CJobPtr CBatchServers::GetJob(const CSmallString& jobid)
 
 bool CBatchServers::SubmitJob(CJob& job,bool verbose)
 {
-    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName());
+    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName(),true);
     if( srv_ptr == NULL ){
         ES_ERROR("no batch server was found for the job");
         return(false);
@@ -551,7 +551,7 @@ bool CBatchServers::SubmitJob(CJob& job,bool verbose)
 
 bool CBatchServers::GetJobStatus(CJob& job)
 {
-    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName());
+    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName(),true);
     if( srv_ptr == NULL ){
         ES_ERROR("no batch server was found for the job");
         return(false);
@@ -564,7 +564,7 @@ bool CBatchServers::GetJobStatus(CJob& job)
 
 bool CBatchServers::KillJob(CJob& job)
 {
-    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName());
+    CBatchServerPtr srv_ptr = FindBatchServer(job.GetServerName(),true);
     if( srv_ptr == NULL ){
         ES_ERROR("no batch server was found for the job");
         return(false);
@@ -736,7 +736,7 @@ const CBatchServerPtr CBatchServers::FindBatchServerByQueue(CSmallString& name)
         srv_name = GetDefaultSrvName();
     }
 
-    srv_ptr = FindBatchServer(srv_name);
+    srv_ptr = FindBatchServer(srv_name,true);
     return(srv_ptr);
 }
 
@@ -789,7 +789,7 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
         srv_name = GetDefaultSrvName();
     }
 
-    srv_ptr = FindBatchServer(srv_name);
+    srv_ptr = FindBatchServer(srv_name,true);
     return(srv_ptr);
 }
 
@@ -827,7 +827,7 @@ const CBatchServerPtr CBatchServers::FindBatchServerByNode(CSmallString& name)
         srv_name = GetDefaultSrvName();
     }
 
-    srv_ptr = FindBatchServer(srv_name);
+    srv_ptr = FindBatchServer(srv_name,true);
     return(srv_ptr);
 }
 
