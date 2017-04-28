@@ -50,7 +50,7 @@ public:
     virtual void ResolveConflicts(CResourceList* p_rl);
 
     /// resolve dynamic resource
-    virtual void ResolveDynamicResource(CResourceList* p_rl,bool delete_me);
+    virtual void ResolveDynamicResource(CResourceList* p_rl,bool& delete_me);
 
     /// get variable
     virtual void GetVariable(CSmallString& name, CSmallString& value);

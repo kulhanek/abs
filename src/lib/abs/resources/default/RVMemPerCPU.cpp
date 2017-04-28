@@ -76,7 +76,7 @@ void CRVMemPerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatu
 
 //------------------------------------------------------------------------------
 
-void CRVMemPerCPU::ResolveDynamicResource(CResourceList* p_rl,bool delete_me)
+void CRVMemPerCPU::ResolveDynamicResource(CResourceList* p_rl,bool& delete_me)
 {
     CResourceValuePtr res = p_rl->FindResource("ncpus");
     int ncpus = 1;

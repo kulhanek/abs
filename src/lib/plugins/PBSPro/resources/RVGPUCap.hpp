@@ -35,11 +35,8 @@ public:
         CRVGPUCap(void);
 
 // information methods ---------------------------------------------------------
-    /// get batch attribute
-    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
-
     /// resolve dynamic resource
-    virtual void ResolveDynamicResource(CResourceList* p_rl,bool delete_me);
+    virtual void ResolveDynamicResource(CResourceList* p_rl,bool& delete_me);
 };
 
 // -----------------------------------------------------------------------------

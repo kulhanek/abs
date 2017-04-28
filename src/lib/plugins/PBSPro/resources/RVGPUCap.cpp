@@ -61,20 +61,11 @@ CRVGPUCap::CRVGPUCap(void)
 
 //------------------------------------------------------------------------------
 
-void CRVGPUCap::ResolveDynamicResource(CResourceList* p_rl,bool delete_me)
+void CRVGPUCap::ResolveDynamicResource(CResourceList* p_rl,bool& delete_me)
 {
     CResourceValuePtr p_ngpus = p_rl->FindResource("ngpus");
     // remove this attribute if ngpus == 0
     if( (p_ngpus == NULL) || (p_ngpus->GetNumber() == 0) ) delete_me = true;
-}
-
-//------------------------------------------------------------------------------
-
-void CRVGPUCap::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
-{
-    name = ATTR_l;
-    resource = "gpu_cap";
-    value = Value;
 }
 
 //==============================================================================

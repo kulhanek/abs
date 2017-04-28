@@ -77,7 +77,7 @@ void CRVWorkSizePerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& r
 
 //------------------------------------------------------------------------------
 
-void CRVWorkSizePerCPU::ResolveDynamicResource(CResourceList* p_rl,bool delete_me)
+void CRVWorkSizePerCPU::ResolveDynamicResource(CResourceList* p_rl,bool& delete_me)
 {
     CResourceValuePtr res = p_rl->FindResource("ncpus");
     int ncpus = 1;
