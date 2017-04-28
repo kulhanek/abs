@@ -114,6 +114,17 @@ void CRVStorageGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rst
         }
         // remove realm if present
         Value = storage_group.substr(0,storage_group.find("@"));
+
+        // validate realm
+        if( storage_group.find("@") != string::npos ){
+            string realm = storage_group.substr(storage_group.find("@")+1,string::npos);
+            if( p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM") != CSmallString(realm) ){
+                sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+                sout <<         "        Inconsistent group realms: '" << realm << "'' vs '" <<  p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM") << "'!</red></b>" << endl;
+                rstatus = false;
+                return;
+            }
+        }
         return;
     }
 
