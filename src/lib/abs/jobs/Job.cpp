@@ -70,6 +70,7 @@ CJob::CJob(void)
 {
     InfoFileLoaded = false;
     DoNotSave = false;
+    ResourceList.SetJob(this);
 }
 
 //==============================================================================
