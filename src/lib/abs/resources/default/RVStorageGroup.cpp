@@ -20,15 +20,14 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVGroup.hpp>
+#include <RVStorageGroup.hpp>
 #include <CategoryUUID.hpp>
-#include <PBSProModule.hpp>
+#include <ABSModule.hpp>
 #include <ResourceList.hpp>
 #include <ErrorSystem.hpp>
 #include <User.hpp>
 #include <FileSystem.hpp>
 #include <Job.hpp>
-#include <pbs_ifl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -36,21 +35,21 @@
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVGroupCB(void* p_data);
+CComObject* RVStorageGroupCB(void* p_data);
 
-CExtUUID        RVGroupID(
-                    "{GROUP:4eaddbda-7bf3-45e6-bd5f-dc1eec3754ee}",
-                    "group");
+CExtUUID        RVStorageGroupID(
+                    "{STORAGE_GROUP:2af7e292-3ab5-40dc-8a26-cc7dffc2df19}",
+                    "storagegroup");
 
-CPluginObject   RVGroupObject(&PBSProPlugin,
-                    RVGroupID,RESOURCES_CAT,
-                    RVGroupCB);
+CPluginObject   RVStorageGroupObject(&ABSPlugin,
+                    RVStorageGroupID,RESOURCES_CAT,
+                    RVStorageGroupCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVGroupCB(void* p_data)
+CComObject* RVStorageGroupCB(void* p_data)
 {
-    CComObject* p_object = new CRVGroup();
+    CComObject* p_object = new CRVStorageGroup();
     return(p_object);
 }
 
@@ -62,14 +61,14 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVGroup::CRVGroup(void)
-    : CResourceValue(&RVGroupObject)
+CRVStorageGroup::CRVStorageGroup(void)
+    : CResourceValue(&RVStorageGroupObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVStorageGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     CJob* p_job = p_rl->GetJob();
 
@@ -86,11 +85,11 @@ void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
     CSmallString batch_server_groupns = p_job->GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS");
 
     if( Value == "current" ){
-        if( input_machine_groupns != batch_server_groupns ){
+        if( input_machine_groupns != storage_machine_groupns ){
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        The usage of 'group=current' requires that the input machine group namespace '" << input_machine_groupns;
-            sout << "' is the same as the batch server group namespace '" << batch_server_groupns << "'!</red></b>" << endl;
+            sout <<         "        The usage of 'storagegroup=current' requires that the input machine group namespace '" << input_machine_groupns;
+            sout << "' is the same as the storage machine group namespace '" << batch_server_groupns << "'!</red></b>" << endl;
             rstatus = false;
             return;
         }
@@ -99,14 +98,6 @@ void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
     }
 
     if( Value == "jobdir" ){
-        if( storage_machine_groupns != batch_server_groupns ){
-            if( rstatus == true ) sout << endl;
-            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        The usage of 'group=jobdir' requires that the storage machine group namespace '" << input_machine_groupns;
-            sout << "' is the same as the batch server group namespace '" << batch_server_groupns << "'!</red></b>" << endl;
-            rstatus = false;
-            return;
-        }
         struct stat info;
         string      storage_group;
         CSmallString pwd;
@@ -126,7 +117,7 @@ void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         return;
     }
 
-    if( input_machine_groupns == batch_server_groupns ){
+    if( input_machine_groupns == storage_machine_groupns ){
         // we can check if the value is correct
         if( User.IsInGroup(Value) == false ){
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
@@ -137,17 +128,8 @@ void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         return;
     }
 
-    // do not check the group as we do not have any information about groups at the batch server
+    // do not check the group as we do not have any information about groups at the storage machine
     return;
-}
-
-//------------------------------------------------------------------------------
-
-void CRVGroup::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
-{
-    name = ATTR_g;
-    resource = NULL;
-    value = Value;
 }
 
 //==============================================================================

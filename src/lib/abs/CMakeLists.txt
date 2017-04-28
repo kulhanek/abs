@@ -30,6 +30,7 @@ SET(ABS_SRC
         resources/default/RVWorkSizePerCPU.cpp
         resources/default/RVDataIn.cpp
         resources/default/RVDataOut.cpp
+        resources/default/RVStorageGroup.cpp
 
     # jobs ---------------------------------------
         jobs/search/nodes/NodeMask.tab.c

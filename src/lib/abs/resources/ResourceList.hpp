@@ -33,6 +33,10 @@
 
 // -----------------------------------------------------------------------------
 
+class CJob;
+
+// -----------------------------------------------------------------------------
+
 /// list of resources
 
 class ABS_PACKAGE CResourceList : public std::list<CResourceValuePtr> {
@@ -42,6 +46,12 @@ public:
         ~CResourceList(void);
 
 // executive methods -----------------------------------------------------------
+    /// set job
+    void SetJob(CJob* p_job);
+
+    /// get job
+    CJob* GetJob(void);
+
     /// add resources - override existing setup
     void AddResources(const CSmallString& reslist,std::ostream& sout,bool& rstatus, bool expertmode);
 
@@ -110,6 +120,8 @@ public:
 
 // section of private data -----------------------------------------------------
 private:
+    CJob*       Job;
+
     /// helper method
     static bool SortCompName(const CResourceValuePtr& p_left,const CResourceValuePtr& p_right);
 

@@ -524,6 +524,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_RESOURCES",ResourceList.ToString(false));
 
 // umask and group
+    SetItem("specific/resources","INF_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
     SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));
     SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
 
@@ -617,9 +618,10 @@ bool CJob::InputDirectory(void)
     }
 
 // determine input machine, storage machine and batch system group namespaces
-    CSmallString input_machine_groupns      = Host.GetGroupNS();
-    CSmallString storage_machine_groupns    = Host.GetGroupNS();
-    CSmallString batch_server_groupns       = BatchServers.GetBatchGroupNS();
+    CSmallString input_machine_groupns          = Host.GetGroupNS();
+    CSmallString storage_machine_groupns        = Host.GetGroupNS();
+    CSmallString storage_machine_group_realm    = Host.GetRealm();
+    CSmallString batch_server_groupns           = BatchServers.GetBatchGroupNS();
 
 // determine storage machine and storage path
     CSmallString storage_machine = input_machine;
@@ -637,7 +639,8 @@ bool CJob::InputDirectory(void)
         }
         if( spath == "/" ) spath = ""; // remove root '/' character
         spath = spath + input_dir_raw.substr(dest.length(),string::npos);
-        storage_machine_groupns = Host.GetGroupNS(smach);
+        storage_machine_groupns     = Host.GetGroupNS(smach);
+        storage_machine_group_realm = Host.GetRealm(smach);
 
         if( ABSConfig.GetSystemConfigItem("INF_USE_NFS4_STORAGES") == "YES" ){
             storage_machine = smach;
@@ -648,20 +651,33 @@ bool CJob::InputDirectory(void)
 // default umask is derived from the input directory permission
     ResourceList.AddResource("umask",CUser::GetUMask(input_dir_umask));
 
-// default group name - derived from the input directory group
+// determine storage group name - derived from the input directory group
+    string gname;
+    struct group* p_grp = getgrgid(input_dir_gid);
+    if( p_grp != NULL ){
+        gname = string(p_grp->gr_name);
+    }
+
+    if( gname.find("@") != string::npos ){
+        string realm = gname.substr(gname.find("@")+1,string::npos);
+        ResourceList.AddResource("storagegroup",gname.substr(0,gname.find("@")));
+    } else {
+        ResourceList.AddResource("storagegroup",gname);
+    }
+
+// default batch group name - derived from the input directory group
     // if the file system is compatible with the batch server
     if( storage_machine_groupns == batch_server_groupns ){
-        string gname;
-        struct group* p_grp = getgrgid(input_dir_gid);
-        if( p_grp != NULL ){
-            gname = string(p_grp->gr_name);
-        }
         // does it contain realm?
         if( gname.find("@") != string::npos ){
             string realm = gname.substr(gname.find("@")+1,string::npos);
             // consistency check
             if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
                 ResourceList.AddResource("group",gname.substr(0,gname.find("@")));
+            } else {
+                CSmallString error;
+                error << "consistency check error: jobdir realm '" << realm << "' is not the same as for storage host'" << Host.GetRealm(storage_machine) << "'";
+                ES_TRACE_ERROR(error);
             }
         } else {
             ResourceList.AddResource("group",gname);
@@ -673,7 +689,8 @@ bool CJob::InputDirectory(void)
 
     SetItem("specific/resources","INF_STORAGE_MACHINE",storage_machine);
     SetItem("specific/resources","INF_STORAGE_DIR",storage_dir);
-    SetItem("specific/resources","INF_STORAGE_GROUPNS",storage_machine_groupns);
+    SetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS",storage_machine_groupns);
+    SetItem("specific/resources","INF_STORAGE_MACHINE_REALM",storage_machine_group_realm);
 
     SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
     SetItem("specific/resources","INF_BATCH_SERVER_GROUPNS",batch_server_groupns);
@@ -2361,12 +2378,25 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "-----------------------------------------------" << endl;
     sout << "Group namespaces : ";
     sout << GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") << " (input machine) | ";
-    sout << GetItem("specific/resources","INF_STORAGE_GROUPNS") << " (storage machine) | ";
+
+    // refactorization: INF_STORAGE_GROUPNS -> INF_STORAGE_MACHINE_GROUPNS
+    tmp = GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS",true);
+    if( tmp == NULL ){
+        tmp = GetItem("specific/resources","INF_STORAGE_GROUPNS");
+    }
+    sout << tmp << " (storage machine) | ";
     sout << GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS") << " (batch server)" <<  endl;
+
+    // refactorization: INF_USTORAGEGROUP introduced
+    tmp = GetItem("specific/resources","INF_USTORAGEGROUP",true);
+    if( tmp ){
+        tmp1 = GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+    sout << "Storage user grp : " <<  tmp << "[@" << tmp1 << "]" << endl;
+    }
 
     tmp = GetItem("specific/resources","INF_UGROUP");
     if( tmp == NULL ) tmp = "-default server group-";
-    sout << "User group       : " <<  tmp << endl;
+    sout << "Batch user group : " <<  tmp << endl;
 
     tmp = GetItem("specific/resources","INF_UMASK");
     sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" <<  endl;

@@ -92,7 +92,7 @@ void CRVProps::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
             if( item[0] == '^' ){
                 if( rstatus == true ) sout << endl;
                 sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-                sout <<         "        It is not permited to negate property that has explicit value! Position: " << pos << ")</red></b>" << endl;
+                sout <<         "        It is not permited to negate property that has explicit value! Position: " << pos << "</red></b>" << endl;
                 rstatus = false;
                 continue;
             }
@@ -103,7 +103,7 @@ void CRVProps::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
                 if( name.empty() ){
                     if( rstatus == true ) sout << endl;
                     sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-                    sout <<         "        Property without name! Position: " << pos << ")</red></b>" << endl;
+                    sout <<         "        Property without name! Position: " << pos << "</red></b>" << endl;
                     rstatus = false;
                     continue;
                 }
