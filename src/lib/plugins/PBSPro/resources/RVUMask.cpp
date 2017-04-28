@@ -24,6 +24,7 @@
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 #include <ResourceList.hpp>
+#include <pbs_ifl.h>
 
 // -----------------------------------------------------------------------------
 
@@ -107,7 +108,7 @@ void CRVUMask::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 
 void CRVUMask::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    name = Name;
+    name = ATTR_umask;
     resource = NULL;
     value = Value;
 }

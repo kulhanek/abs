@@ -24,6 +24,7 @@
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 #include <ResourceList.hpp>
+#include <pbs_ifl.h>
 
 // -----------------------------------------------------------------------------
 
@@ -87,7 +88,7 @@ void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 
 void CRVGroup::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    name = "group_list";
+    name = ATTR_g;
     resource = NULL;
     value = Value;
 }

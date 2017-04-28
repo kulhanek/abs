@@ -24,6 +24,7 @@
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 #include <ResourceList.hpp>
+#include <pbs_ifl.h>
 
 // -----------------------------------------------------------------------------
 
@@ -62,7 +63,7 @@ CRVPlace::CRVPlace(void)
 
 void CRVPlace::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    name = "Resource_List";
+    name = ATTR_l;
     resource = "place";
     value = Value;
 }
