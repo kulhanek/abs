@@ -3059,7 +3059,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     if( user.GetLength() > 12 ){
         user = user.GetSubStringFromTo(0,11);
     }
-    sout << " " << left << setw(12) << user << " ";
+    sout << " " << left << setw(12) << user;
 
     CSmallString title = GetItem("basic/jobinput","INF_JOB_TITLE");
     sout << " " << setw(15) << title;
