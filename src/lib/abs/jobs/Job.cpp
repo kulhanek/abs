@@ -3055,7 +3055,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     sout << "             ";
     }
 
-    CSmallString user = GetItem("specific/resources","INF_JOB_OWNER");
+    CSmallString user = GetItem("specific/resources","INF_JOB_OWNER",true);
     if( user.GetLength() > 12 ){
         user = user.GetSubStringFromTo(0,11);
     }
