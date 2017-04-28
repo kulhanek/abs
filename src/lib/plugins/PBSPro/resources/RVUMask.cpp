@@ -108,7 +108,7 @@ void CRVUMask::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 void CRVUMask::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
     name = Name;
-    resource = "";
+    resource = NULL;
     value = Value;
 }
 

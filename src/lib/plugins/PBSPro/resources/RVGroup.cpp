@@ -88,7 +88,7 @@ void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 void CRVGroup::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
     name = "group_list";
-    resource = "";
+    resource = NULL;
     value = Value;
 }
 

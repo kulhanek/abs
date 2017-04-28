@@ -778,11 +778,7 @@ void CPBSProServer::CreateJobAttributes(struct attropl* &p_prev,CResourceList* p
         CSmallString name,resource,value;
         p_rv->GetAttribute(name,resource,value);
         if( name != NULL ){
-            if( resource == NULL ){
-                set_attribute(p_prev,name,NULL,value);
-            } else {
-                set_attribute(p_prev,name,resource,value);
-            }
+            set_attribute(p_prev,name,resource,value);
         }
         it++;
     }
