@@ -199,6 +199,13 @@ const CSmallString& CABSConfig::GetHostName(void)
 
 //------------------------------------------------------------------------------
 
+const CSmallString CABSConfig::GetDocURL(const CSmallString& key)
+{
+    return("FIXME");
+}
+
+//------------------------------------------------------------------------------
+
 const CFileName CABSConfig::GetSystemSiteConfigDir(void)
 {
     CFileName      config_name;

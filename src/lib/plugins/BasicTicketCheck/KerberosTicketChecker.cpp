@@ -23,6 +23,7 @@
 #include <CategoryUUID.hpp>
 #include <ErrorSystem.hpp>
 #include <User.hpp>
+#include <ABSConfig.hpp>
 #include <string>
 #include <vector>
 #include <boost/algorithm/string/split.hpp>
@@ -84,8 +85,7 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
         sout <<  "<b><red> ERROR: Kerberos tickets are expired!</red></b>" << endl;
         sout <<          "        Obtain new tickets by the <b>kinit</b> command." << endl;
         sout << endl;
-        sout << "<b><blue> HELP:  https://lcc.ncbr.muni.cz/whitezone/development/infinity/wiki/index.php/Kerberos_Authentication</blue></b>" << endl;
-        return(false);
+        sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("kinit") << "</blue></b>" << endl;        return(false);
     }
 
     // check the principal name
@@ -117,7 +117,7 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
         sout <<  "<b><red> ERROR: The Kerberos principal does not match with the logged user!</red></b>" << endl;
         sout <<          "        Obtain the correct Kerbeors tickets by the <b>kinit " << User.GetName() << "</b> command." << endl;
         sout << endl;
-        sout << "<b><blue> HELP:  " << ABSConfig.GetDocuURL("") << "</blue></b>" << endl;
+        sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("kinit") << "</blue></b>" << endl;
         return(false);
     }
 

@@ -75,6 +75,9 @@ public:
     /// get hostname
     const CSmallString& GetHostName(void);
 
+    /// get documentation URL
+    const CSmallString GetDocURL(const CSmallString& key);
+
 // user config -----------------------------------------------------------------
     /// return the name of user config directory for active site
     const CFileName GetUserSiteConfigDir(void);
@@ -125,6 +128,7 @@ private:
 
     CXMLDocument    SystemConfig;
     CXMLDocument    UserConfig;
+    CXMLDocument    DocuConfig;
 
     bool GetSystemConfigItem(CXMLElement* p_root, const CSmallString& item_name,
                              CSmallString& item_value);
