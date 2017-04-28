@@ -159,7 +159,12 @@ bool CJob::SaveInfoFileWithPerms(void)
     int fmode = (mode & (~ umask)) & 0777;
     CFileSystem::SetPosixMode(name,fmode);
 
-    CSmallString sgroup = GetItem("specific/resources","INF_UGROUP");
+    CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
+    if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
+        sgroup += "@";
+        sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+    }
+
     if( sgroup != NULL ){
         gid_t group = User.GetGroupID(sgroup);
         int ret = chown(name,-1,group);
@@ -803,7 +808,12 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
         int fmode = (mode & (~ umask)) & 0777;
         CFileSystem::SetPosixMode(job_script,fmode);
 
-        CSmallString sgroup = GetItem("specific/resources","INF_UGROUP");
+        CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
+        if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
+            sgroup += "@";
+            sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+        }
+
         if( sgroup != NULL ){
             gid_t group = User.GetGroupID(sgroup);
 
@@ -3024,7 +3034,11 @@ bool CJob::SaveJobKey(void)
     int fmode = (mode & (~ umask)) & 0777;
     CFileSystem::SetPosixMode(keyname,fmode);
 
-    CSmallString sgroup = GetItem("specific/resources","INF_UGROUP");
+    CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
+    if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
+        sgroup += "@";
+        sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+    }
     gid_t group = User.GetGroupID(sgroup);
 
     int ret = chown(keyname,-1,group);
