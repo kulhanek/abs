@@ -128,9 +128,9 @@ void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 
     if( input_machine_groupns == batch_server_groupns ){
         // we can check if the value is correct
-        if( User.IsInGroup(Value) == false ){
+        if( User.IsInPosixGroup(Value) == false ){
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        The specified group '" << Value << "' is not from the list of user groups: " << User.GetGroups() << "!</red></b>" << endl;
+            sout <<         "        The specified group '" << Value << "' must be one from user groups: " << User.GetPosixGroups() << "!</red></b>" << endl;
             rstatus = false;
             return;
         }
