@@ -99,10 +99,21 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
     while( feof(p_stdout) == 0 ){
         CSmallString line;
         line.ReadLineFromFile(p_stdout);
-        if( line.FindSubString("Principal:") != -1 ){
+        if( line.FindSubString("Principal:") != -1 ){       // Heimdal Krb5
             stringstream str(line.GetBuffer());
             string key;
             str >> key >> principal;
+            vector<string> items;
+            split(items,principal,is_any_of("@"));
+            if( items.size() >= 1 ){
+                if( User.GetName() == CSmallString(items[0]) ) principal_ok = true;
+                break;
+            }
+        }
+        if( line.FindSubString("Default principal:") != -1 ){ // MIT Krb5
+            stringstream str(line.GetBuffer());
+            string key;
+            str >> key >> key >> principal;
             vector<string> items;
             split(items,principal,is_any_of("@"));
             if( items.size() >= 1 ){
