@@ -12,7 +12,69 @@
 # (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
 # =============================================================================
 
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.0: Cross-host user group translations ..."
+echo "# ------------------------------------------------------------------------------"
+echo ""
+
+# workdir group
+INF_W_GROUP=`id -g -n`
+
+# I->W and W->I
+if [ "$INF_INPUT_MACHINE_GROUPNS" != "$INF_STORAGE_MACHINE_GROUPNS" ]; then
+    INF_IW_GROUPS="$INF_USTORAGEGROUP@INF_STORAGE_MACHINE_REALM:$INF_W_GROUP"
+    INF_WI_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP@INF_STORAGE_MACHINE_REALM"
+else
+    INF_IW_GROUPS="$INF_USTORAGEGROUP:$INF_W_GROUP"
+    INF_WI_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP"
+fi
+
+# S->W and W->S
+INF_SW_GROUPS="$INF_USTORAGEGROUP:$INF_W_GROUP"
+INF_WS_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP"
+
+# L->W and W->L
+if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
+    INF_LR=`stat "$INF_INPUT_DIR" --format=%G | tr '@' ' ' | awk '{ printf("%s",$2);}'`
+    if [ -n "$INF_LR" ]; then
+        if [ "$INF_LR" != "$INF_STORAGE_MACHINE_REALM" ]; then
+            echo "" >&2
+            echo " ERROR: The local input directory realm '$INF_LR' does not match the storage machine realm '$INF_STORAGE_MACHINE_REALM'!" >&2
+            echo "" >&2
+            exit 1
+        fi
+        INF_LW_GROUPS="$INF_USTORAGEGROUP@INF_STORAGE_MACHINE_REALM:$INF_W_GROUP"
+        INF_WL_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP@INF_STORAGE_MACHINE_REALM"
+    else
+        INF_LW_GROUPS="$INF_USTORAGEGROUP:$INF_W_GROUP"
+        INF_WL_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP"
+    fi
+fi
+
+export INF_IW_GROUPS
+export INF_WI_GROUPS
+export INF_SW_GROUPS
+export INF_WS_GROUPS
+export INF_LW_GROUPS
+export INF_WL_GROUPS
+
+echo "I->W : $INF_IW_GROUPS"
+echo "W->I : $INF_WI_GROUPS"
+echo "S->W : $INF_SW_GROUPS"
+echo "W->S : $INF_WS_GROUPS"
+echo "L->W : $INF_LW_GROUPS"
+echo "W->L : $INF_WL_GROUPS"
+
+INF_L_FSTYPE="other"
+# is local input directory of nfs4:krb5 type?
+if [ -n "`grep `stat . --format="%m"` /proc/self/mountinfo | grep 'sec=krb5'`" ]; then
+    INF_L_FSTYPE="nfs4:krb5"
+fi
+export INF_L_FSTYPE
+echo "L FST: $INF_L_FSTYPE"
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
