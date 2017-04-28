@@ -20,29 +20,29 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVWorkSizePerCPU.hpp>
+#include <GPUCap.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 #include <ResourceList.hpp>
-#include <ErrorSystem.hpp>
+#include <pbs_ifl.h>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVWorkSizePerCPUCB(void* p_data);
+CComObject* GPUCapCB(void* p_data);
 
-CExtUUID        RVWorkSizePerCPUID(
-                    "{WORK_SIZE_PER_CPU:1274fdf8-8a65-49e8-b410-491c32861e75}",
-                    "worksizepercpu");
+CExtUUID        GPUCapID(
+                    "{PLACE:9f391d49-b3f2-4a36-b4c5-cd211223d9b4}",
+                    "place");
 
-CPluginObject   RVWorkSizePerCPUObject(&ABSPlugin,
-                    RVWorkSizePerCPUID,RESOURCES_CAT,
-                    RVWorkSizePerCPUCB);
+CPluginObject   GPUCapObject(&ABSPlugin,
+                    GPUCapID,RESOURCES_CAT,
+                    GPUCapCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVWorkSizePerCPUCB(void* p_data)
+CComObject* GPUCapCB(void* p_data)
 {
-    CComObject* p_object = new CRVWorkSizePerCPU();
+    CComObject* p_object = new CGPUCap();
     return(p_object);
 }
 
@@ -54,38 +54,27 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVWorkSizePerCPU::CRVWorkSizePerCPU(void)
-    : CResourceValue(&RVWorkSizePerCPUObject)
+CGPUCap::CGPUCap(void)
+    : CResourceValue(&GPUCapObject)
 {
-
 }
 
 //------------------------------------------------------------------------------
 
-void CRVWorkSizePerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CGPUCap::ResolveDynamicResource(CResourceList* p_rl,bool delete_me)
 {
-    if( TestSizeValue(sout,rstatus) == false ) return;
-    long long size = GetSize();
-    if( size <= 0 ) {
-        if( rstatus == true ) sout << endl;
-        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        Size must be larger than 1kb but " << GetSizeString() << " is specified!</red></b>" << endl;
-        rstatus = false;
-        return;
-    }
+    CResourceValuePtr p_ngpus = p_rl->FindResources("ngpus");
+    // remove this attribute if ngpus == 0
+    if( (p_ngpus == NULL) || (p_ngpus->GetNumber() == 0) ) delete_me = true;
 }
 
 //------------------------------------------------------------------------------
 
-void CRVWorkSizePerCPU::ResolveDynamicResource(CResourceList* p_rl,bool delete_me)
+void CGPUCap::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    CResourceValuePtr res = p_rl->FindResource("ncpus");
-    int ncpus = 1;
-    if( res != NULL ){
-        ncpus = res->GetNumber();
-    }
-    long long size = ncpus * GetSize();
-    p_rl->AddSizeResource("worksize",size);
+    name = ATTR_l;
+    resource = "gpu_cap";
+    value = Value;
 }
 
 //==============================================================================

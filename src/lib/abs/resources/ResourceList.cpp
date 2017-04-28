@@ -279,8 +279,13 @@ void CResourceList::ResolveDynamicResources(void)
     // resolve dynamic resources
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        p_rv->ResolveDynamicResource(this);
-        it++;
+        bool delete_me = false;
+        p_rv->ResolveDynamicResource(this,delete_me);
+        if( delete_me ){
+            it = erase(it);
+        } else {
+            it++;
+        }
     }
 
     // do variable substitution

@@ -61,7 +61,7 @@ void CResourceValue::ResolveConflicts(CResourceList* p_rl)
 
 //------------------------------------------------------------------------------
 
-void CResourceValue::ResolveDynamicResource(CResourceList* p_rl)
+void CResourceValue::ResolveDynamicResource(CResourceList* p_rl,bool delete_me)
 {
     // nothing to be here
 }

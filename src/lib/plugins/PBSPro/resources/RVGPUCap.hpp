@@ -1,8 +1,9 @@
-#ifndef RVWorkSizePerCPUH
-#define RVWorkSizePerCPUH
+#ifndef GPUCapH
+#define GPUCapH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
@@ -28,14 +29,14 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CRVWorkSizePerCPU : public CResourceValue {
+class ABS_PACKAGE CGPUCap : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CRVWorkSizePerCPU(void);
+        CGPUCap(void);
 
 // information methods ---------------------------------------------------------
-    /// test value if it is in expected range
-    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+    /// get batch attribute
+    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
 
     /// resolve dynamic resource
     virtual void ResolveDynamicResource(CResourceList* p_rl,bool delete_me);
