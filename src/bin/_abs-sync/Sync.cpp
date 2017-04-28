@@ -88,6 +88,10 @@ bool CSync::Run(void)
     }
 
     vout << low;
+
+    // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUser();
+
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         vout << endl;        

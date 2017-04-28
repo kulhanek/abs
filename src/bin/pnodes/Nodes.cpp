@@ -97,6 +97,9 @@ bool CNodes::Run(void)
         vout << "#" << endl;
     }
 
+    // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUser();
+
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
@@ -114,8 +117,6 @@ bool CNodes::Run(void)
         BatchServers.PrintNode(vout,Options.GetOptNode());
         return(true);
     }
-
-    User.InitUser();
 
     vout << high;
     User.PrintUserInfo(vout);

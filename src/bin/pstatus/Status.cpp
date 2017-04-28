@@ -82,6 +82,9 @@ bool CStatus::Run(void)
 
     vout << low;
 
+    // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUser();
+
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");

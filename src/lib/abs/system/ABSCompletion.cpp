@@ -191,14 +191,15 @@ bool CABSCompletion::AddQueueSuggestions(void)
         return(false);
     }
 
+    // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUser();
+
     // check if user has valid ticket
     std::stringstream vout;
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
-
-    User.InitUser();
 
     BatchServers.GetQueues();
     QueueList.RemoveDisabledQueues();

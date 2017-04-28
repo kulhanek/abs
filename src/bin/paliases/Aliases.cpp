@@ -132,13 +132,14 @@ bool CAliases::AddAlias(void)
         return(false);
     }
 
+    // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUser();
+
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
         return(false);
     }
-
-    User.InitUser();
 
     if( AliasList.LoadConfig() == false ){
         ES_ERROR("unable to load aliases");
