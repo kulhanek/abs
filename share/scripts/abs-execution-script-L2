@@ -70,8 +70,8 @@ echo "W->L : $INF_WL_GROUPS"
 
 INF_L_FSTYPE="other"
 # is local input directory of nfs4:krb5 type?
-INF_L_MP=`stat "$INF_INPUT_DIR" --format="%m"`"
-if [ -n "`grep "$INF_L_MP" /proc/self/mountinfo | grep 'sec=krb5'`" ]; then
+INF_L_MP=`stat "$INF_INPUT_DIR" --format="%m"`
+if [ -n "`grep $INF_L_MP /proc/self/mountinfo | grep 'sec=krb5'`" ]; then
     INF_L_FSTYPE="nfs4:krb5"
 fi
 export INF_L_FSTYPE
