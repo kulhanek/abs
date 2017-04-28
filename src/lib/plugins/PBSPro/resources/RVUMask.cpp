@@ -105,11 +105,10 @@ void CRVUMask::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 
 //------------------------------------------------------------------------------
 
-void CRVUMask::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
+void CRVUMask::AddToSubmitArgs(CSmallString& args)
 {
-    name = Name;
-    resource = "";
-    value = Value;
+    if( args != NULL ) args << " ";
+    args << "-W umask=" << Value;
 }
 
 //==============================================================================

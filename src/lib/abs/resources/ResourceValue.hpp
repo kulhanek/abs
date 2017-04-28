@@ -58,6 +58,9 @@ public:
     /// get batch attribute
     virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
 
+    /// populate submit arguments
+    virtual void AddToSubmitArgs(CSmallString& args);
+
     /// get size in kB from Value
     long long GetSize(void);
 
