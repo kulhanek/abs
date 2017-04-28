@@ -57,8 +57,14 @@ echo "# UID   : `id`"
 echo "# Umask : `umask`"
 echo
 
-# boot AMS ---------------------------------------------------------------------
+if ! [ -d "$ABS_ROOT" ]; then
+    echo "" >&2
+    echo " ERROR: The ABS_ROOT directory does not exist!" >&2
+    echo "" >&2
+    exit 1
+fi
 
+# boot AMS ---------------------------------------------------------------------
 if [ -f "$INF_BOOT_SCRIPT" ]; then
     # boot AMS system
     source $INF_BOOT_SCRIPT
