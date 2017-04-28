@@ -86,7 +86,7 @@ bool CNodes::Run(void)
     }
 
     vout << low;
-    if( Options.GetOptPrintNames() == false ){
+    if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) ){
         vout << "#" << endl;
         BatchServers.PrintServerOverview(vout);
         if( Options.IsOptSearchSet() ){
