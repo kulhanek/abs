@@ -22,12 +22,16 @@
 #include "BasicTicketCheckModule.hpp"
 #include <CategoryUUID.hpp>
 #include <ErrorSystem.hpp>
+#include <User.hpp>
 #include <string>
-#include <list>
+#include <vector>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 //------------------------------------------------------------------------------
 
 using namespace std;
+using namespace boost;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -75,17 +79,49 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
 
     // close the stream
     int retcode = pclose(p_stdout);
-    if( retcode == 0 ){
-        return(true);
+    if( retcode != 0 ){
+        sout << endl;
+        sout <<  "<b><red> ERROR: Kerberos tickets are expired!</red></b>" << endl;
+        sout <<          "        Obtain new tickets by the <b>kinit</b> command." << endl;
+        sout << endl;
+        sout << "<b><blue> HELP:  https://lcc.ncbr.muni.cz/whitezone/development/infinity/wiki/index.php/Kerberos_Authentication</blue></b>" << endl;
+        return(false);
     }
 
-    sout << endl;
-    sout <<  "<b><red> ERROR: Kerberos tickets are expired!</red></b>" << endl;
-    sout <<          "        Obtain new tickets by the <b>kinit</b> command." << endl;
-    sout << endl;
-    sout << "<b><blue> HELP:  https://lcc.ncbr.muni.cz/whitezone/development/infinity/wiki/index.php/Kerberos_Authentication</blue></b>" << endl;
+    // check the principal name
+    bool principal_ok = false;
+    p_stdout = popen("klist","r");
+        if( p_stdout == NULL ){
+            ES_ERROR("unable to popen klist");
+            return(false);
+        }
+    CSmallString line;
+    while( feof(p_stdout) == 0 ){
+        line.ReadLineFromFile(p_stdout);
+        if( line.FindSubString("Principal:") != -1 ){
+            stringstream str(line.GetBuffer());
+            string key,principal;
+            str >> key >> principal;
+            vector<string> items;
+            split(items,principal,is_any_of("@"));
+            if( items.size() >= 1 ){
+                if( User.GetName() == CSmallString(items[0]) ) principal_ok = true;
+                break;
+            }
+        }
+    }
+    pclose(p_stdout);
 
-    return(false);
+    if( principal_ok == false ){
+        sout << endl;
+        sout <<  "<b><red> ERROR: The Kerberos principal does not match with the logged user!</red></b>" << endl;
+        sout <<          "        Obtain the correct Kerbeors tickets by the <b>kinit " << User.GetName() << "</b> command." << endl;
+        sout << endl;
+        sout << "<b><blue> HELP:  https://lcc.ncbr.muni.cz/whitezone/development/infinity/wiki/index.php/Kerberos_Authentication</blue></b>" << endl;
+        return(false);
+    }
+
+    return(true);
 }
 
 //==============================================================================

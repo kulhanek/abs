@@ -787,6 +787,7 @@ void CPBSProServer::CreateJobAttributes(struct attropl* &p_prev,CResourceList* p
         p_rv->GetAttribute(name,resource,value);
         if( name != NULL ){
             if( resource == NULL ){
+                // KEEP as it is here, resource argument to set_attribute MUST be NULL
                 set_attribute(p_prev,name,NULL,value);
             } else {
                 set_attribute(p_prev,name,resource,value);
