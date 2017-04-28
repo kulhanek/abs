@@ -22,7 +22,7 @@
 
 #include <RVAccount.hpp>
 #include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <PBSProModule.hpp>
 #include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ CExtUUID        RVAccountID(
                     "{ACCOUNT:4d347675-abd8-4b0d-8672-ee35d0e8062e}",
                     "account");
 
-CPluginObject   RVAccountObject(&ABSPlugin,
+CPluginObject   RVAccountObject(&PBSProPlugin,
                     RVAccountID,RESOURCES_CAT,
                     RVAccountCB);
 

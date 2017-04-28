@@ -22,8 +22,9 @@
 
 #include <RVSelect.hpp>
 #include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <PBSProModule.hpp>
 #include <ResourceList.hpp>
+#include <pbs_ifl.h>
 
 // -----------------------------------------------------------------------------
 
@@ -33,7 +34,7 @@ CExtUUID        RVSelectID(
                     "{SELECT:e6b3a771-46a2-444c-ad13-0f859e78a4d7}",
                     "select");
 
-CPluginObject   RVSelectObject(&ABSPlugin,
+CPluginObject   RVSelectObject(&PBSProPlugin,
                     RVSelectID,RESOURCES_CAT,
                     RVSelectCB);
 
@@ -101,8 +102,8 @@ void CRVSelect::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 
 void CRVSelect::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    name = "Resource_List";
-    resource = Name;
+    name = ATTR_l;
+    resource = "select";
     value = Value;
 }
 

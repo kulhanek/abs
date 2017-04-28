@@ -2,6 +2,7 @@
 # ABS CMake File
 # ==============================================================================
 
+INCLUDE_DIRECTORIES(. SYSTEM)
 INCLUDE_DIRECTORIES(pbspro SYSTEM)
 INCLUDE_DIRECTORIES(resources SYSTEM)
 
@@ -21,6 +22,7 @@ SET(PBSPRO_SRC
         resources/RVGroup.cpp
         resources/RVUMask.cpp
         resources/RVPlace.cpp
+        resources/RVProps.cpp
         )
 
 # create shared library --------------------------------------------------------

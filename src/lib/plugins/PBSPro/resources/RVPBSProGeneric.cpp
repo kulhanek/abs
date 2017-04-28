@@ -22,7 +22,7 @@
 
 #include <RVPBSProGeneric.hpp>
 #include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <PBSProModule.hpp>
 #include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
@@ -33,7 +33,7 @@ CExtUUID        RVPBSProGenericID(
                     "{PBSPRO_GENERIC:5cf1351c-883d-4927-8348-6448c0baa888}",
                     "pbsprogeneric");
 
-CPluginObject   RVPBSProGenericObject(&ABSPlugin,
+CPluginObject   RVPBSProGenericObject(&PBSProPlugin,
                     RVPBSProGenericID,RESOURCES_CAT,
                     RVPBSProGenericCB);
 

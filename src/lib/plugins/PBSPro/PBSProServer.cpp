@@ -616,9 +616,11 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
 // ------------
     rv_ptr = p_rl->FindResource("props");
     if( rv_ptr ){
+        // syntax [^]property[=value][(#|:)other_property...]
+
         vector<string> slist;
         string         svalue(rv_ptr->GetValue());
-        split(slist,svalue,is_any_of("#"),boost::token_compress_on);
+        split(slist,svalue,is_any_of("#:"),boost::token_compress_on);
 
         vector<string>::iterator it = slist.begin();
         vector<string>::iterator ie = slist.end();
@@ -628,12 +630,18 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
             it++;
             if( item.size() == 0 ) continue;
             string name = item;
-            string value = "true";
-            if( item[0] == '^' ){
-                name = string(item.begin()+1,item.end());
-                value = "false";
+            if ( item.find('=') != string::npos ){
+                // item already contains property name and its value
+                str << ":" << item;
+            } else {
+                // old fashion property specification
+                string value = "true";
+                if( item[0] == '^' ){
+                    name = string(item.begin()+1,item.end());
+                    value = "false";
+                }
+                str << ":" << name << "=" << value;
             }
-            str << ":" << name << "=" << value;
         }
     }
 

@@ -22,7 +22,7 @@
 
 #include <RVGroup.hpp>
 #include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <PBSProModule.hpp>
 #include <ResourceList.hpp>
 #include <pbs_ifl.h>
 
@@ -34,7 +34,7 @@ CExtUUID        RVGroupID(
                     "{GROUP:4eaddbda-7bf3-45e6-bd5f-dc1eec3754ee}",
                     "group");
 
-CPluginObject   RVGroupObject(&ABSPlugin,
+CPluginObject   RVGroupObject(&PBSProPlugin,
                     RVGroupID,RESOURCES_CAT,
                     RVGroupCB);
 

@@ -22,7 +22,7 @@
 
 #include <RVUMask.hpp>
 #include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <PBSProModule.hpp>
 #include <ResourceList.hpp>
 #include <pbs_ifl.h>
 
@@ -34,7 +34,7 @@ CExtUUID        RVUMaskID(
                     "{UMASK:8dafea8a-5090-4439-b6fc-0ac8228ff594}",
                     "umask");
 
-CPluginObject   RVUMaskObject(&ABSPlugin,
+CPluginObject   RVUMaskObject(&PBSProPlugin,
                     RVUMaskID,RESOURCES_CAT,
                     RVUMaskCB);
 

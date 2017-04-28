@@ -28,7 +28,6 @@ SET(ABS_SRC
         resources/default/RVWorkDir.cpp
         resources/default/RVWorkSize.cpp
         resources/default/RVWorkSizePerCPU.cpp
-        resources/default/RVProps.cpp
         resources/default/RVDataIn.cpp
         resources/default/RVDataOut.cpp
 

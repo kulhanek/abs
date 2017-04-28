@@ -22,7 +22,7 @@
 
 #include <RVPlace.hpp>
 #include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <PBSProModule.hpp>
 #include <ResourceList.hpp>
 #include <pbs_ifl.h>
 
@@ -34,7 +34,7 @@ CExtUUID        RVPlaceID(
                     "{PLACE:9f391d49-b3f2-4a36-b4c5-cd211223d9b4}",
                     "place");
 
-CPluginObject   RVPlaceObject(&ABSPlugin,
+CPluginObject   RVPlaceObject(&PBSProPlugin,
                     RVPlaceID,RESOURCES_CAT,
                     RVPlaceCB);
 

@@ -22,7 +22,7 @@
 
 #include <RVWalltime.hpp>
 #include <CategoryUUID.hpp>
-#include <ABSModule.hpp>
+#include <PBSProModule.hpp>
 #include <ResourceList.hpp>
 #include <sstream>
 #include <iomanip>
@@ -36,7 +36,7 @@ CExtUUID        RVWalltimeID(
                     "{WALLTIME:0bf8863e-67fa-4027-9c0e-41e42be50ecc}",
                     "walltime");
 
-CPluginObject   RVWalltimeObject(&ABSPlugin,
+CPluginObject   RVWalltimeObject(&PBSProPlugin,
                     RVWalltimeID,RESOURCES_CAT,
                     RVWalltimeCB);
 
