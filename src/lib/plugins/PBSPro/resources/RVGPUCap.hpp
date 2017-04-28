@@ -1,5 +1,5 @@
-#ifndef GPUCapH
-#define GPUCapH
+#ifndef RVGPUCapH
+#define RVGPUCapH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -29,10 +29,10 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CGPUCap : public CResourceValue {
+class ABS_PACKAGE CRVGPUCap : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CGPUCap(void);
+        CRVGPUCap(void);
 
 // information methods ---------------------------------------------------------
     /// get batch attribute

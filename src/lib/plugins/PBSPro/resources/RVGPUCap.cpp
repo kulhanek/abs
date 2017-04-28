@@ -20,7 +20,7 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <GPUCap.hpp>
+#include <RVGPUCap.hpp>
 #include <CategoryUUID.hpp>
 #include <PBSProModule.hpp>
 #include <ResourceList.hpp>
@@ -28,21 +28,21 @@
 
 // -----------------------------------------------------------------------------
 
-CComObject* GPUCapCB(void* p_data);
+CComObject* RVGPUCapCB(void* p_data);
 
-CExtUUID        GPUCapID(
+CExtUUID        RVGPUCapID(
                     "{GPUCAP:f88b3567-b4d4-477c-9ff8-638d6bbbbc90}",
                     "gpucap");
 
-CPluginObject   GPUCapObject(&PBSProPlugin,
-                    GPUCapID,RESOURCES_CAT,
-                    GPUCapCB);
+CPluginObject   RVGPUCapObject(&PBSProPlugin,
+                    RVGPUCapID,RESOURCES_CAT,
+                    RVGPUCapCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* GPUCapCB(void* p_data)
+CComObject* RVGPUCapCB(void* p_data)
 {
-    CComObject* p_object = new CGPUCap();
+    CComObject* p_object = new CRVGPUCap();
     return(p_object);
 }
 
@@ -54,23 +54,23 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CGPUCap::CGPUCap(void)
-    : CResourceValue(&GPUCapObject)
+CRVGPUCap::CRVGPUCap(void)
+    : CResourceValue(&RVGPUCapObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CGPUCap::ResolveDynamicResource(CResourceList* p_rl,bool delete_me)
+void CRVGPUCap::ResolveDynamicResource(CResourceList* p_rl,bool delete_me)
 {
-    CResourceValuePtr p_ngpus = p_rl->FindResources("ngpus");
+    CResourceValuePtr p_ngpus = p_rl->FindResource("ngpus");
     // remove this attribute if ngpus == 0
     if( (p_ngpus == NULL) || (p_ngpus->GetNumber() == 0) ) delete_me = true;
 }
 
 //------------------------------------------------------------------------------
 
-void CGPUCap::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
+void CRVGPUCap::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
     name = ATTR_l;
     resource = "gpu_cap";
