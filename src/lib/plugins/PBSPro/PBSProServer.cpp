@@ -773,20 +773,19 @@ void CPBSProServer::CreateJobAttributes(struct attropl* &p_prev,CResourceList* p
     std::list<CResourceValuePtr>::iterator     it = p_rl->begin();
     std::list<CResourceValuePtr>::iterator     ie = p_rl->end();
 
-    CSmallString submit_args;
-
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
         CSmallString name,resource,value;
         p_rv->GetAttribute(name,resource,value);
-        p_rv->AddToSubmitArgs(submit_args);
         if( name != NULL ){
-            set_attribute(p_prev,name,resource,value);
+            if( resource == NULL ){
+                set_attribute(p_prev,name,NULL,value);
+            } else {
+                set_attribute(p_prev,name,resource,value);
+            }
         }
         it++;
     }
-
-    set_attribute(p_prev,ATTR_submit_arguments,NULL,submit_args);
 }
 
 //------------------------------------------------------------------------------

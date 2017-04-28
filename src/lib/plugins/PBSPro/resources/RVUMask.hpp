@@ -38,8 +38,8 @@ public:
     /// test value if it is in expected range
     virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
-    /// populate submit arguments
-    virtual void AddToSubmitArgs(CSmallString& args);
+    /// get batch attribute
+    virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);
 };
 
 // -----------------------------------------------------------------------------
