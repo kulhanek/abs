@@ -466,6 +466,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_QUEUE",queue);
     SetItem("specific/resources","INF_SERVER",BatchServerName);
     SetItem("specific/resources","INF_SERVER_SHORT",ShortServerName);
+    SetItem("specific/resources","INF_JOB_OWNER",User.GetName());
 
 // decode user resources
     ResourceList.AddResources(sres,sout,result,expertmode);
@@ -3008,7 +3009,8 @@ bool CJob::SaveJobKey(void)
 
 void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includecomment)
 {
-//    sout << "# ST    Job ID                    Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
+
+//    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
 //    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- --------------------" << endl;
 
     sout << "  ";
@@ -3052,7 +3054,12 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     } else {
     sout << "             ";
     }
-    sout << "             ";
+
+    CSmallString user = GetItem("specific/resources","INF_JOB_OWNER");
+    if( user.GetLength() > 12 ){
+        user = user.GetSubStringFromTo(0,11);
+    }
+    sout << " " << left << setw(12) << user << " ";
 
     CSmallString title = GetItem("basic/jobinput","INF_JOB_TITLE");
     sout << " " << setw(15) << title;
