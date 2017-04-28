@@ -31,8 +31,8 @@
 CComObject* GPUCapCB(void* p_data);
 
 CExtUUID        GPUCapID(
-                    "{PLACE:9f391d49-b3f2-4a36-b4c5-cd211223d9b4}",
-                    "place");
+                    "{GPUCAP:f88b3567-b4d4-477c-9ff8-638d6bbbbc90}",
+                    "gpucap");
 
 CPluginObject   GPUCapObject(&PBSProPlugin,
                     GPUCapID,RESOURCES_CAT,
