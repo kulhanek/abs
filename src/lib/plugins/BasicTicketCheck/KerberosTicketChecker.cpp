@@ -95,12 +95,13 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
             ES_ERROR("unable to popen klist");
             return(false);
         }
-    CSmallString line;
+    string principal;
     while( feof(p_stdout) == 0 ){
+        CSmallString line;
         line.ReadLineFromFile(p_stdout);
         if( line.FindSubString("Principal:") != -1 ){
             stringstream str(line.GetBuffer());
-            string key,principal;
+            string key;
             str >> key >> principal;
             vector<string> items;
             split(items,principal,is_any_of("@"));
@@ -114,7 +115,7 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
 
     if( principal_ok == false ){
         sout << endl;
-        sout <<  "<b><red> ERROR: The Kerberos principal does not match with the logged user!</red></b>" << endl;
+        sout <<  "<b><red> ERROR: The Kerberos principal '" << principal << "' does not match with the logged user!</red></b>" << endl;
         sout <<          "        Obtain the correct Kerbeors tickets by the <b>kinit " << User.GetName() << "</b> command." << endl;
         sout << endl;
         sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("kinit") << "</blue></b>" << endl;
