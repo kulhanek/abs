@@ -1,5 +1,5 @@
-#ifndef RVGroupH
-#define RVGroupH
+#ifndef RVBatchGroupH
+#define RVBatchGroupH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -29,10 +29,10 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CRVGroup : public CResourceValue {
+class ABS_PACKAGE CRVBatchGroup : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CRVGroup(void);
+        CRVBatchGroup(void);
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range

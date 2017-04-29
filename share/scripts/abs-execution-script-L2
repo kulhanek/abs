@@ -16,7 +16,7 @@
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.0: Cross-host user group translation rules ..."
+echo "# L2.0: Cross-host user group translation rules for rsync ..."
 echo "# ------------------------------------------------------------------------------"
 echo ""
 
@@ -25,16 +25,16 @@ INF_W_GROUP=`id -g -n`
 
 # I->W and W->I
 if [ "$INF_INPUT_MACHINE_GROUPNS" != "$INF_STORAGE_MACHINE_GROUPNS" ]; then
-    INF_IW_GROUPS="$INF_USTORAGEGROUP@$INF_STORAGE_MACHINE_REALM:$INF_W_GROUP"
-    INF_WI_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP@$INF_STORAGE_MACHINE_REALM"
+    INF_IW_RSYNCOPTS="--chown=:$INF_W_GROUP"
+    INF_WI_RSYNCOPTS="--chown=:$INF_USTORAGEGROUP@$INF_STORAGE_MACHINE_REALM"
 else
-    INF_IW_GROUPS="$INF_USTORAGEGROUP:$INF_W_GROUP"
-    INF_WI_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP"
+    INF_IW_RSYNCOPTS="--chown=:$INF_W_GROUP"
+    INF_WI_RSYNCOPTS="--chown=:$INF_USTORAGEGROUP"
 fi
 
 # S->W and W->S
-INF_SW_GROUPS="$INF_USTORAGEGROUP:$INF_W_GROUP"
-INF_WS_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP"
+INF_SW_RSYNCOPTS="--chown=:$INF_W_GROUP"
+INF_WS_RSYNCOPTS="--chown=:$INF_USTORAGEGROUP"
 
 # L->W and W->L
 if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
@@ -46,27 +46,27 @@ if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
             echo "" >&2
             exit 1
         fi
-        INF_LW_GROUPS="$INF_USTORAGEGROUP@$INF_STORAGE_MACHINE_REALM:$INF_W_GROUP"
-        INF_WL_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP@$INF_STORAGE_MACHINE_REALM"
+        INF_LW_RSYNCOPTS="--chown=:$INF_W_GROUP"
+        INF_WL_RSYNCOPTS="--chown=:$INF_USTORAGEGROUP@$INF_STORAGE_MACHINE_REALM"
     else
-        INF_LW_GROUPS="$INF_USTORAGEGROUP:$INF_W_GROUP"
-        INF_WL_GROUPS="$INF_W_GROUP:$INF_USTORAGEGROUP"
+        INF_LW_RSYNCOPTS="--chown=:$INF_W_GROUP"
+        INF_WL_RSYNCOPTS="--chown=:$INF_USTORAGEGROUP"
     fi
 fi
 
-export INF_IW_GROUPS
-export INF_WI_GROUPS
-export INF_SW_GROUPS
-export INF_WS_GROUPS
-export INF_LW_GROUPS
-export INF_WL_GROUPS
+export INF_IW_RSYNCOPTS
+export INF_WI_RSYNCOPTS
+export INF_SW_RSYNCOPTS
+export INF_WS_RSYNCOPTS
+export INF_LW_RSYNCOPTS
+export INF_WL_RSYNCOPTS
 
-echo "I->W : $INF_IW_GROUPS"
-echo "W->I : $INF_WI_GROUPS"
-echo "S->W : $INF_SW_GROUPS"
-echo "W->S : $INF_WS_GROUPS"
-echo "L->W : $INF_LW_GROUPS"
-echo "W->L : $INF_WL_GROUPS"
+echo "I->W : $INF_IW_RSYNCOPTS"
+echo "W->I : $INF_WI_RSYNCOPTS"
+echo "S->W : $INF_SW_RSYNCOPTS"
+echo "W->S : $INF_WS_RSYNCOPTS"
+echo "L->W : $INF_LW_RSYNCOPTS"
+echo "W->L : $INF_WL_RSYNCOPTS"
 
 INF_L_FSTYPE="other"
 # is local input directory of nfs4:krb5 type?

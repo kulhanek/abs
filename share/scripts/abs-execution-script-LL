@@ -45,31 +45,38 @@ function inf-retry-cmd()
 function inf-copy-from-inputdir() 
 {
     echo "= inf-copy-from-inputdir:"
+
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
-        echo "  > coping the data from the local mount via cp ... "
-        echo "    $INF_INPUT_DIR/$1 -> $2"  
-        cp "$INF_INPUT_DIR/$1" "$2"
-        if [ $? -eq 0 ]; then
-            return 0
-        fi
-        echo "  !failure"
-    else
-        echo "  > coping the data from the input storage machine via scp ... "
-        echo "    $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1 -> $2"
-        /usr/bin/scp "$INF_SSH_OPTIONS" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
+        echo "  > rsyncing the data from the local mount ... "
+        echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/$1 -> $2"
+        rsync -av $INF_LW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+              "$INF_INPUT_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
             return 0
         fi
         echo "  !failure"
     fi
-    echo "  > coping the data from the input machine via scp ... "
-    echo "    $INF_INPUT_MACHINE:$INF_INPUT_DIR/$1 -> $2"
-    /usr/bin/scp "$INF_SSH_OPTIONS" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
-    
+
+    echo "  > rsyncing the data from the storage machine via scp ... "
+    echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1 -> $2"
+    rsync -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+          $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
     if [ $? -eq 0 ]; then
         return 0
     fi
     echo "  !failure"
+
+    if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+        echo "  > rsyncing the data from the input machine via scp ... "
+        echo "    $INF_IW_RSYNCOPTS  $INF_INPUT_MACHINE:$INF_INPUT_DIR/$1 -> $2"
+        rsync -av $INF_IW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+              "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
+        if [ $? -eq 0 ]; then
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
     return 1
 }
 
@@ -78,30 +85,41 @@ function inf-copy-from-inputdir()
 function inf-copy-to-inputdir() 
 {
     echo "= inf-copy-to-inputdir:"
+
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
-        echo "  > coping the data to the local mount via cp ... "
-        echo "    $1 -> $INF_INPUT_DIR/$2"
-        cp  "$1" "$INF_INPUT_DIR/$2"
-        if [ $? -eq 0 ]; then
-            return 0
-        fi
-        echo "  !failure"
-    else
-        echo "  > coping the data to the input storage machine via scp ... "
-        echo "    $1 -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
-        /usr/bin/scp "$INF_SSH_OPTIONS" "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
+        echo "  > rsyncing the data to the local mount ... "
+        echo "    $INF_WL_RSYNCOPTS $1 -> $INF_INPUT_DIR/$2"
+        echo ""
+        rsync -av $INF_WL_RSYNCOPTS \
+              "$1" "$INF_INPUT_DIR/$2"
         if [ $? -eq 0 ]; then
             return 0
         fi
         echo "  !failure"
     fi
-    echo "  > coping the data to the input machine via scp ... "
-    echo "    $1 -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
-    /usr/bin/scp "$INF_SSH_OPTIONS" "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"    
+
+    echo "  > rsyncing the data to the storage machine via scp ... "
+    echo "    $INF_WS_RSYNCOPTS $1 -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
+    echo ""
+    rsync -av $INF_WS_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+          "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
     if [ $? -eq 0 ]; then
         return 0
     fi
     echo "  !failure"
+
+    if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+        echo "  > rsyncing the data to the input machine via scp ... "
+        echo "    $INF_WI_RSYNCOPTS $1 -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
+        echo ""
+        rsync -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
+        if [ $? -eq 0 ]; then
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
     return 1
 }
 
@@ -126,21 +144,9 @@ function inf-rsync-from-inputdir()
     echo ""
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "  > rsyncing from the local mount ... "
-        echo "    $INF_INPUT_DIR/ -> $INF_WORK_DIR/"
+        echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/ -> $INF_WORK_DIR/"
         echo ""
-        rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" "$INF_INPUT_DIR/" "$INF_WORK_DIR/"
-        if [ $? -eq 0 ]; then
-            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-            rm -f $TMPDIR/${_TNAME_}.excluded
-            return 0
-        fi
-        echo "  !failure"
-    else
-        echo "  > rsyncing from the input storage machine via scp ... "
-        echo "    $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/ -> $INF_WORK_DIR/"
-        echo ""
-        rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-              "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/" "$INF_WORK_DIR/"
+        rsync -av $INF_LW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" "$INF_INPUT_DIR/" "$INF_WORK_DIR/"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             rm -f $TMPDIR/${_TNAME_}.excluded
@@ -149,17 +155,33 @@ function inf-rsync-from-inputdir()
         echo "  !failure"
     fi
 
-    echo "  > rsyncing from the input machine via scp ... "
-    echo "    $INF_INPUT_MACHINE:$INF_INPUT_DIR/ -> $INF_WORK_DIR/"
+    echo "  > rsyncing from the storage machine via scp ... "
+    echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/ -> $INF_WORK_DIR/"
     echo ""
-    rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-          "$INF_INPUT_MACHINE:$INF_INPUT_DIR/" "$INF_WORK_DIR/"
+    rsync -av $INF_SW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
+          "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/" "$INF_WORK_DIR/"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         rm -f $TMPDIR/${_TNAME_}.excluded
         return 0
     fi
     echo "  !failure"
+
+    if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+        echo "  > rsyncing from the input machine via scp ... "
+        echo "    $INF_IW_RSYNCOPTS $INF_INPUT_MACHINE:$INF_INPUT_DIR/ -> $INF_WORK_DIR/"
+        echo ""
+        rsync -av $INF_IW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
+              "$INF_INPUT_MACHINE:$INF_INPUT_DIR/" "$INF_WORK_DIR/"
+        if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            rm -f $TMPDIR/${_TNAME_}.excluded
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     rm -f $TMPDIR/${_TNAME_}.excluded
     return 1
 }
@@ -180,21 +202,9 @@ function inf-rsync-to-inputdir()
     echo ""
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "  > rsyncing to the local mount ... "
-        echo "    $INF_WORK_DIR/ -> $INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
+        echo "    $INF_WL_RSYNCOPTS $INF_WORK_DIR/ -> $INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
         echo ""
-        rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" "$INF_WORK_DIR/" "$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
-        if [ $? -eq 0 ]; then
-            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-            rm -f $TMPDIR/${_TNAME_}.excluded
-            return 0
-        fi
-        echo "  !failure"
-    else
-        echo "  > rsyncing to the input storage machine via scp ... "
-        echo "    $INF_WORK_DIR/ -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
-        echo ""
-        rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-              "$INF_WORK_DIR/" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
+        rsync -av $INF_WL_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" "$INF_WORK_DIR/" "$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             rm -f $TMPDIR/${_TNAME_}.excluded
@@ -203,17 +213,33 @@ function inf-rsync-to-inputdir()
         echo "  !failure"
     fi
 
-    echo "  > rsyncing to the input machine via scp ... "
-    echo "    $INF_WORK_DIR/ -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
+    echo "  > rsyncing to the storage machine via scp ... "
+    echo "    $INF_WS_RSYNCOPTS $INF_WORK_DIR/ -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
     echo ""
-    rsync -av --no-g --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-          "$INF_WORK_DIR/" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
+    rsync -av $INF_WS_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
+          "$INF_WORK_DIR/" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         rm -f $TMPDIR/${_TNAME_}.excluded
         return 0
     fi
     echo "  !failure"
+
+    if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+        echo "  > rsyncing to the input machine via scp ... "
+        echo "    $INF_WI_RSYNCOPTS $INF_WORK_DIR/ -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
+        echo ""
+        rsync -av $INF_WI_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
+              "$INF_WORK_DIR/" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
+        if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            rm -f $TMPDIR/${_TNAME_}.excluded
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     rm -f $TMPDIR/${_TNAME_}.excluded
     return 1
 }

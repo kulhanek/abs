@@ -531,7 +531,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
 // umask and group
     SetItem("specific/resources","INF_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
-    SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));
+    SetItem("specific/resources","INF_UBATCHGROUP",ResourceList.GetResourceValue("batchgroup"));
     SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
 
 // setup specific items for working directory
@@ -703,7 +703,8 @@ bool CJob::InputDirectory(void)
 
 // do not set here - it might be modifed later
 //    // set default user group and umask
-//    SetItem("specific/resources","INF_UGROUP",ResourceList.GetResourceValue("group"));
+//    SetItem("specific/resources","INF_UBATCHGROUP",ResourceList.GetResourceValue("batchgroup"));
+//    SetItem("specific/resources","INF_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
 //    SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
     return(true);
 }
@@ -2405,7 +2406,8 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Storage user grp : " <<  tmp << "[@" << tmp1 << "]" << endl;
     }
 
-    tmp = GetItem("specific/resources","INF_UGROUP");
+    // refactorization: INF_UGROUP -> INF_BATCH_UGROUP
+    tmp = GetItem("specific/resources","INF_UBATCHGROUP",true);
     if( tmp == NULL ) tmp = "-default server group-";
     sout << "Batch user group : " <<  tmp << endl;
 

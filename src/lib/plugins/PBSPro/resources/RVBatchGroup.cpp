@@ -20,7 +20,7 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVGroup.hpp>
+#include <RVBatchGroup.hpp>
 #include <CategoryUUID.hpp>
 #include <PBSProModule.hpp>
 #include <ResourceList.hpp>
@@ -36,21 +36,21 @@
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVGroupCB(void* p_data);
+CComObject* RVBatchGroupCB(void* p_data);
 
-CExtUUID        RVGroupID(
-                    "{GROUP:4eaddbda-7bf3-45e6-bd5f-dc1eec3754ee}",
-                    "group");
+CExtUUID        RVBatchGroupID(
+                    "{BATCH_GROUP:4eaddbda-7bf3-45e6-bd5f-dc1eec3754ee}",
+                    "batchgroup");
 
-CPluginObject   RVGroupObject(&PBSProPlugin,
-                    RVGroupID,RESOURCES_CAT,
-                    RVGroupCB);
+CPluginObject   RVBatchGroupObject(&PBSProPlugin,
+                    RVBatchGroupID,RESOURCES_CAT,
+                    RVBatchGroupCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVGroupCB(void* p_data)
+CComObject* RVBatchGroupCB(void* p_data)
 {
-    CComObject* p_object = new CRVGroup();
+    CComObject* p_object = new CRVBatchGroup();
     return(p_object);
 }
 
@@ -62,14 +62,14 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVGroup::CRVGroup(void)
-    : CResourceValue(&RVGroupObject)
+CRVBatchGroup::CRVBatchGroup(void)
+    : CResourceValue(&RVBatchGroupObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVBatchGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     CJob* p_job = p_rl->GetJob();
 
@@ -154,7 +154,7 @@ void CRVGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 
 //------------------------------------------------------------------------------
 
-void CRVGroup::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
+void CRVBatchGroup::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
     name = ATTR_g;
     resource = NULL;
