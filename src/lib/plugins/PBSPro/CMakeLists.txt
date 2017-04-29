@@ -19,7 +19,7 @@ SET(PBSPRO_SRC
         resources/RVAccount.cpp
         resources/RVWalltime.cpp
         resources/RVPBSProGeneric.cpp
-        resources/RVGroup.cpp
+        resources/RVBatchGroup.cpp
         resources/RVUMask.cpp
         resources/RVPlace.cpp
         resources/RVProps.cpp

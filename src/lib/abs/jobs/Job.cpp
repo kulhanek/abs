@@ -679,14 +679,14 @@ bool CJob::InputDirectory(void)
             string realm = gname.substr(gname.find("@")+1,string::npos);
             // consistency check
             if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
-                ResourceList.AddResource("group",gname.substr(0,gname.find("@")));
+                ResourceList.AddResource("batchgroup",gname.substr(0,gname.find("@")));
             } else {
                 CSmallString error;
                 error << "consistency check error: jobdir realm '" << realm << "' is not the same as for storage host'" << Host.GetRealm(storage_machine) << "'";
                 ES_TRACE_ERROR(error);
             }
         } else {
-            ResourceList.AddResource("group",gname);
+            ResourceList.AddResource("batchgroup",gname);
         }
     }
 
