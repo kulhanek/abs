@@ -60,7 +60,7 @@ function inf-copy-from-inputdir()
     echo "  > rsyncing the data from the storage machine via scp ... "
     echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1 -> $2"
     rsync -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-          $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
+          "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
     if [ $? -eq 0 ]; then
         return 0
     fi
