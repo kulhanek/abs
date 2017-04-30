@@ -100,11 +100,12 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
     line1.ReadLineFromFile(p_stdout);
 
     CSmallString line2;
-    line2.ReadLineFromFile(p_stdout);
+    // do not store terminal new line
+    line2.ReadLineFromFile(p_stdout,true);
 
     vector<string>  keys;
     string          sline2(line2);
-    split(keys,sline2,is_any_of(" \t\n"),token_compress_on);
+    split(keys,sline2,is_any_of(" "),token_compress_on);
 
     sout << "keys=" << keys.size() << endl;
 
