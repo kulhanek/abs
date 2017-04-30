@@ -106,7 +106,7 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
     string          sline2(line2);
     split(keys,sline2,is_any_of(" \t\n"),token_compress_on);
 
-    vout << "keys=" << keys.size() << endl;
+    sout << "keys=" << keys.size() << endl;
 
     string principal;
     if( keys.size() > 0 ){
