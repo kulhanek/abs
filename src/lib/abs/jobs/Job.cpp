@@ -408,7 +408,7 @@ ERetStatus CJob::JobInput(std::ostream& sout)
     SetItem("basic/modules","INF_EXPORTED_MODULES",AMSGlobalConfig.GetExportedModules());
 
     // unique job key
-    SetItem("basic/jobinput","INF_JOB_KEY",CUtils::GenerateUUID());
+    SetItem("basic/j    obinput","INF_JOB_KEY",CUtils::GenerateUUID());
 
     return(ERS_OK);
 }
@@ -1913,6 +1913,19 @@ void CJob::PrepareSyncWorkingDirEnv(void)
     ShellProcessor.SetVariable("INF_SYNC_WORK_DIR",GetItem("start/workdir","INF_WORK_DIR"));
     ShellProcessor.SetVariable("INF_SYNC_INPUT_MACHINE",GetItem("basic/jobinput","INF_INPUT_MACHINE"));
     ShellProcessor.SetVariable("INF_SYNC_INPUT_DIR",GetItem("basic/jobinput","INF_INPUT_DIR"));
+    CSmallString ssh_opts;
+    if( ABSConfig.GetSystemConfigItem("INF_SSH_OPTIONS",ssh_opts) == false ){
+        ssh_opts = "-o StrictHostKeyChecking=no";
+    }
+    ShellProcessor.SetVariable("INF_SSH_OPTIONS",ssh_opts);
+
+    CSmallString INF_WI_RSYNCOPTS;
+    if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
+        INF_WI_RSYNCOPTS << "--chown=:" << GetItem("specific/resources","INF_USTORAGEGROUP") << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+    } else {
+        INF_WI_RSYNCOPTS << "--chown=:" << GetItem("specific/resources","INF_USTORAGEGROUP");
+    }
+    ShellProcessor.SetVariable("INF_WI_RSYNCOPTS",INF_WI_RSYNCOPTS);
 }
 
 //------------------------------------------------------------------------------

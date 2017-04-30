@@ -90,38 +90,33 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
 
     // check the principal name
     bool principal_ok = false;
-    p_stdout = popen("klist","r");
+    p_stdout = popen("klist 2> /dev/null","r");
         if( p_stdout == NULL ){
             ES_ERROR("unable to popen klist");
             return(false);
         }
+
+    CSmallString line1;
+    line1.ReadLineFromFile(p_stdout);
+
+    CSmallString line2;
+    line2.ReadLineFromFile(p_stdout);
+
+    vector<string>  keys;
+    string          sline2;
+    split(keys,sline2,is_any_of(" \t\n"),token_compress_on);
+
     string principal;
-    while( feof(p_stdout) == 0 ){
-        CSmallString line;
-        line.ReadLineFromFile(p_stdout);
-        if( line.FindSubString("Principal:") != -1 ){       // Heimdal Krb5
-            stringstream str(line.GetBuffer());
-            string key;
-            str >> key >> principal;
-            vector<string> items;
-            split(items,principal,is_any_of("@"));
-            if( items.size() >= 1 ){
-                if( User.GetName() == CSmallString(items[0]) ) principal_ok = true;
-                break;
-            }
-        }
-        if( line.FindSubString("Default principal:") != -1 ){ // MIT Krb5
-            stringstream str(line.GetBuffer());
-            string key;
-            str >> key >> key >> principal;
-            vector<string> items;
-            split(items,principal,is_any_of("@"));
-            if( items.size() >= 1 ){
-                if( User.GetName() == CSmallString(items[0]) ) principal_ok = true;
-                break;
-            }
+    if( keys.size() > 0 ){
+        // get the last key on the second line
+        principal = keys[keys.size()-1];
+        vector<string> items;
+        split(items,principal,is_any_of("@"));
+        if( items.size() >= 1 ){
+            if( User.GetName() == CSmallString(items[0]) ) principal_ok = true;
         }
     }
+
     pclose(p_stdout);
 
     if( principal_ok == false ){

@@ -44,14 +44,18 @@ function inf-retry-cmd()
 
 function inf-copy-from-inputdir() 
 {
+    echo ""
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     echo "= inf-copy-from-inputdir:"
 
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "  > rsyncing the data from the local mount ... "
         echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/$1 -> $2"
+        echo ""
         rsync -av $INF_LW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
               "$INF_INPUT_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
         fi
         echo "  !failure"
@@ -59,9 +63,11 @@ function inf-copy-from-inputdir()
 
     echo "  > rsyncing the data from the storage machine via scp ... "
     echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1 -> $2"
+    echo ""
     rsync -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
           "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
     if [ $? -eq 0 ]; then
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         return 0
     fi
     echo "  !failure"
@@ -69,14 +75,17 @@ function inf-copy-from-inputdir()
     if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
         echo "  > rsyncing the data from the input machine via scp ... "
         echo "    $INF_IW_RSYNCOPTS  $INF_INPUT_MACHINE:$INF_INPUT_DIR/$1 -> $2"
+        echo ""
         rsync -av $INF_IW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
               "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
         fi
         echo "  !failure"
     fi
 
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     return 1
 }
 
@@ -84,6 +93,8 @@ function inf-copy-from-inputdir()
 
 function inf-copy-to-inputdir() 
 {
+    echo ""
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     echo "= inf-copy-to-inputdir:"
 
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
@@ -93,6 +104,7 @@ function inf-copy-to-inputdir()
         rsync -av $INF_WL_RSYNCOPTS \
               "$1" "$INF_INPUT_DIR/$2"
         if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
         fi
         echo "  !failure"
@@ -104,6 +116,7 @@ function inf-copy-to-inputdir()
     rsync -av $INF_WS_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
           "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
     if [ $? -eq 0 ]; then
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         return 0
     fi
     echo "  !failure"
@@ -115,11 +128,13 @@ function inf-copy-to-inputdir()
         rsync -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
             "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
         if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
         fi
         echo "  !failure"
     fi
 
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
     return 1
 }
 
