@@ -90,7 +90,7 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
 
     // check the principal name
     bool principal_ok = false;
-    p_stdout = popen("klist 2> /dev/null","r");
+    p_stdout = popen("klist","r");
         if( p_stdout == NULL ){
             ES_ERROR("unable to popen klist");
             return(false);
