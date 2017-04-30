@@ -408,7 +408,7 @@ ERetStatus CJob::JobInput(std::ostream& sout)
     SetItem("basic/modules","INF_EXPORTED_MODULES",AMSGlobalConfig.GetExportedModules());
 
     // unique job key
-    SetItem("basic/j    obinput","INF_JOB_KEY",CUtils::GenerateUUID());
+    SetItem("basic/jobinput","INF_JOB_KEY",CUtils::GenerateUUID());
 
     return(ERS_OK);
 }
