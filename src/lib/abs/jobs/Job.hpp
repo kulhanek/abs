@@ -452,7 +452,7 @@ protected:
     void PrintResourceTokens(std::ostream& sout,const CSmallString& title,const CSmallString& res_list);
 
     /// prepare data about input directory - called by DecodeResources
-    bool InputDirectory(void);
+    bool InputDirectory(std::ostream& sout);
 
     bool                                DoNotSave;
 

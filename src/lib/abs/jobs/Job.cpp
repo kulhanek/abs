@@ -418,7 +418,7 @@ ERetStatus CJob::JobInput(std::ostream& sout)
 bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 {
     // input directory
-    if( InputDirectory() == false ){
+    if( InputDirectory(sout) == false ){
         ES_TRACE_ERROR("unable to setup resources for the input directory");
         return(false);
     }
@@ -545,7 +545,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
 //------------------------------------------------------------------------------
 
-bool CJob::InputDirectory(void)
+bool CJob::InputDirectory(std::ostream& sout)
 {
     CSmallString input_machine = GetItem("basic/jobinput","INF_INPUT_MACHINE");
     CSmallString input_dir = GetItem("basic/jobinput","INF_INPUT_DIR");
@@ -666,7 +666,13 @@ bool CJob::InputDirectory(void)
 
     if( gname.find("@") != string::npos ){
         string realm = gname.substr(gname.find("@")+1,string::npos);
-        ResourceList.AddResource("storagegroup",gname.substr(0,gname.find("@")));
+        if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
+            ResourceList.AddResource("storagegroup",gname.substr(0,gname.find("@")));
+        } else {
+            sout << "<b><red> ERROR: Consistency check: Input directory group realm '" << realm
+                 << "' is not the same as the storage machine realm '" << Host.GetRealm(storage_machine) << "'!</red></b>" << endl;
+            return(false);
+        }
     } else {
         ResourceList.AddResource("storagegroup",gname);
     }
@@ -676,17 +682,16 @@ bool CJob::InputDirectory(void)
     if( storage_machine_groupns == batch_server_groupns ){
         // does it contain realm?
         if( gname.find("@") != string::npos ){
-            string realm = gname.substr(gname.find("@")+1,string::npos);
-            // consistency check
-            if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
-                ResourceList.AddResource("batchgroup",gname.substr(0,gname.find("@")));
-            } else {
-                CSmallString error;
-                error << "consistency check error: jobdir realm '" << realm << "' is not the same as for storage host'" << Host.GetRealm(storage_machine) << "'";
-                ES_TRACE_ERROR(error);
-            }
+            ResourceList.AddResource("batchgroup",gname.substr(0,gname.find("@")));
+
         } else {
             ResourceList.AddResource("batchgroup",gname);
+        }
+    } else {
+        // is not then try to use the current primary group name
+        if( batch_server_groupns == input_machine_groupns ){
+            // take the effective group
+            ResourceList.AddResource("batchgroup",User.GetEGroup());
         }
     }
 
