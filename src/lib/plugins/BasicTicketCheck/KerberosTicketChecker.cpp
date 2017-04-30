@@ -103,7 +103,7 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
     line2.ReadLineFromFile(p_stdout);
 
     vector<string>  keys;
-    string          sline2;
+    string          sline2(line2);
     split(keys,sline2,is_any_of(" \t\n"),token_compress_on);
 
     string principal;
