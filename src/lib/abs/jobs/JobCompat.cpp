@@ -562,7 +562,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     sout << "Req destination  : " << tmp << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
-    PrintResourceTokens(sout,"Req resources    : ",tmp);
+    PrintResourceTokens(sout,"Req resources    : ",tmp," ");
 
     tmp = GetItem("basic/arguments","INF_ARG_SYNC_MODE");
     if( tmp == NULL ){
@@ -575,7 +575,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     sout << "----------------------------------------" << endl;
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
     if( tmp != NULL ) {
-        PrintResourceTokens(sout,"Default resources: ",tmp);
+        PrintResourceTokens(sout,"Default resources: ",tmp,", ");
     }
 
     tmp = GetItem("specific/resources","INF_ALIAS");
@@ -585,7 +585,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     else{
     sout << "Alias            : " << tmp << endl;
     tmp = GetItem("specific/resources","INF_ALIAS_RESOURCES");
-    PrintResourceTokens(sout,"Alias resources  : ",tmp);
+    PrintResourceTokens(sout,"Alias resources  : ",tmp,", ");
 
     tmp = GetItem("specific/resources","INF_ALIAS_SYNC_MODE");
     sout << "Alias sync mode  : " << tmp << endl;
@@ -595,7 +595,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
     sout << "Queue            : " << tmp << endl;
 
     tmp = GetItem("specific/resources","INF_RESOURCES");
-    PrintResourceTokens(sout,"All resources    : ",tmp);
+    PrintResourceTokens(sout,"All resources    : ",tmp,", ");
 
     sout << "----------------------------------------" << endl;
 

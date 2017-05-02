@@ -2355,7 +2355,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
     if( tmp != NULL ){
-    sout << "Req resources    : " << tmp << endl;
+    PrintResourceTokens(sout,"Req resources    : ",tmp," ");
     } else {
     sout << "Req resources    : -none-" << endl;
     }
@@ -2366,14 +2366,14 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");    
     if( tmp != NULL ){
-    PrintResourceTokens(sout,"Default resources: ",tmp);
+    PrintResourceTokens(sout,"Default resources: ",tmp,", ");
     } else {
     sout << "Default resources: -none-" << endl;
     }
 
     tmp = GetItem("basic/jobinput","INF_JOB_PROJECT_RESOURCES",true);
     if( tmp != NULL ){
-    PrintResourceTokens(sout,"Project resources: ",tmp);
+    PrintResourceTokens(sout,"Project resources: ",tmp,", ");
     } else {
     sout << "Project resources: -none-" << endl;
     }
@@ -2385,11 +2385,11 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     else{
     sout << "Alias            : " << tmp << endl;    
     tmp = GetItem("specific/resources","INF_ALIAS_RESOURCES");
-    PrintResourceTokens(sout,"Alias resources  : ",tmp);
+    PrintResourceTokens(sout,"Alias resources  : ",tmp,", ");
     }
 
     tmp = GetItem("specific/resources","INF_RESOURCES");
-    PrintResourceTokens(sout,"All resources    : ",tmp);
+    PrintResourceTokens(sout,"All resources    : ",tmp,", ");
 
     tmp = GetItem("specific/resources","INF_QUEUE");
     sout << "Queue            : " << tmp << endl;
@@ -2496,7 +2496,8 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, const CSmallString& res_list)
+void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, const CSmallString& res_list,
+                               const CSmallString& delim)
 {
     string          svalue = string(res_list);
     vector<string>  items;
@@ -2530,14 +2531,14 @@ void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, con
             tlen += sres.size();
             tlen++;
             if( tlen > ncolumns ){
-                sout << "," << endl;
+                sout << delim << endl;
                 for(unsigned int i=0; i < title.GetLength(); i++){
                     sout << " ";
                 }
                 len = title.GetLength();
             } else {
-                sout << ", ";
-                len += 2;
+                sout << delim;
+                len += delim.GetLength();
             }
         }
     }
