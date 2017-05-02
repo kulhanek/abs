@@ -277,8 +277,6 @@ void CResourceList::RemoveResource(const CSmallString& name)
         }
     }
 
-    cout << "r-res:" << name << " fname: " << fname << " s: " << srv << endl;
-
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
