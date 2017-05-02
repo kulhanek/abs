@@ -137,6 +137,14 @@ void CResourceList::AddResources(const CSmallString& resources,std::ostream& sou
 void CResourceList::AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,
                                 bool& rstatus, bool expertmode)
 {
+// FIXME
+    //    // does name contain a batch server name?
+//    string srv;
+//    if( name.find("?") != string::npos ){
+//        name = name.substr(name.find("?")+1,string::npos);
+//        srv = name.substr(0,name.find("?"));
+//    }
+
     // be sure that the resource is unique
     RemoveResource(name);
 

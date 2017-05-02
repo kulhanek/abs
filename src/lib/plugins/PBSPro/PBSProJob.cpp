@@ -204,6 +204,7 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     SetItem("specific/resources","INF_NNODES",tmp);
 
 // ------------------
+    // http://www.pbsworks.com/pdfs/PBS14.2.1_BigBook.pdf - page 1130
     // this is optional - times
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_ctime,NULL,tmp);
@@ -219,7 +220,13 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
 
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_stime,NULL,tmp);
-    SetItem("batch/job","INF_START_TIME",tmp);
+    if( tmp != NULL ){
+        SetItem("batch/job","INF_START_TIME",tmp);
+    } if( BatchJobStatus == EJS_RUNNING ){
+        // bypass for RT#198677
+        get_attribute(p_job->attribs,ATTR_etime,NULL,tmp);
+        SetItem("batch/job","INF_START_TIME",tmp);
+    }
 
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_mtime,NULL,tmp);

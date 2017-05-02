@@ -419,7 +419,7 @@ protected:
     void DetectJobProject(void);
 
     /// detect job project
-    CSmallString GetJobProject(const CFileName& dir);
+    CSmallString GetJobProject(const CFileName& dir,CSmallString& resources);
 
     /// detect job collection
     void DetectJobCollection(void);

@@ -151,7 +151,6 @@ bool CJob::SaveInfoFileWithPerms(void)
     if( result == false ) return(false);
 
 // permissions
-    // FIXME
     CSmallString sumask = GetItem("specific/resources","INF_UMASK");
     mode_t umask = CUser::GetUMaskMode(sumask);
 
@@ -160,12 +159,11 @@ bool CJob::SaveInfoFileWithPerms(void)
     CFileSystem::SetPosixMode(name,fmode);
 
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-    if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
-        sgroup += "@";
-        sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
-    }
-
     if( sgroup != NULL ){
+        if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
+            sgroup += "@";
+            sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+        }
         gid_t group = User.GetGroupID(sgroup);
         int ret = chown(name,-1,group);
         if( ret != 0 ){
@@ -450,6 +448,14 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
         SetItem("specific/resources","INF_DEFAULT_RESOURCES",sdef_res);
     }
 
+    // add project resources
+    CSmallString prjres = GetItem("basic/jobinput","INF_JOB_PROJECT_RESOURCES");
+    ResourceList.AddResources(prjres,sout,result,expertmode);
+    if( result == false ){
+        ES_TRACE_ERROR("project resources are invalid");
+        return(false);
+    }
+
     // is destination alias?
     CAliasPtr p_alias = AliasList.FindAlias(dest);
     if( p_alias ){
@@ -482,7 +488,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
 // resolve conflicts
-    ResourceList.ResolveConflicts();
+    ResourceList.ResolveConflicts(BatchServerName,ShortServerName);
 
 // test resources
     ResourceList.TestResourceValues(sout,result);
@@ -806,40 +812,55 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
     user_script = GetItem("basic/jobinput","INF_JOB_NAME",true);
 
     if( ! siblings ) {
-        // FIXME
         CSmallString sumask = GetItem("specific/resources","INF_UMASK");
         mode_t umask = CUser::GetUMaskMode(sumask);
 
-        int mode = 0766;
-        int fmode = (mode & (~ umask)) & 0777;
-        CFileSystem::SetPosixMode(job_script,fmode);
-
+        gid_t group = -1;
         CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-        if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
-            sgroup += "@";
-            sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+        if( sgroup != NULL ){
+            if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
+                sgroup += "@";
+                sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+            }
+            group = User.GetGroupID(sgroup);
         }
 
-        if( sgroup != NULL ){
-            gid_t group = User.GetGroupID(sgroup);
+        // job directory
+        int mode = 0777;
+        int fmode = (mode & (~ umask)) & 0777;
 
-            int ret = chown(job_script,-1,group);
+        CFileName input_dir;
+        input_dir = GetItem("basic/jobinput","INF_INPUT_DIR");
+        CFileSystem::SetPosixMode(input_dir,fmode);
+        int ret = chown(input_dir,-1,group);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set group for directory '" << input_dir << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
+
+        // job script
+        mode = 0766;
+        fmode = (mode & (~ umask)) & 0777;
+        CFileSystem::SetPosixMode(job_script,fmode);
+        ret = chown(job_script,-1,group);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set group for file '" << job_script << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
+
+        // user script
+        if( IsInteractiveJob() == false ){
+            CFileSystem::SetPosixMode(user_script,fmode);
+            ret = chown(user_script,-1,group);
             if( ret != 0 ){
                 CSmallString warning;
-                warning << "unable to set owner and group of file '" << job_script << "' (" << ret << ")";
+                warning << "unable to set group for file '" << user_script << "' (" << ret << ")";
                 ES_WARNING(warning);
             }
-
-            if( IsInteractiveJob() == false ){
-                CFileSystem::SetPosixMode(user_script,fmode);
-                int ret = chown(user_script,-1,group);
-                if( ret != 0 ){
-                    CSmallString warning;
-                    warning << "unable to set owner and group of file '" << user_script << "' (" << ret << ")";
-                    ES_WARNING(warning);
-                }
-            }
         }
+
     }
 
     if( GetItem("basic/collection","INF_COLLECTION_NAME",true) == NULL ) {
@@ -1436,28 +1457,23 @@ bool CJob::GetJobFileConfigItem(const CSmallString& key,CSmallString& value)
 
 void CJob::DetectJobProject(void)
 {
-    CSmallString project;
-    CSmallString curdir;
-// this does not follow symlinks
-//    if( CFileSystem::GetCurrentDir(curdir) == false ){
-//        ES_ERROR("unable to get current directory");
-//        return;
-//    }
-    curdir = GetJobInputPath();
-    project = GetJobProject(curdir);
+    CSmallString curdir = GetJobInputPath();
+    CSmallString resources;
+    CSmallString project = GetJobProject(curdir,resources);
     SetItem("basic/jobinput","INF_JOB_PROJECT",project);
+    SetItem("basic/jobinput","INF_JOB_PROJECT_RESOURCES",resources);
 }
 
 //------------------------------------------------------------------------------
 
-CSmallString CJob::GetJobProject(const CFileName& dir)
+CSmallString CJob::GetJobProject(const CFileName& dir,CSmallString& resources)
 {
     CSmallString project;
 
     // first one level up
     CFileName updir = dir.GetFileDirectory();
     if( updir != NULL ){
-        CSmallString ppath = GetJobProject(updir);
+        CSmallString ppath = GetJobProject(updir,resources);
         project << ppath;
     }
 
@@ -1469,11 +1485,16 @@ CSmallString CJob::GetJobProject(const CFileName& dir)
     // read project file
     ifstream ifs(pfile);
     string line;
+    // read project name
     if( getline(ifs,line) ){
         if( project != NULL ) project << "/";
         project << line.c_str();
     }
-
+    // read project resources - one per line
+    while( getline(ifs,line) ){
+        if( resources != NULL ) resources << ",";
+        resources << line;
+    }
     return(project);
 }
 
@@ -1819,9 +1840,16 @@ bool CJob::IsJobDirLocal(bool no_deep)
     }
     if( no_deep ) return(false); // no deep checking
 
-    // FIXME
-    // try to test for job directory on remote machine, test if keys match
-    return(false);
+    // try to read key file and compare its contents
+    ifstream  ifs;
+    CFileName keyname = GetFullJobName() + ".infkey";
+
+    ifs.open(keyname);
+    if( ! ifs ) return(false);
+    string key;
+    ifs >> key;
+
+    return( GetItem("basic/jobinput","INF_JOB_KEY") == CSmallString(key) );
 }
 
 //------------------------------------------------------------------------------
@@ -2326,7 +2354,11 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Req destination  : " << tmp << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
+    if( tmp != NULL ){
     sout << "Req resources    : " << tmp << endl;
+    } else {
+    sout << "Req resources    : -none-" << endl;
+    }
 
     sout << "-----------------------------------------------" << endl;
 
@@ -3046,7 +3078,6 @@ bool CJob::SaveJobKey(void)
     ofs.close();
 
 // setup correct permissions
-    // FIXME
     CSmallString sumask = GetItem("specific/resources","INF_UMASK");
     mode_t umask = CUser::GetUMaskMode(sumask);
 
@@ -3055,18 +3086,21 @@ bool CJob::SaveJobKey(void)
     CFileSystem::SetPosixMode(keyname,fmode);
 
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-    if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
-        sgroup += "@";
-        sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
-    }
-    gid_t group = User.GetGroupID(sgroup);
+    if( sgroup != NULL ){
+        if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
+            sgroup += "@";
+            sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+        }
+        gid_t group = User.GetGroupID(sgroup);
 
-    int ret = chown(keyname,-1,group);
-    if( ret != 0 ){
-        CSmallString warning;
-        warning << "unable to set owner and group of file '" << keyname << "' (" << ret << ")";
-        ES_WARNING(warning);
+        int ret = chown(keyname,-1,group);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set owner and group of file '" << keyname << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
     }
+
     return(true);
 }
 

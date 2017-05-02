@@ -161,7 +161,8 @@ function inf-rsync-from-inputdir()
         echo "  > rsyncing from the local mount ... "
         echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/ -> $INF_WORK_DIR/"
         echo ""
-        rsync -av $INF_LW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" "$INF_INPUT_DIR/" "$INF_WORK_DIR/"
+        rsync -av $INF_LW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" \
+              "$INF_INPUT_DIR/" "$INF_WORK_DIR/"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             rm -f $TMPDIR/${_TNAME_}.excluded
