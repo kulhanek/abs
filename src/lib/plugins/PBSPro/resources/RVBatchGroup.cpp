@@ -141,7 +141,7 @@ void CRVBatchGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstat
         // we can check if the value is correct
         if( User.IsInPosixGroup(Value) == false ){
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        The specified group '" << Value << "' must be one from user groups: " << User.GetPosixGroups() << "!</red></b>" << endl;
+            sout <<         "        The specified group '" << Value << "' is not one of user groups: " << User.GetPosixGroups() << "!</red></b>" << endl;
             rstatus = false;
             return;
         }

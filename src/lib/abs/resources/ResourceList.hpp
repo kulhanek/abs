@@ -63,7 +63,7 @@ public:
     void AddSizeResource(const CSmallString& name,long long value);
 
     /// add a single resource
-    void AddResource(const CSmallString& name,const CSmallString& value);
+    void AddRawResource(const CSmallString& name,const CSmallString& value);
 
     /// add a single resource
     CResourceValuePtr AddEmptyResource(const CSmallString& name, bool expertmode);
@@ -79,7 +79,7 @@ public:
 
 // expected order of execution ....
     /// resolve conflicts
-    void ResolveConflicts(const CSmallString& server_name,const CSmallString& short_server_name);
+    void ResolveConflicts(const CSmallString& short_server_name);
 
     /// test all resources
     void TestResourceValues(std::ostream& sout,bool& rstatus);

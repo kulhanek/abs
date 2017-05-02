@@ -81,6 +81,7 @@ public:
 
 // section of private data -----------------------------------------------------
 protected:
+    CSmallString    Server;         // batch server - short server name
     CSmallString    Name;           // derived from plusula object configuration
     CSmallString    Value;
 

@@ -102,7 +102,7 @@ void CRVWorkDir::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         p_rele->GetAttribute("name",name);
         p_rele->GetAttribute("value",value);
         if( p_rl->FindResource(name) == NULL ){
-            p_rl->AddResource(name,value);
+            p_rl->AddRawResource(name,value);
         }
         p_rele = p_rele->GetNextSiblingElement("resource");
     }

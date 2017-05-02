@@ -645,7 +645,7 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
         }
     }
 
-    p_rl->AddResource("select",CSmallString(str.str().c_str()));
+    p_rl->AddRawResource("select",CSmallString(str.str().c_str()));
     return(true);
 }
 

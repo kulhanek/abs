@@ -99,6 +99,10 @@ void CResourceList::AddResources(const CSmallString& resources,std::ostream& sou
             command = '-';
             sres = string(sres.begin()+1,sres.end()); // strip down a letter
         }
+        if( sres[0] == '+' ){
+            command = '+';
+            sres = string(sres.begin()+1,sres.end()); // strip down a letter
+        }
 
         // resource is empty string
         if( sres.size() == 0 ) continue;
@@ -137,20 +141,27 @@ void CResourceList::AddResources(const CSmallString& resources,std::ostream& sou
 void CResourceList::AddResource(const CSmallString& name,const CSmallString& value,std::ostream& sout,
                                 bool& rstatus, bool expertmode)
 {
-// FIXME
-    //    // does name contain a batch server name?
-//    string srv;
-//    if( name.find("?") != string::npos ){
-//        name = name.substr(name.find("?")+1,string::npos);
-//        srv = name.substr(0,name.find("?"));
-//    }
+    // does name contain a batch server name?
+    string srv;
+    string sname(name);
+    if( sname.find("?") != string::npos ){
+        sname = sname.substr(sname.find("?")+1,string::npos);
+        srv = sname.substr(0,sname.find("?"));
+        if( srv.size() != 1 ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Resource '" << name << "' can contain only short server name specification (one letter)!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+    }
 
     // be sure that the resource is unique
     RemoveResource(name);
 
     // add resource
-    CResourceValuePtr res_ptr =  AddEmptyResource(name,expertmode);
+    CResourceValuePtr res_ptr =  AddEmptyResource(sname,expertmode);
     if( res_ptr != NULL ){
+        res_ptr->Server = srv;
         res_ptr->Value = value;
         return;
     }
@@ -173,7 +184,7 @@ void CResourceList::AddSizeResource(const CSmallString& name,long long value)
 
 //------------------------------------------------------------------------------
 
-void CResourceList::AddResource(const CSmallString& name,const CSmallString& value)
+void CResourceList::AddRawResource(const CSmallString& name,const CSmallString& value)
 {
     CResourceValuePtr res_ptr =  AddEmptyResource(name,true);
     if( res_ptr != NULL ){
@@ -226,12 +237,20 @@ CResourceValuePtr CResourceList::AddEmptyResource(const CSmallString& name,bool 
 
 void CResourceList::RemoveResource(const CSmallString& name)
 {
+    // does name contain a batch server name?
+    string srv;
+    string sname(name);
+    if( sname.find("?") != string::npos ){
+        sname = sname.substr(sname.find("?")+1,string::npos);
+        srv = sname.substr(0,sname.find("?"));
+    }
+
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        if( p_rv->Name == name ){
+        if( (p_rv->Name == CSmallString(sname)) && (p_rv->Server == CSmallString(srv)) ){
             erase(it);
             return;
         }
@@ -268,11 +287,45 @@ const CSmallString CResourceList::GetResourceValue(const CSmallString& name) con
 
 //------------------------------------------------------------------------------
 
-void CResourceList::ResolveConflicts(const CSmallString& server_name,const CSmallString& short_server_name)
+void CResourceList::ResolveConflicts(const CSmallString& short_server_name)
 {
+    // remove all resources that are not general and do not belong to the server
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
+    while( it != ie ){
+        CResourceValuePtr p_rv = *it;
+        if( (p_rv->Server != NULL) && (p_rv->Server != short_server_name) ){
+            it = erase(it);
+        } else {
+            it++;
+        }
+    }
+
+    // merge down resources
+    it = begin();
+    while( it != ie ){
+        CResourceValuePtr p_srv = *it;
+        std::list<CResourceValuePtr>::iterator uit = it;
+        uit++;
+        bool remove = false;
+        while( uit != ie ){
+            CResourceValuePtr p_mrv = *uit;
+            if( p_mrv->Name == p_srv->Name ){
+                remove = true;
+                break;
+            }
+            uit++;
+        }
+        if( remove ){
+            it = erase(it);
+        } else {
+            it++;
+        }
+    }
+
+    // resolve other conflicts
+    it = begin();
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
         p_rv->ResolveConflicts(this);

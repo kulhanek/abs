@@ -434,8 +434,8 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
     bool result = true;
     // add required default resources
-    ResourceList.AddResource("ncpus","1");
-    ResourceList.AddResource("nnodes","1");
+    ResourceList.AddRawResource("ncpus","1");
+    ResourceList.AddRawResource("nnodes","1");
 
     // add default resources
     CSmallString  sdef_res;
@@ -488,7 +488,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
 // resolve conflicts
-    ResourceList.ResolveConflicts(BatchServerName,ShortServerName);
+    ResourceList.ResolveConflicts(ShortServerName);
 
 // test resources
     ResourceList.TestResourceValues(sout,result);
@@ -518,7 +518,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
             sout << "<b><red> ERROR: Unable to find the specified queue '" << queue << "' at the batch server!</red></b>" << endl;
             return(false);
         }
-        ResourceList.AddResource("walltime",que_ptr->GetDefaultWallTime().GetSTimeFull());
+        ResourceList.AddRawResource("walltime",que_ptr->GetDefaultWallTime().GetSTimeFull());
     }
 
 // init batch specific resources
@@ -661,7 +661,7 @@ bool CJob::InputDirectory(std::ostream& sout)
     }
 
 // default umask is derived from the input directory permission
-    ResourceList.AddResource("umask",CUser::GetUMask(input_dir_umask));
+    ResourceList.AddRawResource("umask",CUser::GetUMask(input_dir_umask));
 
 // determine storage group name - derived from the input directory group
     string gname;
@@ -673,14 +673,14 @@ bool CJob::InputDirectory(std::ostream& sout)
     if( gname.find("@") != string::npos ){
         string realm = gname.substr(gname.find("@")+1,string::npos);
         if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
-            ResourceList.AddResource("storagegroup",gname.substr(0,gname.find("@")));
+            ResourceList.AddRawResource("storagegroup",gname.substr(0,gname.find("@")));
         } else {
             sout << "<b><red> ERROR: Consistency check: Input directory group realm '" << realm
                  << "' is not the same as the storage machine realm '" << Host.GetRealm(storage_machine) << "'!</red></b>" << endl;
             return(false);
         }
     } else {
-        ResourceList.AddResource("storagegroup",gname);
+        ResourceList.AddRawResource("storagegroup",gname);
     }
 
 // default batch group name - derived from the input directory group
@@ -688,16 +688,16 @@ bool CJob::InputDirectory(std::ostream& sout)
     if( storage_machine_groupns == batch_server_groupns ){
         // does it contain realm?
         if( gname.find("@") != string::npos ){
-            ResourceList.AddResource("batchgroup",gname.substr(0,gname.find("@")));
+            ResourceList.AddRawResource("batchgroup",gname.substr(0,gname.find("@")));
 
         } else {
-            ResourceList.AddResource("batchgroup",gname);
+            ResourceList.AddRawResource("batchgroup",gname);
         }
     } else {
         // is not then try to use the current primary group name
         if( batch_server_groupns == input_machine_groupns ){
             // take the effective group
-            ResourceList.AddResource("batchgroup",User.GetEGroup());
+            ResourceList.AddRawResource("batchgroup",User.GetEGroup());
         }
     }
 
