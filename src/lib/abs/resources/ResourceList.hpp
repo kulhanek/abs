@@ -79,7 +79,7 @@ public:
 
 // expected order of execution ....
     /// resolve conflicts
-    void ResolveConflicts(void);
+    void ResolveConflicts(const CSmallString& server_name,const CSmallString& short_server_name);
 
     /// test all resources
     void TestResourceValues(std::ostream& sout,bool& rstatus);

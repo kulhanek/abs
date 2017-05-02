@@ -268,7 +268,7 @@ const CSmallString CResourceList::GetResourceValue(const CSmallString& name) con
 
 //------------------------------------------------------------------------------
 
-void CResourceList::ResolveConflicts(void)
+void CResourceList::ResolveConflicts(const CSmallString& server_name,const CSmallString& short_server_name)
 {
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
