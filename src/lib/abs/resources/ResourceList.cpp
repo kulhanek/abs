@@ -254,6 +254,7 @@ void CResourceList::RemoveResource(const CSmallString& name)
     // does name contain a batch server name?
     string srv;
     string sname(name);
+    string fname(name);
     size_t qpos = sname.find("?");
     if( qpos != string::npos ){
         if( qpos == 0 ){
@@ -262,8 +263,8 @@ void CResourceList::RemoveResource(const CSmallString& name)
         if( qpos+1 == sname.size() ){
             return;
         }
-        sname = sname.substr(qpos+1,string::npos);
-        srv = sname.substr(0,qpos-1);
+        fname = sname.substr(qpos+1,string::npos);
+        srv = sname.substr(0,qpos);
         if( srv.size() != 1 ){
             return;
         }
@@ -274,7 +275,7 @@ void CResourceList::RemoveResource(const CSmallString& name)
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        if( (p_rv->Name == CSmallString(sname)) && (p_rv->Server == CSmallString(srv)) ){
+        if( (p_rv->Name == CSmallString(fname)) && (p_rv->Server == CSmallString(srv)) ){
             erase(it);
             return;
         }
