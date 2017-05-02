@@ -66,7 +66,7 @@ public:
     void AddRawResource(const CSmallString& name,const CSmallString& value);
 
     /// add a single resource
-    CResourceValuePtr AddEmptyResource(const CSmallString& name, bool expertmode);
+    CResourceValuePtr AddEmptyResource(const CSmallString& name, bool expertmode,bool do_not_remove);
 
     /// find resource
     CResourceValuePtr FindResource(const CSmallString& name) const;

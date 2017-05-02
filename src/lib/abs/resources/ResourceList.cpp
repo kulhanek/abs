@@ -180,7 +180,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     RemoveResource(name);
 
     // add resource
-    CResourceValuePtr res_ptr =  AddEmptyResource(fname,expertmode);
+    CResourceValuePtr res_ptr =  AddEmptyResource(fname,expertmode,true);
     if( res_ptr != NULL ){
         res_ptr->Server = srv;
         res_ptr->Value = value;
@@ -197,7 +197,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
 
 void CResourceList::AddSizeResource(const CSmallString& name,long long value)
 {
-    CResourceValuePtr res_ptr =  AddEmptyResource(name,true);
+    CResourceValuePtr res_ptr =  AddEmptyResource(name,true,false);
     if( res_ptr != NULL ){
         res_ptr->SetSize(value);
     }
@@ -207,7 +207,7 @@ void CResourceList::AddSizeResource(const CSmallString& name,long long value)
 
 void CResourceList::AddRawResource(const CSmallString& name,const CSmallString& value)
 {
-    CResourceValuePtr res_ptr =  AddEmptyResource(name,true);
+    CResourceValuePtr res_ptr =  AddEmptyResource(name,true,false);
     if( res_ptr != NULL ){
         res_ptr->Value = value;
     }
@@ -215,10 +215,10 @@ void CResourceList::AddRawResource(const CSmallString& name,const CSmallString& 
 
 //------------------------------------------------------------------------------
 
-CResourceValuePtr CResourceList::AddEmptyResource(const CSmallString& name,bool expertmode)
+CResourceValuePtr CResourceList::AddEmptyResource(const CSmallString& name,bool expertmode,bool do_not_remove)
 {
     // be sure that the resource is unique
-    RemoveResource(name);
+    if( do_not_remove == false ) RemoveResource(name);
 
     // try to find resource plugin object
     CSimpleIteratorC<CPluginObject> I(PluginDatabase.GetObjectList());
@@ -247,7 +247,7 @@ CResourceValuePtr CResourceList::AddEmptyResource(const CSmallString& name,bool 
     if( gen_name == NULL ) return(CResourceValuePtr());
 
     // must be always false to avoid infinite recursion
-    CResourceValuePtr gen_res = AddEmptyResource(gen_name,false);
+    CResourceValuePtr gen_res = AddEmptyResource(gen_name,false,do_not_remove);
     // override resource name
     gen_res->Name = name;
 
