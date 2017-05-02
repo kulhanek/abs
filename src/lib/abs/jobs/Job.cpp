@@ -2364,9 +2364,18 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
 
-    tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
-    if( tmp ){
-        PrintResourceTokens(sout,"Default resources: ",tmp);
+    tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");    
+    if( tmp != NULL ){
+    sout << "Default resources: " << tmp << endl;
+    } else {
+    sout << "Default resources: -none-" << endl;
+    }
+
+    tmp = GetItem("specific/resources","INF_JOB_PROJECT_RESOURCES");
+    if( tmp != NULL ){
+    sout << "Project resources: " << tmp << endl;
+    } else {
+    sout << "Project resources: -none-" << endl;
     }
 
     tmp = GetItem("specific/resources","INF_ALIAS");
