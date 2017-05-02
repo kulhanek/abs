@@ -2362,7 +2362,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     sout << "-----------------------------------------------" << endl;
 
-    sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << ")" << endl;
+    sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << "|" << GetShortServerName() << ")" << endl;
 
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");    
     if( tmp != NULL ){
