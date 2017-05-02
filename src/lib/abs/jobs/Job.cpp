@@ -2371,7 +2371,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Default resources: -none-" << endl;
     }
 
-    tmp = GetItem("specific/resources","INF_JOB_PROJECT_RESOURCES",true);
+    tmp = GetItem("basic/jobinput","INF_JOB_PROJECT_RESOURCES",true);
     if( tmp != NULL ){
     sout << "Project resources: " << tmp << endl;
     } else {
