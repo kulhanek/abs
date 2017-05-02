@@ -144,12 +144,25 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     // does name contain a batch server name?
     string srv;
     string sname(name);
-    if( sname.find("?") != string::npos ){
-        sname = sname.substr(sname.find("?")+1,string::npos);
-        srv = sname.substr(0,sname.find("?"));
+    size_t qpos = sname.find("?");
+    if( qpos != string::npos ){
+        if( qpos == 0 ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Resource '" << name << "' does not contain the short name (S) of batch server (S?name=value)!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+        if( qpos+1 == sname.size() ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Resource '" << name << "' does not contain the name (name) of resource (S?name=value)!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+        sname = sname.substr(qpos+1,string::npos);
+        srv = sname.substr(0,qpos-1);
         if( srv.size() != 1 ){
             if( rstatus == true ) sout << endl;
-            sout << "<b><red> ERROR: Resource '" << name << "' can contain only short server name specification (one letter)!</red></b>" << endl;
+            sout << "<b><red> ERROR: Resource '" << name << "' does not contain the short name (S) of batch server (S?name=value)!</red></b>" << endl;
             rstatus = false;
             return;
         }
@@ -240,9 +253,19 @@ void CResourceList::RemoveResource(const CSmallString& name)
     // does name contain a batch server name?
     string srv;
     string sname(name);
-    if( sname.find("?") != string::npos ){
-        sname = sname.substr(sname.find("?")+1,string::npos);
-        srv = sname.substr(0,sname.find("?"));
+    size_t qpos = sname.find("?");
+    if( qpos != string::npos ){
+        if( qpos == 0 ){
+            return;
+        }
+        if( qpos+1 == sname.size() ){
+            return;
+        }
+        sname = sname.substr(qpos+1,string::npos);
+        srv = sname.substr(0,qpos-1);
+        if( srv.size() != 1 ){
+            return;
+        }
     }
 
     std::list<CResourceValuePtr>::iterator     it = begin();
