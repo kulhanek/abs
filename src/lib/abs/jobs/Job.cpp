@@ -480,6 +480,24 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_SERVER_SHORT",ShortServerName);
     SetItem("specific/resources","INF_JOB_OWNER",User.GetName());
 
+    CSmallString batch_server_groupns = Host.GetGroupNS(BatchServerName);
+    SetItem("specific/resources","INF_BATCH_SERVER_GROUPNS",batch_server_groupns);
+
+    CSmallString input_machine_groupns          = GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS");
+    CSmallString storage_machine_groupns        = GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS");
+
+// default batch group name - derived from the input directory group
+    // if the file system is compatible with the batch server
+    if( storage_machine_groupns == batch_server_groupns ){
+        ResourceList.AddRawResource("batchgroup",ResourceList.GetResourceValue("storagegroup"));
+    } else {
+        // is not then try to use the current primary group name
+        if( batch_server_groupns == input_machine_groupns ){
+            // take the effective group
+            ResourceList.AddRawResource("batchgroup",User.GetEGroup());
+        }
+    }
+
 // decode user resources
     ResourceList.AddResources(sres,sout,result,expertmode);
     if( result == false ){
@@ -490,7 +508,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 // resolve conflicts
     ResourceList.ResolveConflicts(ShortServerName);
 
-// fix default values ------------------------------------
+// fix default values for umask and storagegroup
 // do we have umask? - if not add the default one
     if( ResourceList.FindResource("umask") == NULL ){
         ResourceList.AddRawResource("umask",GetItem("specific/resources","INF_BACKUP_UMASK"));
@@ -499,8 +517,6 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     if( ResourceList.FindResource("storagegroup") == NULL ){
         ResourceList.AddRawResource("storagegroup",GetItem("specific/resources","INF_BACKUP_USTORAGEGROUP"));
     }
-
-// -------------------------------------------------------
 
 // test resources
     ResourceList.TestResourceValues(sout,result);
@@ -645,7 +661,6 @@ bool CJob::InputDirectory(std::ostream& sout)
     CSmallString input_machine_groupns          = Host.GetGroupNS();
     CSmallString storage_machine_groupns        = Host.GetGroupNS();
     CSmallString storage_machine_group_realm    = Host.GetRealm();
-    CSmallString batch_server_groupns           = BatchServers.GetBatchGroupNS();
 
 // determine storage machine and storage path
     CSmallString storage_machine = input_machine;
@@ -695,37 +710,16 @@ bool CJob::InputDirectory(std::ostream& sout)
         ResourceList.AddRawResource("storagegroup",gname);
     }
 
-// default batch group name - derived from the input directory group
-    // if the file system is compatible with the batch server
-    if( storage_machine_groupns == batch_server_groupns ){
-        // does it contain realm?
-        if( gname.find("@") != string::npos ){
-            ResourceList.AddRawResource("batchgroup",gname.substr(0,gname.find("@")));
-
-        } else {
-            ResourceList.AddRawResource("batchgroup",gname);
-        }
-    } else {
-        // is not then try to use the current primary group name
-        if( batch_server_groupns == input_machine_groupns ){
-            // take the effective group
-            ResourceList.AddRawResource("batchgroup",User.GetEGroup());
-        }
-    }
-
 // input storage
     SetItem("specific/resources","INF_INPUT_PATH_FSTYPE",fstype);
+    SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
 
     SetItem("specific/resources","INF_STORAGE_MACHINE",storage_machine);
     SetItem("specific/resources","INF_STORAGE_DIR",storage_dir);
     SetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS",storage_machine_groupns);
     SetItem("specific/resources","INF_STORAGE_MACHINE_REALM",storage_machine_group_realm);
 
-    SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
-    SetItem("specific/resources","INF_BATCH_SERVER_GROUPNS",batch_server_groupns);
-
 // set backup values
-    SetItem("specific/resources","INF_BACKUP_UBATCHGROUP",ResourceList.GetResourceValue("batchgroup"));
     SetItem("specific/resources","INF_BACKUP_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
     SetItem("specific/resources","INF_BACKUP_UMASK",ResourceList.GetResourceValue("umask"));
     return(true);
