@@ -160,7 +160,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
             return;
         }
         fname = sname.substr(qpos+1,string::npos);
-        srv = sname.substr(0,qpos-1);
+        srv = sname.substr(0,qpos);
         if( srv.size() != 1 ){
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Resource '" << name << "' does not contain the short name (S) of batch server (S?name=value) but '" << srv << "'!</red></b>" << endl;
