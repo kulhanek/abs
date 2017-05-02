@@ -2366,14 +2366,14 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");    
     if( tmp != NULL ){
-    sout << "Default resources: " << tmp << endl;
+    PrintResourceTokens(sout,"Default resources: ",tmp);
     } else {
     sout << "Default resources: -none-" << endl;
     }
 
     tmp = GetItem("basic/jobinput","INF_JOB_PROJECT_RESOURCES",true);
     if( tmp != NULL ){
-    sout << "Project resources: " << tmp << endl;
+    PrintResourceTokens(sout,"Project resources: ",tmp);
     } else {
     sout << "Project resources: -none-" << endl;
     }
