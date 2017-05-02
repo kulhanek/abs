@@ -129,9 +129,16 @@ void CResourceList::AddResources(const CSmallString& resources,std::ostream& sou
             case '+':
                 AddResource(name,value,sout,rstatus,expertmode);
                 break;
-            case '-':
+            case '-':{
+                if( ! value.empty() ){
+                    if( rstatus == true ) sout << endl;
+                    sout << "<b><red> ERROR: Value cannot be specified for removed resource '" << sres << "'!</red></b>" << endl;
+                    rstatus = false;
+                    return;
+                }
                 RemoveResource(name);
                 break;
+            }
         }
     }
 }
