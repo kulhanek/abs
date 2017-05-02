@@ -490,6 +490,18 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 // resolve conflicts
     ResourceList.ResolveConflicts(ShortServerName);
 
+// fix default values ------------------------------------
+// do we have umask? - if not add the default one
+    if( ResourceList.FindResource("umask") == NULL ){
+        ResourceList.AddRawResource("umask",GetItem("specific/resources","INF_BACKUP_UMASK"));
+    }
+// do we have storagegroup? - if not add the default one
+    if( ResourceList.FindResource("storagegroup") == NULL ){
+        ResourceList.AddRawResource("storagegroup",GetItem("specific/resources","INF_BACKUP_USTORAGEGROUP"));
+    }
+
+// -------------------------------------------------------
+
 // test resources
     ResourceList.TestResourceValues(sout,result);
     if( result == false ){
@@ -712,11 +724,10 @@ bool CJob::InputDirectory(std::ostream& sout)
     SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
     SetItem("specific/resources","INF_BATCH_SERVER_GROUPNS",batch_server_groupns);
 
-// do not set here - it might be modifed later
-//    // set default user group and umask
-//    SetItem("specific/resources","INF_UBATCHGROUP",ResourceList.GetResourceValue("batchgroup"));
-//    SetItem("specific/resources","INF_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
-//    SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
+// set backup values
+    SetItem("specific/resources","INF_BACKUP_UBATCHGROUP",ResourceList.GetResourceValue("batchgroup"));
+    SetItem("specific/resources","INF_BACKUP_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
+    SetItem("specific/resources","INF_BACKUP_UMASK",ResourceList.GetResourceValue("umask"));
     return(true);
 }
 
