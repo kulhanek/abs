@@ -144,6 +144,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     // does name contain a batch server name?
     string srv;
     string sname(name);
+    string fname(name);
     size_t qpos = sname.find("?");
     if( qpos != string::npos ){
         if( qpos == 0 ){
@@ -158,11 +159,11 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
             rstatus = false;
             return;
         }
-        sname = sname.substr(qpos+1,string::npos);
+        fname = sname.substr(qpos+1,string::npos);
         srv = sname.substr(0,qpos-1);
         if( srv.size() != 1 ){
             if( rstatus == true ) sout << endl;
-            sout << "<b><red> ERROR: Resource '" << name << "' does not contain the short name (S) of batch server (S?name=value)!</red></b>" << endl;
+            sout << "<b><red> ERROR: Resource '" << name << "' does not contain the short name (S) of batch server (S?name=value) but '" << srv << "'!</red></b>" << endl;
             rstatus = false;
             return;
         }
@@ -172,7 +173,7 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
     RemoveResource(name);
 
     // add resource
-    CResourceValuePtr res_ptr =  AddEmptyResource(sname,expertmode);
+    CResourceValuePtr res_ptr =  AddEmptyResource(fname,expertmode);
     if( res_ptr != NULL ){
         res_ptr->Server = srv;
         res_ptr->Value = value;
