@@ -286,14 +286,15 @@ void CResourceList::RemoveResource(const CSmallString& name)
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
+    // it is necessary to run the whole cycle because of wild server name
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
         if( ( (srv != "*") && (p_rv->Name == CSmallString(fname)) && (p_rv->Server == CSmallString(srv))) ||
             ( (srv == "*") && (p_rv->Name == CSmallString(fname)) )  ){
-            erase(it);
-            return;
+            it = erase(it);
+        } else {
+            it++;
         }
-        it++;
     }
 }
 
