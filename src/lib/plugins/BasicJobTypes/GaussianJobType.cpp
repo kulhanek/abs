@@ -89,9 +89,14 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     CFileName arg_job = job.GetItem("basic/arguments","INF_ARG_JOB");
 
     // is the job name a file with .com or .gjf extension?
-    if( ! ((arg_job.GetFileNameExt() == ".com") || (arg_job.GetFileNameExt() == ".gjf")) ) return(ERS_OK);
-
-    detected = true;
+    if( arg_job.GetFileNameExt() == ".com" ){
+        job.SetItem("basic/jobinput","INF_JOB_INPUT_EXT",".com");
+        detected = true;
+    } else if ( arg_job.GetFileNameExt() == ".gjf" ){
+        job.SetItem("basic/jobinput","INF_JOB_INPUT_EXT",".gjf");
+        detected = true;
+    }
+    if( detected == false ) return(ERS_OK);
 
     if( CFileSystem::IsFile(arg_job) == false ){
         sout << endl;
@@ -183,7 +188,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
     int ncpus = sncpus.ToInt();
 
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");
-    int uncpus = GetNProcShared(job_name);
+    int uncpus = GetNProcShared(job,job_name);
 
     if( uncpus != ncpus ){
         sout << endl;
@@ -193,7 +198,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
         sout << "<b><blue>          The number of CPUs requested via psubmit command        : " << ncpus << "</blue></b>" << endl;
         sout << "<b><blue>          The number of CPUs requested in the gaussian input file : " << uncpus << " (via %NProcShared)</blue></b>" << endl;
 
-        if( UpdateNProcShared(job_name,ncpus) == false ){
+        if( UpdateNProcShared(job,job_name,ncpus) == false ){
             sout << endl;
             sout << "<b><red> ERROR: Unable to save updated gaussian input file (NProcShared)!</red></b>" << endl;
             return(false);
@@ -201,19 +206,19 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
     }
 
     // check memory keyword
-    long int mem = job.ResourceList.GetMemory()*1024;
+    CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
+    long int mem = CResourceValue::GetSize(smem)*1024;
+    long int umem = GetMemory(job,job_name);
 
-    long int umem = GetMemory(job_name);
-
-    if( abs(umem/1024/1024 - mem*90/100/1024/1024) > 2 ){
+    if( abs(umem/1024/1024 - mem*95/100/1024/1024) > 2 ){
         sout << endl;
         sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
         sout << "<b><blue>          in the gaussian input file!</blue></b>" << endl;
         sout << endl;
-        sout << "<b><blue>          The ammount of memory requested via psubmit command (90%)  : " << setw(7) << mem*90/100/1024/1024 << " MB</blue></b>" << endl;
+        sout << "<b><blue>          The ammount of memory requested via psubmit command (95%)  : " << setw(7) << mem*90/100/1024/1024 << " MB</blue></b>" << endl;
         sout << "<b><blue>          The ammount of memory requested in the gaussian input file : " << setw(7) << umem/1024/1024 << " MB (via %Mem)</blue></b>" << endl;
 
-        if( UpdateMemory(job_name,mem*90/100) == false ){
+        if( UpdateMemory(job,job_name,mem*90/100) == false ){
             sout << endl;
             sout << "<b><red> ERROR: Unable to save updated gaussian input file (%Mem)!</red></b>" << endl;
             return(false);
@@ -230,14 +235,10 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CGaussianJobType::UpdateNProcShared(const CSmallString& name,int nprocshared)
+bool CGaussianJobType::UpdateNProcShared(CJob& job,const CSmallString& name,int nprocshared)
 {
-    CSmallString full_name = name + ".com";
+    CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
-    if( ! ifs ) {
-        full_name = name + ".gjf";
-        ifs.open(full_name);
-    }
     if( ! ifs ) return(false);
 
     string          line;
@@ -283,14 +284,10 @@ bool CGaussianJobType::UpdateNProcShared(const CSmallString& name,int nprocshare
 
 //------------------------------------------------------------------------------
 
-bool CGaussianJobType::UpdateMemory(const CSmallString& name,long int mem)
+bool CGaussianJobType::UpdateMemory(CJob& job,const CSmallString& name,long int mem)
 {
-    CSmallString full_name = name + ".com";
+    CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
-    if( ! ifs ) {
-        full_name = name + ".gjf";
-        ifs.open(full_name);
-    }
     if( ! ifs ) return(false);
 
     string          line;
@@ -336,14 +333,10 @@ bool CGaussianJobType::UpdateMemory(const CSmallString& name,long int mem)
 
 //------------------------------------------------------------------------------
 
-int CGaussianJobType::GetNProcShared(const CSmallString& name)
+int CGaussianJobType::GetNProcShared(CJob& job,const CSmallString& name)
 {
-    CSmallString full_name = name + ".com";
+    CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
-    if( ! ifs ) {
-        full_name = name + ".gjf";
-        ifs.open(full_name);
-    }
     if( ! ifs ) return(false);
 
     string          line;
@@ -369,14 +362,10 @@ int CGaussianJobType::GetNProcShared(const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-long int CGaussianJobType::GetMemory(const CSmallString& name)
+long int CGaussianJobType::GetMemory(CJob& job,const CSmallString& name)
 {
-    CSmallString full_name = name + ".com";
+    CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
-    if( ! ifs ) {
-        full_name = name + ".gjf";
-        ifs.open(full_name);
-    }
     if( ! ifs ) return(false);
 
     string          line;

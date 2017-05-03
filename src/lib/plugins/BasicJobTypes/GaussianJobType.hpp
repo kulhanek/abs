@@ -38,16 +38,16 @@ public:
     virtual bool CheckInputFile(CJob& job,std::ostream& sout);
 
     /// update number of ncpus in job input file
-    bool UpdateNProcShared(const CSmallString& name,int nprocshared);
+    bool UpdateNProcShared(CJob& job,const CSmallString& name,int nprocshared);
 
     /// get number of ncpus specified in the job input file
-    int GetNProcShared(const CSmallString& name);
+    int GetNProcShared(CJob& job,const CSmallString& name);
 
     /// update memory
-    bool UpdateMemory(const CSmallString& name,long int mem);
+    bool UpdateMemory(CJob& job,const CSmallString& name,long int mem);
 
     /// get memory from the file
-    long int GetMemory(const CSmallString& name);
+    long int GetMemory(CJob& job,const CSmallString& name);
 };
 
 // -----------------------------------------------------------------------------
