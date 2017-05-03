@@ -237,6 +237,11 @@ bool CGaussianJobType::UpdateNProcShared(const CSmallString& name,int nprocshare
 {
     CSmallString full_name = name + ".com";
     ifstream ifs(full_name);
+    if( ! ifs ) {
+        full_name = name + ".gfj";
+        ifs.open(full_name);
+    }
+    if( ! ifs ) return(false);
 
     string          line;
     vector<string>  lines;
@@ -285,6 +290,11 @@ bool CGaussianJobType::UpdateMemory(const CSmallString& name,long int mem)
 {
     CSmallString full_name = name + ".com";
     ifstream ifs(full_name);
+    if( ! ifs ) {
+        full_name = name + ".gfj";
+        ifs.open(full_name);
+    }
+    if( ! ifs ) return(false);
 
     string          line;
     vector<string>  lines;
@@ -333,6 +343,11 @@ int CGaussianJobType::GetNProcShared(const CSmallString& name)
 {
     CSmallString full_name = name + ".com";
     ifstream ifs(full_name);
+    if( ! ifs ) {
+        full_name = name + ".gfj";
+        ifs.open(full_name);
+    }
+    if( ! ifs ) return(false);
 
     string          line;
 
@@ -361,6 +376,11 @@ long int CGaussianJobType::GetMemory(const CSmallString& name)
 {
     CSmallString full_name = name + ".com";
     ifstream ifs(full_name);
+    if( ! ifs ) {
+        full_name = name + ".gfj";
+        ifs.open(full_name);
+    }
+    if( ! ifs ) return(false);
 
     string          line;
 
