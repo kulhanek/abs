@@ -160,11 +160,10 @@ bool CJob::SaveInfoFileWithPerms(void)
 
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
     if( sgroup != NULL ){
-        if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
-            sgroup += "@";
-            sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+        if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
+            sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }
-        gid_t group = User.GetGroupID(sgroup);
+        gid_t group = CUser::GetGroupID(sgroup,false);
         int ret = chown(name,-1,group);
         if( ret != 0 ){
             CSmallString warning;
@@ -821,15 +820,11 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
 // determine FS user group
     // if the FS uses composed group add a storage machine realm to the group
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-    if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") ){
+    if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
         sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
     }
+    gid_t sgrid = CUser::GetGroupID(sgroup,false);
 
-    gid_t sgrid = -1;
-    struct group* p_sgrp = getgrnam(sgroup);
-    if( p_sgrp != NULL ){
-        sgrid = p_sgrp->gr_gid;
-    }
 // ------------------------
 
     CSmallString input_dir  = GetItem("basic/jobinput","INF_INPUT_DIR");
@@ -3118,11 +3113,10 @@ bool CJob::SaveJobKey(void)
 
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
     if( sgroup != NULL ){
-        if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
-            sgroup += "@";
-            sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+        if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
+            sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }
-        gid_t group = User.GetGroupID(sgroup);
+        gid_t group = CUser::GetGroupID(sgroup,false);
 
         int ret = chown(keyname,-1,group);
         if( ret != 0 ){
