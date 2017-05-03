@@ -94,10 +94,7 @@ void CRVStorageGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rst
             return;
         }
         Value = User.GetEGroup();
-        return;
-    }
-
-    if( Value == "jobdir" ){
+    } else if( Value == "jobdir" ){
         struct stat info;
         string      storage_group;
         CSmallString pwd;
@@ -117,29 +114,40 @@ void CRVStorageGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rst
 
         // validate realm
         if( storage_group.find("@") != string::npos ){
-            string realm = storage_group.substr(storage_group.find("@")+1,string::npos);
+            string realm = storage_group.substr(storage_group.find("@")+1,string::npos);            
             if( p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM") != CSmallString(realm) ){
+                if( rstatus == true ) sout << endl;
                 sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
                 sout <<         "        Inconsistent group realms: '" << realm << "'' vs '" <<  p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM") << "'!</red></b>" << endl;
                 rstatus = false;
                 return;
             }
         }
-        return;
     }
 
-    if( input_machine_groupns == storage_machine_groupns ){
+    if( p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") == NULL ){
         // we can check if the value is correct
         if( User.IsInPosixGroup(Value) == false ){
+            if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
             sout <<         "        The specified group '" << Value << "' is not one of user groups: " << User.GetPosixGroups() << "!</red></b>" << endl;
             rstatus = false;
             return;
         }
         return;
+    } else {        
+        CSmallString full_name;
+        full_name << Value << "@" << p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") ;
+        group* p_grp = getgrnam(full_name);
+        if( p_grp == NULL ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout <<         "        The derived group '" << full_name << "' does not exist!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
     }
 
-    // do not check the group as we do not have any information about groups at the storage machine
     return;
 }
 

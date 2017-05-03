@@ -95,10 +95,7 @@ void CRVBatchGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstat
             return;
         }
         Value = User.GetEGroup();
-        return;
-    }
-
-    if( Value == "jobdir" ){
+    } else if( Value == "jobdir" ){
         if( storage_machine_groupns != batch_server_groupns ){
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
@@ -134,7 +131,6 @@ void CRVBatchGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstat
                 return;
             }
         }
-        return;
     }
 
     if( input_machine_groupns == batch_server_groupns ){

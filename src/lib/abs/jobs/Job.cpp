@@ -698,6 +698,7 @@ bool CJob::InputDirectory(std::ostream& sout)
     }
 
     if( gname.find("@") != string::npos ){
+        SetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE",Host.GetRealm(storage_machine));
         string realm = gname.substr(gname.find("@")+1,string::npos);
         if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
             ResourceList.AddRawResource("storagegroup",gname.substr(0,gname.find("@")));
@@ -707,8 +708,12 @@ bool CJob::InputDirectory(std::ostream& sout)
             return(false);
         }
     } else {
+        SetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE","");
         ResourceList.AddRawResource("storagegroup",gname);
     }
+
+// default security
+    ResourceList.AddRawResource("fixperms","jobdir");
 
 // input storage
     SetItem("specific/resources","INF_INPUT_PATH_FSTYPE",fstype);
@@ -813,42 +818,52 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
         return(false);
     }
 
-    CFileName user_script;
-    user_script = GetItem("basic/jobinput","INF_JOB_NAME",true);
+// determine FS user group
+    // if the FS uses composed group add a storage machine realm to the group
+    CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
+    if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") ){
+        sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
+    }
+
+    gid_t sgrid = -1;
+    struct group* p_sgrp = getgrnam(sgroup);
+    if( p_sgrp != NULL ){
+        sgrid = p_sgrp->gr_gid;
+    }
+// ------------------------
+
+    CSmallString input_dir  = GetItem("basic/jobinput","INF_INPUT_DIR");
+    CFileName user_script   = GetItem("basic/jobinput","INF_JOB_NAME",true);
 
     if( ! siblings ) {
         CSmallString sumask = GetItem("specific/resources","INF_UMASK");
         mode_t umask = CUser::GetUMaskMode(sumask);
 
-        gid_t group = -1;
-        CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-        if( sgroup != NULL ){
-            if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
-                sgroup += "@";
-                sgroup += GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+        int mode;
+        int fmode;
+        int ret;
+
+        CSmallString fixperms = ResourceList.GetResourceValue("fixperms");
+        if( fixperms == "jobdir" ){
+            // job directory
+            mode = 0777;
+            fmode = (mode & (~ umask)) & 0777;
+            CFileSystem::SetPosixMode(input_dir,fmode);
+            ret = chown(input_dir,-1,sgrid);
+            if( ret != 0 ){
+                CSmallString warning;
+                warning << "unable to set group for directory '" << input_dir << "' (" << ret << ")";
+                ES_WARNING(warning);
             }
-            group = User.GetGroupID(sgroup);
-        }
-
-        // job directory
-        int mode = 0777;
-        int fmode = (mode & (~ umask)) & 0777;
-
-        CFileName input_dir;
-        input_dir = GetItem("basic/jobinput","INF_INPUT_DIR");
-        CFileSystem::SetPosixMode(input_dir,fmode);
-        int ret = chown(input_dir,-1,group);
-        if( ret != 0 ){
-            CSmallString warning;
-            warning << "unable to set group for directory '" << input_dir << "' (" << ret << ")";
-            ES_WARNING(warning);
+        } if ( fixperms == "deep" ){
+            // FIXME
         }
 
         // job script
         mode = 0766;
         fmode = (mode & (~ umask)) & 0777;
         CFileSystem::SetPosixMode(job_script,fmode);
-        ret = chown(job_script,-1,group);
+        ret = chown(job_script,-1,sgrid);
         if( ret != 0 ){
             CSmallString warning;
             warning << "unable to set group for file '" << job_script << "' (" << ret << ")";
@@ -858,7 +873,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
         // user script
         if( IsInteractiveJob() == false ){
             CFileSystem::SetPosixMode(user_script,fmode);
-            ret = chown(user_script,-1,group);
+            ret = chown(user_script,-1,sgrid);
             if( ret != 0 ){
                 CSmallString warning;
                 warning << "unable to set group for file '" << user_script << "' (" << ret << ")";
@@ -872,7 +887,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
         // submit job to torque
         if( BatchServers.SubmitJob(*this,verbose) == false ){
             if( ! siblings ){
-                sout << "<b><red>Job was NOT submited to the Torque server!</red></b>" << endl;
+                sout << "<b><red>Job was NOT submited to the Batch server!</red></b>" << endl;
                 sout << "  > Reason: " << GetLastError() << endl;
             } else {
                 CSmallString tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX");
