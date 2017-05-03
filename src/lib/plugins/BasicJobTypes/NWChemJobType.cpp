@@ -174,8 +174,8 @@ bool CNWChemJobType::CheckInputFile(CJob& job,std::ostream& sout)
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");
 
     // check memory keyword - convert to B
-    long int mem = job.ResourceList.GetMemory()*1024;
-
+    CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
+    long int mem = CResourceValue::GetSize(smem)*1024;
     long int umem = GetMemory(job_name);
 
     if( abs(umem/1024/1024 - mem*90/100/1024/1024) > 2 ){
