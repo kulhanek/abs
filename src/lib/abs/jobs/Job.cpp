@@ -2478,7 +2478,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     // refactorization: INF_USTORAGEGROUP introduced
     tmp = GetItem("specific/resources","INF_USTORAGEGROUP",true);
-    if( tmp ){
+    if( tmp != NULL ){
         tmp1 = GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
     sout << "Storage user grp : " <<  tmp << "[@" << tmp1 << "]" << endl;
     }

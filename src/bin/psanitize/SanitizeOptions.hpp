@@ -70,7 +70,7 @@ class CSanitizeOptions : public CSimpleOptions {
                     false,                          /* is option mandatory */
                     't',                           /* short option name */
                     "jobtype",                      /* long option name */
-                    NULL,                           /* parametr name */
+                    "TYPE",                           /* parametr name */
                     "explicitly specify job type")   /* option description */
         //----------------------------------------------------------------------
             CSO_MAP_OPT(bool,                           /* option type */
