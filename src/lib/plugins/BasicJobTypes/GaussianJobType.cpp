@@ -201,7 +201,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
     }
 
     // check memory keyword
-    long int mem = job.ResourceList.GetMemory();
+    long int mem = job.ResourceList.GetMemory()*1024;
 
     long int umem = GetMemory(job_name);
 
