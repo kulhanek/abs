@@ -89,7 +89,7 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     CFileName arg_job = job.GetItem("basic/arguments","INF_ARG_JOB");
 
     // is the job name a file with .com or .gjf extension?
-    if( (arg_job.GetFileNameExt() != ".com") || (arg_job.GetFileNameExt() != ".gjf") ) return(ERS_OK);
+    if( ! ((arg_job.GetFileNameExt() == ".com") || (arg_job.GetFileNameExt() == ".gjf")) ) return(ERS_OK);
 
     detected = true;
 
