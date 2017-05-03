@@ -486,14 +486,16 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     CSmallString storage_machine_groupns        = GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS");
 
 // default batch group name - derived from the input directory group
-    // if the file system is compatible with the batch server
-    if( storage_machine_groupns == batch_server_groupns ){
-        ResourceList.AddRawResource("batchgroup",ResourceList.GetResourceValue("storagegroup"));
-    } else {
-        // is not then try to use the current primary group name
-        if( batch_server_groupns == input_machine_groupns ){
-            // take the effective group
-            ResourceList.AddRawResource("batchgroup",User.GetEGroup());
+    if( ResourceList.FindResource("batchgroup") == NULL ){
+        if( storage_machine_groupns == batch_server_groupns ){
+            // if the file system is compatible with the batch server
+            ResourceList.AddRawResource("batchgroup",ResourceList.GetResourceValue("storagegroup"));
+        } else {
+            // is not then try to use the current primary group name
+            if( batch_server_groupns == input_machine_groupns ){
+                // take the effective group
+                ResourceList.AddRawResource("batchgroup",User.GetEGroup());
+            }
         }
     }
 
