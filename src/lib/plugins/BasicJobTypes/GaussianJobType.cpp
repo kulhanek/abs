@@ -136,9 +136,6 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
 
     ofs << "#!/usr/bin/env infinity-env" << endl;
     ofs << "# ----------------------------------------------------------" << endl;
-    ofs << "# Please do not remove above line as it protects you against" << endl;
-    ofs << "# accidental execution of this job script." << endl;
-    ofs << "# ----------------------------------------------------------" << endl;
     ofs << endl;
     ofs << "# activate gaussian module -----------------------" << endl;
     ofs << "module add " << gmodule << ":" << gmodver << endl;
@@ -198,7 +195,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
         if( UpdateNProcShared(job_name,ncpus) == false ){
             sout << endl;
-            sout << "<b><red> ERROR: Unable to save updated gaussian input file!</red></b>" << endl;
+            sout << "<b><red> ERROR: Unable to save updated gaussian input file (NProcShared)!</red></b>" << endl;
             return(false);
         }
     }
@@ -218,7 +215,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
         if( UpdateMemory(job_name,mem*90/100) == false ){
             sout << endl;
-            sout << "<b><red> ERROR: Unable to save updated gaussian input file!</red></b>" << endl;
+            sout << "<b><red> ERROR: Unable to save updated gaussian input file (%Mem)!</red></b>" << endl;
             return(false);
         }
     }
@@ -238,7 +235,7 @@ bool CGaussianJobType::UpdateNProcShared(const CSmallString& name,int nprocshare
     CSmallString full_name = name + ".com";
     ifstream ifs(full_name);
     if( ! ifs ) {
-        full_name = name + ".gfj";
+        full_name = name + ".gjf";
         ifs.open(full_name);
     }
     if( ! ifs ) return(false);
@@ -291,7 +288,7 @@ bool CGaussianJobType::UpdateMemory(const CSmallString& name,long int mem)
     CSmallString full_name = name + ".com";
     ifstream ifs(full_name);
     if( ! ifs ) {
-        full_name = name + ".gfj";
+        full_name = name + ".gjf";
         ifs.open(full_name);
     }
     if( ! ifs ) return(false);
@@ -344,7 +341,7 @@ int CGaussianJobType::GetNProcShared(const CSmallString& name)
     CSmallString full_name = name + ".com";
     ifstream ifs(full_name);
     if( ! ifs ) {
-        full_name = name + ".gfj";
+        full_name = name + ".gjf";
         ifs.open(full_name);
     }
     if( ! ifs ) return(false);
@@ -377,7 +374,7 @@ long int CGaussianJobType::GetMemory(const CSmallString& name)
     CSmallString full_name = name + ".com";
     ifstream ifs(full_name);
     if( ! ifs ) {
-        full_name = name + ".gfj";
+        full_name = name + ".gjf";
         ifs.open(full_name);
     }
     if( ! ifs ) return(false);
