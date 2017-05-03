@@ -174,6 +174,12 @@ void CResourceList::AddResource(const CSmallString& name,const CSmallString& val
             rstatus = false;
             return;
         }
+        if( srv == "*" ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Resource '" << name << "' cannot contain a star character as the short name (S) of batch server (S?name=value)!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
     }
 
     // be sure that the resource is unique
@@ -282,7 +288,8 @@ void CResourceList::RemoveResource(const CSmallString& name)
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        if( (p_rv->Name == CSmallString(fname)) && (p_rv->Server == CSmallString(srv)) ){
+        if( ( (srv != "*") && (p_rv->Name == CSmallString(fname)) && (p_rv->Server == CSmallString(srv))) ||
+            ( (srv == "*") && (p_rv->Name == CSmallString(fname)) )  ){
             erase(it);
             return;
         }
