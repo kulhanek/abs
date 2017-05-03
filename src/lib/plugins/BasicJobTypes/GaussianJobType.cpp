@@ -88,8 +88,8 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
 
     CFileName arg_job = job.GetItem("basic/arguments","INF_ARG_JOB");
 
-    // is the job name a file with .com extension?
-    if( arg_job.GetFileNameExt() != ".com" ) return(ERS_OK);
+    // is the job name a file with .com or .gjf extension?
+    if( (arg_job.GetFileNameExt() != ".com") || (arg_job.GetFileNameExt() != ".gjf") ) return(ERS_OK);
 
     detected = true;
 
@@ -153,7 +153,7 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     if( ! ofs ) {
         sout << endl;
         sout << "<b><red> ERROR: The gaussian job was detected but unable to write data to the job script '" << job_file << "'!</red></b>" << endl;
-        sout << "<b><red>        Check if you have the write permission in the job directory.</red></b>" << endl;
+        sout << "<b><red>        Check if you have the write permission to the job input directory.</red></b>" << endl;
         return(ERS_FAILED);
     }
 
