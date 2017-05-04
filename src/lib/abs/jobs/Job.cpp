@@ -1037,7 +1037,6 @@ void CJob::FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exc
         if( strcmp(p_dirent->d_name,"..") == 0 ) continue;
 
         CFileName full_name = dir / CFileName(p_dirent->d_name);
-        cout << full_name << endl;
         struct stat* p_stat = NULL;
         if( stat(full_name,p_stat) == 0 ){
             if( p_stat == NULL ) continue;
@@ -1053,6 +1052,7 @@ void CJob::FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exc
                 if( S_ISDIR(p_stat->st_mode) ){
                     mode = 0777;
                 }
+                cout << full_name << endl;
                 mode_t fmode = (mode & (~ umask)) & 0777;
                 chmod(full_name,fmode);
                 chown(full_name,-1,groupid);
