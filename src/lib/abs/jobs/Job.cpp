@@ -975,7 +975,7 @@ void CJob::FixJobPerms(void)
         string fixmode = *it;
         if( fixmode == "jobdir" ){
             FixJobPermsJobDir(groupid,umask);
-        } if( fixmode == "jobdata" ){
+        } else if( fixmode == "jobdata" ){
             FixJobPermsJobData(groupid,umask);
         } else if ( fixmode == "parent" ) {
             FixJobPermsParent(groupid,umask);
@@ -1037,6 +1037,7 @@ void CJob::FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exc
         if( strcmp(p_dirent->d_name,"..") == 0 ) continue;
 
         CFileName full_name = dir / CFileName(p_dirent->d_name);
+        cout << full_name << endl;
         struct stat* p_stat = NULL;
         if( stat(full_name,p_stat) == 0 ){
             if( p_stat == NULL ) continue;
