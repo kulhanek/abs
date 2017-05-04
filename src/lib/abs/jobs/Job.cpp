@@ -1124,7 +1124,7 @@ void CJob::FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,boo
     // go one level up
     CFileName updir = dir.GetFileDirectory();
     if( updir != NULL ){
-        FixJobPermsParent(updir,groupid,umask,setumask,setgroup);
+        FixJobPermsParent(updir,groupid,umask,setgroup,setumask);
     }
 }
 
