@@ -518,6 +518,13 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     if( ResourceList.FindResource("storagegroup") == NULL ){
         ResourceList.AddRawResource("storagegroup",GetItem("specific/resources","INF_BACKUP_USTORAGEGROUP"));
     }
+// fix default values for ncpus and nnodes
+    if( ResourceList.FindResource("ncpus") == NULL ){
+        ResourceList.AddRawResource("ncpus","1");
+    }
+    if( ResourceList.FindResource("nnodes") == NULL ){
+        ResourceList.AddRawResource("nnodes","1");
+    }
 
 // test resources
     ResourceList.TestResourceValues(sout,result);
