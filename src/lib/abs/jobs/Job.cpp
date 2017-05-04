@@ -156,7 +156,7 @@ bool CJob::SaveInfoFileWithPerms(void)
 
     int mode = 0666;
     int fmode = (mode & (~ umask)) & 0777;
-    CFileSystem::SetPosixMode(name,fmode);
+    chmod(name,fmode);
 
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
     if( sgroup != NULL ){
@@ -835,8 +835,6 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
     gid_t sgrid = CUser::GetGroupID(sgroup,false);
 
 // ------------------------
-
-    CSmallString input_dir  = GetItem("basic/jobinput","INF_INPUT_DIR");
     CFileName user_script   = GetItem("basic/jobinput","INF_JOB_NAME",true);
 
     if( ! siblings ) {
@@ -847,26 +845,18 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
         int fmode;
         int ret;
 
-        CSmallString fixperms = ResourceList.GetResourceValue("fixperms");
-        if( fixperms == "jobdir" ){
-            // job directory
-            mode = 0777;
-            fmode = (mode & (~ umask)) & 0777;
-            CFileSystem::SetPosixMode(input_dir,fmode);
-            ret = chown(input_dir,-1,sgrid);
-            if( ret != 0 ){
-                CSmallString warning;
-                warning << "unable to set group for directory '" << input_dir << "' (" << ret << ")";
-                ES_WARNING(warning);
-            }
-        } if ( fixperms == "deep" ){
-            // FIXME
-        }
+        FixJobPerms();
 
         // job script
         mode = 0766;
         fmode = (mode & (~ umask)) & 0777;
-        CFileSystem::SetPosixMode(job_script,fmode);
+        ret = chmod(job_script,fmode);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set group for file '" << job_script << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
+
         ret = chown(job_script,-1,sgrid);
         if( ret != 0 ){
             CSmallString warning;
@@ -876,7 +866,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
 
         // user script
         if( IsInteractiveJob() == false ){
-            CFileSystem::SetPosixMode(user_script,fmode);
+            chmod(user_script,fmode);
             ret = chown(user_script,-1,sgrid);
             if( ret != 0 ){
                 CSmallString warning;
@@ -955,6 +945,178 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
     }
 
     return(true);
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::FixJobPerms(void)
+{
+    CSmallString fixperms = ResourceList.GetResourceValue("fixperms");
+
+    if( (fixperms == NULL) || (fixperms == "none") ) return;
+
+    CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
+    if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
+        sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
+    }
+    gid_t groupid = CUser::GetGroupID(sgroup,false);
+
+    CSmallString sumask = GetItem("specific/resources","INF_UMASK");
+    mode_t umask = CUser::GetUMaskMode(sumask);
+
+    string sfixperms(fixperms);
+    vector<string> fixmodes;
+    split(fixmodes,sfixperms,is_any_of("+"),token_compress_on);
+
+    vector<string>::iterator it = fixmodes.begin();
+    vector<string>::iterator ie = fixmodes.end();
+
+    while( it != ie ){
+        string fixmode = *it;
+        if( fixmode == "jobdir" ){
+            FixJobPermsJobDir(groupid,umask);
+        } if( fixmode == "jobdata" ){
+            FixJobPermsJobData(groupid,umask);
+        } else if ( fixmode == "parent" ) {
+            FixJobPermsParent(groupid,umask);
+        }
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::FixJobPermsJobDir(gid_t groupid,mode_t umask)
+{
+    CSmallString input_dir  = GetItem("basic/jobinput","INF_INPUT_DIR");
+
+    int ret;
+
+    mode_t mode = 0777;
+    mode_t fmode = (mode & (~ umask)) & 0777;
+    ret = chmod(input_dir,fmode);
+    if( ret != 0 ){
+        CSmallString warning;
+        warning << "unable to set permissions for directory '" << input_dir << "' (" << ret << ")";
+        ES_WARNING(warning);
+    }
+
+    ret = chown(input_dir,-1,groupid);
+    if( ret != 0 ){
+        CSmallString warning;
+        warning << "unable to set user group for directory '" << input_dir << "' (" << ret << ")";
+        ES_WARNING(warning);
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::FixJobPermsJobData(gid_t groupid,mode_t umask)
+{
+    CFileName input_dir  = GetItem("basic/jobinput","INF_INPUT_DIR");
+    CSmallString excluded_files  = GetItem("basic/jobinput","INF_EXCLUDED_FILES");
+
+    std::set<std::string> exclusions;
+    std::string sexlusions(excluded_files);
+    split(exclusions,sexlusions,is_any_of(" "),token_compress_on);
+
+    FixJobPermsJobDataDir(input_dir,exclusions,groupid,umask,0);
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exclusions,const gid_t groupid,
+                                const mode_t umask,const int level)
+{
+    DIR* p_dir = opendir(dir);
+    if( p_dir == NULL ) return;
+
+    struct dirent* p_dirent;
+    while( (p_dirent = readdir(p_dir)) != NULL ){
+        if( strcmp(p_dirent->d_name,".") == 0 ) continue;
+        if( strcmp(p_dirent->d_name,"..") == 0 ) continue;
+
+        CFileName full_name = dir / CFileName(p_dirent->d_name);
+        struct stat* p_stat = NULL;
+        if( stat(full_name,p_stat) == 0 ){
+            if( p_stat == NULL ) continue;
+            if( S_ISREG(p_stat->st_mode) ||  S_ISDIR(p_stat->st_mode) ){
+                mode_t mode = p_stat->st_mode;
+                mode_t fmode = (mode & (~ umask)) & 0777;
+                chmod(full_name,fmode);
+                chown(full_name,-1,groupid);
+            }
+            if( S_ISDIR(p_stat->st_mode) ){
+                // skip directories from exclusion list on the first level only
+                if( (level == 0) && ( exclusions.count(string(p_dirent->d_name)) != 0) ) continue;
+                // recursion
+                FixJobPermsJobDataDir(full_name,exclusions,groupid,umask,level+1);
+            }
+        }
+    }
+
+    closedir(p_dir);
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::FixJobPermsParent(gid_t groupid,mode_t umask)
+{
+    CFileName input_dir  = GetItem("basic/jobinput","INF_INPUT_DIR");
+    bool setumask = true;
+    bool setgroup = true;
+    CFileName updir = input_dir.GetFileDirectory();  // skip job dir
+    FixJobPermsParent(updir,groupid,umask,setgroup,setumask);
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,bool& setgroup,bool& setumask)
+{
+    // read project file if exists
+    CFileName pfile = dir / ".project";
+    ifstream ifs(pfile);
+    if( ifs ){
+        string line;
+        getline(ifs,line); // skip project name
+        // read project resources - one per line
+        while( getline(ifs,line) ){
+            if( line.find("umask") != string::npos ) setumask = false;
+            if( line.find("storagegroup") != string::npos ) setgroup = false;
+        }
+    }
+
+    if( (setumask == false) && (setgroup == false) ) return; // nothing to set
+
+    // set permissions
+    int ret;
+
+    if( setumask ){
+        mode_t mode = 0777;
+        mode_t fmode = (mode & (~ umask)) & 0777;
+
+        ret = chmod(dir,fmode);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set permissions for directory '" << dir << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
+    }
+
+    if( setgroup ){
+        ret = chown(dir,-1,groupid);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set user group for directory '" << dir << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
+    }
+
+    // go one level up
+    CFileName updir = dir.GetFileDirectory();
+    if( updir != NULL ){
+        FixJobPermsParent(updir,groupid,umask,setumask,setgroup);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -3118,7 +3280,7 @@ bool CJob::SaveJobKey(void)
 
     int mode = 0666;
     int fmode = (mode & (~ umask)) & 0777;
-    CFileSystem::SetPosixMode(keyname,fmode);
+    chmod(keyname,fmode);
 
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
     if( sgroup != NULL ){

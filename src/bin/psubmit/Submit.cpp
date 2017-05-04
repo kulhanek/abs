@@ -29,6 +29,7 @@
 #include <BatchServers.hpp>
 #include <Host.hpp>
 #include <vector>
+#include <sys/stat.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -484,9 +485,9 @@ bool CSubmit::ExecPresubmitHook(void)
     if( presubmit_hook == NULL ) return(true);  // nothing to do
 
     // make the script executable
-    int mode = CFileSystem::GetPosixMode(presubmit_hook);
-    int fmode = (mode | 0100 ) & 0777;
-    CFileSystem::SetPosixMode(presubmit_hook,fmode);
+    mode_t mode = CFileSystem::GetPosixMode(presubmit_hook);
+    mode_t fmode = (mode | 0100 ) & 0777;
+    chmod(presubmit_hook,fmode);
 
     CFileName pwd = CJob::GetJobInputPath();
     presubmit_hook =  pwd / presubmit_hook;
@@ -496,7 +497,7 @@ bool CSubmit::ExecPresubmitHook(void)
 
     // dissable execution flag for the executable
     fmode = (mode & ~0111 ) & 0777;
-    CFileSystem::SetPosixMode(presubmit_hook,fmode);
+    chmod(presubmit_hook,fmode);
 
     return(result);
 }

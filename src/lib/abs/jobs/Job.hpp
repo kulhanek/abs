@@ -29,6 +29,7 @@
 #include <SmallTimeAndDate.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
+#include <set>
 #include <JobType.hpp>
 #include <FileName.hpp>
 #include <ResourceList.hpp>
@@ -453,6 +454,15 @@ protected:
 
     /// prepare data about input directory - called by DecodeResources
     bool InputDirectory(std::ostream& sout);
+
+    /// job permissions
+    void FixJobPerms(void);
+    void FixJobPermsJobDir(gid_t groupid,mode_t umask);
+    void FixJobPermsJobData(gid_t groupid,mode_t umask);
+    void FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exclusions,const gid_t groupid,
+                                const mode_t umask,const int level);
+    void FixJobPermsParent(gid_t groupid,mode_t umask);
+    void FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,bool& setgroup,bool& setumask);
 
     bool                                DoNotSave;
 
