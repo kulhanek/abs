@@ -1041,7 +1041,17 @@ void CJob::FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exc
         if( stat(full_name,p_stat) == 0 ){
             if( p_stat == NULL ) continue;
             if( S_ISREG(p_stat->st_mode) ||  S_ISDIR(p_stat->st_mode) ){
-                mode_t mode = p_stat->st_mode;
+                mode_t mode = 0600;
+                if( S_ISREG(p_stat->st_mode) ){
+                    if( S_IXUSR & p_stat->st_mode ){
+                        mode = 0777;
+                    } else {
+                        mode = 0666;
+                    }
+                }
+                if( S_ISDIR(p_stat->st_mode) ){
+                    mode = 0777;
+                }
                 mode_t fmode = (mode & (~ umask)) & 0777;
                 chmod(full_name,fmode);
                 chown(full_name,-1,groupid);
