@@ -1037,27 +1037,25 @@ void CJob::FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exc
         if( strcmp(p_dirent->d_name,"..") == 0 ) continue;
 
         CFileName full_name = dir / CFileName(p_dirent->d_name);
-        struct stat* p_stat = NULL;
-        if( stat(full_name,p_stat) == 0 ){
-            if( p_stat == NULL ) continue;
-            if( S_ISREG(p_stat->st_mode) ||  S_ISDIR(p_stat->st_mode) ){
+        struct stat my_stat;
+        if( stat(full_name,&my_stat) == 0 ){
+            if( S_ISREG(my_stat.st_mode) ||  S_ISDIR(my_stat.st_mode) ){
                 mode_t mode = 0600;
-                if( S_ISREG(p_stat->st_mode) ){
-                    if( S_IXUSR & p_stat->st_mode ){
+                if( S_ISREG(my_stat.st_mode) ){
+                    if( S_IXUSR & my_stat.st_mode ){
                         mode = 0777;
                     } else {
                         mode = 0666;
                     }
                 }
-                if( S_ISDIR(p_stat->st_mode) ){
+                if( S_ISDIR(my_stat.st_mode) ){
                     mode = 0777;
                 }
-                cout << full_name << endl;
                 mode_t fmode = (mode & (~ umask)) & 0777;
                 chmod(full_name,fmode);
                 chown(full_name,-1,groupid);
             }
-            if( S_ISDIR(p_stat->st_mode) ){
+            if( S_ISDIR(my_stat.st_mode) ){
                 // skip directories from exclusion list on the first level only
                 if( (level == 0) && ( exclusions.count(string(p_dirent->d_name)) != 0) ) continue;
                 // recursion
