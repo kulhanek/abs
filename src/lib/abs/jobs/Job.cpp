@@ -1107,7 +1107,7 @@ void CJob::FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,boo
 
         struct stat my_stat;
         memset(&my_stat,0,sizeof(my_stat));
-        stat(full_name,&my_stat);
+        stat(dir,&my_stat);
 
         mode_t mode = 0777;
         // preserve sticky-bits
