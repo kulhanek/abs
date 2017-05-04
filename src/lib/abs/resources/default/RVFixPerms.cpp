@@ -80,7 +80,7 @@ void CRVFixPerms::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus
     list<string>::iterator ie = items.end();
 
     while( it != ie ){
-        if( keys.count(*it) != 0 ){
+        if( keys.count(*it) == 0 ){
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
             sout << "<b><red>        The mode '" << *it << "' is not one of " << allowed << "!</red></b>" << endl;
