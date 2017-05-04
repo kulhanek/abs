@@ -720,9 +720,6 @@ bool CJob::InputDirectory(std::ostream& sout)
         ResourceList.AddRawResource("storagegroup",gname);
     }
 
-// default security
-    ResourceList.AddRawResource("fixperms","jobdir");
-
 // input storage
     SetItem("specific/resources","INF_INPUT_PATH_FSTYPE",fstype);
     SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
