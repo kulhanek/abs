@@ -24,6 +24,11 @@
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 #include <ResourceList.hpp>
+#include <list>
+#include <set>
+#include <string>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -48,6 +53,7 @@ CComObject* RVFixPermsCB(void* p_data)
 //------------------------------------------------------------------------------
 
 using namespace std;
+using namespace boost;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -62,7 +68,27 @@ CRVFixPerms::CRVFixPerms(void)
 
 void CRVFixPerms::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    if( TestKeyValue(sout,rstatus,"jobdir,none") == false ) return;
+    string allowed = "jobdir+jobdata+parent";
+    set<string>  keys;
+    split(keys,allowed,is_any_of("+"));
+
+    list<string> items;
+    string svalue(Value);
+    split(items,svalue,is_any_of("+"),token_compress_on);
+
+    list<string>::iterator it = items.begin();
+    list<string>::iterator ie = items.end();
+
+    while( it != ie ){
+        if( keys.count(*it) != 0 ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout << "<b><red>        The mode '" << *it << "' is not one of " << allowed << "!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+        it++;
+    }
 }
 
 //==============================================================================

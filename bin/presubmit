@@ -38,7 +38,7 @@ ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" "
             cd \"$INF_INPUT_DIR\"; \
             export INF_EXTERNAL_START_AFTER=$INF_JOB_ID;
             export INF_EXTERNAL_NAME_SUFFIX=\"$INF_EXTERNAL_NAME_SUFFIX\";
-            psubmit -y -i -e -r \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" \"$INF_ARG_RESOURCES\"; "
+            psubmit -y -i -e -r \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" \"$INF_ARG_RESOURCES\" fixperms=none; "
 
 if [ $? -ne 0 ]; then
     echo "" >&2
