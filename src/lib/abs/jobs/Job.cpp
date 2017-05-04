@@ -990,8 +990,13 @@ void CJob::FixJobPermsJobDir(gid_t groupid,mode_t umask)
 
     int ret;
 
+    struct stat my_stat;
+    memset(&my_stat,0,sizeof(my_stat));
+    stat(input_dir,&my_stat);
+
     mode_t mode = 0777;
-    mode_t fmode = (mode & (~ umask)) & 0777;
+    // preserve sticky-bits
+    mode_t fmode = (my_stat.st_mode & 07000) | ((mode & (~ umask)) & 0777);
     ret = chmod(input_dir,fmode);
     if( ret != 0 ){
         CSmallString warning;
@@ -1050,7 +1055,7 @@ void CJob::FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exc
                     mode = 0777;
                 }
                 // preserve sticky-bits
-                mode_t fmode = (my_stat.st_mode & 0700) | ((mode & (~ umask)) & 0777);
+                mode_t fmode = (my_stat.st_mode & 07000) | ((mode & (~ umask)) & 0777);
                 chmod(full_name,fmode);
                 chown(full_name,-1,groupid);
             }
@@ -1111,7 +1116,7 @@ void CJob::FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,boo
 
         mode_t mode = 0777;
         // preserve sticky-bits
-        mode_t fmode = (my_stat.st_mode & 0700) | ((mode & (~ umask)) & 0777);
+        mode_t fmode = (my_stat.st_mode & 07000) | ((mode & (~ umask)) & 0777);
 
         ret = chmod(dir,fmode);
         if( ret != 0 ){
