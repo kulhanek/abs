@@ -1088,8 +1088,12 @@ void CJob::FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,boo
         getline(ifs,line); // skip project name
         // read project resources - one per line
         while( getline(ifs,line) ){
-            if( line.find("umask") != string::npos ) setumask = false;
             if( line.find("storagegroup") != string::npos ) setgroup = false;
+            if( line.find("umask") != string::npos ) setumask = false;
+            if( line.find("fixperms") != string::npos ){
+                setgroup = false;
+                setumask = false;
+            }
         }
     }
 
