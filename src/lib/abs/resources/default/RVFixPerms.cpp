@@ -68,7 +68,7 @@ CRVFixPerms::CRVFixPerms(void)
 
 void CRVFixPerms::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    string allowed = "jobdir+jobdata+parent";
+    string allowed = "jobdir+jobdata+parent+none";
     set<string>  keys;
     split(keys,allowed,is_any_of("+"));
 
