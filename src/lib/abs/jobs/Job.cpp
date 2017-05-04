@@ -1041,7 +1041,7 @@ void CJob::FixJobPermsJobDataDir(CFileName& dir,const std::set<std::string>& exc
                 mode_t mode = 0600;
                 if( S_ISREG(my_stat.st_mode) ){
                     if( S_IXUSR & my_stat.st_mode ){
-                        mode = 0777;
+                        mode = 0766;
                     } else {
                         mode = 0666;
                     }
