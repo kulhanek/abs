@@ -2680,9 +2680,9 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     tmp = GetItem("specific/resources","INF_FIXPERMS",true);
     if( tmp != NULL ){
-    sout << "Fix permissions : " << tmp << endl;
+    sout << "Fix permissions  : " << tmp << endl;
     } else {
-    sout << "Fix permissions : none" << endl;
+    sout << "Fix permissions  : none" << endl;
     }
 
     sout << "-----------------------------------------------" << endl;
