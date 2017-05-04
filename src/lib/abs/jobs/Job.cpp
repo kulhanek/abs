@@ -575,6 +575,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
     SetItem("specific/resources","INF_UBATCHGROUP",ResourceList.GetResourceValue("batchgroup"));
     SetItem("specific/resources","INF_UMASK",ResourceList.GetResourceValue("umask"));
+    SetItem("specific/resources","INF_FIXPERMS",ResourceList.GetResourceValue("fixperms"));
 
 // setup specific items for working directory
     SetItem("specific/resources","INF_DATAIN",ResourceList.GetResourceValue("datain"));
@@ -2665,6 +2666,13 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     tmp = GetItem("specific/resources","INF_UMASK");
     sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" <<  endl;
+
+    tmp = GetItem("specific/resources","INF_FIXPERMS",true);
+    if( tmp != NULL ){
+    sout << "Fix permissions : " << tmp << endl;
+    } else {
+    sout << "Fix permissions : none" << endl;
+    }
 
     sout << "-----------------------------------------------" << endl;
 
