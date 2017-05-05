@@ -116,35 +116,35 @@ ERetStatus CNWChemJobType::DetectJobType(CJob& job,bool& detected,std::ostream& 
 
     CFileName job_file = arg_job.GetFileNameWithoutExt();
 
-    ofstream ofs(job_file);
-    if( ! ofs ) {
-        sout << endl;
-        sout << "<b><red> ERROR: The nwchem job was detected but unable to open the job script '" << job_file << "' for writing!</red></b>" << endl;
-        sout << "<b><red>        Remove the file and check if you have the write permission in the job directory.</red></b>" << endl;
-        return(ERS_FAILED);
-    }
+    // do not write the file if psanitize is used
+    if( job.GetItem("basic/arguments","INF_SANITIZE_JOB","YES") != "YES" ){
+        ofstream ofs(job_file);
+        if( ! ofs ) {
+            sout << endl;
+            sout << "<b><red> ERROR: The nwchem job was detected but unable to open the job script '" << job_file << "' for writing!</red></b>" << endl;
+            sout << "<b><red>        Remove the file and check if you have the write permission in the job directory.</red></b>" << endl;
+            return(ERS_FAILED);
+        }
 
-    ofs << "#!/usr/bin/env infinity-env" << endl;
-    ofs << "# ----------------------------------------------------------" << endl;
-    ofs << "# Please do not remove above line as it protects you against" << endl;
-    ofs << "# accident execution of this job script." << endl;
-    ofs << "# ----------------------------------------------------------" << endl;
-    ofs << endl;
-    ofs << "# activate nwchem module -------------------------" << endl;
-    ofs << "module add " << nmodule << endl;
-    ofs << endl;
-    ofs << "# start job --------------------------------------" << endl;
-    ofs << "nwchem " << arg_job << endl;
-    ofs << endl;
-    ofs << "# clean ------------------------------------------" << endl;
-    ofs << "rm -f core" << endl;
-    ofs << endl;
+        ofs << "#!/usr/bin/env infinity-env" << endl;
+        ofs << "# ----------------------------------------------------------" << endl;
+        ofs << endl;
+        ofs << "# activate nwchem module -------------------------" << endl;
+        ofs << "module add " << nmodule << endl;
+        ofs << endl;
+        ofs << "# start job --------------------------------------" << endl;
+        ofs << "nwchem " << arg_job << endl;
+        ofs << endl;
+        ofs << "# clean ------------------------------------------" << endl;
+        ofs << "rm -f core" << endl;
+        ofs << endl;
 
-    if( ! ofs ) {
-        sout << endl;
-        sout << "<b><red> ERROR: The nwchem job was detected but unable to write data to the job script '" << job_file << "'!</red></b>" << endl;
-        sout << "<b><red>        Check if you have the write permission in the job directory.</red></b>" << endl;
-        return(ERS_FAILED);
+        if( ! ofs ) {
+            sout << endl;
+            sout << "<b><red> ERROR: The nwchem job was detected but unable to write data to the job script '" << job_file << "'!</red></b>" << endl;
+            sout << "<b><red>        Check if you have the write permission in the job directory.</red></b>" << endl;
+            return(ERS_FAILED);
+        }
     }
 
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
@@ -173,27 +173,30 @@ bool CNWChemJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");
 
+    // what amount should be dedicated to the gaussian job
+    int perc = 95; // in %
+
     // check memory keyword - convert to B
     CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
     long int mem = CResourceValue::GetSize(smem)*1024;
     long int umem = GetMemory(job_name);
 
-    if( abs(umem/1024/1024 - mem*90/100/1024/1024) > 2 ){
+    if( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ){
         sout << endl;
         sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
         sout << "<b><blue>          in the nwchem input file!</blue></b>" << endl;
         sout << endl;
-        sout << "<b><blue>          The ammount of memory requested via psubmit command (90%) : " << setw(7) << mem*90/100/1024/1024 << " MB</blue></b>" << endl;
+        sout << "<b><blue>          The ammount of memory requested via psubmit command (90%) : " << setw(7) << mem*perc/100/1024/1024 << " MB</blue></b>" << endl;
         sout << "<b><blue>          The ammount of memory requested in the nwchem input file  : " << setw(7) << umem/1024/1024 << " MB (via memory)</blue></b>" << endl;
 
-        if( UpdateMemory(job_name,mem*90/100) == false ){
+        if( UpdateMemory(job_name,mem*perc/100) == false ){
             sout << endl;
             sout << "<b><red> ERROR: Unable to save updated nwchem input file!</red></b>" << endl;
             return(false);
         }
     }
 
-    if( abs(umem/1024/1024 - mem*90/100/1024/1024) > 2 ){
+    if( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ){
         sout << endl;
         sout << "<b><blue> WARNING: The input file was updated!</blue></b>" << endl;
     }

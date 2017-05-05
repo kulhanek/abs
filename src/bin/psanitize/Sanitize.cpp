@@ -133,6 +133,7 @@ bool CSanitize::Run(void)
 
     // overwrite job input data
     p_job->SetItem("basic/arguments","INF_ARG_JOB",Options.GetArgJobInputName());
+    p_job->SetItem("basic/arguments","INF_SANITIZE_JOB","YES");
 
     // detect job input and potentially update its status
     vout << endl;
