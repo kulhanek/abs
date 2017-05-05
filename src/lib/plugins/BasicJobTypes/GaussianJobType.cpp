@@ -221,7 +221,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
         sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
         sout << "<b><blue>          in the gaussian input file!</blue></b>" << endl;
         sout << endl;
-        sout << "<b><blue>          The ammount of memory requested via psubmit command (95%)  : " << setw(7) << mem*perc/100/1024/1024 << " MB</blue></b>" << endl;
+        sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem*perc/100/1024/1024 << " MB</blue></b>" << endl;
         sout << "<b><blue>          The ammount of memory requested in the gaussian input file : " << setw(7) << umem/1024/1024 << " MB (via %Mem)</blue></b>" << endl;
 
         if( UpdateMemory(job,job_name,mem*perc/100) == false ){
