@@ -143,7 +143,7 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
 // -----------------
     DecodeBatchJobComment(p_job->attribs,BatchJobComment);
     if( (status == "H") && (BatchJobComment == NULL) ){
-        BatchJobComment = "Holded";
+        BatchJobComment = "Held";
     }
     SetItem("batch/job","INF_JOB_COMMENT",BatchJobComment);
 
