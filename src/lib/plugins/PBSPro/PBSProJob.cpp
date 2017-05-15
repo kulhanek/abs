@@ -222,7 +222,7 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     get_attribute(p_job->attribs,ATTR_stime,NULL,tmp);
     if( tmp != NULL ){
         SetItem("batch/job","INF_START_TIME",tmp);
-    } if( BatchJobStatus == EJS_RUNNING ){
+    } else if( BatchJobStatus == EJS_RUNNING ){
         // bypass for RT#198677
         get_attribute(p_job->attribs,ATTR_etime,NULL,tmp);
         SetItem("batch/job","INF_START_TIME",tmp);
