@@ -294,7 +294,7 @@ fi
 echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L2.6: Determining type of executive environment ..."
-echo "#       Supported types: raw, cpuset, exclusive
+echo "#       Supported types: raw, cpuset, exclusive"
 echo "# ------------------------------------------------------------------------------"
 
 #determine INF_EXEC_TYPE -------------------------------------------------------
