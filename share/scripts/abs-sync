@@ -23,6 +23,9 @@
 #-------------------------------------------------------------------------------
 #===============================================================================
 
+# we need modified rsync
+amsmodule --system add abs-rsync 2> /dev/null
+
 echo "List of files in working directory:"
 echo "========================================================"
 ssh -x $INF_SSH_OPTIONS $INF_SYNC_MAIN_NODE "cd $INF_SYNC_WORK_DIR; if [ \$? -ne 0 ]; then echo; exit 1; fi; \ls -l *"
