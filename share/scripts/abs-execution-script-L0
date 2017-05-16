@@ -105,8 +105,16 @@ echo "# amsmodule --system add abs-rsync"
 
 amsmodule --system add abs-rsync
 
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to add the 'abs-rsync' module!" >&2
+    echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
+fi
+
 # print rsync version and capabilities
-rsync --version
+$ABS_RSYNC --version
 
 # ==============================================================================
 
