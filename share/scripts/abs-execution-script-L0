@@ -105,6 +105,9 @@ echo "# amsmodule --system add abs-rsync"
 
 amsmodule --system add abs-rsync
 
+# print rsync version and capabilities
+rsync --version
+
 # ==============================================================================
 
 # load ABS library
