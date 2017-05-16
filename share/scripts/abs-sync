@@ -47,7 +47,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
     if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
         echo "from the working directory ..."
         $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
-              --rsync-path="if [ -f $ABS_RSYNC ]; then $ABS_RSYNC; else rsync; fi" \
+              --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
               "$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
             echo ""
@@ -58,7 +58,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
     else
         echo "from the input directory ..."
         $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
-              --rsync-path="if [ -f $ABS_RSYNC ]; then $ABS_RSYNC; else rsync; fi" \
+              --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
               "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
             echo ""
@@ -110,7 +110,7 @@ for SFILE in $FILES; do
     else
         if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
             $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-                  --rsync-path="if [ -f $ABS_RSYNC ]; then $ABS_RSYNC; else rsync; fi" \
+                  --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                   "$INF_SYNC_WORK_DIR/$SFILE" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" > /dev/null
             if [ $? -ne 0 ]; then
                 echo ""
@@ -120,7 +120,7 @@ for SFILE in $FILES; do
             fi
         else
             $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-                  --rsync-path="if [ -f $ABS_RSYNC ]; then $ABS_RSYNC; else rsync; fi" \
+                  --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                   "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE" "$INF_SYNC_INPUT_DIR/" > /dev/null
             if [ $? -ne 0 ]; then
                 echo ""
