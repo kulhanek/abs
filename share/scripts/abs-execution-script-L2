@@ -253,20 +253,7 @@ done
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.4: Current NUMA settings on the master node ..."
-echo "# ------------------------------------------------------------------------------"
-
-type numactl &> /dev/null
-
-if [ $? -eq 0 ]; then
-    numactl --show
-else
-    echo ">>> INFO: the numactl command not available ... skipping"
-fi
-
-echo ""
-echo "# ------------------------------------------------------------------------------"
-echo "# L2.5: Machine hardware info ..."
+echo "# L2.4: Machine hardware info ..."
 echo "# ------------------------------------------------------------------------------"
 
 echo
@@ -291,6 +278,61 @@ if [ $INF_NGPUS -gt 0 ]; then
     fi
 fi
 
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.5: Current NUMA settings on the master node ..."
+echo "# ------------------------------------------------------------------------------"
+
+type numactl &> /dev/null
+
+if [ $? -eq 0 ]; then
+    numactl --show
+else
+    echo ">>> INFO: the numactl command not available ... skipping"
+fi
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.6: Determining type of executive environment ..."
+echo "#       Supported types: raw, cpuset, exclusive
+echo "# ------------------------------------------------------------------------------"
+
+#determine INF_EXEC_TYPE -------------------------------------------------------
+
+read INF_CPUSET < /proc/self/cpuset
+if [ "$INF_CPUSET" != "/" ]; then
+    INF_EXEC_TYPE="cpuset"
+else
+    TMP_FILE=/tmp/$USER.$$.pbsnodes
+    pbsnodes `cat $INF_NODEFILE | sort -u` > $TMP_FILE
+    INF_MAX_CPUS=`awk 'BEGIN { ncpus = 0; } /resources_available.ncpus/ { ncpus += $3; } END { print ncpus; }' $TMP_FILE`
+    if [ "$INF_MAX_CPUS" -eq "$INF_NCPUS" ]; then
+        INF_EXEC_TYPE="exclusive"
+    else
+        INF_EXEC_TYPE="raw"
+    fi
+    rm -f $TMP_FILE
+    unset TMP_FILE
+fi
+
+# setup OpenMPI ----------------------------------------------------------------
+
+case "$INF_EXEC_TYPE" in
+    cpuset|exclusive)
+        export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
+        export INF_OPENMPI2_SPEC="-report-bindings -bind-to core"
+        ;;
+esac
+
+export INF_CPUSET
+export INF_EXEC_TYPE
+
+# final reporting --------------------------------------------------------------
+
+echo "INF_EXEC_TYPE     = $INF_EXEC_TYPE"
+echo "INF_CPUSET        = $INF_CPUSET"
+echo "INF_OPENMPI1_SPEC = $INF_OPENMPI1_SPEC"
+echo "INF_OPENMPI2_SPEC = $INF_OPENMPI2_SPEC"
 
 
 
