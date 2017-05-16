@@ -248,7 +248,7 @@ echo "# ------------------------------------------------------------------------
 for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
     echo ""
     echo ">>> $NODE_NAME ----------------------------------"
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /   PID USER/ { start = 1; }'"
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /PID USER/ { start = 1; }'"
 done
 
 echo ""
@@ -301,7 +301,7 @@ echo "# ------------------------------------------------------------------------
 
 TMP_FILE=/tmp/$USER.$$.pbsnodes
 pbsnodes `cat $INF_NODEFILE | sort -u` > $TMP_FILE
-INF_MAX_CPUS=`awk 'BEGIN { ncpus = 0; } /resources_available.ncpus/ { ncpus += $3; } END { print ncpus; }' $TMP_FILE`
+INF_MAX_NCPUS=`awk 'BEGIN { ncpus = 0; } /resources_available.ncpus/ { ncpus += $3; } END { print ncpus; }' $TMP_FILE`
 rm -f $TMP_FILE
 unset TMP_FILE
 
@@ -309,7 +309,7 @@ read INF_CPUSET < /proc/self/cpuset
 if [ "$INF_CPUSET" != "/" ]; then
     INF_EXEC_TYPE="cpuset"
 else
-    if [ "$INF_MAX_CPUS" -eq "$INF_NCPUS" ]; then
+    if [ "$INF_MAX_NCPUS" -eq "$INF_NCPUS" ]; then
         INF_EXEC_TYPE="exclusive"
     else
         INF_EXEC_TYPE="raw"
@@ -325,16 +325,16 @@ case "$INF_EXEC_TYPE" in
         ;;
 esac
 
-export INF_MAX_CPUS
+export INF_MAX_NCPUS
 export INF_CPUSET
 export INF_EXEC_TYPE
 
 # final reporting --------------------------------------------------------------
 
-echo "INF_MAX_CPUS      = $INF_MAX_CPUS"
+echo "INF_MAX_NCPUS     = $INF_MAX_NCPUS"
 echo "INF_NCPUS         = $INF_NCPUS"
-echo "INF_EXEC_TYPE     = $INF_EXEC_TYPE"
 echo "INF_CPUSET        = $INF_CPUSET"
+echo "INF_EXEC_TYPE     = $INF_EXEC_TYPE"
 echo "INF_OPENMPI1_SPEC = $INF_OPENMPI1_SPEC"
 echo "INF_OPENMPI2_SPEC = $INF_OPENMPI2_SPEC"
 

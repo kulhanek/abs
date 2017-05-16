@@ -100,7 +100,7 @@ echo "# ------------------------------------------------------------------------
 for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
     echo ""
     echo ">>> $NODE_NAME ----------------------------------"
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /   PID USER/ { start = 1; }'"
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /PID USER/ { start = 1; }'"
 done
 
 echo ""
