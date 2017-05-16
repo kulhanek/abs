@@ -33,6 +33,13 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+if [ -e "$ABS_RSYNC" ]; then
+    echo "" >&2
+    echo " ERROR: '$ABS_RSYNC' is not executable!" >&2
+    echo "" >&2
+    exit 1
+fi
+
 echo "List of files in the working directory:"
 echo "========================================================"
 ssh -x $INF_SSH_OPTIONS $INF_SYNC_MAIN_NODE "cd $INF_SYNC_WORK_DIR; if [ \$? -ne 0 ]; then echo; exit 1; fi; \ls -l *"

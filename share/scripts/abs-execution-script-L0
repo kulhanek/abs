@@ -113,6 +113,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+if [ -e "$ABS_RSYNC" ]; then
+    echo "" >&2
+    echo " ERROR: '$ABS_RSYNC' is not executable!" >&2
+    echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
+fi
+
 # print rsync version and capabilities
 $ABS_RSYNC --version
 

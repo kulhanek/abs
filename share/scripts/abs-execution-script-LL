@@ -52,8 +52,9 @@ function inf-copy-from-inputdir()
         echo "  > rsyncing the data from the local mount ... "
         echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/$1 -> $2"
         echo ""
-        rsync -av $INF_LW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-              "$INF_INPUT_DIR/$1" "$2"
+        $ABS_RSYNC -av $INF_LW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$INF_INPUT_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
@@ -64,8 +65,9 @@ function inf-copy-from-inputdir()
     echo "  > rsyncing the data from the storage machine via scp ... "
     echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1 -> $2"
     echo ""
-    rsync -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-          "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
+    $ABS_RSYNC -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+            "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         return 0
@@ -76,8 +78,9 @@ function inf-copy-from-inputdir()
         echo "  > rsyncing the data from the input machine via scp ... "
         echo "    $INF_IW_RSYNCOPTS  $INF_INPUT_MACHINE:$INF_INPUT_DIR/$1 -> $2"
         echo ""
-        rsync -av $INF_IW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-              "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
+        $ABS_RSYNC -av $INF_IW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
@@ -101,8 +104,9 @@ function inf-copy-to-inputdir()
         echo "  > rsyncing the data to the local mount ... "
         echo "    $INF_WL_RSYNCOPTS $1 -> $INF_INPUT_DIR/$2"
         echo ""
-        rsync -av $INF_WL_RSYNCOPTS \
-              "$1" "$INF_INPUT_DIR/$2"
+        $ABS_RSYNC -av $INF_WL_RSYNCOPTS \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$1" "$INF_INPUT_DIR/$2"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
@@ -113,8 +117,9 @@ function inf-copy-to-inputdir()
     echo "  > rsyncing the data to the storage machine via scp ... "
     echo "    $INF_WS_RSYNCOPTS $1 -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
     echo ""
-    rsync -av $INF_WS_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-          "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
+    $ABS_RSYNC -av $INF_WS_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+            "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         return 0
@@ -125,8 +130,9 @@ function inf-copy-to-inputdir()
         echo "  > rsyncing the data to the input machine via scp ... "
         echo "    $INF_WI_RSYNCOPTS $1 -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
         echo ""
-        rsync -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-            "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
+        $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
@@ -161,8 +167,9 @@ function inf-rsync-from-inputdir()
         echo "  > rsyncing from the local mount ... "
         echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/ -> $INF_WORK_DIR/"
         echo ""
-        rsync -av $INF_LW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" \
-              "$INF_INPUT_DIR/" "$INF_WORK_DIR/"
+        $ABS_RSYNC -av $INF_LW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$INF_INPUT_DIR/" "$INF_WORK_DIR/"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             rm -f $TMPDIR/${_TNAME_}.excluded
@@ -174,8 +181,9 @@ function inf-rsync-from-inputdir()
     echo "  > rsyncing from the storage machine via scp ... "
     echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/ -> $INF_WORK_DIR/"
     echo ""
-    rsync -av $INF_SW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-          "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/" "$INF_WORK_DIR/"
+    $ABS_RSYNC -av $INF_SW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
+            --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+            "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/" "$INF_WORK_DIR/"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         rm -f $TMPDIR/${_TNAME_}.excluded
@@ -187,8 +195,9 @@ function inf-rsync-from-inputdir()
         echo "  > rsyncing from the input machine via scp ... "
         echo "    $INF_IW_RSYNCOPTS $INF_INPUT_MACHINE:$INF_INPUT_DIR/ -> $INF_WORK_DIR/"
         echo ""
-        rsync -av $INF_IW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-              "$INF_INPUT_MACHINE:$INF_INPUT_DIR/" "$INF_WORK_DIR/"
+        $ABS_RSYNC -av $INF_IW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$INF_INPUT_MACHINE:$INF_INPUT_DIR/" "$INF_WORK_DIR/"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             rm -f $TMPDIR/${_TNAME_}.excluded
@@ -220,7 +229,9 @@ function inf-rsync-to-inputdir()
         echo "  > rsyncing to the local mount ... "
         echo "    $INF_WL_RSYNCOPTS $INF_WORK_DIR/ -> $INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
         echo ""
-        rsync -av $INF_WL_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" "$INF_WORK_DIR/" "$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
+        $ABS_RSYNC -av $INF_WL_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$INF_WORK_DIR/" "$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             rm -f $TMPDIR/${_TNAME_}.excluded
@@ -232,8 +243,9 @@ function inf-rsync-to-inputdir()
     echo "  > rsyncing to the storage machine via scp ... "
     echo "    $INF_WS_RSYNCOPTS $INF_WORK_DIR/ -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
     echo ""
-    rsync -av $INF_WS_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-          "$INF_WORK_DIR/" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
+    $ABS_RSYNC -av $INF_WS_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
+            --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+            "$INF_WORK_DIR/" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         rm -f $TMPDIR/${_TNAME_}.excluded
@@ -245,8 +257,9 @@ function inf-rsync-to-inputdir()
         echo "  > rsyncing to the input machine via scp ... "
         echo "    $INF_WI_RSYNCOPTS $INF_WORK_DIR/ -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
         echo ""
-        rsync -av $INF_WI_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-              "$INF_WORK_DIR/" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
+        $ABS_RSYNC -av $INF_WI_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$INF_WORK_DIR/" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             rm -f $TMPDIR/${_TNAME_}.excluded
