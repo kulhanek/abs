@@ -299,20 +299,21 @@ echo "# ------------------------------------------------------------------------
 
 #determine INF_EXEC_TYPE -------------------------------------------------------
 
+TMP_FILE=/tmp/$USER.$$.pbsnodes
+pbsnodes `cat $INF_NODEFILE | sort -u` > $TMP_FILE
+INF_MAX_CPUS=`awk 'BEGIN { ncpus = 0; } /resources_available.ncpus/ { ncpus += $3; } END { print ncpus; }' $TMP_FILE`
+rm -f $TMP_FILE
+unset TMP_FILE
+
 read INF_CPUSET < /proc/self/cpuset
 if [ "$INF_CPUSET" != "/" ]; then
     INF_EXEC_TYPE="cpuset"
 else
-    TMP_FILE=/tmp/$USER.$$.pbsnodes
-    pbsnodes `cat $INF_NODEFILE | sort -u` > $TMP_FILE
-    INF_MAX_CPUS=`awk 'BEGIN { ncpus = 0; } /resources_available.ncpus/ { ncpus += $3; } END { print ncpus; }' $TMP_FILE`
     if [ "$INF_MAX_CPUS" -eq "$INF_NCPUS" ]; then
         INF_EXEC_TYPE="exclusive"
     else
         INF_EXEC_TYPE="raw"
     fi
-    rm -f $TMP_FILE
-    unset TMP_FILE
 fi
 
 # setup OpenMPI ----------------------------------------------------------------
@@ -324,11 +325,14 @@ case "$INF_EXEC_TYPE" in
         ;;
 esac
 
+export INF_MAX_CPUS
 export INF_CPUSET
 export INF_EXEC_TYPE
 
 # final reporting --------------------------------------------------------------
 
+echo "INF_MAX_CPUS      = $INF_MAX_CPUS"
+echo "INF_NCPUS         = $INF_NCPUS"
 echo "INF_EXEC_TYPE     = $INF_EXEC_TYPE"
 echo "INF_CPUSET        = $INF_CPUSET"
 echo "INF_OPENMPI1_SPEC = $INF_OPENMPI1_SPEC"
