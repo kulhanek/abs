@@ -26,6 +26,13 @@
 # we need modified rsync
 amsmodule --system add abs-rsync 2> /dev/null
 
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " ERROR: Unable to add the 'abs-rsync' module!" >&2
+    echo "" >&2
+    exit 1
+fi
+
 echo "List of files in the working directory:"
 echo "========================================================"
 ssh -x $INF_SSH_OPTIONS $INF_SYNC_MAIN_NODE "cd $INF_SYNC_WORK_DIR; if [ \$? -ne 0 ]; then echo; exit 1; fi; \ls -l *"
@@ -39,7 +46,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
     echo -n "All files will be synchronized by rsync "
     if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
         echo "from the working directory ..."
-        rsync -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
+        $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
               --rsync-path="if [ -f $ABS_RSYNC ]; then $ABS_RSYNC; else rsync; fi" \
               "$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
@@ -50,7 +57,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
         fi
     else
         echo "from the input directory ..."
-        rsync -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
+        $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
               --rsync-path="if [ -f $ABS_RSYNC ]; then $ABS_RSYNC; else rsync; fi" \
               "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
@@ -102,7 +109,7 @@ for SFILE in $FILES; do
         echo "Skipped."
     else
         if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
-            rsync -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                   --rsync-path="if [ -f $ABS_RSYNC ]; then $ABS_RSYNC; else rsync; fi" \
                   "$INF_SYNC_WORK_DIR/$SFILE" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" > /dev/null
             if [ $? -ne 0 ]; then
@@ -112,7 +119,7 @@ for SFILE in $FILES; do
                 exit 1
             fi
         else
-            rsync -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                   --rsync-path="if [ -f $ABS_RSYNC ]; then $ABS_RSYNC; else rsync; fi" \
                   "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE" "$INF_SYNC_INPUT_DIR/" > /dev/null
             if [ $? -ne 0 ]; then
