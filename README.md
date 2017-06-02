@@ -1,9 +1,8 @@
 # Advanced Batch System #
-This package is responsible for a batch job management as an alternative frontend on top of [PBSPro](http://www.pbspro.org/). ABS is part of the Infinity framework together with AMS (Advanced Module System), which is responsible for a software management via software modules. ABS is one of AMS software modules.
+Advanced Batch System (ABS) is part of the Infinity framework together with Advanced Module System (AMS). ABS is responsible for a job management as an alternative batch system frontend to [PBSPro](http://www.pbspro.org/). ABS is one of AMS software modules.
 
 ## Documentation ##
-ABS documentation is available in [Wiki](https://github.com/kulhanek/abs/wiki).
-
+The ABS reference documentation is available in [Wiki](https://github.com/kulhanek/abs/wiki).
 
 ## Installation ##
 Helper scripts for installation can be found in the [abs-build](https://github.com/kulhanek/abs-build) repository. The AMS system must be fully operational prior to an ABS instalation.

@@ -70,6 +70,14 @@ if [ -f "$INF_BOOT_SCRIPT" ]; then
     source $INF_BOOT_SCRIPT
 fi
 
+# do not use the host chache as it can be outdated
+echo "# ams-host --nocache"
+
+AMS_HOST_CACHE="/tmp/ams_cache.${USER}.${PBS_JOBID}"
+export AMS_HOST_CACHE
+
+ams-host --nocache
+
 echo "# site -v activate $INF_SITE_ID"
 
 site -v activate "$INF_SITE_ID"
@@ -82,11 +90,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# do not use the host chache as it can be outdated
-echo "# ams-host --nocache"
-
-ams-host --nocache
-
 echo "# amsmodule --system add abs:$INF_ABS_VERSION"
 
 # here we should use the same version as it was used for job submision
@@ -94,7 +97,7 @@ amsmodule --system add abs:$INF_ABS_VERSION
 
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " ERROR: Unable to add the 'abs:$INF_MODULE_VERS' module!" >&2
+    echo " ERROR: Unable to add the 'abs:$INF_ABS_VERSION' module!" >&2
     echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
     exit 1
@@ -148,6 +151,11 @@ source $ABS_ROOT/share/scripts/abs-execution-script-L5
 source $ABS_ROOT/share/scripts/abs-execution-script-L6 
 
 # =============================================================================
+
+# clean AMS host cache
+if [ -f "$AMS_HOST_CACHE" ]; then
+    rm -f "$AMS_HOST_CACHE"
+fi
 
 echo
 echo "################################################################################"
