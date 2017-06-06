@@ -59,17 +59,20 @@ function get_data_from_archive() {
         return 1
     fi
 
-    FILES=""
-    while [ $# -ne 0 ]; do
-        FILES="$FILES $INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
-        shift
-    done
-
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "Data transfer: local mode ..."
+        FILES=""
+        while [ $# -ne 0 ]; do
+            FILES="$FILES $INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
+            shift
+        done
         rsync -av $FILES "$PWD/"
     else
         echo "Data transfer: remote mode ..."
+        while [ $# -ne 0 ]; do
+            FILES="$FILES $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
+            shift
+        done
         rsync -av -e "ssh -x $INF_SSH_OPTIONS" $FILES "$PWD/"
     fi
 
