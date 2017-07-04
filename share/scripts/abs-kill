@@ -47,7 +47,7 @@ case "$INF_KILL_JOB_NAME" in
                    echo \"\"; exit 1; \
                 fi; \
                 echo \">>> Process ID: \`cat ___JOB_IS_RUNNING___\`\"; \
-                echo \">>> TERMINATED ON USER REQUEST \`date\`\" >> \"${INF_KILL_JOB_NAME}${INF_KILL_JOB_NAME_SUFFIX}\"; \
+                echo \">>> TERMINATED ON USER REQUEST \`date\`\" >> \"${INF_KILL_JOB_NAME}${INF_KILL_JOB_NAME_SUFFIX}.stdout\"; \
                 kill -TERM \`cat ___JOB_IS_RUNNING___\`; \
                 exit 0;"
         echo ""
