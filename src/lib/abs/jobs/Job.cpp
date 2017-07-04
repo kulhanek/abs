@@ -2177,6 +2177,7 @@ void CJob::PrepareSoftKillEnv(void)
     ShellProcessor.SetVariable("INF_KILL_MAIN_NODE",GetItem("start/workdir","INF_MAIN_NODE"));
     ShellProcessor.SetVariable("INF_KILL_WORK_DIR",GetItem("start/workdir","INF_WORK_DIR"));
     ShellProcessor.SetVariable("INF_KILL_JOB_NAME",GetItem("basic/jobinput","INF_JOB_NAME"));
+    ShellProcessor.SetVariable("INF_KILL_JOB_NAME_SUFFIX",GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX"));
     ShellProcessor.SetVariable("INF_KILL_JOB_KEY",GetItem("basic/jobinput","INF_JOB_KEY"));
 }
 

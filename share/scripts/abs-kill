@@ -13,6 +13,7 @@
 #
 # required input
 # INF_KILL_JOB_NAME
+# INF_KILL_JOB_NAME_SUFFIX
 # INF_KILL_JOB_KEY
 # INF_KILL_MAIN_NODE
 # INF_KILL_WORK_DIR
@@ -42,12 +43,11 @@ case "$INF_KILL_JOB_NAME" in
         ssh -x $INF_KILL_MAIN_NODE "cd $INF_KILL_WORK_DIR; \
                 if ! [ -f ___JOB_IS_RUNNING___ ]; then \
                    echo \"\"; \
-                   echo \"ERROR: The user script has not been started or it has already been terminated!\"; \
-                   echo \"\"; exit 1;
+                   echo \"ERROR: The user script has not been started or it has been terminated already!\"; \
+                   echo \"\"; exit 1; \
                 fi; \
                 echo \">>> Process ID: \`cat ___JOB_IS_RUNNING___\`\"; \
-                STDOUT=\`find -name '*.stdout'\`; \
-                echo \">>> TERMINATED ON USER REQUEST \`date\`\" >> \$STDOUT; \
+                echo \">>> TERMINATED ON USER REQUEST \`date\`\" >> \"${INF_KILL_JOB_NAME}${INF_KILL_JOB_NAME_SUFFIX}\"; \
                 kill -TERM \`cat ___JOB_IS_RUNNING___\`; \
                 exit 0;"
         echo ""

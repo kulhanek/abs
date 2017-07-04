@@ -48,6 +48,7 @@ pkill(){
     unset INF_KILL_MAIN_NODE
     unset INF_KILL_WORK_DIR
     unset INF_KILL_JOB_NAME
+    unset INF_KILL_JOB_NAME_SUFFIX
     unset INF_KILL_JOB_KEY
 
     eval `_abs-kill $*`
@@ -61,6 +62,7 @@ pkill(){
     unset INF_KILL_MAIN_NODE
     unset INF_KILL_WORK_DIR
     unset INF_KILL_JOB_NAME
+    unset INF_KILL_JOB_NAME_SUFFIX
     unset INF_KILL_JOB_KEY
 
     return "$AMS_EXIT_CODE"
