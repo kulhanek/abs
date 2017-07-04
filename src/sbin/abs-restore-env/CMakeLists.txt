@@ -10,6 +10,7 @@ SET(RESTORE_ENV_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(abs-restore-env ${RESTORE_ENV_SRC})
+ADD_DEPENDENCIES(abs-restore-env abs_shared)
 
 TARGET_LINK_LIBRARIES(abs-restore-env ${ABS_LIBS})
 

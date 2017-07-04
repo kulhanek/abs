@@ -10,6 +10,7 @@ SET(IJOBS_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(abs-ijobs ${IJOBS_SRC})
+ADD_DEPENDENCIES(abs-ijobs abs_shared)
 
 TARGET_LINK_LIBRARIES(abs-ijobs ${ABS_LIBS})
 

@@ -10,6 +10,7 @@ SET(CONFIG_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(abs-get-work-dir ${CONFIG_SRC})
+ADD_DEPENDENCIES(abs-get-work-dir abs_shared)
 
 TARGET_LINK_LIBRARIES(abs-get-work-dir ${ABS_LIBS})
 

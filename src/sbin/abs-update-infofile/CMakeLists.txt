@@ -10,6 +10,7 @@ SET(UPDATE_INFO_FILE_SRC
 
 # final build ------------------------------------------------------------------
 ADD_EXECUTABLE(abs-update-infofile ${UPDATE_INFO_FILE_SRC})
+ADD_DEPENDENCIES(abs-update-infofile abs_shared)
 
 TARGET_LINK_LIBRARIES(abs-update-infofile ${ABS_LIBS})
 
