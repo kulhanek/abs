@@ -151,6 +151,8 @@ bool CInfoGo::GoByInfoFiles(void)
 
     // update status of live jobs
     JobList.UpdateJobStatuses();
+    JobList.SortByPrepareDateAndTime();
+    JobList.KeepOnlyLiveJobs(false);
 
     // print final information
     vout << endl;

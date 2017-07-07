@@ -153,7 +153,7 @@ public:
     /// sort by prepare date
     void SortByPrepareDateAndTime(void);
 
-    /// sort by submut date from batch manager
+    /// sort by submit date from batch manager
     void SortByBatchSubmitDateAndTime(void);
 
     /// sort by prepare date
