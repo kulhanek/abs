@@ -149,8 +149,8 @@ function inf-copy-from-archive()
     LFILES=""
     RFILES=""
     while [ $# -ne 0 ]; do
-        LFILES="$LFILES $INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
-        RFILES="$RFILES :$INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
+        LFILES="$LFILES$INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1 "
+        RFILES="$RFILES:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1 "
         shift
     done
 
