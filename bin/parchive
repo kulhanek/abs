@@ -3,8 +3,10 @@
 
 function archive_runtime_files() {
     if [ $# -ne 3 ]; then
-        echo "ERROR: Three arguments are required for the 'runtime' mode!"
-        echo "       parchive runtime <start> <current> <format>"
+        echo "" 1>&2
+        echo "ERROR: Three arguments are required for the 'runtime' mode!" 1>&2
+        echo "       parchive runtime <start> <current> <format>" 1>&2
+        echo "" 1>&2
         return 1
     fi
 
@@ -34,19 +36,23 @@ function archive_runtime_files() {
         mv "${OLD}.infout" "$INF_ARCHIVE_DIR/${NEW}.infout"
         rm -f "${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
     else
-        echo "Data transfer: remote mode ..."
-        echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
-        echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
-        echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
-        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
+        if [ "$INF_INPUT_MACHINE_ENABLED" == "YES" ]; then
+            echo "Data transfer: remote mode ..."
+            echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
+            echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
+            echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
+            echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
 
-        ssh $INF_INPUT_MACHINE \
-            "cd $INF_INPUT_DIR; \
-            if [ $? -ne 0 ]; then exit 1; fi; \
-            mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
-            mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
-            mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
-            rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\" \"${OLD}.mpinodes\""
+            ssh $INF_INPUT_MACHINE \
+                "cd $INF_INPUT_DIR; \
+                if [ $? -ne 0 ]; then exit 1; fi; \
+                mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
+                mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
+                mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
+                rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\" \"${OLD}.mpinodes\""
+        else
+            echo ">>> WARNING: This operation is not enabled under current grid configuration!"
+        fi
     fi
 }
 
@@ -55,31 +61,18 @@ function archive_runtime_files() {
 function get_data_from_archive() {
 
     if [ $# -eq 0 ]; then
-        echo "ERROR: No files to get from the archive!"
+        echo "" 1>&2
+        echo ">>> ERROR: No files to get from the archive!" 1>&2
+        echo "" 1>&2
         return 1
     fi
 
-    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
-        echo "Data transfer: local mode ..."
-        FILES=""
-        while [ $# -ne 0 ]; do
-            FILES="$FILES $INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
-            shift
-        done
-        rsync -av $FILES "$PWD/"
-    else
-        echo "Data transfer: remote mode ..."
-        while [ $# -ne 0 ]; do
-            FILES="$FILES $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
-            shift
-        done
-        rsync -av -e "ssh -x $INF_SSH_OPTIONS" $FILES "$PWD/"
-    fi
+    inf-retry-cmd inf-copy-from-archive "$@"
 
     if [ $? -ne 0 ]; then
-        echo ""
-        echo ">>> ERROR: Unable to get specified data from the archive!"
-        echo ""
+        echo "" 1>&2
+        echo ">>> ERROR: Unable to get specified data from the archive!" 1>&2
+        echo "" 1>&2
         exit 1
     fi
 }
@@ -89,25 +82,19 @@ function get_data_from_archive() {
 function write_to_archive() {
 
     if [ $# -eq 0 ]; then
-        echo "ERROR: No files to write to the archive!"
+        echo "" 1>&2
+        echo ">>> ERROR: No files to write to the archive!" 1>&2
+        echo "" 1>&2
         return 1
     fi
 
-    inf-retry-cmd 
-
-    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
-        echo "Data transfer: local mode ..."
-        rsync -av $* "$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
-    else
-        echo "Data transfer: remote mode ..."
-        rsync -av -e "ssh -x $INF_SSH_OPTIONS" $* "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
-    fi
+    inf-retry-cmd inf-copy-to-archive "$@"
 
     if [ $? -ne 0 ]; then
-        echo ""
-        echo ">>> ERROR: Unable to copy specified data to the archive!"
-        echo ""
-        return 1
+        echo "" 1>&2
+        echo ">>> ERROR: Unable to get specified data from the archive!" 1>&2
+        echo "" 1>&2
+        exit 1
     fi
 }
 
@@ -116,18 +103,18 @@ function write_to_archive() {
 function move_to_archive() {
 
     if [ $# -eq 0 ]; then
-        echo ""
-        echo ">>> ERROR: No files to move to the archive!"
-        echo ""
+        echo "" 1>&2
+        echo ">>> ERROR: No files to move to the archive!" 1>&2
+        echo "" 1>&2
         return 1
     fi
 
     # write data to the archive
-    write_to_archive $*
+    write_to_archive "$@"
     if [ $? -ne 0 ]; then return 1; fi
 
     # remove files
-    rm -f $*
+    rm -f "$@"
 }
 
 # ------------------------------------------------------------------------------
@@ -142,14 +129,14 @@ case $1 in
         INF_MODE=$1
         ;;
     * )
-        echo ""
-        echo ">>> ERROR: Unsupported action: $1"
-        echo "           Supported action: runtime | get | write | move"
-        echo "              parchive runtime <start> <current> <format>"
-        echo "              parchive get   <file1> [file2] ..."
-        echo "              parchive write <file1> [file2] ..."
-        echo "              parchive move  <file1> [file2] ..."
-        echo ""
+        echo "" 1>&2
+        echo ">>> ERROR: Unsupported action: $1" 1>&2
+        echo "           Supported action: runtime | get | write | move" 1>&2
+        echo "              parchive runtime <start> <current> <format>" 1>&2
+        echo "              parchive get   <file1> [file2] ..." 1>&2
+        echo "              parchive write <file1> [file2] ..." 1>&2
+        echo "              parchive move  <file1> [file2] ..." 1>&2
+        echo "" 1>&2
         exit 1
         ;;
 esac
@@ -158,14 +145,6 @@ esac
 shift
 
 # write summary of job setup
-echo "# Job name            : $INF_JOB_NAME"
-echo "# Input directory     : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
-echo "# Working directory   : $INF_WORK_DIR"
-echo "# ABS root directory  : $ABS_ROOT"
-echo "# SSH Options         : $INF_SSH_OPTIONS"
-echo "# Retry count         : $INF_RETRY_COUNT"
-echo "# Retry time          : $INF_RETRY_TIME"
-echo "# Local data mode     : $INF_LOCAL_INPUT_DATA"
 echo "# Archive directory   : $INF_ARCHIVE_DIR"
 echo "# Requested action    : $INF_MODE"
 echo "# Arguments           : $*"
@@ -174,13 +153,16 @@ echo ""
 if  [ -z "$INF_JOB_NAME" ] || [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR" ] || [ -z "$INF_WORK_DIR" ] || \
     [ -z "$INF_SSH_OPTIONS" ] || [ -z "$INF_RETRY_COUNT" ] || \
     [ -z "$INF_RETRY_TIME" ] || [ -z "$INF_LOCAL_INPUT_DATA" ] || [ -z "$ABS_ROOT" ] || [ -z "$INF_ARCHIVE_DIR" ]; then
-    echo "ERROR: This command must be run in the Infinity environment!"
-    echo ""
+    echo "" 1>&2
+    echo ">>> ERROR: This command must be run in the Infinity environment!" 1>&2
+    echo "" 1>&2
     exit 1
 fi
 
 if [ $# -eq 0 ]; then
-    echo "ERROR: No files are specified for archiving!"
+    echo "" 1>&2
+    echo ">>> ERROR: No files are specified for archiving!" 1>&2
+    echo "" 1>&2
     exit 1
 fi
 
@@ -191,16 +173,16 @@ source $ABS_ROOT/share/scripts/abs-execution-script-LL
 
 case $INF_MODE in
     runtime )
-        inf-retry-cmd archive_runtime_files $*
+        inf-retry-cmd archive_runtime_files "$@"
         ;;
     get )
-        inf-retry-cmd get_data_from_archive $*
+        get_data_from_archive "$@"
         ;;
     write )
-        inf-retry-cmd write_to_archive $*
+        write_to_archive "$@"
         ;;
     move )
-        inf-retry-cmd move_to_archive $*
+        move_to_archive "$@"
         ;;
 esac
 

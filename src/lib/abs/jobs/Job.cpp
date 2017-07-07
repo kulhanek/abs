@@ -563,6 +563,15 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
         return(false);
     }
 
+// consistency check
+    if( batch_server_groupns != "personal" ){
+        if( storage_machine_groupns == "personal" ){
+            sout << "<b><red> ERROR: When submitting job outside of the personal computer the storage machine cannot be on the personal computer!</red></b>" << endl;
+            return(false);
+        }
+    }
+
+
 // setup specific items derived from resources
     SetItem("specific/resources","INF_NCPUS",ResourceList.GetNumOfCPUs());
     SetItem("specific/resources","INF_NGPUS",ResourceList.GetNumOfGPUs());

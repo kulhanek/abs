@@ -38,9 +38,6 @@ function inf-retry-cmd()
 }
 
 # ==============================================================================
-# copy data from the job input directory
-# $1 - name of the file in the job input directory
-# $2 - name of the destination file
 
 function inf-copy-from-inputdir() 
 {
@@ -65,8 +62,8 @@ function inf-copy-from-inputdir()
     echo "  > rsyncing the data from the storage machine via scp ... "
     echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1 -> $2"
     echo ""
+    # do not use abs-rsync here, see RT#209118 and RT#209712
     $ABS_RSYNC -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-            --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
             "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
@@ -74,7 +71,7 @@ function inf-copy-from-inputdir()
     fi
     echo "  !failure"
 
-    if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+    if [ "$INF_INPUT_MACHINE_ENABLED" == "YES" ]; then
         echo "  > rsyncing the data from the input machine via scp ... "
         echo "    $INF_IW_RSYNCOPTS  $INF_INPUT_MACHINE:$INF_INPUT_DIR/$1 -> $2"
         echo ""
@@ -117,8 +114,8 @@ function inf-copy-to-inputdir()
     echo "  > rsyncing the data to the storage machine via scp ... "
     echo "    $INF_WS_RSYNCOPTS $1 -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
     echo ""
+    # do not use abs-rsync here, see RT#209118 and RT#209712
     $ABS_RSYNC -av $INF_WS_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
-            --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
             "$1" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$2"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
@@ -126,13 +123,126 @@ function inf-copy-to-inputdir()
     fi
     echo "  !failure"
 
-    if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+    if [ "$INF_INPUT_MACHINE_ENABLED" == "YES" ]; then
         echo "  > rsyncing the data to the input machine via scp ... "
         echo "    $INF_WI_RSYNCOPTS $1 -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
         echo ""
         $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                 --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                 "$1" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$2"
+        if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    return 1
+}
+
+# ==============================================================================
+
+function inf-copy-from-archive()
+{
+
+    LFILES=""
+    RFILES=""
+    while [ $# -ne 0 ]; do
+        LFILES="$LFILES $INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
+        RFILES="$RFILES :$INF_INPUT_DIR/$INF_ARCHIVE_DIR/$1"
+        shift
+    done
+
+    echo ""
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    echo "= inf-copy-from-archive:"
+
+    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
+        echo "  > rsyncing the data from the local mount ... "
+        echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/$INF_ARCHIVE_DIR/{$@} -> $PWD"
+        echo ""
+        $ABS_RSYNC -av $INF_LW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                $LFILES "$PWD/"
+        if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
+    echo "  > rsyncing the data from the storage machine via scp ... "
+    echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_ARCHIVE_DIR/{$@} -> $PWD"
+    echo ""
+    # do not use abs-rsync here, see RT#209118 and RT#209712
+    $ABS_RSYNC -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            $INF_STORAGE_MACHINE$RFILES "$PWD/"
+    if [ $? -eq 0 ]; then
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        return 0
+    fi
+    echo "  !failure"
+
+    if [ "$INF_INPUT_MACHINE_ENABLED" == "YES" ]; then
+        echo "  > rsyncing the data from the input machine via scp ... "
+        echo "    $INF_IW_RSYNCOPTS  $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/{$@} -> $PWD"
+        echo ""
+        $ABS_RSYNC -av $INF_IW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                $INF_INPUT_MACHINE$RFILES "$PWD/"
+        if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    return 1
+}
+
+# ==============================================================================
+
+function inf-copy-to-archive()
+{
+    echo ""
+    echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+    echo "= inf-copy-to-archive:"
+
+    if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
+        echo "  > rsyncing the data to the local mount ... "
+        echo "    $INF_WL_RSYNCOPTS $@ -> $INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
+        echo ""
+        $ABS_RSYNC -av $INF_WL_RSYNCOPTS \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$@" "$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
+        if [ $? -eq 0 ]; then
+            echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+            return 0
+        fi
+        echo "  !failure"
+    fi
+
+    echo "  > rsyncing the data to the storage machine via scp ... "
+    echo "    $INF_WS_RSYNCOPTS $@ -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_ARCHIVE_DIR/"
+    echo ""
+    # do not use abs-rsync here, see RT#209118 and RT#209712
+    $ABS_RSYNC -av $INF_WS_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            "$@" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_ARCHIVE_DIR/"
+    if [ $? -eq 0 ]; then
+        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        return 0
+    fi
+    echo "  !failure"
+
+    if [ "$INF_INPUT_MACHINE_ENABLED" == "YES" ]; then
+        echo "  > rsyncing the data to the input machine via scp ... "
+        echo "    $INF_WI_RSYNCOPTS $@ -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
+        echo ""
+        $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+                --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
+                "$@" "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/"
         if [ $? -eq 0 ]; then
             echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
             return 0
@@ -181,8 +291,8 @@ function inf-rsync-from-inputdir()
     echo "  > rsyncing from the storage machine via scp ... "
     echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/ -> $INF_WORK_DIR/"
     echo ""
+    # do not use abs-rsync here, see RT#209118 and RT#209712
     $ABS_RSYNC -av $INF_SW_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-            --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
             "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/" "$INF_WORK_DIR/"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
@@ -191,7 +301,7 @@ function inf-rsync-from-inputdir()
     fi
     echo "  !failure"
 
-    if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+    if [ "$INF_INPUT_MACHINE_ENABLED" == "YES" ]; then
         echo "  > rsyncing from the input machine via scp ... "
         echo "    $INF_IW_RSYNCOPTS $INF_INPUT_MACHINE:$INF_INPUT_DIR/ -> $INF_WORK_DIR/"
         echo ""
@@ -243,8 +353,8 @@ function inf-rsync-to-inputdir()
     echo "  > rsyncing to the storage machine via scp ... "
     echo "    $INF_WS_RSYNCOPTS $INF_WORK_DIR/ -> $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
     echo ""
+    # do not use abs-rsync here, see RT#209118 and RT#209712
     $ABS_RSYNC -av $INF_WS_RSYNCOPTS --exclude-from="$TMPDIR/${_TNAME_}.excluded" -e "ssh -x $INF_SSH_OPTIONS" \
-            --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
             "$INF_WORK_DIR/" "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_OUTPUT_SUFFIX/"
     if [ $? -eq 0 ]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
@@ -253,7 +363,7 @@ function inf-rsync-to-inputdir()
     fi
     echo "  !failure"
 
-    if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+    if [ "$INF_INPUT_MACHINE_ENABLED" == "YES" ]; then
         echo "  > rsyncing to the input machine via scp ... "
         echo "    $INF_WI_RSYNCOPTS $INF_WORK_DIR/ -> $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_OUTPUT_SUFFIX/"
         echo ""

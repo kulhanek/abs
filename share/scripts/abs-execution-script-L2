@@ -77,6 +77,20 @@ fi
 export INF_L_FSTYPE
 echo "L FST: $INF_L_FSTYPE"
 
+if [ "$INF_INPUT_MACHINE" != "$INF_STORAGE_MACHINE" ]; then
+    INF_INPUT_MACHINE_ENABLED="YES"
+else
+    INF_INPUT_MACHINE_ENABLED="NO"
+fi
+if [ "$INF_BATCH_SERVER_GROUPNS" != "personal" ]; then
+    if [ "$INF_INPUT_MACHINE_GROUPNS" == "personal" ]; then
+        # if the job is sent outside of personal machine then we cannot expect
+        # that the personal machine will be still on at the end of job and thus available for data transfer
+        INF_INPUT_MACHINE_ENABLED="NO"
+    fi
+fi
+export INF_INPUT_MACHINE_ENABLED
+
 echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L2.1: Prepare the working directory ..."
