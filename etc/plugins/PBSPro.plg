@@ -3,6 +3,6 @@
         uuid="{PBSPRO:4774704a-0272-4d92-b651-67aa6692a271}">
     <!-- some local setup will be here -->
     <OBJECT uuid="{PBSPRO_SERVER:e6425fbb-f6aa-48ff-84b4-1d37a9aa01eb}">
-        <CONFIG key="libname" value="/usr/lib/libpbs.so:/software/pbspro-client/usr/lib/libpbs.so"/>
+        <CONFIG key="libname" value="/usr/lib/libpbs.so.0:/software/pbspro-client/usr/lib/libpbs.so"/>
     </OBJECT>
 </PLUGIN> 
