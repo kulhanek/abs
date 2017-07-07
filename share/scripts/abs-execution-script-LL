@@ -160,7 +160,7 @@ function inf-copy-from-archive()
 
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "  > rsyncing the data from the local mount ... "
-        echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/$INF_ARCHIVE_DIR/{$@} -> $PWD"
+        echo "    $INF_LW_RSYNCOPTS $LFILES -> $PWD"
         echo ""
         $ABS_RSYNC -av $INF_LW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                 --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
@@ -173,7 +173,7 @@ function inf-copy-from-archive()
     fi
 
     echo "  > rsyncing the data from the storage machine via scp ... "
-    echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$INF_ARCHIVE_DIR/{$@} -> $PWD"
+    echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE$RFILES -> $PWD"
     echo ""
     # do not use abs-rsync here, see RT#209118 and RT#209712
     $ABS_RSYNC -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
@@ -186,7 +186,7 @@ function inf-copy-from-archive()
 
     if [ "$INF_INPUT_MACHINE_ENABLED" == "YES" ]; then
         echo "  > rsyncing the data from the input machine via scp ... "
-        echo "    $INF_IW_RSYNCOPTS  $INF_INPUT_MACHINE:$INF_INPUT_DIR/$INF_ARCHIVE_DIR/{$@} -> $PWD"
+        echo "    $INF_IW_RSYNCOPTS  $INF_INPUT_MACHINE$RFILES  -> $PWD"
         echo ""
         $ABS_RSYNC -av $INF_IW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                 --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \

@@ -148,7 +148,6 @@ shift
 echo "# Archive directory   : $INF_ARCHIVE_DIR"
 echo "# Requested action    : $INF_MODE"
 echo "# Arguments           : $*"
-echo ""
 
 if  [ -z "$INF_JOB_NAME" ] || [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DIR" ] || [ -z "$INF_WORK_DIR" ] || \
     [ -z "$INF_SSH_OPTIONS" ] || [ -z "$INF_RETRY_COUNT" ] || \
