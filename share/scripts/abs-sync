@@ -119,6 +119,9 @@ if [ "$FILES" == "" ]; then
 fi
 
 echo ""
+echo "rsync setup: $INF_WI_RSYNCOPTS"
+echo "ssh options: $INF_SSH_OPTIONS"
+echo ""
 
 for SFILE in $FILES; do
     echo -n "Copying file '$SFILE' by rsync ... "
