@@ -102,7 +102,7 @@ public:
     void PrintLastJobStatus(std::ostream& sout);
 
 // executive methods -----------------------------------------------------------
-    /// contact torque manager and update job statuses
+    /// contact batch system manager and update job statuses
     void UpdateJobStatuses(void);
 
     /// keep only live jobs (running or submitted)

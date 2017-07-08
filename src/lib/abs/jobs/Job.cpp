@@ -891,7 +891,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
     }
 
     if( GetItem("basic/collection","INF_COLLECTION_NAME",true) == NULL ) {
-        // submit job to torque
+        // submit job to batch system
         if( BatchServers.SubmitJob(*this,verbose) == false ){
             if( ! siblings ){
                 sout << "<b><red>Job was NOT submited to the Batch server!</red></b>" << endl;
@@ -1178,7 +1178,7 @@ bool CJob::ResubmitJob(bool verbose)
 
     // submit job to torque
     if( BatchServers.SubmitJob(*this,verbose) == false ){
-        ES_TRACE_ERROR("unable to resubmit job to torque");
+        ES_TRACE_ERROR("unable to resubmit job to batch system");
         BatchJobComment = GetLastError();
         CFileSystem::SetCurrentDir(curr_dir);
         return(false);

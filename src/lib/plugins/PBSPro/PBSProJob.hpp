@@ -34,7 +34,7 @@ public:
         CPBSProJob(void);
 
 // methods ---------------------------------------------------------------------
-    //! init queue with torque information
+    //! init queue with batch system information
     bool Init(const CSmallString& short_srv_name,struct batch_status* p_job);
 
     //! decode job comment

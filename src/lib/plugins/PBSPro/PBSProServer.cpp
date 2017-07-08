@@ -152,7 +152,7 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
 bool CPBSProServer::InitSymbols(void)
 {
     if( PBSProLib.Open(PBSProLibName) == false ){
-        ES_ERROR("unable to load torque library");
+        ES_ERROR("unable to load batch system library");
         return(false);
     }
 

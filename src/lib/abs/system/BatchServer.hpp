@@ -50,7 +50,7 @@ public:
         CBatchServer(CPluginObject* p_objectinfo);
         ~CBatchServer(void);
 
-// init torque subsystem -------------------------------------------------------
+// init batch system subsystem -------------------------------------------------------
     //! load symbols and connect to server
     virtual bool Init(const CSmallString& server_name,const CSmallString& short_name);
 

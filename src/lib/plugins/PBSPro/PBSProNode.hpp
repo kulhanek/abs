@@ -34,7 +34,7 @@ public:
         CPBSProNode(void);
 
 // methods ---------------------------------------------------------------------
-    /// init node with torque information
+    /// init node with batch system information
     bool Init(const CSmallString& short_srv_name,struct batch_status* p_node);
 };
 

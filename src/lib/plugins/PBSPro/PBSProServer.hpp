@@ -59,7 +59,7 @@ public:
         CPBSProServer(void);
         ~CPBSProServer(void);
 
-// init torque subsystem -------------------------------------------------------
+// init batch system subsystem -------------------------------------------------------
     //! load symbols and connect to server
     bool Init(const CSmallString& server_name,const CSmallString& short_name);
 
@@ -149,7 +149,7 @@ private:
     // print attributes
     void PrintAttributes(std::ostream& sout,struct attropl* p_as);
 
-    // torque api symbols
+    // batch system api symbols
     PBS_CONNECT     pbspro_connect;
     PBS_DISCONNECT  pbspro_disconnect;
     PBS_STATSERVER  pbspro_statserver;
