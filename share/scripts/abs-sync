@@ -59,6 +59,18 @@ if [ "$HOSTNAME" != "$INF_SYNC_MAIN_NODE" ]; then
 fi
 
 echo ""
+echo "rsync setup: $INF_WI_RSYNCOPTS"
+echo "ssh options: $INF_SSH_OPTIONS"
+if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
+echo "direction:   $INF_SYNC_WORK_DIR/FILE -> $INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/"
+else
+echo "direction:   $INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/FILE -> $PWD/"
+fi
+
+# we must use $PWD instead of $INF_SYNC_INPUT_DIR as we can be in different path on other machines,
+# for example on a personal computer, where the path might be differnt
+
+echo ""
 if [ "$INF_SYNC_ALL" == "YES" ]; then
     echo -n "All files will be synchronized by rsync "
     if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
@@ -76,7 +88,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
         echo "from the input directory ..."
         $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
               --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
-              "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
+              "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$PWD/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
             echo "" >&2
             echo " >>> ERROR: Unable to copy all files!" >&2
@@ -118,16 +130,6 @@ if [ "$FILES" == "" ]; then
     exit 1
 fi
 
-echo ""
-echo "rsync setup: $INF_WI_RSYNCOPTS"
-echo "ssh options: $INF_SSH_OPTIONS"
-if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
-echo "direction:   $INF_SYNC_WORK_DIR/FILE -> $INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/"
-else
-echo "direction:   $INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/FILE -> $INF_SYNC_INPUT_DIR/"
-fi
-echo ""
-
 for SFILE in $FILES; do
     echo -n "Copying file '$SFILE' by rsync ... "
     if [ "$SFILE" == "___JOB_IS_RUNNING___" ]; then
@@ -146,7 +148,7 @@ for SFILE in $FILES; do
         else
             $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                   --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
-                  "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE" "$INF_SYNC_INPUT_DIR/" > /dev/null
+                  "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE" "$PWD/" > /dev/null
             if [ $? -ne 0 ]; then
                 echo "" >&2
                 echo " >>> ERROR: Unable to copy the file!" >&2
