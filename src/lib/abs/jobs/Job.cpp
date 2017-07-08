@@ -1319,12 +1319,17 @@ bool CJob::WriteStart(void)
 
 //------------------------------------------------------------------------------
 
-bool CJob::WriteTerminalReady(void)
+void CJob::WriteCLITerminalReady(void)
 {
-// create section -------------------------------
     CreateSection("terminal");
+}
 
-    return(true);
+//------------------------------------------------------------------------------
+
+void CJob::WriteGUITerminalReady(const CSmallString& vncid)
+{
+    CreateSection("terminal");
+    SetItem("terminal","INF_VNC_ID",vncid);
 }
 
 //------------------------------------------------------------------------------
@@ -2140,11 +2145,13 @@ void CJob::PrepareGoWorkingDirEnv(bool noterm)
     } else {
         ShellProcessor.SetVariable("INF_GO_JOB_NAME",GetItem("basic/jobinput","INF_JOB_NAME"));
     }
+    if( GetItem("basic/jobinput","INF_JOB_NAME") == "gui" ){
+        CSmallString psw;
+        psw << GetItem("basic/jobinput","INF_JOB_NAME") << GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX") << ".vncpsw";
+        ShellProcessor.SetVariable("INF_GO_VNC_PSW",psw);
+        ShellProcessor.SetVariable("INF_GO_VNC_ID",GetItem("terminal","INF_VNC_ID"));
+    }
     ShellProcessor.SetVariable("INF_GO_JOB_KEY",GetItem("basic/jobinput","INF_JOB_KEY"));
-    // FIXME
-    // the group aand umask should be reset by the job in the infex script
-    // ShellProcessor.SetVariable("INF_GO_UGROUP",GetItem("specific/resources","INF_GROUP"));
-    // ShellProcessor.SetVariable("INF_GO_UMASK",GetItem("specific/resources","INF_UMASK"));
 }
 
 //------------------------------------------------------------------------------

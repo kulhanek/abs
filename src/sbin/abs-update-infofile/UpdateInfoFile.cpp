@@ -68,11 +68,10 @@ bool CUpdateInfoFile::Run(void)
             ES_ERROR("unable to write start section");
             return(false);
         }
-    } else if( Options.GetArgAction() == "tready" ){
-        if( Job.WriteTerminalReady() == false ){
-            ES_ERROR("unable to write tready section");
-            return(false);
-        }
+    } else if( Options.GetArgAction() == "cliready" ){
+        Job.WriteCLITerminalReady();
+    } else if( Options.GetArgAction() == "guiready" ){
+        Job.WriteGUITerminalReady(Options.GetOptVNCID());
     }
     else if( Options.GetArgAction() == "stop" ){
         if( Job.WriteStop() == false ){

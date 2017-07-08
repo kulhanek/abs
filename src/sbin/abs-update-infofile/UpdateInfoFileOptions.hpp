@@ -48,6 +48,7 @@ public:
     CSO_LIST_BEGIN
         CSO_ARG(CSmallString,Action)
         // options ------------------------------
+        CSO_OPT(CSmallString,VNCID)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -61,9 +62,21 @@ public:
                     "action",                        /* parametr name */
                     "supported actions are as follows:\n"
                     "      start\n"
-                    "      stop\n")   /* argument description */
+                    "      stop\n"
+                    "      cliready\n"
+                    "      guiready\n"
+                    )   /* argument description */
     // description of options -----------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
+                    VNCID,                        /* option name */
+                    NULL,                          /* default value */
+                    false,                          /* is option mandatory */
+                    '\0',                           /* short option name */
+                    "vncid",                      /* long option name */
+                    "ID",                           /* parametr name */
+                    "vnc terminal id in the form of user@machine:display")   /* option description */
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(CSmallString,                           /* option type */
                     Verbose,                        /* option name */
                     false,                          /* default value */
                     false,                          /* is option mandatory */

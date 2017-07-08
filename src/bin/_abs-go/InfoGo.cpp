@@ -152,7 +152,6 @@ bool CInfoGo::GoByInfoFiles(void)
     // update status of live jobs
     JobList.UpdateJobStatuses();
     JobList.SortByPrepareDateAndTime();
-    JobList.KeepOnlyLiveJobs(false);
 
     // print final information
     vout << endl;
@@ -175,8 +174,8 @@ bool CInfoGo::GoByInfoFiles(void)
         vout << endl;
 
         if( JobList.GetNumberOfJobs() > 1 ){
-            vout << "<b><red> ERROR: The use of --force option with more than one job is not supported!</red></b>" << endl;
-            vout << "<b><red>        Specify the required job as argument of the pgo command.</red></b>" << endl;
+            vout << "<b><red> ERROR: The usage of --force option with more than one job is not supported!</red></b>" << endl;
+            vout << "<b><red>        Specify the required job as the argument of the pgo command.</red></b>" << endl;
             vout << endl;
             return(false);
         }

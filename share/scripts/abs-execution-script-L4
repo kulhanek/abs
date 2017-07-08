@@ -27,7 +27,16 @@ fi
 
 case $INF_JOB_NAME in
     cli )
-        echo "Starting CLI terminal ..."
+        echo "Starting a CLI terminal ..."
+        amsmodule add screen
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " ERROR: Unable to add the 'screen' module!" >&2
+            echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+            echo "" >&2
+            exit 1
+        fi
+
         # disable termcap capabilities
         export SCREENCAP=""
         # start screen terminal and detach from it
@@ -45,12 +54,13 @@ case $INF_JOB_NAME in
         screen -S "T$INF_JOB_KEY" -p 0 -X log on
         screen -S "T$INF_JOB_KEY" -p 0 -X caption always
 
-        $ABS_ROOT/sbin/abs-update-infofile tready
+        $ABS_ROOT/sbin/abs-update-infofile cliready
 
         if [ $? -ne 0 ]; then
             echo "" >&2
             echo " ERROR: Unable to update job status in the job info file!" >&2
             echo "" >&2
+            kill $SCREEN_PID
             return 1
         fi
 
@@ -66,7 +76,7 @@ case $INF_JOB_NAME in
             pinfo | mail -s "[INFINITY] CLI job $INF_JOB_ID was started" "$INF_EMAIL"
         fi
 
-        # wait for screen termination
+        # wait for the screen termination
         wait
         export INF_JOB_EXIT_CODE=$?
         if [ $INF_JOB_EXIT_CODE -gt 128 ]; then
@@ -77,8 +87,78 @@ case $INF_JOB_NAME in
 
         ;;
     gui )
-        echo ">>> ERROR: the gui interactive mode is not currently supported!"
-        export INF_JOB_EXIT_CODE=1
+        echo "Starting a GUI terminal ..."
+        amsmodule add tigervnc
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " ERROR: Unable to add the 'tigervnc' module!" >&2
+            echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+            echo "" >&2
+            exit 1
+        fi
+
+        # generate password
+        touch "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw"
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " ERROR: Unable to create VNC password file '$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw'!" >&2
+            echo "" >&2
+            exit 1
+        fi
+        chmod 600 "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw"
+        uuidgen | vncpasswd -f > "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw"
+
+        # start VNC server
+        vncserver -fg -rfbauth "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw"  > "$INF_WORK_DIR/${INF_WHOLE_NAME}.vnclog" &
+
+        VNCSERVER_PID=$!
+
+        # catch signals to properly terminate vnc session
+        trap "kill $VNCSERVER_PID; exit" SIGINT SIGTERM
+
+        # setup terminal
+        sleep 10  # wait for terminal initialization
+
+        INF_VNC_ID="`grep \"^VNCID:\" \"$INF_WORK_DIR/${INF_WHOLE_NAME}.vnclog\" | awk '{printf("%s",$2); }'`"
+
+        if [ -z "$INF_VNC_ID" ]; then
+            echo "" >&2
+            echo " ERROR: Unable to get VNC ID from the log file '$INF_WORK_DIR/${INF_WHOLE_NAME}.vnclog'!" >&2
+            kill $VNCSERVER_PID
+            echo "" >&2
+            exit 1
+        fi
+
+        $ABS_ROOT/sbin/abs-update-infofile --vncid "$INF_VNC_ID" guiready
+
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " ERROR: Unable to update job status in the job info file!" >&2
+            kill $VNCSERVER_PID
+            echo "" >&2
+            return 1
+        fi
+
+        case $INF_DATAIN in
+            copy)
+                inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
+            ;;
+        esac
+
+        # notify user if requested
+        if [ -n "$INF_EMAIL" ]; then
+            echo "E-mail notification: $INF_EMAIL"
+            pinfo | mail -s "[INFINITY] GUI job $INF_JOB_ID was started" "$INF_EMAIL"
+        fi
+
+        # wait for the vnc server termination
+        wait
+        export INF_JOB_EXIT_CODE=$?
+        if [ $INF_JOB_EXIT_CODE -gt 128 ]; then
+            # signal received
+            exit 1  # immediatelly exit
+        fi
+        echo "GUI terminal was terminated."
         ;;
     * )
         chmod u+x $INF_JOB_NAME

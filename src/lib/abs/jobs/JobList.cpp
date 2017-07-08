@@ -575,7 +575,7 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
                 break;
             case EJS_SUBMITTED:
                 sout << "<b><blue>WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
-                sout << "<b><blue>         Please wait until it is started.</blue></b>" << endl;
+                sout << "<b><blue>         Wait until the job is started.</blue></b>" << endl;
                 sout << endl;
                 it++;
                 break;
@@ -583,18 +583,39 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
                 if( p_job->IsInteractiveJob() == true ){
                     if( p_job->IsTerminalReady() == false ){
                         sout << "<b><blue>WARNING: The job was started but the job terminal is not ready yet.</blue></b>" << endl;
-                        sout << "<b><blue>         Please wait until the job terminal is ready.</blue></b>" << endl;
+                        sout << "<b><blue>         Wait until the job terminal is ready.</blue></b>" << endl;
                         sout << endl;
+                        it++;
                     } else {
-                        nrun++;
+                        if( p_job->GetJobName() == "gui" ){
+                            // is the display local?
+                            string display = string(CShell::GetSystemVariable("DISPLAY"));
+                            vector<string> items;
+                            split(items,display,is_any_of(":"),boost::token_compress_on);
+                            if( (items.size() == 0) || (items.size() == 1) ){
+                                sout << "<b><blue>WARNING: This is a GUI job, which requires an active DISPLAY but none is found!</blue></b>" << endl;
+                                sout << endl;
+                                it = erase(it);
+                            } else if( (items.size() == 3) ){
+                                sout << "<b><blue>WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
+                                sout << endl;
+                                it = erase(it);
+                            } else {
+                                nrun++;
+                                it++;
+                            }
+                        } else {
+                            nrun++;
+                            it++;
+                        }
                     }
                 } else {
                     nrun++;
+                    it++;
                 }
-                it++;
                 break;
             case EJS_INCONSISTENT:
-                sout << "<b><red>INFO: The job is not in well defined state.</red></b>" << endl;
+                sout << "<b><red>INFO: The job is not in a well defined state.</red></b>" << endl;
                 sout << "<b><red>      The pgo command might not succeed.</red></b>" << endl;
                 sout << endl;
                 it++;
@@ -619,12 +640,12 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
                 // do we have start/workdir
                 if( ( p_job->GetItem("start/workdir","INF_MAIN_NODE",true) == NULL ) ||
                     ( p_job->GetItem("start/workdir","INF_WORK_DIR",true) == NULL ) ) {
-                    sout << "<b><blue>WARNING: The job is not in well defined state.</green></b>" << endl;
+                    sout << "<b><blue>WARNING: The job is not in a well defined state.</green></b>" << endl;
                     sout << "<b><blue>         The pgo command cannot be used because the information about the job working directory is not known yet.</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
-                    sout << "<b><red>INFO: The job is not in well defined state.</red></b>" << endl;
+                    sout << "<b><red>INFO: The job is not in a well defined state.</red></b>" << endl;
                     sout << "<b><red>      The pgo command might not succeed.</red></b>" << endl;
                     sout << endl;
                     it++;
@@ -635,8 +656,8 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
     }
 
     if( size() > 1 ){
-        sout << "<b><red>ERROR: pgo action cannot be applied to more than one job.</red></b>" << endl;
-        sout << "<b><red>       Specify the required job as argument of pgo command.</red></b>" << endl;
+        sout << "<b><red>ERROR: The pgo command cannot be applied to more than one job.</red></b>" << endl;
+        sout << "<b><red>       Specify the required job as the argument of the pgo command.</red></b>" << endl;
         sout << endl;
         return(false);
     }

@@ -136,7 +136,10 @@ public:
     bool WriteStart(void);
 
     /// write info about job terminal start
-    bool WriteTerminalReady(void);
+    void WriteCLITerminalReady(void);
+
+    /// write info about job terminal start
+    void WriteGUITerminalReady(const CSmallString& vncid);
 
     /// write info about job termination
     bool WriteStop(void);
