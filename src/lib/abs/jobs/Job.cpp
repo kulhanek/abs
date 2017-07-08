@@ -208,6 +208,12 @@ void CJob::CreateHeader(void)
 
     p_header->SetAttribute("version",version);
     p_header->SetAttribute("site",AMSGlobalConfig.GetActiveSiteID());
+
+    CSmallString absmod,absver;
+    absmod = "abs";
+    AMSGlobalConfig.GetActiveModuleVersion(absmod,absver);
+    absmod << ":" << absver;
+    p_header->SetAttribute("abs",absmod);
 }
 
 //------------------------------------------------------------------------------
@@ -1942,6 +1948,22 @@ const CSmallString CJob::GetSiteID(void)
 
 //------------------------------------------------------------------------------
 
+const CSmallString CJob::GetABSModule(void)
+{
+    CXMLElement* p_rele = GetElementByPath("infinity",false);
+    if( p_rele == NULL ){
+        ES_ERROR("infinity element was not found");
+        return("");
+    }
+
+    CSmallString absmod;
+    p_rele->GetAttribute("abs",absmod);
+
+    return(absmod);
+}
+
+//------------------------------------------------------------------------------
+
 CSmallString CJob::GetInfoFileVersion(void)
 {
     CXMLElement* p_rele = GetElementByPath("infinity",false);
@@ -2590,7 +2612,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "-----------------------------------------------" << endl;
 
     tmp = GetItem("specific/resources","INF_SERVER_SHORT");
-    sout << "Site name        : " << GetSiteName() << " (Batch server: " << GetServerName() << "|" << tmp << ")" << endl;
+    sout << "Site spec        : " << GetSiteName() << "/" << GetABSModule() << "/" << GetServerName() << "|" << tmp << endl;
 
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");    
     if( tmp != NULL ){

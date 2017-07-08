@@ -302,6 +302,9 @@ public:
     /// get site id
     const CSmallString GetSiteID(void);
 
+    /// get abs module used to submit the job
+    const CSmallString GetABSModule(void);
+
     /// get server name
     const CSmallString GetServerName(void);
 
