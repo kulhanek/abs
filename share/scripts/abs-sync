@@ -130,6 +130,8 @@ if [ "$FILES" == "" ]; then
     exit 1
 fi
 
+echo ""
+
 for SFILE in $FILES; do
     echo -n "Copying file '$SFILE' by rsync ... "
     if [ "$SFILE" == "___JOB_IS_RUNNING___" ]; then
