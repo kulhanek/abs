@@ -42,6 +42,7 @@ if [ "$FORCE" == "NO" ]; then
         echo ""
         echo ">>> INFO: No runtime files were deleted!"
         echo ""
+        exit 0
     fi
 fi
 
