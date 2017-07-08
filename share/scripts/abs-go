@@ -15,7 +15,7 @@
 case "$INF_GO_JOB_NAME" in
     cli )
         if [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
-            ssh -t -X "$INF_GO_MAIN_NODE" screen -d -r "T$INF_GO_JOB_KEY"
+            ssh -t -X "$INF_GO_MAIN_NODE" "amsmodule add screen; screen -d -r \"T$INF_GO_JOB_KEY\""
             echo ""
         fi
         return 0

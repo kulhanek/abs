@@ -3116,7 +3116,7 @@ const CSmallString CJob::GetWorkDirType(void)
 
 const CSmallString CJob::GetDataOut(void)
 {
-    CSmallString rv = GetItem("basic/jobinput","INF_DATAOUT");
+    CSmallString rv = GetItem("specific/resources","INF_DATAOUT");
     return(rv);
 }
 
