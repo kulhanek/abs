@@ -2790,6 +2790,10 @@ bool CJob::PrintExecV3(std::ostream& sout)
     sout << "Main node        : " << tmp << endl;
     tmp = GetItem("start/workdir","INF_WORK_DIR");
     sout << "Working directory: " << tmp << endl;
+    tmp = GetItem("terminal","INF_VNC_ID",true);
+    if( tmp != NULL ){
+    sout << "VNC Server ID    : " << tmp << endl;
+    }
     tmp = GetItem("stop/result","INF_JOB_EXIT_CODE",true);
     if( tmp != NULL ){
     sout << "Job exit code    : " << tmp << endl;

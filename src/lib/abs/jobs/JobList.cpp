@@ -592,17 +592,19 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
                             string display = string(CShell::GetSystemVariable("DISPLAY"));
                             vector<string> items;
                             split(items,display,is_any_of(":"),boost::token_compress_on);
-                            if( (items.size() == 0) || (items.size() == 1) ){
-                                sout << "<b><blue>WARNING: This is a GUI job, which requires an active DISPLAY but none is found!</blue></b>" << endl;
-                                sout << endl;
-                                it = erase(it);
-                            } else if( (items.size() == 3) ){
-                                sout << "<b><blue>WARNING: This is a GUI job, which requires a local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
+                            if( (items.size() != 2) ){
+                                sout << "<b><blue>WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
                                 sout << endl;
                                 it = erase(it);
                             } else {
-                                nrun++;
-                                it++;
+                                if( items[0].empty() == false ){
+                                    sout << "<b><blue>WARNING: This is a GUI job, which requires a local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
+                                    sout << endl;
+                                    it = erase(it);
+                                } else {
+                                    nrun++;
+                                    it++;
+                                }
                             }
                         } else {
                             nrun++;

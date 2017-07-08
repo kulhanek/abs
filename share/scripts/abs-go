@@ -22,7 +22,7 @@ case "$INF_GO_JOB_NAME" in
         ;;
     gui )
         amsmodule add tigervnc
-        vncviewer -passwd "$INF_GO_VNC_PSW" "$INF_GO_VNC_ID"
+        vncviewer "$INF_GO_VNC_ID" -passwd "$INF_GO_VNC_PSW"
         ;;
     * )
         # go to working directory
