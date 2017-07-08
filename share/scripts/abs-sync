@@ -121,6 +121,11 @@ fi
 echo ""
 echo "rsync setup: $INF_WI_RSYNCOPTS"
 echo "ssh options: $INF_SSH_OPTIONS"
+if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
+echo "direction:   $INF_SYNC_WORK_DIR/FILE -> $INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/"
+else
+echo "direction:   $INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/FILE -> $INF_SYNC_INPUT_DIR/"
+fi
 echo ""
 
 for SFILE in $FILES; do
