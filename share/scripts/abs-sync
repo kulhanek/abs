@@ -18,6 +18,7 @@
 # INF_SYNC_INPUT_MACHINE
 # INF_WI_RSYNCOPTS
 # INF_SSH_OPTIONS
+# INF_SYNC_INFOFILE
 
 #===============================================================================
 #-------------------------------------------------------------------------------
@@ -46,6 +47,15 @@ ssh -x $INF_SSH_OPTIONS $INF_SYNC_MAIN_NODE "cd $INF_SYNC_WORK_DIR; if [ \$? -ne
 
 if [ $? -ne 0 ]; then
     exit 1
+fi
+
+# fix group name translation
+if [ "$HOSTNAME" != "$INF_SYNC_MAIN_NODE" ]; then
+    # we are in the job input directory
+    INF_LR=`stat "$INF_SYNC_INFOFILE" --format=%G | tr '@' ' ' | awk '{ printf("%s",$2);}'`
+    if [ -n "$INF_LR" ]; then
+        INF_WI_RSYNCOPTS="${INF_WI_RSYNCOPTS}@$INF_LR"
+    fi
 fi
 
 echo ""

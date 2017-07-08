@@ -9,6 +9,7 @@ INSTALL(FILES
             infinity-ijobs-finalize
             infinity-ijobs-copy-into
             parchive
+            premovertf
        DESTINATION
             bin
         PERMISSIONS

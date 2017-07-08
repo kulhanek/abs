@@ -2207,6 +2207,10 @@ void CJob::PrepareSyncWorkingDirEnv(void)
         INF_WI_RSYNCOPTS << "--chown=:" << GetItem("specific/resources","INF_USTORAGEGROUP");
     }
     ShellProcessor.SetVariable("INF_WI_RSYNCOPTS",INF_WI_RSYNCOPTS);
+    // info file for @REALM detection
+    CSmallString info;
+    info << GetItem("basic/jobinput","INF_JOB_NAME") << GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX") << ".info";
+    ShellProcessor.SetVariable("INF_SYNC_INFOFILE",info);
 }
 
 //------------------------------------------------------------------------------
