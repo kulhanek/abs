@@ -1,0 +1,53 @@
+#!/bin/bash
+
+SHIFT="-"
+FORCE="NO"
+while [ -n "$SHIFT" ]; do
+    SHIFT=""
+    case $1 in
+        '-h'|'--help')
+            echo ""
+            echo " Remove all Infinity job runtime files."
+            echo " Usage: premovertf [-h|--help] [-f|--force]"
+            echo ""
+            exit 0
+        ;;
+        '-f'|'--force')
+            FORCE="YES"
+            shift
+            SHIFT="-"
+        ;;
+    esac
+done
+
+echo ""
+echo "# List of job runtime files ..."
+echo "# --------------------------------------------------------------------"
+ls -l *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey *.vnclog *.vncpsw ___JOB_IS_RUNNING___
+
+# do we have runtime files?
+NRTF=`ls -l *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey *.vnclog *.vncpsw ___JOB_IS_RUNNING___ 2>/dev/null | wc -l`
+if [ "$NRTF" -eq 0 ]; then
+    echo ""
+    echo ">>> INFO: No runtime files detected!"
+    echo ""
+    exit 0
+fi
+
+if [ "$FORCE" == "NO" ]; then
+    echo ""
+    echo -n "Do you want to remove runtime files (YES/NO)? "
+    read ANSW
+    if [ "$ANSW" != "YES" ]; then
+        echo ""
+        echo ">>> INFO: No runtime files were deleted!"
+        echo ""
+    fi
+fi
+
+# clean runtime file
+rm -f *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey *.vnclog *.vncpsw ___JOB_IS_RUNNING___
+
+echo ""
+echo ">>> INFO: Runtime files were deleted!"
+echo ""
