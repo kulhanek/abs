@@ -59,7 +59,7 @@ echo
 
 if ! [ -d "$ABS_ROOT" ]; then
     echo "" >&2
-    echo " ERROR: The ABS_ROOT directory does not exist!" >&2
+    echo " >>> ERROR: The ABS_ROOT directory does not exist!" >&2
     echo "" >&2
     exit 1
 fi
@@ -84,8 +84,8 @@ site -v activate "$INF_SITE_ID"
 
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " ERROR: Unable to activate the site ($INF_SITE_ID)!" >&2
-    echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo " >>> ERROR: Unable to activate the site ($INF_SITE_ID)!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
     exit 1
 fi
@@ -97,8 +97,8 @@ amsmodule --system add abs:$INF_ABS_VERSION
 
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " ERROR: Unable to add the 'abs:$INF_ABS_VERSION' module!" >&2
-    echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo " >>> ERROR: Unable to add the 'abs:$INF_ABS_VERSION' module!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
     exit 1
 fi
@@ -110,16 +110,16 @@ amsmodule --system add abs-rsync
 
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " ERROR: Unable to add the 'abs-rsync' module!" >&2
-    echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo " >>> ERROR: Unable to add the 'abs-rsync' module!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
     exit 1
 fi
 
 if ! [ -e "$ABS_RSYNC" ]; then
     echo "" >&2
-    echo " ERROR: '$ABS_RSYNC' is not executable!" >&2
-    echo "        Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo " >>> ERROR: '$ABS_RSYNC' is not executable!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
     exit 1
 fi

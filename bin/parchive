@@ -58,7 +58,7 @@ function get_data_from_archive() {
 
     if [ $# -eq 0 ]; then
         echo "" 1>&2
-        echo ">>> ERROR: No files to get from the archive!" 1>&2
+        echo " >>> ERROR: No files to get from the archive!" 1>&2
         echo "" 1>&2
         return 1
     fi
@@ -67,7 +67,7 @@ function get_data_from_archive() {
 
     if [ $? -ne 0 ]; then
         echo "" 1>&2
-        echo ">>> ERROR: Unable to get specified data from the archive!" 1>&2
+        echo " >>> ERROR: Unable to get specified data from the archive!" 1>&2
         echo "" 1>&2
         exit 1
     fi
@@ -79,7 +79,7 @@ function write_to_archive() {
 
     if [ $# -eq 0 ]; then
         echo "" 1>&2
-        echo ">>> ERROR: No files to write to the archive!" 1>&2
+        echo " >>> ERROR: No files to write to the archive!" 1>&2
         echo "" 1>&2
         return 1
     fi
@@ -88,7 +88,7 @@ function write_to_archive() {
 
     if [ $? -ne 0 ]; then
         echo "" 1>&2
-        echo ">>> ERROR: Unable to get specified data from the archive!" 1>&2
+        echo " >>> ERROR: Unable to get specified data from the archive!" 1>&2
         echo "" 1>&2
         exit 1
     fi
@@ -100,7 +100,7 @@ function move_to_archive() {
 
     if [ $# -eq 0 ]; then
         echo "" 1>&2
-        echo ">>> ERROR: No files to move to the archive!" 1>&2
+        echo " >>> ERROR: No files to move to the archive!" 1>&2
         echo "" 1>&2
         return 1
     fi
@@ -126,12 +126,12 @@ case $1 in
         ;;
     * )
         echo "" 1>&2
-        echo ">>> ERROR: Unsupported action: $1" 1>&2
-        echo "           Supported action: runtime | get | write | move" 1>&2
-        echo "              parchive runtime <start> <current> <format>" 1>&2
-        echo "              parchive get   <file1> [file2] ..." 1>&2
-        echo "              parchive write <file1> [file2] ..." 1>&2
-        echo "              parchive move  <file1> [file2] ..." 1>&2
+        echo " >>> ERROR: Unsupported action: $1" 1>&2
+        echo "            Supported action: runtime | get | write | move" 1>&2
+        echo "                parchive runtime <start> <current> <format>" 1>&2
+        echo "                parchive get   <file1> [file2] ..." 1>&2
+        echo "                parchive write <file1> [file2] ..." 1>&2
+        echo "                parchive move  <file1> [file2] ..." 1>&2
         echo "" 1>&2
         exit 1
         ;;
@@ -149,14 +149,14 @@ if  [ -z "$INF_JOB_NAME" ] || [ -z "$INF_INPUT_MACHINE" ] || [ -z "$INF_INPUT_DI
     [ -z "$INF_SSH_OPTIONS" ] || [ -z "$INF_RETRY_COUNT" ] || \
     [ -z "$INF_RETRY_TIME" ] || [ -z "$INF_LOCAL_INPUT_DATA" ] || [ -z "$ABS_ROOT" ] || [ -z "$INF_ARCHIVE_DIR" ]; then
     echo "" 1>&2
-    echo ">>> ERROR: This command must be run in the Infinity environment!" 1>&2
+    echo " >>> ERROR: This command must be run in the Infinity environment!" 1>&2
     echo "" 1>&2
     exit 1
 fi
 
 if [ $# -eq 0 ]; then
     echo "" 1>&2
-    echo ">>> ERROR: No files are specified for archiving!" 1>&2
+    echo " >>> ERROR: No files are specified for archiving!" 1>&2
     echo "" 1>&2
     exit 1
 fi

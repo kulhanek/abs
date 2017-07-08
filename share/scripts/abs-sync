@@ -28,14 +28,14 @@ amsmodule --system add abs-rsync 2> /dev/null
 
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " ERROR: Unable to add the 'abs-rsync' module!" >&2
+    echo " >>> ERROR: Unable to add the 'abs-rsync' module!" >&2
     echo "" >&2
     exit 1
 fi
 
 if ! [ -e "$ABS_RSYNC" ]; then
     echo "" >&2
-    echo " ERROR: '$ABS_RSYNC' is not executable!" >&2
+    echo " >>> ERROR: '$ABS_RSYNC' is not executable!" >&2
     echo "" >&2
     exit 1
 fi
@@ -57,9 +57,9 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
               --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
               "$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
-            echo ""
-            echo " ERROR: Unable to copy all files!"
-            echo ""
+            echo "" >&2
+            echo " >>> ERROR: Unable to copy all files!" >&2
+            echo "" >&2
             exit 1
         fi
     else
@@ -68,9 +68,9 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
               --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
               "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
-            echo ""
-            echo " ERROR: Unable to copy all files!"
-            echo ""
+            echo "" >&2
+            echo " >>> ERROR: Unable to copy all files!" >&2
+            echo "" >&2
             exit 1
         fi
     fi
@@ -102,9 +102,9 @@ else
 fi
 
 if [ "$FILES" == "" ]; then
-    echo ""
-    echo " ERROR: No files were specified ..."
-    echo ""
+    echo "" >&2
+    echo " >>> ERROR: No files were specified ..." >&2
+    echo "" >&2
     exit 1
 fi
 
@@ -120,9 +120,9 @@ for SFILE in $FILES; do
                   --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                   "$INF_SYNC_WORK_DIR/$SFILE" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" > /dev/null
             if [ $? -ne 0 ]; then
-                echo ""
-                echo " ERROR: Unable to copy the file!"
-                echo ""
+                echo "" >&2
+                echo " >>> ERROR: Unable to copy the file!" >&2
+                echo "" >&2
                 exit 1
             fi
         else
@@ -130,9 +130,9 @@ for SFILE in $FILES; do
                   --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                   "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE" "$INF_SYNC_INPUT_DIR/" > /dev/null
             if [ $? -ne 0 ]; then
-                echo ""
-                echo " ERROR: Unable to copy the file!"
-                echo ""
+                echo "" >&2
+                echo " >>> ERROR: Unable to copy the file!" >&2
+                echo "" >&2
                 exit 1
             fi
         fi

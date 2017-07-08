@@ -10,44 +10,44 @@ echo "# ========================================================================
 
 # are we on main node?
 if [ "`hostname -f`" != "${INF_MAIN_NODE}" ]; then
-    echo ""
-    echo " >>> ERROR: This script can be run only on the main computational node!"
-    echo "            Main node : ${INF_MAIN_NODE}"
-    echo "            Hostname  : `hostname -f`"
-    echo ""
+    echo "" >&2
+    echo " >>> ERROR: This script can be run only on the main computational node!" >&2
+    echo "            Main node : ${INF_MAIN_NODE}" >&2
+    echo "            Hostname  : `hostname -f`" >&2
+    echo "" >&2
     exit 1
 fi
 
 # we need access to main info file
 INF_INFOFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
 if ! [ -f "$INF_INFOFILE" ]; then
-    echo ""
-    echo " >>> ERROR: Main job info file ($INF_INFOFILE) does not exist!"
-    echo ""
+    echo "" >&2
+    echo " >>> ERROR: Main job info file ($INF_INFOFILE) does not exist!" >&2
+    echo "" >&2
     exit 1
 fi
 
 INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
 if ! [ -f "$INF_NODEFILE" ]; then
-    echo ""
-    echo " >>> ERROR: Main node file ($INF_NODEFILE) does not exist!"
-    echo ""
+    echo "" >&2
+    echo " >>> ERROR: Main node file ($INF_NODEFILE) does not exist!" >&2
+    echo "" >&2
     exit 1
 fi
 
 # get number of ijobs
 NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
 if [ $? -ne 0 ]; then
-    echo ""
-    echo " >>> ERROR: Unable to get number of ijobs!"
-    echo ""
+    echo "" >&2
+    echo " >>> ERROR: Unable to get number of ijobs!" >&2
+    echo "" >&2
     exit 1
 fi
 
 if [ "$NIJOBS" -le 0 ]; then
-    echo ""
-    echo " >>> ERROR: No ijobs detected in the main job!"
-    echo ""
+    echo "" >&2
+    echo " >>> ERROR: No ijobs detected in the main job!" >&2
+    echo "" >&2
     exit 1
 fi
 
@@ -66,17 +66,17 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
     # set working directory, master node, and node file ------------------------
     INF_IJOB_PATH=`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" path`
     if [ $? -ne -0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to get path for ijob $ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to get path for ijob $ID!" >&2
+        echo "" >&2
         exit 1
     fi
 
     INF_IJOB_NAME=`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" name`
     if [ $? -ne -0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to get name for ijob $ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to get name for ijob $ID!" >&2
+        echo "" >&2
         exit 1
     fi
 
@@ -85,8 +85,8 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
             INF_IJOB_WORK_DIR="$INF_JOB_PATH/$INF_IJOB_PATH"
             if [ "$INF_REMOTE_JOBDIR" == "YES" ]; then
                 echo "" >&2
-                echo " ERROR: The job input directory must be available locally on the computational node" >&2
-                echo "        if the 'jobdir' synchronization mode is used!" >&2
+                echo " >>> ERROR: The job input directory must be available locally on the computational node" >&2
+                echo "            if the 'jobdir' synchronization mode is used!" >&2
                 echo "" >&2
                 return 1
             fi
@@ -94,9 +94,9 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
         sync | nosync )
             SCRATCH_DIR="`$ABS_ROOT/sbin/abs-get-scratch-dir --type ijob $INF_SCRATCH_TYPE`"
             if [ $? -ne -0 ]; then
-                echo ""
-                echo " >>> ERROR: Unable to get ijob scratch dir!"
-                echo ""
+                echo "" >&2
+                echo " >>> ERROR: Unable to get ijob scratch dir!" >&2
+                echo "" >&2
                 exit 1
             fi
             echo "     Scratch dir definition   : $SCRATCH_DIR"
@@ -108,9 +108,9 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
     INF_IJOB_MAIN_NODE=`head -$NCPU $INF_NODEFILE | tail -1`
     RNCPU=`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" ncpus`
     if [ $? -ne 0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to get number of cpus for ijob $ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to get number of cpus for ijob $ID!" >&2
+        echo "" >&2
         exit 1
     fi
     echo "     Requested number of CPUs : $RNCPU"
@@ -125,23 +125,23 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
     # update info file ---------------------------------------------------------
     $ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" id --set "$INF_IJOB_ID"
     if [ $? -ne 0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to set ID of ijob $ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to set ID of ijob $ID!" >&2
+        echo "" >&2
         exit 1
     fi
     $ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" mainnode --set "$INF_IJOB_MAIN_NODE"
     if [ $? -ne 0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to set main node $INF_INODE_MAIN_NODE for ijob $INF_ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to set main node $INF_INODE_MAIN_NODE for ijob $INF_ID!" >&2
+        echo "" >&2
         exit 1
     fi
     $ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" workdir --set "$INF_IJOB_WORK_DIR"
     if [ $? -ne 0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to set main node $INF_INODE_MAIN_NODE for ijob $INF_ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to set main node $INF_INODE_MAIN_NODE for ijob $INF_ID!" >&2
+        echo "" >&2
         exit 1
     fi
 
@@ -164,7 +164,7 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
 
                 if [ $? -ne 0 ]; then
                     echo "" >&2
-                    echo " ERROR: Unable to create the working directory on the specified node!" >&2
+                    echo " >>> ERROR: Unable to create the working directory on the specified node!" >&2
                     echo "" >&2
                     return 1
                 fi
@@ -184,7 +184,7 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
 
                 if [ $? -ne 0 ]; then
                     echo "" >&2
-                    echo " ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
+                    echo " >>> ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
                     echo "" >&2
                     exit 1
                 fi
@@ -193,7 +193,7 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
 
                 if [ $? -ne 0 ]; then
                     echo "" >&2
-                    echo " ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
+                    echo " >>> ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
                     echo "" >&2
                     exit 1
                 fi
@@ -207,7 +207,7 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
 
                 if [ $? -ne 0 ]; then
                     echo "" >&2
-                    echo " ERROR: Unable to copy the input job data to theijob main computational node!" >&2
+                    echo " >>> ERROR: Unable to copy the input job data to theijob main computational node!" >&2
                     echo "" >&2
                     exit 1
                 fi
@@ -216,7 +216,7 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
 
                 if [ $? -ne 0 ]; then
                     echo "" >&2
-                    echo " ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
+                    echo " >>> ERROR: Unable to copy the input job data to the ijob main computational node!" >&2
                     echo "" >&2
                     exit 1
                 fi

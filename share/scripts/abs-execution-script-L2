@@ -42,7 +42,7 @@ if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
     if [ -n "$INF_LR" ]; then
         if [ "$INF_LR" != "$INF_STORAGE_MACHINE_REALM" ]; then
             echo "" >&2
-            echo " ERROR: The local input directory realm '$INF_LR' does not match the storage machine realm '$INF_STORAGE_MACHINE_REALM'!" >&2
+            echo " >>> ERROR: The local input directory realm '$INF_LR' does not match the storage machine realm '$INF_STORAGE_MACHINE_REALM'!" >&2
             echo "" >&2
             exit 1
         fi
@@ -136,7 +136,7 @@ case $INF_DATAIN in
 
             if [ $? -ne 0 ]; then
                 echo "" >&2
-                echo " ERROR: Unable to create the working directory on the specified node!" >&2
+                echo " >>> ERROR: Unable to create the working directory on the specified node!" >&2
                 echo "" >&2
                 exit 1
             fi
@@ -154,7 +154,7 @@ cd "$INF_WORK_DIR"
 
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " ERROR: Unable to change the current directory to the working directory." >&2
+    echo " >>> ERROR: Unable to change the current directory to the working directory." >&2
     echo "" >&2
     exit 1
 fi
@@ -165,7 +165,7 @@ fi
 mv "$TMPDIR/${_TNAME_}.info" "$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " ERROR: Unable to move the job info file into the working directory!" >&2
+    echo " >>> ERROR: Unable to move the job info file into the working directory!" >&2
     echo "" >&2
     exit 1
 fi
@@ -181,7 +181,7 @@ echo "# File: $PBS_NODEFILE"
 
 if ! [ -f "$PBS_NODEFILE" ]; then
     echo ""  >&2
-    echo " ERROR: PBS_NODEFILE does not exist!"  >&2
+    echo " >>> ERROR: PBS_NODEFILE does not exist!"  >&2
     echo "" >&2
     exit 1
 fi
@@ -241,7 +241,7 @@ echo "# Write the job start and update the info file in the input directory ..."
 $ABS_ROOT/sbin/abs-update-infofile start
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " ERROR: Unable to update job status in the job info file!" >&2
+    echo " >>> ERROR: Unable to update job status in the job info file!" >&2
     echo "" >&2
     exit 1
 fi

@@ -33,24 +33,24 @@ fi
 
 site activate $INF_SITE_ID 2> /dev/null
 if [ $? -ne 0 ]; then
-    echo " ERROR: Site ($INF_SITE_ID) cannot be activated!"
-    echo
+    echo " >>> ERROR: The site ($INF_SITE_ID) cannot be activated!" >&2
+    echo >&2
     exit 1
 fi
 
 if [ "$AMS_ALTERNATIVE_BOOT" == "YES" ]; then
-    echo ">>> NOTE: Infinity has been booted using an alternative approach,"
-    echo "          please report this to the site support: $AMS_SITE_SUPPORT"
-    echo "          (Include the whole output beggining by the pgo command!)"
+    echo " >>> NOTE: Infinity has been booted using an alternative approach,"
+    echo "           please report this to the site support: $AMS_SITE_SUPPORT"
+    echo "           (Include the whole output beggining by the pgo command!)"
     echo ""
-    echo "          In the alternative mode, some functionality might be limited!"
+    echo "           In the alternative mode, some functionality might be limited!"
     echo ""
 fi
 
 cd $INF_WORK_DIR 2> /dev/null
 if [ $? -ne 0 ]; then
-    echo " ERROR: Job working directory ($INF_WORK_DIR) is not accesible!"
-    echo
+    echo " >>> ERROR: The job working directory ($INF_WORK_DIR) is not accesible!" >&2
+    echo >&2
     exit 1
 fi
 if [ -n "$INF_SITE_EMODS" ]; then

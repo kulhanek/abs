@@ -46,10 +46,10 @@ case "$INF_GO_JOB_NAME" in
                 echo "          Hostname     : $HOSTNAME"
             fi
             if ! [ -d "$INF_GO_INPUT_DIR" ]; then
-                echo ""
-                echo " ERROR: The job input directory does not exist on this host!"
-                echo "        $INF_GO_INPUT_DIR"
-                echo ""
+                echo "" >&2
+                echo " >>> ERROR: The job input directory does not exist on this host!" >&2
+                echo "            $INF_GO_INPUT_DIR" >&2
+                echo "" >&2
                 return 1
             fi
             cd "$INF_GO_INPUT_DIR"

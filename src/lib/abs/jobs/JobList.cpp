@@ -597,7 +597,7 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
                                 sout << endl;
                                 it = erase(it);
                             } else if( (items.size() == 3) ){
-                                sout << "<b><blue>WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
+                                sout << "<b><blue>WARNING: This is a GUI job, which requires a local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
                                 sout << endl;
                                 it = erase(it);
                             } else {

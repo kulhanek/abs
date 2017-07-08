@@ -10,18 +10,18 @@ INF_NODEFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.nodes"
 # get number of ijobs
 NIJOBS="`$ABS_ROOT/sbin/abs-ijobs "$INF_INFOFILE" number`"
 if [ $? -ne 0 ]; then
-    echo ""
-    echo " >>> ERROR: Unable to get number of ijobs!"
-    echo ""
+    echo "" >&2
+    echo " >>> ERROR: Unable to get number of ijobs!" >&2
+    echo "" >&2
     exit 1
 fi
 
 for((ID=1;ID<=$NIJOBS;ID++)); do
     INF_IJOB_ID="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" id`"
     if [ $? -ne 0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to get id of ijob $ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to get id of ijob $ID!" >&2
+        echo "" >&2
         exit 1
     fi
 
@@ -30,23 +30,23 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
 
     INF_IJOB_MAIN_NODE="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" mainnode`"
     if [ $? -ne 0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to get mainnode of ijob $ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to get mainnode of ijob $ID!" >&2
+        echo "" >&2
         exit 1
     fi
     INF_IJOB_WORK_DIR="`$ABS_ROOT/sbin/abs-ijobs --id "$ID" "$INF_INFOFILE" workdir`"
     if [ $? -ne 0 ]; then
-        echo ""
-        echo " >>> ERROR: Unable to get workdir of ijob $ID!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: Unable to get workdir of ijob $ID!" >&2
+        echo "" >&2
         exit 1
     fi
     INF_IJOB_NODEFILE="$INF_WORK_DIR/${INF_IJOB_ID}.nodes"
     if ! [ -f "$INF_IJOB_NODEFILE" ]; then
-        echo ""
-        echo " >>> ERROR: ijob node file ($INF_IJOB_NODEFILE) does not exist!"
-        echo ""
+        echo "" >&2
+        echo " >>> ERROR: ijob node file ($INF_IJOB_NODEFILE) does not exist!" >&2
+        echo "" >&2
         exit 1
     fi
 
