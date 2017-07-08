@@ -92,7 +92,7 @@ if [ "$INF_BATCH_SERVER_GROUPNS" != "personal" ]; then
     fi
 fi
 export INF_INPUT_MACHINE_ENABLED
-echo "Input machine storage enabled: $INF_INPUT_MACHINE_ENABLED"
+echo "Input machine enabled: $INF_INPUT_MACHINE_ENABLED"
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
