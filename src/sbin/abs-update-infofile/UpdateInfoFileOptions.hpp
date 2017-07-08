@@ -37,7 +37,11 @@ public:
     CSO_PROG_NAME_END
 
     CSO_PROG_DESC_BEGIN
-        "Update information about a job in the job info file."
+        "Update information about a job in the job info file. Supported actions are as follows:\n"
+        "      start        - job was started\n"
+        "      stop         - job was terminated\n"
+        "      cliready     - CLI terminal is available\n"
+        "      guiready     - GUI terminal is available"
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN
@@ -60,14 +64,9 @@ public:
                     NULL,                           /* default value */
                     true,                           /* is argument mandatory */
                     "action",                        /* parametr name */
-                    "supported actions are as follows:\n"
-                    "      start\n"
-                    "      stop\n"
-                    "      cliready\n"
-                    "      guiready\n"
-                    )   /* argument description */
+                    "what should be updated")   /* argument description */
     // description of options -----------------------------------------------------
-        CSO_MAP_OPT(bool,                           /* option type */
+        CSO_MAP_OPT(CSmallString,                           /* option type */
                     VNCID,                        /* option name */
                     NULL,                          /* default value */
                     false,                          /* is option mandatory */
@@ -76,7 +75,7 @@ public:
                     "ID",                           /* parametr name */
                     "vnc terminal id in the form of user@machine:display")   /* option description */
         //----------------------------------------------------------------------
-        CSO_MAP_OPT(CSmallString,                           /* option type */
+        CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
                     false,                          /* default value */
                     false,                          /* is option mandatory */

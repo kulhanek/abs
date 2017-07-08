@@ -128,7 +128,7 @@ case $INF_JOB_NAME in
             echo "" >&2
             exit 1
         fi
-
+        echo "VNC ID: $INF_VNC_ID"
         $ABS_ROOT/sbin/abs-update-infofile --vncid "$INF_VNC_ID" guiready
 
         if [ $? -ne 0 ]; then
