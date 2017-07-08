@@ -23,7 +23,7 @@ done
 echo ""
 echo "# List of job runtime files ..."
 echo "# --------------------------------------------------------------------"
-ls -l *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey *.vnclog *.vncpsw ___JOB_IS_RUNNING___
+ls -l *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey *.vnclog *.vncpsw ___JOB_IS_RUNNING___ 2> /dev/null
 
 # do we have runtime files?
 NRTF=`ls -l *.info *.infex *.infout *.stdout *.nodes *.gpus *.infkey *.vnclog *.vncpsw ___JOB_IS_RUNNING___ 2>/dev/null | wc -l`
