@@ -2157,39 +2157,82 @@ void CJob::RestoreEnv(void)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrepareGoWorkingDirEnv(bool noterm)
+bool CJob::PrepareGoWorkingDirEnv(bool noterm)
 {
     CSmallString job_key = CShell::GetSystemVariable("INF_JOB_KEY");
-    if( IsInteractiveJob() && job_key == GetJobKey() ) return;
+    if( IsInteractiveJob() && job_key == GetJobKey() ){
+        ES_ERROR("already in CLI/GUI");
+        return(false);
+    }
+
+    bool result = true;
 
     ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
-    ShellProcessor.SetVariable("INF_GO_MAIN_NODE",GetItem("start/workdir","INF_MAIN_NODE"));
-    ShellProcessor.SetVariable("INF_GO_WORK_DIR",GetItem("start/workdir","INF_WORK_DIR"));
+
+    CSmallString tmp;
+    tmp = NULL;
+    result &= GetItem("start/workdir","INF_MAIN_NODE",tmp);
+    ShellProcessor.SetVariable("INF_GO_MAIN_NODE",tmp);
+    tmp = NULL;
+    result &= GetItem("start/workdir","INF_WORK_DIR",tmp);
+    ShellProcessor.SetVariable("INF_GO_WORK_DIR",tmp);
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_JOB_KEY",tmp);
+    ShellProcessor.SetVariable("INF_GO_JOB_KEY",tmp);
+
+    CSmallString jobname;
+    result &= GetItem("basic/jobinput","INF_JOB_NAME",tmp);
+
     if( noterm == true ){
         ShellProcessor.SetVariable("INF_GO_JOB_NAME","noterm");
     } else {
-        ShellProcessor.SetVariable("INF_GO_JOB_NAME",GetItem("basic/jobinput","INF_JOB_NAME"));
+        ShellProcessor.SetVariable("INF_GO_JOB_NAME",jobname);
+        // terminal items are optional as the terminal session might not be started yet
+        if( jobname == "gui" ){
+            CSmallString psw;
+            tmp = NULL;
+            result &= GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",tmp);
+            ShellProcessor.SetVariable("INF_GO_JOB_KEY",tmp);
+            psw << jobname << tmp << ".vncpsw";
+            ShellProcessor.SetVariable("INF_GO_VNC_PSW",psw);
+
+            tmp = NULL;
+            result &= GetItem("terminal","INF_VNC_ID",tmp);
+            ShellProcessor.SetVariable("INF_GO_VNC_ID",tmp);
+
+            tmp = NULL;
+            result &= GetItem("terminal","INF_AGENT_MODULE",tmp);
+            ShellProcessor.SetVariable("INF_GO_AGENT_MODULE",tmp);
+        }
+        if( jobname == "cli" ){
+            tmp = NULL;
+            result &= GetItem("terminal","INF_AGENT_MODULE",tmp);
+            ShellProcessor.SetVariable("INF_GO_AGENT_MODULE",tmp);
+        }
     }
-    if( GetItem("basic/jobinput","INF_JOB_NAME") == "gui" ){
-        CSmallString psw;
-        psw << GetItem("basic/jobinput","INF_JOB_NAME") << GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX") << ".vncpsw";
-        ShellProcessor.SetVariable("INF_GO_VNC_PSW",psw);
-        ShellProcessor.SetVariable("INF_GO_VNC_ID",GetItem("terminal","INF_VNC_ID"));
-        ShellProcessor.SetVariable("INF_GO_AGENT_MODULE",GetItem("terminal","INF_AGENT_MODULE"));
-    }
-    if( GetItem("basic/jobinput","INF_JOB_NAME") == "cli" ){
-        ShellProcessor.SetVariable("INF_GO_AGENT_MODULE",GetItem("terminal","INF_AGENT_MODULE"));
-    }
-    ShellProcessor.SetVariable("INF_GO_JOB_KEY",GetItem("basic/jobinput","INF_JOB_KEY"));
+    return(result);
 }
 
 //------------------------------------------------------------------------------
 
-void CJob::PrepareGoInputDirEnv(void)
+bool CJob::PrepareGoInputDirEnv(void)
 {
-    ShellProcessor.SetVariable("INF_GO_MAIN_NODE","");
-    ShellProcessor.SetVariable("INF_GO_INPUT_MACHINE",GetItem("basic/jobinput","INF_INPUT_MACHINE"));
-    ShellProcessor.SetVariable("INF_GO_INPUT_DIR",GetItem("basic/jobinput","INF_INPUT_DIR"));
+    bool result = true;
+
+    ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
+
+    CSmallString tmp;
+    tmp = NULL;
+    result &= GetItem("start/workdir","INF_MAIN_NODE",tmp);
+    ShellProcessor.SetVariable("INF_GO_MAIN_NODE",tmp);
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_INPUT_MACHINE",tmp);
+    ShellProcessor.SetVariable("INF_GO_INPUT_MACHINE",tmp);
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_INPUT_DIR",tmp);
+    ShellProcessor.SetVariable("INF_GO_INPUT_DIR",tmp);
+
+    return(true);
 }
 
 //------------------------------------------------------------------------------

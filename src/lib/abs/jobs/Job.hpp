@@ -276,10 +276,10 @@ public:
     void RestoreEnv(void);
 
     /// prepare environment for pgo
-    void PrepareGoWorkingDirEnv(bool noterm);
+    bool PrepareGoWorkingDirEnv(bool noterm);
 
     /// prepare environment for pgo
-    void PrepareGoInputDirEnv(void);
+    bool PrepareGoInputDirEnv(void);
 
     /// prepare environment for psync
     void PrepareSyncWorkingDirEnv(void);

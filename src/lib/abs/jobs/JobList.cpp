@@ -821,33 +821,46 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
 bool CJobList::PrepareGoWorkingDirEnv(std::ostream& sout,bool noterm)
 {
     if( size() != 1 ){
-        ES_ERROR("none or more than one job is on stack");
+        sout << "<b><red>ERROR: None or more than one job is suitable for the pgo command!</red></b>" << endl;
+        sout << "<b><red>       In the second case, you must explicitly specified the info file of the job!</red></b>" << endl;
+        sout << endl;
         return(false);
     }
     CJobPtr p_job = *begin();
 
     CSmallString job_key = CShell::GetSystemVariable("INF_JOB_KEY");
     if( p_job->IsInteractiveJob() && job_key == p_job->GetJobKey() ){
-        sout << "<b><red>ERROR: pgo cannot be used once you are logged to the job terminal.</red></b>" << endl;
+        sout << "<b><red>ERROR: pgo cannot be used once you are logged to the job terminal!</red></b>" << endl;
         sout << endl;
         return(false);
     }
 
-    p_job->PrepareGoWorkingDirEnv(noterm);
+    if( p_job->PrepareGoWorkingDirEnv(noterm) == false ){
+        sout << "<b><red>ERROR: Unable to prepare environment for the pgo command as some items are missing in the info file!</red></b>" << endl;
+        sout << endl;
+        return(false);
+    }
     return(true);
 }
 
 //------------------------------------------------------------------------------
 
-bool CJobList::PrepareGoInputDirEnv(void)
+bool CJobList::PrepareGoInputDirEnv(std::ostream& sout)
 {
     if( size() != 1 ){
-        ES_ERROR("none or more than one job is on stack");
+        sout << "<b><red>ERROR: None or more than one job is suitable for the pgo command!</red></b>" << endl;
+        sout << "<b><red>       In the second case, you must explicitly specified the info file of the job!</red></b>" << endl;
+        sout << endl;
         return(false);
     }
 
     CJobPtr p_job = *begin();
-    p_job->PrepareGoInputDirEnv();
+    if( p_job->PrepareGoInputDirEnv() == false ){
+        sout << "<b><red>ERROR: Unable to prepare environment for the pgo command as some items are missing in the info file!</red></b>" << endl;
+        sout << endl;
+        return(false);
+    }
+
     return(true);
 }
 

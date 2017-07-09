@@ -145,7 +145,7 @@ public:
     bool PrepareGoWorkingDirEnv(std::ostream& sout,bool noterm);
 
     /// prepare environment for pgo
-    bool PrepareGoInputDirEnv(void);
+    bool PrepareGoInputDirEnv(std::ostream& sout);
 
     /// prepare environment for psync
     bool PrepareSyncWorkingDirEnv(void);
