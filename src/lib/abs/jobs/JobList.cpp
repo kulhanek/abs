@@ -597,12 +597,12 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
                         vector<string> items;
                         split(items,display,is_any_of(":"),boost::token_compress_on);
                         if( (items.size() != 2) ){
-                            sout << "<b><red>ERROR: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</red></b>" << endl;
+                            sout << "<b><blue>WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
                             sout << endl;
                             it = erase(it);
                             break;
                         } else if( items[0].empty() == false ){
-                            sout << "<b><red>ERROR: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</red></b>" << endl;
+                            sout << "<b><blue>WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
                             sout << endl;
                             it = erase(it);
                             break;
@@ -654,8 +654,8 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
                 // do we have start/workdir
                 if( ( p_job->GetItem("start/workdir","INF_MAIN_NODE",true) == NULL ) ||
                     ( p_job->GetItem("start/workdir","INF_WORK_DIR",true) == NULL ) ) {
-                    sout << "<b><red>ERROR: The job is not in a well defined state.</red></b>" << endl;
-                    sout << "<b><red>       The pgo command cannot be used because the information about the job working directory is not known.</red></b>" << endl;
+                    sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                    sout << "<b><blue>         The pgo command cannot be used because the information about the job working directory is not known.</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
@@ -795,8 +795,8 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
                 // do we have start/workdir
                 if( ( p_job->GetItem("start/workdir","INF_MAIN_NODE",true) == NULL ) ||
                     ( p_job->GetItem("start/workdir","INF_WORK_DIR",true) == NULL ) ) {
-                    sout << "<b><red>ERROR: The job is not in a well defined state.</red></b>" << endl;
-                    sout << "<b><red>       The psync command cannot be used because the information about the job working directory is not known.</red></b>" << endl;
+                    sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                    sout << "<b><blue>       The psync command cannot be used because the information about the job working directory is not known.</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
