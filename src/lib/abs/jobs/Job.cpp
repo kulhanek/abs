@@ -2185,11 +2185,11 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
         ShellProcessor.SetVariable("INF_GO_JOB_NAME",jobname);
         // terminal items are optional as the terminal session might not be started yet
         if( jobname == "gui" ){
-            CSmallString psw;
+            CSmallString wn;
             tmp = NULL;
             result &= GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",tmp);
-            psw << jobname << tmp << ".vncpsw";
-            ShellProcessor.SetVariable("INF_GO_VNC_PSW",psw);
+            wn << jobname << tmp;
+            ShellProcessor.SetVariable("INF_GO_WHOLE_NAME",wn);
 
             tmp = NULL;
             result &= GetItem("terminal","INF_VNC_ID",tmp);
@@ -2259,13 +2259,40 @@ void CJob::PrepareSyncWorkingDirEnv(void)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrepareSoftKillEnv(void)
+bool CJob::PrepareSoftKillEnv(void)
 {
-    ShellProcessor.SetVariable("INF_KILL_MAIN_NODE",GetItem("start/workdir","INF_MAIN_NODE"));
-    ShellProcessor.SetVariable("INF_KILL_WORK_DIR",GetItem("start/workdir","INF_WORK_DIR"));
-    ShellProcessor.SetVariable("INF_KILL_JOB_NAME",GetItem("basic/jobinput","INF_JOB_NAME"));
-    ShellProcessor.SetVariable("INF_KILL_JOB_NAME_SUFFIX",GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX"));
-    ShellProcessor.SetVariable("INF_KILL_JOB_KEY",GetItem("basic/jobinput","INF_JOB_KEY"));
+/*
+    # INF_KILL_MAIN_NODE
+    # INF_KILL_WORK_DIR
+    # INF_KILL_WHOLE_NAME
+    # INF_KILL_JOB_KEY
+*/
+
+    bool result = true;
+
+    ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
+
+    CSmallString tmp;
+    tmp = NULL;
+    result &= GetItem("start/workdir","INF_MAIN_NODE",tmp);
+    ShellProcessor.SetVariable("INF_GO_MAIN_NODE",tmp);
+    tmp = NULL;
+    result &= GetItem("start/workdir","INF_WORK_DIR",tmp);
+    ShellProcessor.SetVariable("INF_GO_WORK_DIR",tmp);
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_JOB_KEY",tmp);
+    ShellProcessor.SetVariable("INF_GO_JOB_KEY",tmp);
+
+    CSmallString wn;
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_JOB_NAME",tmp);
+    wn << tmp;
+    tmp = NULL;
+    result &= GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",tmp);
+    wn << tmp;
+    ShellProcessor.SetVariable("INF_KILL_WHOLE_NAME",wn);
+
+    return(true);
 }
 
 //------------------------------------------------------------------------------

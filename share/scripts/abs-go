@@ -18,7 +18,7 @@
 # INF_GO_JOB_KEY
 # INF_GO_AGENT_MODULE
 # INF_GO_VNC_ID
-# INF_GO_VNC_PSW
+# INF_GO_WHOLE_NAME
 # INF_GO_SITE_ID
 
 # this is inline script
@@ -42,7 +42,7 @@ case "$INF_GO_JOB_NAME" in
         return 0
         ;;
     gui )
-        if [ -n "$INF_GO_AGENT_MODULE" ] && [ -n "$INF_GO_VNC_ID" ] && [ -n "$INF_GO_VNC_PSW" ] ; then
+        if [ -n "$INF_GO_AGENT_MODULE" ] && [ -n "$INF_GO_VNC_ID" ] && [ -n "$INF_GO_WHOLE_NAME" ] ; then
             amsmodule add $INF_GO_AGENT_MODULE
             if [ $? -ne 0 ]; then
                 echo "" >&2
@@ -50,7 +50,7 @@ case "$INF_GO_JOB_NAME" in
                 echo "" >&2
                 return 1
             fi
-            vncviewer "$INF_GO_VNC_ID" -passwd "$INF_GO_VNC_PSW"
+            vncviewer "$INF_GO_VNC_ID" -passwd "${INF_GO_WHOLE_NAME}.vncpsw"
             return $?
         fi
         ;;

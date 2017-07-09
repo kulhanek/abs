@@ -285,7 +285,7 @@ public:
     void PrepareSyncWorkingDirEnv(void);
 
     /// prepare environment for soft kill
-    void PrepareSoftKillEnv(void);
+    bool PrepareSoftKillEnv(void);
 
     /// restore job env IsInteractiveJobfor given element
     void RestoreEnv(CXMLElement* p_ele);

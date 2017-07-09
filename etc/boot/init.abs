@@ -19,16 +19,14 @@ pgo(){
     unset INF_GO_JOB_KEY
     unset INF_GO_AGENT_MODULE
     unset INF_GO_VNC_ID
-    unset INF_GO_VNC_PSW
+    unset INF_GO_WHOLE_NAME
     unset INF_GO_SITE_ID
 
     eval `_abs-go $*`
-    if [ "$AMS_EXIT_CODE" -ne 0 ]; then
-        return "$AMS_EXIT_CODE"
+    if [ "$AMS_EXIT_CODE" -eq 0 ]; then
+        source $ABS_ROOT/share/scripts/abs-go
+        AMS_EXIT_CODE=$?
     fi
-
-    source $ABS_ROOT/share/scripts/abs-go
-    AMS_EXIT_CODE=$?
 
     unset INF_GO_MAIN_NODE
     unset INF_GO_INPUT_MACHINE
@@ -37,7 +35,7 @@ pgo(){
     unset INF_GO_JOB_KEY
     unset INF_GO_AGENT_MODULE
     unset INF_GO_VNC_ID
-    unset INF_GO_VNC_PSW
+    unset INF_GO_WHOLE_NAME
     unset INF_GO_SITE_ID
 
     return "$AMS_EXIT_CODE"
@@ -55,12 +53,10 @@ pkill(){
     unset INF_KILL_JOB_KEY
 
     eval `_abs-kill $*`
-    if [ "$AMS_EXIT_CODE" -ne 0 ]; then
-        return "$AMS_EXIT_CODE"
+    if [ "$AMS_EXIT_CODE" -eq 0 ]; then
+        $ABS_ROOT/share/scripts/abs-kill
+        AMS_EXIT_CODE=$?
     fi
-
-    $ABS_ROOT/share/scripts/abs-kill
-    AMS_EXIT_CODE=$?
 
     unset INF_KILL_MAIN_NODE
     unset INF_KILL_WORK_DIR
@@ -85,12 +81,10 @@ psync(){
     unset INF_SYNC_ALL
 
     eval `_abs-sync $*`
-    if [ "$AMS_EXIT_CODE" -ne 0 ]; then
-        return "$AMS_EXIT_CODE"
+    if [ "$AMS_EXIT_CODE" -eq 0 ]; then
+        $ABS_ROOT/share/scripts/abs-sync $*
+        AMS_EXIT_CODE=$?
     fi
-
-    $ABS_ROOT/share/scripts/abs-sync $*
-    AMS_EXIT_CODE=$?
 
     unset INF_SYNC_MAIN_NODE
     unset INF_SYNC_WORK_DIR

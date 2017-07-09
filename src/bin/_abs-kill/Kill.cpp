@@ -177,18 +177,22 @@ bool CKill::Run(void)
 
     if( Options.GetOptSoft() == true ) {
         // kill softly the job
-        Jobs.KillJobSoftly(vout);
+        return(Jobs.KillJobSoftly(vout));
     } else {
         // kill all jobs
-        Jobs.KillAllJobs();
-        vout << "<b><red>Listed jobs were killed!</red></b>" << endl;
+        bool result = Jobs.KillAllJobs();
+        if( result == true ){
+            vout << "<b><red>Listed jobs were killed!</red></b>" << endl;
+        } else {
+            vout << "<b><red>Some jobs were not killed, please, repeat the command again!</red></b>" << endl;
+        }
         vout << endl;
 
         // save info files
         Jobs.SaveAllInfoFiles();
+        return(result);
     }
 
-    return(true);
 }
 
 //------------------------------------------------------------------------------

@@ -420,7 +420,7 @@ bool CJobList::KillAllJobs(void)
         it++;
     }
 
-    return(true);
+    return(result);
 }
 
 //------------------------------------------------------------------------------
@@ -428,7 +428,9 @@ bool CJobList::KillAllJobs(void)
 bool CJobList::KillJobSoftly(std::ostream& sout)
 {
     if( size() != 1 ){
-        ES_ERROR("none or more than one job is on stack");
+        sout << "<b><red>ERROR: None or more than one job is suitable for the pkill command!</red></b>" << endl;
+        sout << "<b><red>       In the second case, you must explicitly specified the info file of the job!</red></b>" << endl;
+        sout << endl;
         return(false);
     }
 
@@ -454,7 +456,11 @@ bool CJobList::KillJobSoftly(std::ostream& sout)
         }
     }
 
-    p_job->PrepareSoftKillEnv();
+    if( p_job->PrepareSoftKillEnv() == false ){
+        sout << "<b><red>ERROR: Unable to prepare environment for the pkill command as some items are missing in the info file!</red></b>" << endl;
+        sout << endl;
+        return(false);
+    }
     return(true);
 }
 
