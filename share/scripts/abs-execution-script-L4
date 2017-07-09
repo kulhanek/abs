@@ -30,8 +30,7 @@ fi
 echo ""
 echo "Job soft termination initiated ..."
 
-echo ">>>>> JOB SOFT TERMINATION INITIATED UPON USER REQUEST AT `date`" >> ${INF_WHOLE_NAME}.stdout
-
+echo ">>>>> JOB SOFT TERMINATION INITIATED UPON USER REQUEST AT `date`" >> "${INF_WHOLE_NAME}.stdout"
 EOF
 }
 
@@ -42,8 +41,8 @@ function abs_write_kill_screen()
 cat << EOF
 
 # activate site and terminal agent module
-site activate $INF_SITE_ID
-amsmodule add $INF_AGENT_MODULE
+site activate "$INF_SITE_ID"
+amsmodule add "$INF_AGENT_MODULE"
 
 # terminate screen session
 screen -d -r "T$INF_JOB_KEY" -X quit
@@ -57,11 +56,11 @@ function abs_write_kill_tigervnc()
 cat << EOF
 
 # activate site and terminal agent module
-site activate $INF_SITE_ID
-amsmodule add $INF_AGENT_MODULE
+site activate "$INF_SITE_ID"
+amsmodule add "$INF_AGENT_MODULE"
 
 # terminate vnc display
-vncserver -kill $INF_VNC_DISPLAY
+vncserver -kill ":$INF_VNC_DISPLAY"
 EOF
 }
 
@@ -72,7 +71,7 @@ function abs_write_kill_script()
 cat << EOF
 
 # kill the main job process
-kill $INF_AGENT_PID
+kill "$INF_AGENT_PID"
 EOF
 }
 
@@ -84,7 +83,7 @@ cat << EOF
 
 # wait until the session is terminated
 for((I=0;I<12;I++)); do
-    if ! [ -d /proc/$INF_AGENT_PID ]; then
+    if ! [ -d "/proc/$INF_AGENT_PID" ]; then
         echo
         exit
     fi
@@ -93,13 +92,13 @@ for((I=0;I<12;I++)); do
 done
 
 # if not terminated within 60 seconds - kill the process
-kill $INF_AGENT_PID
+kill "$INF_AGENT_PID"
 sleep 5
-if ! [ -d /proc/$INF_AGENT_PID ]; then
+if ! [ -d "/proc/$INF_AGENT_PID" ]; then
     echo
     exit
 fi
-kill -9 $INF_AGENT_PID
+kill -9 "$INF_AGENT_PID"
 echo
 EOF
 }

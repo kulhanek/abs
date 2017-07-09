@@ -1,5 +1,3 @@
-pgo - print visible warning if job runs under different site
-psync - test if PWD contains jobkey
 completition - final fixes
 ams-personal
 umask - test for empty value
