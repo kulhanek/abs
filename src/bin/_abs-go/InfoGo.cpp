@@ -189,7 +189,7 @@ bool CInfoGo::GoByInfoFiles(void)
     vout << endl;
 
     // prepare environment for pgo command
-    return(JobList.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal()||Options.GetOptForce()));
+    return(JobList.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal()));
 }
 
 //------------------------------------------------------------------------------

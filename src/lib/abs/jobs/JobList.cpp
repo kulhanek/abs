@@ -574,14 +574,14 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
         switch( p_job->GetJobStatus() ){
             case EJS_NONE:
             case EJS_PREPARED:
-                sout << "<b><blue>WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
-                sout << "<b><blue>         The pgo command cannot be used.</blue></b>" << endl;
+                sout << "<b><blue> WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
+                sout << "<b><blue>          The pgo command cannot be used.</blue></b>" << endl;
                 sout << endl;
                 it = erase(it);
                 break;
             case EJS_SUBMITTED:
-                sout << "<b><blue>WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
-                sout << "<b><blue>         Wait until the job is started.</blue></b>" << endl;
+                sout << "<b><blue> WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
+                sout << "<b><blue>          Wait until the job is started.</blue></b>" << endl;
                 sout << endl;
                 it++;
                 break;
@@ -597,12 +597,12 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
                         vector<string> items;
                         split(items,display,is_any_of(":"),boost::token_compress_on);
                         if( (items.size() != 2) ){
-                            sout << "<b><blue>WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
+                            sout << "<b><blue> WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
                             sout << endl;
                             it = erase(it);
                             break;
                         } else if( items[0].empty() == false ){
-                            sout << "<b><blue>WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
+                            sout << "<b><blue> WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
                             sout << endl;
                             it = erase(it);
                             break;
@@ -610,8 +610,8 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
                     }
 
                     if( p_job->IsTerminalReady() == false ){
-                        sout << "<b><blue>WARNING: The job was started but the job terminal is not ready yet.</blue></b>" << endl;
-                        sout << "<b><blue>         Wait until the job terminal is ready.</blue></b>" << endl;
+                        sout << "<b><blue> WARNING: The job was started but the job terminal is not ready yet.</blue></b>" << endl;
+                        sout << "<b><blue>          Wait until the job terminal is ready.</blue></b>" << endl;
                         sout << endl;
                         it++;
                         break;
@@ -623,8 +623,8 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
                 break;
 
             case EJS_INCONSISTENT:
-                sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
-                sout << "<b><blue>         Usage of the --force option is recommended but the success is not guaranteed.</blue></b>" << endl;
+                sout << "<b><blue> WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                sout << "<b><blue>          Usage of the --force option is recommended but the success is not guaranteed.</blue></b>" << endl;
                 sout << endl;
                 if( force ){
                     it++;
@@ -636,14 +636,14 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
 
             case EJS_FINISHED:
                 if( p_job->GetDataOut() == "keep" ){
-                    sout << "<b><blue>WARNING: The job was finished but the job data were kept in the working directory.</blue></b>" << endl;
-                    sout << "<b><blue>         The success of the pgo command is not guaranteed!</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The job was finished but the job data were kept in the working directory.</blue></b>" << endl;
+                    sout << "<b><blue>          The success of the pgo command is not guaranteed!</blue></b>" << endl;
                     sout << endl;
                     it++;
                     nrun++;
                 } else {
-                    sout << "<b><blue>WARNING: The job was finished and synchronized.</blue></b>" << endl;
-                    sout << "<b><blue>         The pgo command cannot be used.</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The job was finished and synchronized.</blue></b>" << endl;
+                    sout << "<b><blue>          The pgo command cannot be used.</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 }
@@ -654,13 +654,13 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
                 // do we have start/workdir
                 if( ( p_job->GetItem("start/workdir","INF_MAIN_NODE",true) == NULL ) ||
                     ( p_job->GetItem("start/workdir","INF_WORK_DIR",true) == NULL ) ) {
-                    sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
-                    sout << "<b><blue>         The pgo command cannot be used because the information about the job working directory is not known.</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                    sout << "<b><blue>          The pgo command cannot be used because the information about the job working directory is not known.</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
-                    sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
-                    sout << "<b><blue>         Usage of the --force option is recommended but the success is not guaranteed.</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                    sout << "<b><blue>          Usage of the --force option is recommended but the success is not guaranteed.</blue></b>" << endl;
                     sout << endl;
                     if( force ){
                         it++;
@@ -761,14 +761,14 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
             case EJS_NONE:
             case EJS_PREPARED:
             case EJS_SUBMITTED:
-                sout << "<b><blue>WARNING: The job was not started therefore it does not have the working directory.</blue></b>" << endl;
-                sout << "<b><blue>         The psync command cannot be used.</blue></b>" << endl;
+                sout << "<b><blue> WARNING: The job was not started therefore it does not have the working directory.</blue></b>" << endl;
+                sout << "<b><blue>          The psync command cannot be used.</blue></b>" << endl;
                 sout << endl;
                 it = erase(it);
                 break;
             case EJS_RUNNING:
                 if( p_job->GetWorkDirType() == "jobdir" ){
-                    sout << "<b><blue>WARNING: The input directory and working directories are the same (workdir=jobdir).</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The input directory and working directories are the same (workdir=jobdir).</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
@@ -777,13 +777,13 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
                 break;
             case EJS_FINISHED:
                 if( p_job->GetDataOut() == "keep" ){
-                    sout << "<b><blue>WARNING: The job was finished but the job data were left on the working directory (dataout=keep).</blue></b>" << endl;
-                    sout << "<b><blue>         The success of the psync command is not guaranteed.</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The job was finished but the job data were left on the working directory (dataout=keep).</blue></b>" << endl;
+                    sout << "<b><blue>          The success of the psync command is not guaranteed.</blue></b>" << endl;
                     sout << endl;
                     it++;
                 } else {
-                    sout << "<b><blue>WARNING: The job was finished and synchronized.</blue></b>" << endl;
-                    sout << "<b><blue>         The psync command cannot be used.</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The job was finished and synchronized.</blue></b>" << endl;
+                    sout << "<b><blue>          The psync command cannot be used.</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 }
@@ -795,13 +795,13 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
                 // do we have start/workdir
                 if( ( p_job->GetItem("start/workdir","INF_MAIN_NODE",true) == NULL ) ||
                     ( p_job->GetItem("start/workdir","INF_WORK_DIR",true) == NULL ) ) {
-                    sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
-                    sout << "<b><blue>       The psync command cannot be used because the information about the job working directory is not known.</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                    sout << "<b><blue>          The psync command cannot be used because the information about the job working directory is not known.</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
-                    sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
-                    sout << "<b><blue>         The success of the psync command is not guaranteed.</blue></b>" << endl;
+                    sout << "<b><blue> WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                    sout << "<b><blue>          The success of the psync command is not guaranteed.</blue></b>" << endl;
                     sout << endl;
                     it++;
                 }
