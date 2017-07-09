@@ -191,9 +191,7 @@ bool CInfoGo::GoByInfoFiles(void)
     vout << endl;
 
     // get last job and prepare environment for pgo command
-    JobList.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal()||Options.GetOptForce());
-
-    return(true);
+    return(JobList.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal()||Options.GetOptForce()));
 }
 
 //------------------------------------------------------------------------------
@@ -213,9 +211,7 @@ bool CInfoGo::GoByJobID(void)
     JobList.PrintBatchInfo(vout,true,true);
 
     // get last job and prepare environment for pgo command
-    JobList.PrepareGoInputDirEnv(vout);
-
-    return(true);
+    return(JobList.PrepareGoInputDirEnv(vout));
 }
 
 //------------------------------------------------------------------------------

@@ -1870,9 +1870,7 @@ bool CJob::GetItem(const CSmallString& path,const CSmallString& name,
         return(false);
     }
 
-    p_iele->GetAttribute("value",value);
-
-    return(false);
+    return(p_iele->GetAttribute("value",value));
 }
 
 //------------------------------------------------------------------------------
@@ -1896,9 +1894,7 @@ bool CJob::GetTime(const CSmallString& path,const CSmallString& name,
         return(false);
     }
 
-    p_iele->GetAttribute("value",value);
-
-    return(false);
+    return(p_iele->GetAttribute("value",value));
 }
 
 //------------------------------------------------------------------------------
@@ -2181,7 +2177,7 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
     ShellProcessor.SetVariable("INF_GO_JOB_KEY",tmp);
 
     CSmallString jobname;
-    result &= GetItem("basic/jobinput","INF_JOB_NAME",tmp);
+    result &= GetItem("basic/jobinput","INF_JOB_NAME",jobname);
 
     if( noterm == true ){
         ShellProcessor.SetVariable("INF_GO_JOB_NAME","noterm");
@@ -2192,7 +2188,6 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
             CSmallString psw;
             tmp = NULL;
             result &= GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",tmp);
-            ShellProcessor.SetVariable("INF_GO_JOB_KEY",tmp);
             psw << jobname << tmp << ".vncpsw";
             ShellProcessor.SetVariable("INF_GO_VNC_PSW",psw);
 
@@ -2232,7 +2227,7 @@ bool CJob::PrepareGoInputDirEnv(void)
     result &= GetItem("basic/jobinput","INF_INPUT_DIR",tmp);
     ShellProcessor.SetVariable("INF_GO_INPUT_DIR",tmp);
 
-    return(true);
+    return(result);
 }
 
 //------------------------------------------------------------------------------
