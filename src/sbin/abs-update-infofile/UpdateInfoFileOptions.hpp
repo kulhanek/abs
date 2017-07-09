@@ -52,6 +52,7 @@ public:
     CSO_LIST_BEGIN
         CSO_ARG(CSmallString,Action)
         // options ------------------------------
+        CSO_OPT(CSmallString,Agent)
         CSO_OPT(CSmallString,VNCID)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
@@ -65,6 +66,15 @@ public:
                     true,                           /* is argument mandatory */
                     "action",                        /* parametr name */
                     "what should be updated")   /* argument description */
+    // description of options -----------------------------------------------------
+        CSO_MAP_OPT(CSmallString,                           /* option type */
+                    Agent,                        /* option name */
+                    NULL,                          /* default value */
+                    false,                          /* is option mandatory */
+                    '\0',                           /* short option name */
+                    "agent",                      /* long option name */
+                    "MODULE",                           /* parametr name */
+                    "terminal agent module name")   /* option description */
     // description of options -----------------------------------------------------
         CSO_MAP_OPT(CSmallString,                           /* option type */
                     VNCID,                        /* option name */

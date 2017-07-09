@@ -12,44 +12,34 @@
 # ==============================================================================
 #
 # required input
-# INF_KILL_JOB_NAME
-# INF_KILL_JOB_NAME_SUFFIX
-# INF_KILL_JOB_KEY
 # INF_KILL_MAIN_NODE
 # INF_KILL_WORK_DIR
+# INF_KILL_WHOLE_NAME
+# INF_KILL_JOB_KEY
 
-# soft kill mode - do we have all data?
+# soft kill mode - call kill script in the working directory ...
 
-case "$INF_KILL_JOB_NAME" in
-    cli )
-        if [ -n "$INF_KILL_MAIN_NODE" ] && [ -n "$INF_KILL_JOB_KEY" ]; then
-            echo ""
-            echo "Terminating the job CLI terminal ..."
-            ssh -x -t "$INF_KILL_MAIN_NODE" screen -d -r "T$INF_KILL_JOB_KEY -X quit"
-            echo ""
+if [ -n "$INF_KILL_MAIN_NODE" ] && [ -n "$INF_KILL_JOB_KEY" ] && \
+   [ -n "$INF_KILL_WORK_DIR" ] && [ -n "$INF_KILL_WHOLE_NAME" ]; then
+   echo "Calling the kill script $INF_KILL_MAIN_NODE:$INF_KILL_WORK_DIR/$INF_KILL_WHOLE_NAME.kill $INF_KILL_JOB_KEY ..."
+   ssh -x $INF_KILL_MAIN_NODE " \
+        cd \"$INF_KILL_WORK_DIR\"; \
+        if [ \$? -ne 0 ]; then \
+            echo \"\" >&2; \
+            echo \" >>> ERROR: Unable to set the working directory '$INF_KILL_WORK_DIR'!\" >&2; \
+            echo \"\" >&2; \
+            exit 1; \
+        fi; \
+        if ! [ -f \"${INF_KILL_WHOLE_NAME}.kill\" ]; then \
+            echo \"\" >&2; \
+            echo \" >>> ERROR: Unable to find the kill script '${INF_KILL_WHOLE_NAME}.kill'!\" >&2; \
+            echo \"\" >&2; \
+            exit 1; \
         fi
-        ;;
-    gui )
-        # not implemented
-        ;;
-    * )
-        if [ -z "$INF_KILL_MAIN_NODE" ] || [ -z "$INF_KILL_WORK_DIR" ]; then
-            exit 0
-        fi
+        bash \"${INF_KILL_WHOLE_NAME}.kill\" \"$INF_KILL_JOB_KEY\"; \
+        "
+    exit $?
+fi
 
-        # send TERM signal to user script
-        echo ""
-        echo "Sending TERM signal to "$INF_KILL_MAIN_NODE:$INF_KILL_WORK_DIR" ..."
-        ssh -x $INF_KILL_MAIN_NODE "cd $INF_KILL_WORK_DIR; \
-                if ! [ -f ___JOB_IS_RUNNING___ ]; then \
-                   echo \"\"; \
-                   echo \"ERROR: The user script has not been started or it has been terminated already!\"; \
-                   echo \"\"; exit 1; \
-                fi; \
-                echo \">>> Process ID: \`cat ___JOB_IS_RUNNING___\`\"; \
-                echo \">>> TERMINATED ON USER REQUEST \`date\`\" >> \"${INF_KILL_JOB_NAME}${INF_KILL_JOB_NAME_SUFFIX}.stdout\"; \
-                kill -TERM \`cat ___JOB_IS_RUNNING___\`; \
-                exit 0;"
-        echo ""
-        ;;
-esac
+# not supported
+exit 1

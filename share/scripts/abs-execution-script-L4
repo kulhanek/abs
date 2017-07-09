@@ -12,6 +12,90 @@
 # (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
 # =============================================================================
 
+function abs_write_kill_header()
+{
+cat << EOF
+#!/bin/bash
+# ********************************************************************
+# WARNING: This script will kill the job, use it with precaution!
+#*********************************************************************
+
+if [ "\$1" != "$INF_JOB_KEY" ]; then
+    echo >&2
+    echo " >>> ERROR: Unable to execute due to incorrect job key!" >&2
+    echo >&2
+    exit 1
+fi
+EOF
+}
+
+# ------------------------------------------------------------------------------
+
+function abs_write_kill_screen()
+{
+cat << EOF
+
+# activate site and terminal agent module
+site activate $INF_SITE_ID
+amsmodule add $INF_AGENT_MODULE
+
+# terminate screen session
+screen -d -r "T$INF_JOB_KEY -X quit
+EOF
+}
+
+# ------------------------------------------------------------------------------
+
+function abs_write_kill_tigervnc()
+{
+cat << EOF
+
+# activate site and terminal agent module
+site activate $INF_SITE_ID
+amsmodule add $INF_AGENT_MODULE
+
+# terminate vnc display
+vncserver -kill $INF_VNC_DISPLAY
+EOF
+}
+
+# ------------------------------------------------------------------------------
+
+function abs_write_kill_script()
+{
+cat << EOF
+
+# kill the main job process
+kill $MY_PID
+EOF
+}
+
+# ------------------------------------------------------------------------------
+
+function abs_write_kill_footer()
+{
+
+# wait until the session is terminated
+for((I=0;I<12;I++)); do
+    if ! [ -d /proc/$INF_AGENT_PID ]; then
+        exit
+    fi
+    echo ">>> INFO: Waiting until the agent session termination ...."
+    sleep 5
+done
+
+# if not terminated within 60 seconds - kill the process
+kill $INF_AGENT_PID
+sleep 5
+if ! [ -d /proc/$INF_AGENT_PID ]; then
+    exit
+fi
+kill -9 $INF_AGENT_PID
+EOF
+}
+
+# ------------------------------------------------------------------------------
+
 echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L4: Starting the job ..."
@@ -37,6 +121,9 @@ case $INF_JOB_NAME in
             exit 1
         fi
 
+        INF_AGENT_MODULE="`amsmodule getactmod screen 2>&1`"
+        export INF_AGENT_MODULE
+
         # disable termcap capabilities
         export SCREENCAP=""
         # start screen terminal and detach from it
@@ -46,6 +133,19 @@ case $INF_JOB_NAME in
         # catch signals to properly terminate screen session
         trap "kill $SCREEN_PID; exit" SIGINT SIGTERM
 
+        # create kill script
+        touch "${INF_WHOLE_NAME}.kill"
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " >>> ERROR: Unable to create kill script '${INF_WHOLE_NAME}.kill'!" >&2
+            echo "" >&2
+            exit 1
+        fi
+        chmod 600 "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_header >  "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_screen >> "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_footer >> "${INF_WHOLE_NAME}.kill"
+
         # setup terminal
         sleep 10  # wait for terminal initialization
         screen -S "T$INF_JOB_KEY" -p 0 -X backtick 100 1 1 pinfo --terminal
@@ -54,8 +154,8 @@ case $INF_JOB_NAME in
         screen -S "T$INF_JOB_KEY" -p 0 -X log on
         screen -S "T$INF_JOB_KEY" -p 0 -X caption always
 
-        $ABS_ROOT/sbin/abs-update-infofile cliready
-
+        # update info file
+        $ABS_ROOT/sbin/abs-update-infofile --agent "$INF_AGENT_MODULE" cliready
         if [ $? -ne 0 ]; then
             echo "" >&2
             echo " >>> ERROR: Unable to update job status in the job info file!" >&2
@@ -84,7 +184,6 @@ case $INF_JOB_NAME in
             exit 1  # immediatelly exit
         fi
         echo "CLI terminal was terminated."
-
         ;;
     gui )
         echo "Starting a GUI terminal ..."
@@ -97,19 +196,22 @@ case $INF_JOB_NAME in
             exit 1
         fi
 
+        INF_AGENT_MODULE="`amsmodule getactmod tigervnc 2>&1`"
+        export INF_AGENT_MODULE
+
         # generate password
-        touch "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw"
+        touch "${INF_WHOLE_NAME}.vncpsw"
         if [ $? -ne 0 ]; then
             echo "" >&2
-            echo " >>> ERROR: Unable to create VNC password file '$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw'!" >&2
+            echo " >>> ERROR: Unable to create VNC password file '${INF_WHOLE_NAME}.vncpsw'!" >&2
             echo "" >&2
             exit 1
         fi
-        chmod 600 "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw"
-        uuidgen | vncpasswd -f > "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw"
+        chmod 600 "${INF_WHOLE_NAME}.vncpsw"
+        uuidgen | vncpasswd -f > "${INF_WHOLE_NAME}.vncpsw"
 
         # start VNC server
-        vncserver -fg -rfbauth "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw" &> "$INF_WORK_DIR/${INF_WHOLE_NAME}.vnclog" &
+        vncserver -fg -rfbauth "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw" &> "${INF_WHOLE_NAME}.vncid" &
 
         VNCSERVER_PID=$!
 
@@ -119,17 +221,41 @@ case $INF_JOB_NAME in
         # setup terminal
         sleep 10  # wait for terminal initialization
 
-        INF_VNC_ID="`grep \"^VNCID:\" \"$INF_WORK_DIR/${INF_WHOLE_NAME}.vnclog\" | awk '{printf("%s",$2); }'`"
-
+        INF_VNC_ID="`grep \"^VNCID:\" \"${INF_WHOLE_NAME}.vncid\" | awk '{printf("%s",$2); }'`"
         if [ -z "$INF_VNC_ID" ]; then
             echo "" >&2
-            echo " >>> ERROR: Unable to get VNC ID from the log file '$INF_WORK_DIR/${INF_WHOLE_NAME}.vnclog'!" >&2
+            echo " >>> ERROR: Unable to get VNC ID from the vncid file '${INF_WHOLE_NAME}.vncid'!" >&2
             kill $VNCSERVER_PID
             echo "" >&2
             exit 1
         fi
-        echo "VNC ID: $INF_VNC_ID"
-        $ABS_ROOT/sbin/abs-update-infofile --vncid "$INF_VNC_ID" guiready
+        echo "VNC ID:      $INF_VNC_ID"
+
+        INF_VNC_DISPLAY="`grep \"^VNCDSP:\" \"${INF_WHOLE_NAME}.vncid\" | awk '{printf("%s",$2); }'`"
+        if [ -z "$INF_VNC_ID" ]; then
+            echo "" >&2
+            echo " >>> ERROR: Unable to get VNC DISPLAY from the vncid file '${INF_WHOLE_NAME}.vncid'!" >&2
+            kill $VNCSERVER_PID
+            echo "" >&2
+            exit 1
+        fi
+        echo "VNC DISPLAY: $INF_VNC_ID"
+
+        # create kill script
+        touch "${INF_WHOLE_NAME}.kill"
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " >>> ERROR: Unable to create kill script '${INF_WHOLE_NAME}.kill'!" >&2
+            echo "" >&2
+            exit 1
+        fi
+        chmod 600 "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_header   >  "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_tigervnc >> "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_footer   >> "${INF_WHOLE_NAME}.kill"
+
+        # update info file
+        $ABS_ROOT/sbin/abs-update-infofile --agent "$INF_AGENT_MODULE" --vncid "$INF_VNC_ID" guiready
 
         if [ $? -ne 0 ]; then
             echo "" >&2
@@ -173,10 +299,22 @@ case $INF_JOB_NAME in
         # this is used by pkill command to softly kill the job
         ./$INF_JOB_NAME &> ${INF_WHOLE_NAME}.stdout &
         MY_PID=$!
-        echo "$MY_PID" > ___JOB_IS_RUNNING___ # PID of the process
+
+        # create kill script
+        touch "${INF_WHOLE_NAME}.kill"
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " >>> ERROR: Unable to create kill script '${INF_WHOLE_NAME}.kill'!" >&2
+            echo "" >&2
+            exit 1
+        fi
+        chmod 600 "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_header >  "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_script >> "${INF_WHOLE_NAME}.kill"
+        abs_write_kill_footer >> "${INF_WHOLE_NAME}.kill"
+
         wait $MY_PID
         export INF_JOB_EXIT_CODE=$?
-        rm -f ___JOB_IS_RUNNING___
 
         echo " Finished at   : `date`"
         echo " Exit code     : $INF_JOB_EXIT_CODE"
@@ -184,4 +322,8 @@ case $INF_JOB_NAME in
         echo "========================= End of the script execution =========================="
         ;;
 esac
+
+# remove the kill script
+rm -f "${INF_WHOLE_NAME}.kill"
+
 

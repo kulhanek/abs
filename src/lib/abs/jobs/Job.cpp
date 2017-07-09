@@ -1326,16 +1326,18 @@ bool CJob::WriteStart(void)
 
 //------------------------------------------------------------------------------
 
-void CJob::WriteCLITerminalReady(void)
+void CJob::WriteCLITerminalReady(const CSmallString& agent)
 {
     CreateSection("terminal");
+    SetItem("terminal","INF_AGENT_MODULE",agent);
 }
 
 //------------------------------------------------------------------------------
 
-void CJob::WriteGUITerminalReady(const CSmallString& vncid)
+void CJob::WriteGUITerminalReady(const CSmallString& agent,const CSmallString& vncid)
 {
     CreateSection("terminal");
+    SetItem("terminal","INF_AGENT_MODULE",agent);
     SetItem("terminal","INF_VNC_ID",vncid);
 }
 
@@ -2173,6 +2175,10 @@ void CJob::PrepareGoWorkingDirEnv(bool noterm)
         psw << GetItem("basic/jobinput","INF_JOB_NAME") << GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX") << ".vncpsw";
         ShellProcessor.SetVariable("INF_GO_VNC_PSW",psw);
         ShellProcessor.SetVariable("INF_GO_VNC_ID",GetItem("terminal","INF_VNC_ID"));
+        ShellProcessor.SetVariable("INF_GO_AGENT_MODULE",GetItem("terminal","INF_AGENT_MODULE"));
+    }
+    if( GetItem("basic/jobinput","INF_JOB_NAME") == "cli" ){
+        ShellProcessor.SetVariable("INF_GO_AGENT_MODULE",GetItem("terminal","INF_AGENT_MODULE"));
     }
     ShellProcessor.SetVariable("INF_GO_JOB_KEY",GetItem("basic/jobinput","INF_JOB_KEY"));
 }

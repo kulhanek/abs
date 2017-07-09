@@ -1,3 +1,5 @@
+pkill -s via a script in the job working directory, needed for screen and vncserver sessions
+pgo - print visible warning if job runs under different site
 psync - test if PWD contains jobkey
 completition - final fixes
 ams-personal

@@ -69,9 +69,9 @@ bool CUpdateInfoFile::Run(void)
             return(false);
         }
     } else if( Options.GetArgAction() == "cliready" ){
-        Job.WriteCLITerminalReady();
+        Job.WriteCLITerminalReady(Options.GetOptAgent());
     } else if( Options.GetArgAction() == "guiready" ){
-        Job.WriteGUITerminalReady(Options.GetOptVNCID());
+        Job.WriteGUITerminalReady(Options.GetOptAgent(),Options.GetOptVNCID());
     }
     else if( Options.GetArgAction() == "stop" ){
         if( Job.WriteStop() == false ){

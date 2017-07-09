@@ -17,8 +17,10 @@ pgo(){
     unset INF_GO_INPUT_DIR
     unset INF_GO_JOB_NAME
     unset INF_GO_JOB_KEY
-    unset INF_GO_UGROUP
-    unset INF_GO_UMASK
+    unset INF_GO_AGENT_MODULE
+    unset INF_GO_VNC_ID
+    unset INF_GO_VNC_PSW
+    unset INF_GO_SITE_ID
 
     eval `_abs-go $*`
     if [ "$AMS_EXIT_CODE" -ne 0 ]; then
@@ -33,8 +35,10 @@ pgo(){
     unset INF_GO_INPUT_DIR
     unset INF_GO_JOB_NAME
     unset INF_GO_JOB_KEY
-    unset INF_GO_UGROUP
-    unset INF_GO_UMASK
+    unset INF_GO_AGENT_MODULE
+    unset INF_GO_VNC_ID
+    unset INF_GO_VNC_PSW
+    unset INF_GO_SITE_ID
 
     return "$AMS_EXIT_CODE"
 }
@@ -47,8 +51,7 @@ pkill(){
     AMS_EXIT_CODE=1
     unset INF_KILL_MAIN_NODE
     unset INF_KILL_WORK_DIR
-    unset INF_KILL_JOB_NAME
-    unset INF_KILL_JOB_NAME_SUFFIX
+    unset INF_KILL_WHOLE_NAME
     unset INF_KILL_JOB_KEY
 
     eval `_abs-kill $*`
@@ -61,8 +64,7 @@ pkill(){
 
     unset INF_KILL_MAIN_NODE
     unset INF_KILL_WORK_DIR
-    unset INF_KILL_JOB_NAME
-    unset INF_KILL_JOB_NAME_SUFFIX
+    unset INF_KILL_WHOLE_NAME
     unset INF_KILL_JOB_KEY
 
     return "$AMS_EXIT_CODE"
