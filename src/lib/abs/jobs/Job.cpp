@@ -2239,19 +2239,19 @@ bool CJob::PrepareSyncWorkingDirEnv(void)
     CSmallString tmp;
     tmp = NULL;
     result &= GetItem("start/workdir","INF_MAIN_NODE",tmp);
-    ShellProcessor.SetVariable("INF_GO_MAIN_NODE",tmp);
+    ShellProcessor.SetVariable("INF_SYNC_MAIN_NODE",tmp);
     tmp = NULL;
     result &= GetItem("start/workdir","INF_WORK_DIR",tmp);
-    ShellProcessor.SetVariable("INF_GO_WORK_DIR",tmp);
+    ShellProcessor.SetVariable("INF_SYNC_WORK_DIR",tmp);
     tmp = NULL;
     result &= GetItem("basic/jobinput","INF_JOB_KEY",tmp);
-    ShellProcessor.SetVariable("INF_GO_JOB_KEY",tmp);
+    ShellProcessor.SetVariable("INF_SYNC_JOB_KEY",tmp);
     tmp = NULL;
     result &= GetItem("basic/jobinput","INF_INPUT_MACHINE",tmp);
-    ShellProcessor.SetVariable("INF_GO_INPUT_MACHINE",tmp);
+    ShellProcessor.SetVariable("INF_SYNC_INPUT_MACHINE",tmp);
     tmp = NULL;
     result &= GetItem("basic/jobinput","INF_INPUT_DIR",tmp);
-    ShellProcessor.SetVariable("INF_GO_INPUT_DIR",tmp);
+    ShellProcessor.SetVariable("INF_SYNC_INPUT_DIR",tmp);
 
     CSmallString INF_WI_RSYNCOPTS;
     if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
@@ -2268,7 +2268,7 @@ bool CJob::PrepareSyncWorkingDirEnv(void)
     tmp = NULL;
     result &= GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",tmp);
     wn << tmp;
-    ShellProcessor.SetVariable("INF_KILL_WHOLE_NAME",wn);
+    ShellProcessor.SetVariable("INF_SYNC_WHOLE_NAME",wn);
 
     return(result);
 }
@@ -2286,18 +2286,16 @@ bool CJob::PrepareSoftKillEnv(void)
 
     bool result = true;
 
-    ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
-
     CSmallString tmp;
     tmp = NULL;
     result &= GetItem("start/workdir","INF_MAIN_NODE",tmp);
-    ShellProcessor.SetVariable("INF_GO_MAIN_NODE",tmp);
+    ShellProcessor.SetVariable("INF_KILL_MAIN_NODE",tmp);
     tmp = NULL;
     result &= GetItem("start/workdir","INF_WORK_DIR",tmp);
-    ShellProcessor.SetVariable("INF_GO_WORK_DIR",tmp);
+    ShellProcessor.SetVariable("INF_KILL_WORK_DIR",tmp);
     tmp = NULL;
     result &= GetItem("basic/jobinput","INF_JOB_KEY",tmp);
-    ShellProcessor.SetVariable("INF_GO_JOB_KEY",tmp);
+    ShellProcessor.SetVariable("INF_KILL_JOB_KEY",tmp);
 
     CSmallString wn;
     tmp = NULL;
