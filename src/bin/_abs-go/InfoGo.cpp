@@ -158,39 +158,37 @@ bool CInfoGo::GoByInfoFiles(void)
 
     if( Options.GetOptForce() == false ) {
         // analyze jobs for pgo action
-        if( JobList.IsGoActionPossible(vout) == false ){
-            if( Options.GetOptNoWait() == false ){
-                if( JobList.WaitForRunningJob(vout) == false ){
-                    ES_TRACE_ERROR("pgo action is not possible");
-                    return(false);
-                }
-            } else {
+        if( JobList.IsGoActionPossible(vout,false) == false ){
+
+            if( JobList.GetNumberOfJobs() != 1 ) return(false); // no suitable job at all
+
+            // we have one job
+            if( Options.GetOptNoWait() == true ) return(false); // we cannot wait
+
+            // we must wait until is in good conditions
+            if( JobList.WaitForRunningJob(vout) == false ){
                 ES_TRACE_ERROR("pgo action is not possible");
                 return(false);
             }
         }
+        // we have one suitable job
     } else {
-        JobList.PrintInfos(vout);
-        vout << endl;
+        // preprocess jobs but ignore final result - only exit if more than one job remains
+        JobList.IsGoActionPossible(vout,true);
 
-        if( JobList.GetNumberOfJobs() > 1 ){
-            vout << "<b><red> ERROR: The usage of --force option with more than one job is not supported!</red></b>" << endl;
-            vout << "<b><red>        Specify the required job as the argument of the pgo command.</red></b>" << endl;
-            vout << endl;
-            return(false);
-        }
+        if( JobList.GetNumberOfJobs() != 1 ) return(false); // no suitable job at all
 
-        vout << "<b><blue> WARNING: pgo action is forced by user!</blue></b>" << endl;
-        vout << "<b><blue>          It might happen that it will not succeed!</blue></b>" << endl;
+        vout << "<b><blue> WARNING: The pgo command is forced (--force)!</blue></b>" << endl;
+        vout << "<b><blue>          The success is not guaranteed!</blue></b>" << endl;
         vout << endl;
     }
 
     // satisfying job
-    vout << ">>> Job suitable for pgo action ..." << endl;
+    vout << ">>> The job suitable for pgo ..." << endl;
     JobList.PrintInfosCompact(vout,false,true);
     vout << endl;
 
-    // get last job and prepare environment for pgo command
+    // prepare environment for pgo command
     return(JobList.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal()||Options.GetOptForce()));
 }
 
@@ -210,7 +208,7 @@ bool CInfoGo::GoByJobID(void)
     // print info about jobs
     JobList.PrintBatchInfo(vout,true,true);
 
-    // get last job and prepare environment for pgo command
+    // prepare environment for pgo command
     return(JobList.PrepareGoInputDirEnv(vout));
 }
 

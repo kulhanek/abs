@@ -124,17 +124,10 @@ bool CKill::Run(void)
     Jobs.KeepOnlyLiveJobs(Options.GetOptSoft() == false);
 
     if( Jobs.GetNumberOfJobs() == 0 ){
-        if( Options.GetOptSoft() == true ){
-            vout << endl;
-            vout << "<b><red> ERROR: No running jobs were found for soft job termination!</red></b>" << endl;
-            vout << endl;
-            return(false);
-        } else {
-            vout << endl;
-            vout << "<b><red> ERROR: No submitted or running jobs were found!</red></b>" << endl;
-            vout << endl;
-            return(false);
-        }
+        vout << endl;
+        vout << "<b><red> ERROR: No submitted or running jobs were found!</red></b>" << endl;
+        vout << endl;
+        return(false);
     }
 
     // full job info
@@ -149,7 +142,7 @@ bool CKill::Run(void)
     if( Options.GetOptSoft() == true ){
         if( Jobs.GetNumberOfJobs() != 1 ){
             vout << endl;
-            vout << "<b><red> ERROR: Only one job can be selected for soft job termination!</red></b>" << endl;
+            vout << "<b><red> ERROR: Only one job can be selected for the job soft termination!</red></b>" << endl;
             vout << endl;
             return(false);
         }
@@ -201,7 +194,6 @@ bool CKill::Run(void)
 
 bool CKill::Finalize(void)
 {
-
     if( ! ErrorSystem.IsError() ){
         ShellProcessor.SetExitCode(0);
     } else {

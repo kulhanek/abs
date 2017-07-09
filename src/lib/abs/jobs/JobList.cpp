@@ -558,7 +558,7 @@ bool CJobList::SaveAllInfoFiles(void)
 
 //------------------------------------------------------------------------------
 
-bool CJobList::IsGoActionPossible(std::ostream& sout)
+bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
 {
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
@@ -586,55 +586,61 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
                 it++;
                 break;
             case EJS_RUNNING:
-                if( p_job->IsInteractiveJob() == true ){
+                if( p_job->IsInteractiveJob() == false ){
+                    nrun++;
+                    it++;
+                } else {
+                    // interactive jobs
+                    if( p_job->GetJobName() == "gui" ){
+                        // is the display local?
+                        string display = string(CShell::GetSystemVariable("DISPLAY"));
+                        vector<string> items;
+                        split(items,display,is_any_of(":"),boost::token_compress_on);
+                        if( (items.size() != 2) ){
+                            sout << "<b><red>ERROR: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</red></b>" << endl;
+                            sout << endl;
+                            it = erase(it);
+                            break;
+                        } else if( items[0].empty() == false ){
+                            sout << "<b><red>ERROR: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</red></b>" << endl;
+                            sout << endl;
+                            it = erase(it);
+                            break;
+                        }
+                    }
+
                     if( p_job->IsTerminalReady() == false ){
                         sout << "<b><blue>WARNING: The job was started but the job terminal is not ready yet.</blue></b>" << endl;
                         sout << "<b><blue>         Wait until the job terminal is ready.</blue></b>" << endl;
                         sout << endl;
                         it++;
-                    } else {
-                        if( p_job->GetJobName() == "gui" ){
-                            // is the display local?
-                            string display = string(CShell::GetSystemVariable("DISPLAY"));
-                            vector<string> items;
-                            split(items,display,is_any_of(":"),boost::token_compress_on);
-                            if( (items.size() != 2) ){
-                                sout << "<b><blue>WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
-                                sout << endl;
-                                it = erase(it);
-                            } else {
-                                if( items[0].empty() == false ){
-                                    sout << "<b><blue>WARNING: This is a GUI job, which requires a local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
-                                    sout << endl;
-                                    it = erase(it);
-                                } else {
-                                    nrun++;
-                                    it++;
-                                }
-                            }
-                        } else {
-                            nrun++;
-                            it++;
-                        }
+                        break;
                     }
-                } else {
+
                     nrun++;
                     it++;
                 }
                 break;
+
             case EJS_INCONSISTENT:
-                sout << "<b><red>INFO: The job is not in a well defined state.</red></b>" << endl;
-                sout << "<b><red>      The pgo command might not succeed.</red></b>" << endl;
+                sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                sout << "<b><blue>         Usage of the --force option is recommended but the success is not guaranteed.</blue></b>" << endl;
                 sout << endl;
-                it++;
+                if( force ){
+                    it++;
+                    nrun++;
+                } else {
+                    it = erase(it);
+                }
                 break;
 
             case EJS_FINISHED:
                 if( p_job->GetDataOut() == "keep" ){
-                    sout << "<b><green>INFO: The job was finished but the job data were kept in the working directory.</green></b>" << endl;
-                    sout << "<b><green>      The pgo command might not succeed.</green></b>" << endl;
+                    sout << "<b><blue>WARNING: The job was finished but the job data were kept in the working directory.</blue></b>" << endl;
+                    sout << "<b><blue>         The success of the pgo command is not guaranteed!</blue></b>" << endl;
                     sout << endl;
                     it++;
+                    nrun++;
                 } else {
                     sout << "<b><blue>WARNING: The job was finished and synchronized.</blue></b>" << endl;
                     sout << "<b><blue>         The pgo command cannot be used.</blue></b>" << endl;
@@ -642,29 +648,39 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
                     it = erase(it);
                 }
                 break;
-            case EJS_KILLED:
-            case EJS_ERROR: {
 
+            case EJS_KILLED:
+            case EJS_ERROR:
                 // do we have start/workdir
                 if( ( p_job->GetItem("start/workdir","INF_MAIN_NODE",true) == NULL ) ||
                     ( p_job->GetItem("start/workdir","INF_WORK_DIR",true) == NULL ) ) {
-                    sout << "<b><blue>WARNING: The job is not in a well defined state.</green></b>" << endl;
-                    sout << "<b><blue>         The pgo command cannot be used because the information about the job working directory is not known yet.</blue></b>" << endl;
+                    sout << "<b><red>ERROR: The job is not in a well defined state.</red></b>" << endl;
+                    sout << "<b><red>       The pgo command cannot be used because the information about the job working directory is not known.</red></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
-                    sout << "<b><red>INFO: The job is not in a well defined state.</red></b>" << endl;
-                    sout << "<b><red>      The pgo command might not succeed.</red></b>" << endl;
+                    sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                    sout << "<b><blue>         Usage of the --force option is recommended but the success is not guaranteed.</blue></b>" << endl;
                     sout << endl;
-                    it++;
-                }
+                    if( force ){
+                        it++;
+                        nrun++;
+                    } else {
+                        it = erase(it);
+                    }
                 }
                 break;
         }
     }
 
+    if( size() == 0 ){
+        sout << "<b><red>ERROR: No job is suitable for the pgo command!</red></b>" << endl;
+        sout << endl;
+        return(false);
+    }
+
     if( size() > 1 ){
-        sout << "<b><red>ERROR: The pgo command cannot be applied to more than one job.</red></b>" << endl;
+        sout << "<b><red>ERROR: The pgo command cannot be applied to more than one job!</red></b>" << endl;
         sout << "<b><red>       Specify the required job as the argument of the pgo command.</red></b>" << endl;
         sout << endl;
         return(false);
@@ -677,45 +693,26 @@ bool CJobList::IsGoActionPossible(std::ostream& sout)
 
 bool CJobList::WaitForRunningJob(std::ostream& sout)
 {
-    list<CJobPtr>::iterator it = begin();
-    list<CJobPtr>::iterator ie = end();
+    if( size() != 1 ) return(false); // only one job is expected
 
-    CJobPtr p_wjob; // wait for a  job
-    int     num = 0;
+    CJobPtr p_job = front();
 
-    while( it != ie ){
-        CJobPtr p_job = *it;
-
-        switch( p_job->GetJobStatus() ){
-            case EJS_SUBMITTED:
-                p_wjob = p_job;
-                num++;
+    switch( p_job->GetJobStatus() ){
+        case EJS_SUBMITTED:
+        case EJS_RUNNING:
             break;
-            case EJS_RUNNING:
-                p_wjob = p_job;
-                num++;
-            break;
-            case EJS_INCONSISTENT:
-                p_wjob = p_job;
-                num++;
-            break;
-            default:
-                break;
-        }
-
-        it++;
+        default:
+            return(false);
     }
-
-    if( num != 1 ) return(false); // more then one waiting job
 
     int count = 0;
     for(;;){
-        if( p_wjob->IsInteractiveJob() ){
+        if( p_job->IsInteractiveJob() ){
             sout << "Awaiting for the job terminal ... ";
-            if( p_wjob->IsTerminalReady() ) break;
+            if( p_job->IsTerminalReady() ) break;
         } else {
             sout << "Awaiting for the job execution ... ";
-            if( p_wjob->GetJobInfoStatus() == EJS_RUNNING ) break;
+            if( p_job->GetJobInfoStatus() == EJS_RUNNING ) break;
         }
         switch(count % 8){
             case 0: sout << "|\r";
@@ -737,11 +734,11 @@ bool CJobList::WaitForRunningJob(std::ostream& sout)
         }
         sout.flush();
         sleep(1);
-        p_wjob->LoadInfoFile();
+        p_job->LoadInfoFile();
         count++;
     }
     sout << endl;
-    p_wjob->UpdateJobStatus();
+    p_job->UpdateJobStatus();
     sout << endl;
 
     return(true);
@@ -771,7 +768,7 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
                 break;
             case EJS_RUNNING:
                 if( p_job->GetWorkDirType() == "jobdir" ){
-                    sout << "<b><blue>WARNING: The running job found but it seems you are already in the working directory (workdir=jobdir).</blue></b>" << endl;
+                    sout << "<b><blue>WARNING: The input directory and working directories are the same (workdir=jobdir).</blue></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
@@ -780,8 +777,8 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
                 break;
             case EJS_FINISHED:
                 if( p_job->GetDataOut() == "keep" ){
-                    sout << "<b><green>INFO: The job was finished but the job data were left on the working directory (dataout=keep).</green></b>" << endl;
-                    sout << "<b><green>      The psync command might not succeed.</green></b>" << endl;
+                    sout << "<b><blue>WARNING: The job was finished but the job data were left on the working directory (dataout=keep).</blue></b>" << endl;
+                    sout << "<b><blue>         The success of the psync command is not guaranteed.</blue></b>" << endl;
                     sout << endl;
                     it++;
                 } else {
@@ -798,13 +795,13 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
                 // do we have start/workdir
                 if( ( p_job->GetItem("start/workdir","INF_MAIN_NODE",true) == NULL ) ||
                     ( p_job->GetItem("start/workdir","INF_WORK_DIR",true) == NULL ) ) {
-                    sout << "<b><blue>WARNING: The job is not in well defined state.</green></b>" << endl;
-                    sout << "<b><blue>         The psync command cannot be used because the information about the job working directory is not known yet.</blue></b>" << endl;
+                    sout << "<b><red>ERROR: The job is not in a well defined state.</red></b>" << endl;
+                    sout << "<b><red>       The psync command cannot be used because the information about the job working directory is not known.</red></b>" << endl;
                     sout << endl;
                     it = erase(it);
                 } else {
-                    sout << "<b><red>INFO: The job is not in well defined state.</red></b>" << endl;
-                    sout << "<b><red>      The psync command might not succeed.</red></b>" << endl;
+                    sout << "<b><blue>WARNING: The job is not in a well defined state.</blue></b>" << endl;
+                    sout << "<b><blue>         The success of the psync command is not guaranteed.</blue></b>" << endl;
                     sout << endl;
                     it++;
                 }
@@ -813,26 +810,29 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
         }
     }
 
-    if( size() > 1 ){
-        sout << "<b><red>ERROR: The psync command cannot be applied to more than one job.</red></b>" << endl;
+    if( size() == 0 ){
+        sout << "<b><red>ERROR: No job is suitable for the psync command!</red></b>" << endl;
         sout << endl;
         return(false);
     }
 
-    return(size() == 1);
+    if( size() > 1 ){
+        sout << "<b><red>ERROR: The psync command cannot be applied to more than one job!</red></b>" << endl;
+        sout << "<b><red>       Specify the required job as the argument of the psync command.</red></b>" << endl;
+        sout << endl;
+        return(false);
+    }
+
+    return(true);
 }
 
 //------------------------------------------------------------------------------
 
 bool CJobList::PrepareGoWorkingDirEnv(std::ostream& sout,bool noterm)
 {
-    if( size() != 1 ){
-        sout << "<b><red>ERROR: None or more than one job is suitable for the pgo command!</red></b>" << endl;
-        sout << "<b><red>       In the second case, you must explicitly specified the info file of the job!</red></b>" << endl;
-        sout << endl;
-        return(false);
-    }
-    CJobPtr p_job = *begin();
+    if( size() != 1 ) return(false);
+
+    CJobPtr p_job = front();
 
     CSmallString job_key = CShell::GetSystemVariable("INF_JOB_KEY");
     if( p_job->IsInteractiveJob() && job_key == p_job->GetJobKey() ){
@@ -853,14 +853,10 @@ bool CJobList::PrepareGoWorkingDirEnv(std::ostream& sout,bool noterm)
 
 bool CJobList::PrepareGoInputDirEnv(std::ostream& sout)
 {
-    if( size() != 1 ){
-        sout << "<b><red>ERROR: None or more than one job is suitable for the pgo command!</red></b>" << endl;
-        sout << "<b><red>       In the second case, you must explicitly specified the info file of the job!</red></b>" << endl;
-        sout << endl;
-        return(false);
-    }
+    if( size() != 1 ) return(false);
 
-    CJobPtr p_job = *begin();
+    CJobPtr p_job = front();
+
     if( p_job->PrepareGoInputDirEnv() == false ){
         sout << "<b><red>ERROR: Unable to prepare environment for the pgo command as some items are missing in the info file!</red></b>" << endl;
         sout << endl;
