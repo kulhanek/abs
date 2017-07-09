@@ -26,6 +26,12 @@ if [ "\$1" != "$INF_JOB_KEY" ]; then
     echo >&2
     exit 1
 fi
+
+echo ""
+echo "Job soft termination initiated ..."
+
+echo ">>>>> JOB SOFT TERMINATION INITIATED UPON USER REQUEST AT `date`" >> ${INF_WHOLE_NAME}.stdout
+
 EOF
 }
 
@@ -79,6 +85,7 @@ cat << EOF
 # wait until the session is terminated
 for((I=0;I<12;I++)); do
     if ! [ -d /proc/$INF_AGENT_PID ]; then
+        echo
         exit
     fi
     echo ">>> INFO: Waiting until the agent session is terminated ...."
@@ -89,9 +96,11 @@ done
 kill $INF_AGENT_PID
 sleep 5
 if ! [ -d /proc/$INF_AGENT_PID ]; then
+    echo
     exit
 fi
 kill -9 $INF_AGENT_PID
+echo
 EOF
 }
 
@@ -130,6 +139,9 @@ case $INF_JOB_NAME in
         # start screen terminal and detach from it
         screen -D -m -S "T$INF_JOB_KEY" -c $ABS_ROOT/share/scripts/screenrc &
         INF_AGENT_PID=$!
+
+        echo "Screen session: T$INF_JOB_KEY"
+        echo "Screen PID:     $INF_AGENT_PID"
 
         # catch signals to properly terminate screen session
         trap "kill $INF_AGENT_PID; exit" SIGINT SIGTERM
@@ -222,6 +234,8 @@ case $INF_JOB_NAME in
         # setup terminal
         sleep 10  # wait for terminal initialization
 
+        echo "VNC PID:     $INF_AGENT_PID"
+
         INF_VNC_ID="`grep \"^VNCID:\" \"${INF_WHOLE_NAME}.vncid\" | awk '{printf("%s",$2); }'`"
         if [ -z "$INF_VNC_ID" ]; then
             echo "" >&2
@@ -241,6 +255,9 @@ case $INF_JOB_NAME in
             exit 1
         fi
         echo "VNC DISPLAY: $INF_VNC_ID"
+
+        # create empty stdout
+        touch "${INF_WHOLE_NAME}.stdout"
 
         # create kill script
         touch "${INF_WHOLE_NAME}.kill"

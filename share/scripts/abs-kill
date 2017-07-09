@@ -26,6 +26,7 @@ export INF_SSH_OPTIONS
 
 if [ -n "$INF_KILL_MAIN_NODE" ] && [ -n "$INF_KILL_JOB_KEY" ] && \
    [ -n "$INF_KILL_WORK_DIR" ] && [ -n "$INF_KILL_WHOLE_NAME" ]; then
+   echo ""
    echo "Calling the kill script $INF_KILL_MAIN_NODE:$INF_KILL_WORK_DIR/$INF_KILL_WHOLE_NAME.kill $INF_KILL_JOB_KEY ..."
    ssh -x $INF_SSH_OPTIONS $INF_KILL_MAIN_NODE " \
         cd \"$INF_KILL_WORK_DIR\"; \

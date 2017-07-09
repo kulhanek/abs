@@ -279,7 +279,7 @@ bool CJob::SetOutputNumber(std::ostream& sout,int number)
 bool CJob::CheckRuntimeFiles(std::ostream& sout,bool ignore)
 {
     bool            runtime_files = false;
-    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vnclog;*.vncpsw;___JOB_IS_RUNNING___";
+    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill";
     char*           p_filter;
     char*           p_buffer = NULL;
 
