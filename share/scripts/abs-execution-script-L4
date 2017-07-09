@@ -74,7 +74,7 @@ EOF
 
 function abs_write_kill_footer()
 {
-
+cat << EOF
 # wait until the session is terminated
 for((I=0;I<12;I++)); do
     if ! [ -d /proc/$INF_AGENT_PID ]; then
