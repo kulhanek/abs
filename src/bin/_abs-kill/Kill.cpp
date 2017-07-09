@@ -118,6 +118,8 @@ bool CKill::Run(void)
     }
 
     Jobs.UpdateJobStatuses();
+    JobList.SortByPrepareDateAndTime();
+
     // for soft kill all jobs must be running
     Jobs.KeepOnlyLiveJobs(Options.GetOptSoft() == false);
 

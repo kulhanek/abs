@@ -126,6 +126,7 @@ bool CSync::SyncByInfoFiles(void)
 
     // update status of live jobs
     Jobs.UpdateJobStatuses();
+    JobList.SortByPrepareDateAndTime();
 
     // print final information
     vout << endl;
@@ -142,9 +143,7 @@ bool CSync::SyncByInfoFiles(void)
     vout << endl;
 
     // get last job and prepare environment for psync command
-    Jobs.PrepareSyncWorkingDirEnv();
-
-    return(true);
+    return(Jobs.PrepareSyncWorkingDirEnv(vout));
 }
 
 //------------------------------------------------------------------------------

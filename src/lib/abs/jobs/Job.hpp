@@ -282,7 +282,7 @@ public:
     bool PrepareGoInputDirEnv(void);
 
     /// prepare environment for psync
-    void PrepareSyncWorkingDirEnv(void);
+    bool PrepareSyncWorkingDirEnv(void);
 
     /// prepare environment for soft kill
     bool PrepareSoftKillEnv(void);

@@ -2232,17 +2232,26 @@ bool CJob::PrepareGoInputDirEnv(void)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrepareSyncWorkingDirEnv(void)
+bool CJob::PrepareSyncWorkingDirEnv(void)
 {
-    ShellProcessor.SetVariable("INF_SYNC_MAIN_NODE",GetItem("start/workdir","INF_MAIN_NODE"));
-    ShellProcessor.SetVariable("INF_SYNC_WORK_DIR",GetItem("start/workdir","INF_WORK_DIR"));
-    ShellProcessor.SetVariable("INF_SYNC_INPUT_MACHINE",GetItem("basic/jobinput","INF_INPUT_MACHINE"));
-    ShellProcessor.SetVariable("INF_SYNC_INPUT_DIR",GetItem("basic/jobinput","INF_INPUT_DIR"));
-    CSmallString ssh_opts;
-    if( ABSConfig.GetSystemConfigItem("INF_SSH_OPTIONS",ssh_opts) == false ){
-        ssh_opts = "-o StrictHostKeyChecking=no";
-    }
-    ShellProcessor.SetVariable("INF_SSH_OPTIONS",ssh_opts);
+    bool result = true;
+
+    CSmallString tmp;
+    tmp = NULL;
+    result &= GetItem("start/workdir","INF_MAIN_NODE",tmp);
+    ShellProcessor.SetVariable("INF_GO_MAIN_NODE",tmp);
+    tmp = NULL;
+    result &= GetItem("start/workdir","INF_WORK_DIR",tmp);
+    ShellProcessor.SetVariable("INF_GO_WORK_DIR",tmp);
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_JOB_KEY",tmp);
+    ShellProcessor.SetVariable("INF_GO_JOB_KEY",tmp);
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_INPUT_MACHINE",tmp);
+    ShellProcessor.SetVariable("INF_GO_INPUT_MACHINE",tmp);
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_INPUT_DIR",tmp);
+    ShellProcessor.SetVariable("INF_GO_INPUT_DIR",tmp);
 
     CSmallString INF_WI_RSYNCOPTS;
     if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
@@ -2250,11 +2259,18 @@ void CJob::PrepareSyncWorkingDirEnv(void)
     } else {
         INF_WI_RSYNCOPTS << "--chown=:" << GetItem("specific/resources","INF_USTORAGEGROUP");
     }
-    ShellProcessor.SetVariable("INF_WI_RSYNCOPTS",INF_WI_RSYNCOPTS);
-    // info file for @REALM detection
-    CSmallString info;
-    info << GetItem("basic/jobinput","INF_JOB_NAME") << GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX") << ".info";
-    ShellProcessor.SetVariable("INF_SYNC_INFOFILE",info);
+    ShellProcessor.SetVariable("INF_SYNC_WI_RSYNCOPTS",INF_WI_RSYNCOPTS);
+
+    CSmallString wn;
+    tmp = NULL;
+    result &= GetItem("basic/jobinput","INF_JOB_NAME",tmp);
+    wn << tmp;
+    tmp = NULL;
+    result &= GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",tmp);
+    wn << tmp;
+    ShellProcessor.SetVariable("INF_KILL_WHOLE_NAME",wn);
+
+    return(result);
 }
 
 //------------------------------------------------------------------------------

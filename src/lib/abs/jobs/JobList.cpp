@@ -872,15 +872,21 @@ bool CJobList::PrepareGoInputDirEnv(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CJobList::PrepareSyncWorkingDirEnv(void)
+bool CJobList::PrepareSyncWorkingDirEnv(std::ostream& sout)
 {
     if( size() != 1 ){
-        ES_ERROR("none or more than one job is on stack");
+        sout << "<b><red>ERROR: None or more than one job is suitable for the psync command!</red></b>" << endl;
+        sout << "<b><red>       In the second case, you must explicitly specified the info file of the job!</red></b>" << endl;
+        sout << endl;
         return(false);
     }
 
     CJobPtr p_job = *begin();
-    p_job->PrepareSyncWorkingDirEnv();
+    if( p_job->PrepareSyncWorkingDirEnv() == false ){
+        sout << "<b><red>ERROR: Unable to prepare environment for the psync command as some items are missing in the info file!</red></b>" << endl;
+        sout << endl;
+        return(false);
+    }
     return(true);
 }
 

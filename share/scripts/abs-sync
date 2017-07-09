@@ -16,9 +16,14 @@
 # INF_SYNC_WORK_DIR
 # INF_SYNC_INPUT_DIR
 # INF_SYNC_INPUT_MACHINE
-# INF_WI_RSYNCOPTS
-# INF_SSH_OPTIONS
-# INF_SYNC_INFOFILE
+# INF_SYNC_WI_RSYNCOPTS
+# INF_SYNC_WHOLE_NAME
+# INF_SYNC_ALL
+
+# global setup
+INF_SSH_OPTIONS=`$ABS_ROOT/sbin/abs-get-setup-item INF_SSH_OPTIONS`
+if [ $? -ne 0 ]; then INF_SSH_OPTIONS="-o StrictHostKeyChecking=no"; fi
+export INF_SSH_OPTIONS
 
 #===============================================================================
 #-------------------------------------------------------------------------------
@@ -52,14 +57,14 @@ fi
 # fix group name translation
 if [ "$HOSTNAME" != "$INF_SYNC_MAIN_NODE" ]; then
     # we are in the job input directory
-    INF_LR=`stat "$INF_SYNC_INFOFILE" --format=%G | tr '@' ' ' | awk '{ printf("%s",$2);}'`
+    INF_LR=`stat "${INF_SYNC_WHOLE_NAME}.info" --format=%G | tr '@' ' ' | awk '{ printf("%s",$2);}'`
     if [ -n "$INF_LR" ]; then
-        INF_WI_RSYNCOPTS="${INF_WI_RSYNCOPTS}@$INF_LR"
+        INF_SYNC_WI_RSYNCOPTS="${INF_SYNC_WI_RSYNCOPTS}@$INF_LR"
     fi
 fi
 
 echo ""
-echo "rsync setup: $INF_WI_RSYNCOPTS"
+echo "rsync setup: $INF_SYNC_WI_RSYNCOPTS"
 echo "ssh options: $INF_SSH_OPTIONS"
 if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
 echo "direction:   $INF_SYNC_WORK_DIR/FILE -> $INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/"
@@ -75,7 +80,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
     echo -n "All files will be synchronized by rsync "
     if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
         echo "from the working directory ..."
-        $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
+        $ABS_RSYNC -av $INF_SYNC_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
               --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
               "$INF_SYNC_WORK_DIR/" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
@@ -86,7 +91,7 @@ if [ "$INF_SYNC_ALL" == "YES" ]; then
         fi
     else
         echo "from the input directory ..."
-        $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
+        $ABS_RSYNC -av $INF_SYNC_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" --exclude "___JOB_IS_RUNNING___" \
               --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
               "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/" "$PWD/" 2>&1 | awk '{ printf("   %s\n",$0); }'
         if [ $? -ne 0 ]; then
@@ -138,7 +143,7 @@ for SFILE in $FILES; do
         echo "Skipped."
     else
         if [ "$HOSTNAME" == "$INF_SYNC_MAIN_NODE" ]; then
-            $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            $ABS_RSYNC -av $INF_SYNC_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                   --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                   "$INF_SYNC_WORK_DIR/$SFILE" "$INF_SYNC_INPUT_MACHINE:$INF_SYNC_INPUT_DIR/" > /dev/null
             if [ $? -ne 0 ]; then
@@ -148,7 +153,7 @@ for SFILE in $FILES; do
                 exit 1
             fi
         else
-            $ABS_RSYNC -av $INF_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+            $ABS_RSYNC -av $INF_SYNC_WI_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                   --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                   "$INF_SYNC_MAIN_NODE:$INF_SYNC_WORK_DIR/$SFILE" "$PWD/" > /dev/null
             if [ $? -ne 0 ]; then

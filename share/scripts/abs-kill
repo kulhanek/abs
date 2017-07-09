@@ -17,12 +17,17 @@
 # INF_KILL_WHOLE_NAME
 # INF_KILL_JOB_KEY
 
+# global setup
+INF_SSH_OPTIONS=`$ABS_ROOT/sbin/abs-get-setup-item INF_SSH_OPTIONS`
+if [ $? -ne 0 ]; then INF_SSH_OPTIONS="-o StrictHostKeyChecking=no"; fi
+export INF_SSH_OPTIONS
+
 # soft kill mode - call kill script in the working directory ...
 
 if [ -n "$INF_KILL_MAIN_NODE" ] && [ -n "$INF_KILL_JOB_KEY" ] && \
    [ -n "$INF_KILL_WORK_DIR" ] && [ -n "$INF_KILL_WHOLE_NAME" ]; then
    echo "Calling the kill script $INF_KILL_MAIN_NODE:$INF_KILL_WORK_DIR/$INF_KILL_WHOLE_NAME.kill $INF_KILL_JOB_KEY ..."
-   ssh -x $INF_KILL_MAIN_NODE " \
+   ssh -x $INF_SSH_OPTIONS $INF_KILL_MAIN_NODE " \
         cd \"$INF_KILL_WORK_DIR\"; \
         if [ \$? -ne 0 ]; then \
             echo \"\" >&2; \

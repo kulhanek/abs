@@ -21,12 +21,17 @@
 # INF_GO_WHOLE_NAME
 # INF_GO_SITE_ID
 
+# global setup
+INF_SSH_OPTIONS=`$ABS_ROOT/sbin/abs-get-setup-item INF_SSH_OPTIONS`
+if [ $? -ne 0 ]; then INF_SSH_OPTIONS="-o StrictHostKeyChecking=no"; fi
+export INF_SSH_OPTIONS
+
 # this is inline script
 case "$INF_GO_JOB_NAME" in
     cli )   
         if [ -n "$INF_GO_SITE_ID" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
-            ssh -t -X "$INF_GO_MAIN_NODE" " \
+            ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
                 site activate $INF_GO_SITE_ID; \
                 amsmodule add $INF_GO_AGENT_MODULE; \
                 if [ \$? -ne 0 ]; then \
@@ -57,7 +62,7 @@ case "$INF_GO_JOB_NAME" in
     * )
         # go to working directory
         if [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_WORK_DIR" ] && [ -n "$INF_GO_SITE_ID" ] ; then
-            ssh -t -X $INF_GO_MAIN_NODE \
+            ssh -t -X $INF_SSH_OPTIONS $INF_GO_MAIN_NODE \
                       INF_GO_SITE_ID="$INF_GO_SITE_ID" \
                       INF_GO_WORK_DIR="$INF_GO_WORK_DIR" \
                       INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \

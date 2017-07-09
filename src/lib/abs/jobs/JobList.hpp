@@ -148,7 +148,7 @@ public:
     bool PrepareGoInputDirEnv(std::ostream& sout);
 
     /// prepare environment for psync
-    bool PrepareSyncWorkingDirEnv(void);
+    bool PrepareSyncWorkingDirEnv(std::ostream& sout);
 
     /// sort by prepare date
     void SortByPrepareDateAndTime(void);
