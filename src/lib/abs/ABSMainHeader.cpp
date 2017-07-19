@@ -21,10 +21,7 @@
 // =============================================================================
 
 #include <ABSMainHeader.hpp>
-
-#define ABS_CONFIG_VERSION  "3.x"
-#define ABS_VERSION         "3.GITREVS.GITHASH"
-#define ABS_BUILDTIME       "DATE"
+#include <ABSMainHeaderConfig.hpp>
 
 //------------------------------------------------------------------------------
 

@@ -8,4 +8,7 @@ Makefile
 /lib
 /include
 /tests
+/sbin/
+/etc/sites/
 ABS-3.creator.user
+src/lib/abs/ABSMainHeaderConfig.hpp

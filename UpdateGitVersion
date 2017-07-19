@@ -10,10 +10,11 @@ GITREVS=`git rev-list --count HEAD`
 GITHASH=`git rev-parse --short HEAD`
 DATE=`date +"%Y-%m-%d %H:%M"`
 
-sed -e "s/GITREVS/$GITREVS/g" -e "s/GITHASH/$GITHASH/g" -e "s/DATE/$DATE/g" \
-    src/lib/abs/ABSMainHeader.cpp > src/lib/abs/_ABSMainHeader.cpp
-
-mv -f src/lib/abs/_ABSMainHeader.cpp src/lib/abs/ABSMainHeader.cpp
+cat > src/lib/abs/ABSMainHeaderConfig.hpp << EOF
+#define ABS_CONFIG_VERSION  "3.x"
+#define ABS_VERSION         "3.${GITREVS}.${GITHASH}"
+#define ABS_BUILDTIME       "${DATE}"
+EOF
 
 echo ""
 echo "ABS Revision: 3.$GITREVS.$GITHASH ($DATE)"
