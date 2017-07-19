@@ -74,9 +74,9 @@ INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/srv SYSTEM)
 LINK_DIRECTORIES(${AMS_ROOT}/lib)
 SET(AMS_LIB_NAME ams)
 
-# boost ---------------------------------------
-SET(BOOST_ROOT ${DEVELOPMENT_ROOT}/thirdparty/boost/1.59.0)
-INCLUDE_DIRECTORIES(${BOOST_ROOT} SYSTEM)
+# BOOST ------------------------------------------
+FIND_PACKAGE(Boost REQUIRED)
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS} SYSTEM)
 
 # all libs ---------------------------------------
 SET(ABS_EXT_LIBS

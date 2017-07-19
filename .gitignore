@@ -7,4 +7,5 @@ Makefile
 /bin
 /lib
 /include
-/test
+/tests
+ABS-3.creator.user
