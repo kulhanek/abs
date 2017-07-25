@@ -1953,9 +1953,9 @@ const CSmallString CJob::GetSiteID(void)
 {
     CXMLElement* p_rele = GetElementByPath("infinity",false);
     if( p_rele == NULL ){
-        CXMLPrinter xml_printer;
-        xml_printer.SetPrintedXMLNode(this);
-        xml_printer.Print(stdout);
+//        CXMLPrinter xml_printer;
+//        xml_printer.SetPrintedXMLNode(this);
+//        xml_printer.Print(stdout);
         ES_ERROR("infinity element was not found");
         return("");
     }
