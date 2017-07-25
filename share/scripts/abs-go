@@ -94,12 +94,20 @@ case "$INF_GO_JOB_NAME" in
                 echo "" >&2
                 return 1
             fi
+            echo ""
             cd "$INF_GO_INPUT_DIR"
-            echo ""
-            echo " INFO: The current directory was set to:"
-            echo "       $INF_GO_INPUT_DIR"
-            echo ""
-            return 0
+            if [ $? -eq 0 ]; then
+                echo " INFO: The current directory was set to:"
+                echo "       $INF_GO_INPUT_DIR"
+                echo ""
+                return 0
+            else
+                echo ""
+                echo " ERROR: Unable to set current directory to:"
+                echo "       $INF_GO_INPUT_DIR"
+                echo ""
+                return 1
+            fi
         fi
         ;;
 esac
