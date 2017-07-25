@@ -220,9 +220,7 @@ void CJob::CreateHeader(void)
 
 void CJob::CreateHeaderFromBatchJob(const CSmallString& siteid, const CSmallString& absvers)
 {
-    CreateChildDeclaration();
-
-    CXMLElement* p_header = CreateChildElementByPath("job_info/infinity");
+    CXMLElement* p_header = GetChildElementByPath("job_info/infinity",true);
 
     CSmallString version;
 
