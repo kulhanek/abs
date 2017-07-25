@@ -48,7 +48,7 @@ case "$INF_GO_JOB_NAME" in
         ;;
     gui )
         if [ -n "$INF_GO_AGENT_MODULE" ] && [ -n "$INF_GO_VNC_ID" ] && [ -n "$INF_GO_WHOLE_NAME" ] ; then
-            amsmodule add $INF_GO_AGENT_MODULE
+            amsmodule add "$INF_GO_AGENT_MODULE"
             if [ $? -ne 0 ]; then
                 echo "" >&2
                 echo " >>> ERROR: Unable to activate GUI agent module '$INF_GO_AGENT_MODULE'!" >&2
@@ -78,6 +78,13 @@ case "$INF_GO_JOB_NAME" in
                 echo " WARNING: The job input directory is located on the remote computer."
                 echo "          Job input dir: $INF_GO_INPUT_MACHINE:$INF_GO_INPUT_DIR"
                 echo "          Hostname     : $HOSTNAME"
+                ssh -t -X $INF_SSH_OPTIONS $INF_GO_INPUT_MACHINE \
+                          INF_GO_SITE_ID="$INF_GO_SITE_ID" \
+                          INF_GO_WORK_DIR="$INF_GO_INPUT_DIR" \
+                          INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \
+                          INF_GO_EXPORTED_MODULES_2="" \
+                          "$ABS_ROOT/share/scripts/abs-go-remote"
+                return $?
             fi
             if ! [ -d "$INF_GO_INPUT_DIR" ]; then
                 echo "" >&2

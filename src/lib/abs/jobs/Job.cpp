@@ -218,6 +218,27 @@ void CJob::CreateHeader(void)
 
 //------------------------------------------------------------------------------
 
+void CJob::CreateHeaderFromBatchJob(const CSmallString& siteid, const CSmallString& absvers)
+{
+    CreateChildDeclaration();
+
+    CXMLElement* p_header = CreateChildElementByPath("job_info/infinity");
+
+    CSmallString version;
+
+    version = "INFINITY_INFO_v_3_0";
+
+    p_header->SetAttribute("version",version);
+    p_header->SetAttribute("site",siteid);
+
+    CSmallString absmod;
+    absmod = "abs";
+    absmod << ":" << absvers;
+    p_header->SetAttribute("abs",absmod);
+}
+
+//------------------------------------------------------------------------------
+
 void CJob::CreateBasicSection(void)
 {
     CreateSection("basic");

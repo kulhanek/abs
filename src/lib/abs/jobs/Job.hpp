@@ -88,6 +88,9 @@ public:
     /// 0.0 create info file header
     void CreateHeader(void);
 
+    /// 0.0 create info file header
+    void CreateHeaderFromBatchJob(const CSmallString& siteid, const CSmallString& absvers);
+
     /// 1.0 create basic section
     void CreateBasicSection(void);
 

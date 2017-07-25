@@ -141,6 +141,9 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     }
 
 // -----------------
+    CreateHeaderFromBatchJob(BatchVariables["INF_SITE_ID"],BatchVariables["INF_ABS_VERSION"]);
+
+// -----------------
     DecodeBatchJobComment(p_job->attribs,BatchJobComment);
     if( (status == "H") && (BatchJobComment == NULL) ){
         BatchJobComment = "Held";
