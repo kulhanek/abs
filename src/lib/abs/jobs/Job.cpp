@@ -2240,9 +2240,6 @@ bool CJob::PrepareGoInputDirEnv(void)
 
     CSmallString tmp;
     tmp = NULL;
-    result &= GetItem("start/workdir","INF_MAIN_NODE",tmp);
-    ShellProcessor.SetVariable("INF_GO_MAIN_NODE",tmp);
-    tmp = NULL;
     result &= GetItem("basic/jobinput","INF_INPUT_MACHINE",tmp);
     ShellProcessor.SetVariable("INF_GO_INPUT_MACHINE",tmp);
     tmp = NULL;
