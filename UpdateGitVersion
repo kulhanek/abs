@@ -18,7 +18,7 @@ cat > src/lib/abs/ABSMainHeaderConfig.hpp << EOF
 #define ABS_VERSION         "3.${GITREVS}.${GITHASH}"
 #define ABS_BUILDTIME       "${DATE}"
 EOF
-if [ $? -ne 1 ]; then exit 1; fi
+if [ $? -ne 0 ]; then exit 1; fi
 
 echo ""
 echo "ABS Revision: 3.$GITREVS.$GITHASH ($DATE)"
