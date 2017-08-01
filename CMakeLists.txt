@@ -39,6 +39,12 @@ ENDIF(NOT DEVELOPMENT_ROOT)
 # external libraries -----------------------------------------------------------
 # ==============================================================================
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${DEVELOPMENT_ROOT}/projects/cmake-modules/1.0/share/modules")
+
+# boost =======================
+FIND_PACKAGE(MyBoost REQUIRED)
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR} SYSTEM)
+
 # HIPOLY -----------------------------------------
 SET(HIPOLY_ROOT ${DEVELOPMENT_ROOT}/projects/hipoly/1.0)
 INCLUDE_DIRECTORIES(${HIPOLY_ROOT}/src/lib/hipoly SYSTEM)
@@ -73,10 +79,6 @@ INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/cuda SYSTEM)
 INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/srv SYSTEM)
 LINK_DIRECTORIES(${AMS_ROOT}/lib)
 SET(AMS_LIB_NAME ams)
-
-# BOOST ------------------------------------------
-FIND_PACKAGE(Boost REQUIRED)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS} SYSTEM)
 
 # all libs ---------------------------------------
 SET(ABS_EXT_LIBS
