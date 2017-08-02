@@ -417,7 +417,7 @@ bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool fin
     }
 
     struct attropl* p_first = NULL;
-    set_attribute(p_first,ATTR_owner,NULL,user,EQ);
+    set_attribute(p_first,ATTR_u,NULL,user,EQ);
 
     struct batch_status* p_jobs;
     p_jobs = pbspro_selstat(ServerID,p_first,NULL,extend.GetBuffer());
