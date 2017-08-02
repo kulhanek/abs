@@ -611,7 +611,7 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
 
                     if( p_job->IsTerminalReady() == false ){
                         sout << "<b><blue> WARNING: The job was started but the job terminal is not ready yet.</blue></b>" << endl;
-                        sout << "<b><blue>          Wait until the job terminal is ready.</blue></b>" << endl;
+                        sout << "<b><blue>          Wait for the job terminal ...</blue></b>" << endl;
                         sout << endl;
                         it++;
                         break;
