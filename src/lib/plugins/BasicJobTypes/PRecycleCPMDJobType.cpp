@@ -378,7 +378,7 @@ bool CPRecycleCPMDJobType::CheckInputFile(CJob& job,std::ostream& sout)
     CSmallString sumask = job.GetItem("specific/resources","INF_UMASK");
     mode_t umask = CUser::GetUMaskMode(sumask);
 
-    int mode = 0666;
+    int mode = 0777;
     int fmode = (mode & (~ umask)) & 0777;
     chmod(storage,fmode);
 
