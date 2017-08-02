@@ -105,6 +105,9 @@ bool CJobs::Run(void)
     if( Options.IsOptUserSet() ){
         // overwrite user name
         User.SetUserName(Options.GetOptUser());
+
+        // user must be re-initialized
+        User.InitUser();
     }
 
     vout << high;
