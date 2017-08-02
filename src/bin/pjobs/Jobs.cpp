@@ -102,19 +102,18 @@ bool CJobs::Run(void)
         return(false);
     }
 
-    if( Options.IsOptUserSet() ){
-        // overwrite user name
-        User.SetUserName(Options.GetOptUser());
+    CSmallString user = User.GetName();
 
-        // user must be re-initialized
-        User.InitUser();
+    if( Options.IsOptUserSet() ){
+        user = Options.GetOptUser();
     }
 
     vout << high;
     User.PrintUserInfo(vout);
+    vout << "# PBSPro user: " << user << endl;
     vout << low;
 
-    if( BatchServers.GetUserJobs(User.GetName(),Options.GetOptKeepCompleted() | Options.GetOptFinished()) == false ){
+    if( BatchServers.GetUserJobs(user,Options.GetOptKeepCompleted() | Options.GetOptFinished()) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }
