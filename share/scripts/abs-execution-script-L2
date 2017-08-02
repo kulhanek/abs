@@ -74,7 +74,7 @@ if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
     # INF_L_MP=`stat "$INF_INPUT_DIR" --format="%m"`
 
     # is local input directory of nfs4:krb5 type?
-    INF_L_DEV=`stat "$INF_INPUT_DIR" --format="%d"
+    INF_L_DEV=`stat "$INF_INPUT_DIR" --format="%d"`
     INF_L_DEV_MAJ=$(($INF_L_DEV / 256))
     INF_L_DEV_MIN=$(($INF_L_DEV % 256))
 
