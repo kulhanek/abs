@@ -4,6 +4,11 @@
 # (c) 2009,2012,2017 Petr Kulhanek, kulhanek@chemi.muni.cz
 # ==============================================================================
 
+echo ""
+echo "# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo "# presubmit $INF_ARG_DESTINATION $INF_ARG_JOB $INF_ARG_RESOURCES"
+echo "# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
 if [ -z "$INF_ARG_DESTINATION" ] || [ -z "$INF_ARG_JOB" ]; then
     echo "" >&2
     echo " >>> ERROR: The INF_ARG_DESTINATION or INF_ARG_JOB variables are not set!" >&2
@@ -35,6 +40,7 @@ if ! [[ $INF_ARG_RESOURCES == *"fixperms=none"* ]]; then
 fi
 
 if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
+    echo "# via the input machine: $INF_INPUT_MACHINE ..."
     # submit new run
     ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" "
                 if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
@@ -63,10 +69,10 @@ else
         fi
         while read INF_INPUT_MACHINE; do
             echo ""
-            echo -n "Testing surrogate machine '$INF_INPUT_MACHINE' ... "
+            echo -n "# via the surrogate machine: '$INF_INPUT_MACHINE' ... "
             ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" echo &> /dev/null
             if [ $? -eq 0 ]; then
-                echo "success"
+                echo "connection available"
                 ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" "
                             if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
                             site activate $INF_SITE_ID; \
@@ -85,7 +91,7 @@ else
                     exit 1
                 fi
             else
-                echo "failure"
+                echo "no connection available, trying the next one ..."
             fi
         done < <( echo "$INF_SURROGATE_MACHINES" | tr ',' '\n' )
     else
@@ -95,6 +101,9 @@ else
         exit 1
     fi
 fi
+
+echo "# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+echo ""
 
 exit 0
 
