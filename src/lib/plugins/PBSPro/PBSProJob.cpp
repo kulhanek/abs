@@ -181,11 +181,23 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     tmp = NULL;
     // this is optional - exec host
     SetItem("start/workdir","INF_MAIN_NODE","-unknown-");
+    // metacentrum - recent pbspro
+    // exec_host2 = luna42.fzu.cz:15002/1*12+luna44.fzu.cz:15002/0*12+luna45.fzu.cz:15002/0*12+luna49.fzu.cz:15002/0*12+luna50.fzu.cz:15002/4*12
     get_attribute(p_job->attribs,ATTR_exechost2,NULL,tmp);
     if( tmp != NULL ){
         stmp = tmp;
         items.clear();
         split(items,stmp,is_any_of(":"));
+        if( items.size() > 0 ){
+            SetItem("start/workdir","INF_MAIN_NODE",items[0]);
+        }
+    } else {
+        // it4i - pbspro 13.1
+        // exec_host = cn204/0*16+cn197/0*16
+        get_attribute(p_job->attribs,ATTR_exechost,NULL,tmp);
+        stmp = tmp;
+        items.clear();
+        split(items,stmp,is_any_of("/"));
         if( items.size() > 0 ){
             SetItem("start/workdir","INF_MAIN_NODE",items[0]);
         }
@@ -266,20 +278,24 @@ void CPBSProJob::DecodeBatchJobComment(struct attrl* p_item,CSmallString& commen
     get_attribute(p_item,ATTR_estimated,"exec_vnode",exec_vnode);
 
     if( (start_time > 0) && (exec_vnode != NULL) ){
+        comment += " | planned start";
+    }
+    if( start_time > 0 ){
         CSmallTimeAndDate   date(start_time);
         CSmallTimeAndDate   cdate;
         CSmallTime          ddiff;
         cdate.GetActualTimeAndDate();
         ddiff = date - cdate;
         if( ddiff > 0 ){
-            comment = "planned start within " + ddiff.GetSTimeAndDay();
+            comment += " within " + ddiff.GetSTimeAndDay();
         }
-
+    }
+    if( exec_vnode != NULL ){
         vector<string> nodes;
         string         list(exec_vnode);
         split(nodes,list,is_any_of("+"),boost::token_compress_on);
         if( nodes.size() >= 1 ){
-            comment += " " + nodes[0];
+            comment += " at " + nodes[0];
             if( nodes.size() > 1 ) comment += ",+";
         }
     }

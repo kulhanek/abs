@@ -2171,6 +2171,19 @@ void CJob::RestoreEnv(void)
     RestoreEnv(GetChildElementByPath("job_info/basic"));
     RestoreEnv(GetChildElementByPath("job_info/specific"));
     RestoreEnv(GetChildElementByPath("job_info/submit"));
+
+    // get surrogate machines if any
+    Host.InitHostFile();
+    CSmallString hostname = CShell::GetSystemVariable("HOSTNAME");
+    bool         personal = CShell::GetSystemVariable("AMS_PERSONAL") == "ON";
+    CXMLElement* p_ele = Host.FindGroup(hostname,personal);
+    if( p_ele ){
+        CSmallString surrogates;
+        p_ele->GetAttribute("surrogates",surrogates);
+        ShellProcessor.SetVariable("INF_SURROGATE_MACHINES",surrogates);
+    } else {
+        ShellProcessor.SetVariable("INF_SURROGATE_MACHINES","");
+    }
 }
 
 //------------------------------------------------------------------------------

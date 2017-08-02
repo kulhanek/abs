@@ -119,9 +119,6 @@ public:
     //! get last error message
     const CSmallString GetLastErrorMsg(void);
 
-    //! get job comment from comment, planned_start, planned_nodes
-    static void DecodeBatchJobComment(attrl* p_item,CSmallString& comment);
-
     //! decode batch attributes
     void CreateJobAttributes(struct attropl* &p_prev,CResourceList* p_rl);
 

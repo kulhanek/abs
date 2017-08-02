@@ -34,13 +34,13 @@ INF_RETRY_TIME=`$ABS_ROOT/sbin/abs-get-setup-item INF_RETRY_TIME`
 if [ $? -ne 0 ]; then INF_RETRY_TIME="600"; fi
 export INF_RETRY_TIME
 
-echo "Temporary directory  : $TMPDIR"
-echo "SSH Options          : $INF_SSH_OPTIONS"
-echo "Retry count          : $INF_RETRY_COUNT"
-echo "Retry time           : $INF_RETRY_TIME"
-echo "# Current directory  : `pwd`"
-echo "# Input directory    : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
-echo "# Storage directory  : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
+echo "# Temporary directory : $TMPDIR"
+echo "# SSH Options         : $INF_SSH_OPTIONS"
+echo "# Retry count         : $INF_RETRY_COUNT"
+echo "# Retry time          : $INF_RETRY_TIME"
+echo "# Current directory   : `pwd`"
+echo "# Input directory     : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
+echo "# Storage directory   : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
 
 
 # the full name of the job service files
