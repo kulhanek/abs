@@ -32,6 +32,7 @@
 #include <Cache.hpp>
 #include <Utils.hpp>
 #include <AMSGlobalConfig.hpp>
+#include <sys/stat.h>
 
 //------------------------------------------------------------------------------
 
@@ -259,7 +260,6 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         return(ERS_FAILED);
     }
 
-
     //--------------------------------------------------------------------------
     // determine current stage
     int current = 0;
@@ -396,6 +396,32 @@ bool CPRecycleJobType::CheckInputFile(CJob& job,std::ostream& sout)
         sout << "<b><red> ERROR: The specified MD engine module (" << mname;
         sout << ") requires GPU resources but none were requested!</red></b>" << endl;
         return(false);
+    }
+
+    CFileName storage;
+    storage = "storage";  // hardcoded
+
+    // fix access permissions to storage dir
+    CSmallString sumask = job.GetItem("specific/resources","INF_UMASK");
+    mode_t umask = CUser::GetUMaskMode(sumask);
+
+    int mode = 0666;
+    int fmode = (mode & (~ umask)) & 0777;
+    chmod(storage,fmode);
+
+    CSmallString sgroup = job.GetItem("specific/resources","INF_USTORAGEGROUP");
+    if( sgroup != NULL ){
+        if( job.GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
+            sgroup << "@" << job.GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
+        }
+        gid_t group = CUser::GetGroupID(sgroup,false);
+
+        int ret = chown(storage,-1,group);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set owner and group of file '" << storage << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
     }
 
     return(true);

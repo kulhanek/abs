@@ -33,6 +33,7 @@
 #include <Utils.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <sys/stat.h>
 
 //------------------------------------------------------------------------------
 
@@ -263,6 +264,37 @@ ERetStatus CLoopJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
 
 bool CLoopJobType::CheckInputFile(CJob& job,std::ostream& sout)
 {
+    CFileName storage;
+    storage = "storage";  // hardcoded
+
+    CSmallString ustorage =  GetKeyValue("archive");
+    if( ustorage != NULL ){
+        storage = ustorage;
+    }
+
+    // fix access permissions
+    CSmallString sumask = job.GetItem("specific/resources","INF_UMASK");
+    mode_t umask = CUser::GetUMaskMode(sumask);
+
+    int mode = 0666;
+    int fmode = (mode & (~ umask)) & 0777;
+    chmod(storage,fmode);
+
+    CSmallString sgroup = job.GetItem("specific/resources","INF_USTORAGEGROUP");
+    if( sgroup != NULL ){
+        if( job.GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
+            sgroup << "@" << job.GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
+        }
+        gid_t group = CUser::GetGroupID(sgroup,false);
+
+        int ret = chown(storage,-1,group);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set owner and group of file '" << storage << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
+    }
+
     return(true);
 }
 
