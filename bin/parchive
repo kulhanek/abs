@@ -42,13 +42,46 @@ function archive_runtime_files() {
         echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
         echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
 
-        ssh $INF_INPUT_MACHINE \
-            "cd $INF_INPUT_DIR; \
-            if [ $? -ne 0 ]; then exit 1; fi; \
-            mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
-            mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
-            mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
-            rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\" \"${OLD}.mpinodes\""
+        if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
+            ssh $INF_INPUT_MACHINE \
+                "cd $INF_INPUT_DIR; \
+                if [ $? -ne 0 ]; then exit 1; fi; \
+                mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
+                mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
+                mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
+                rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\" \"${OLD}.mpinodes\""
+        else
+            if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "NO" ]; then
+                if [ -z "$INF_SURROGATE_MACHINES" ]; then
+                    echo "" >&2
+                    echo " >>> ERROR: No surrogate machines defined!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+                while read INF_INPUT_MACHINE; do
+                    echo ""
+                    echo -n "Testing surrogate machine '$INF_INPUT_MACHINE' ... "
+                    ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" echo &> /dev/null
+                    if [ $? -eq 0 ]; then
+                        echo "success"
+                        ssh $INF_INPUT_MACHINE \
+                            "cd $INF_INPUT_DIR; \
+                            if [ $? -ne 0 ]; then exit 1; fi; \
+                            mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
+                            mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
+                            mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
+                            rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\" \"${OLD}.mpinodes\""
+                    else
+                        echo "failure"
+                    fi
+                done < <( echo "$INF_SURROGATE_MACHINES" | tr ',' '\n' )
+            else
+                echo "" >&2
+                echo " >>> ERROR: INF_INPUT_MACHINE_ENABLED_FOR_EXEC = '$INF_INPUT_MACHINE_ENABLED_FOR_EXEC' but YES/NO expected!" >&2
+                echo "" >&2
+                exit 1
+            fi
+        fi
     fi
 }
 
@@ -116,9 +149,9 @@ function move_to_archive() {
 # ------------------------------------------------------------------------------
 
 echo ""
-echo "# ------------------------------------------------------------------------------"
+echo "# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 echo "# parchive - manipulation with the job data archive"
-echo "# ------------------------------------------------------------------------------"
+echo "# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 case $1 in
     runtime | get | write | move )
@@ -183,7 +216,7 @@ esac
 
 EXIT_CODE=$?
 
-echo "# ------------------------------------------------------------------------------"
+echo "# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo ""
 
 exit $EXIT_CODE

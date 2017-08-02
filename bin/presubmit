@@ -53,45 +53,47 @@ if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
         echo "" >&2
         exit 1
     fi
-else if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "NO" ]; then
-    if [ -z "$INF_SURROGATE_MACHINES" ]; then
+else
+    if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "NO" ]; then
+        if [ -z "$INF_SURROGATE_MACHINES" ]; then
+            echo "" >&2
+            echo " >>> ERROR: No surrogate machines defined!" >&2
+            echo "" >&2
+            exit 1
+        fi
+        while read INF_INPUT_MACHINE; do
+            echo ""
+            echo -n "Testing surrogate machine '$INF_INPUT_MACHINE' ... "
+            ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" echo &> /dev/null
+            if [ $? -eq 0 ]; then
+                echo "success"
+                ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" "
+                            if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
+                            site activate $INF_SITE_ID; \
+                            amsmodule add abs:$INF_ABS_VERSION &> /dev/null; \
+                            if [ -n \"$INF_EXPORTED_MODULES\" ]; then amsmodule add $INF_EXPORTED_MODULES &> /dev/null; fi; \
+                            cd \"$INF_INPUT_DIR\"; \
+                            export INF_EXTERNAL_START_AFTER=$INF_JOB_ID;
+                            export INF_EXTERNAL_NAME_SUFFIX=\"$INF_EXTERNAL_NAME_SUFFIX\";
+                            psubmit -y -i -e -r \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" $INF_ARG_RESOURCES; "
+
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " >>> ERROR: Unable to submit the next job run to the batch system!" >&2
+                    echo "            See error messages above." >&2
+                    echo "" >&2
+                    exit 1
+                fi
+            else
+                echo "failure"
+            fi
+        done < <( echo "$INF_SURROGATE_MACHINES" | tr ',' '\n' )
+    else
         echo "" >&2
-        echo " >>> ERROR: No surrogate machines defined!" >&2
+        echo " >>> ERROR: INF_INPUT_MACHINE_ENABLED_FOR_EXEC = '$INF_INPUT_MACHINE_ENABLED_FOR_EXEC' but YES/NO expected!" >&2
         echo "" >&2
         exit 1
     fi
-    while read INF_INPUT_MACHINE; do
-        echo ""
-        echo -n "Testing surrogate machine '$INF_INPUT_MACHINE' ... "
-        ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" echo &> /dev/null
-        if [ $? -ne 0 ]; then
-            echo "success"
-            ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" "
-                        if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
-                        site activate $INF_SITE_ID; \
-                        amsmodule add abs:$INF_ABS_VERSION &> /dev/null; \
-                        if [ -n \"$INF_EXPORTED_MODULES\" ]; then amsmodule add $INF_EXPORTED_MODULES &> /dev/null; fi; \
-                        cd \"$INF_INPUT_DIR\"; \
-                        export INF_EXTERNAL_START_AFTER=$INF_JOB_ID;
-                        export INF_EXTERNAL_NAME_SUFFIX=\"$INF_EXTERNAL_NAME_SUFFIX\";
-                        psubmit -y -i -e -r \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" $INF_ARG_RESOURCES; "
-
-            if [ $? -ne 0 ]; then
-                echo "" >&2
-                echo " >>> ERROR: Unable to submit the next job run to the batch system!" >&2
-                echo "            See error messages above." >&2
-                echo "" >&2
-                exit 1
-            fi
-        else
-            echo "failure"
-        fi
-    done < <( echo "$INF_SURROGATE_MACHINES" | tr ',' '\n' )
-else
-    echo "" >&2
-    echo " >>> ERROR: INF_INPUT_MACHINE_ENABLED_FOR_EXEC = '$INF_INPUT_MACHINE_ENABLED_FOR_EXEC' but YES/NO expected!" >&2
-    echo "" >&2
-    exit 1
 fi
 
 exit 0
