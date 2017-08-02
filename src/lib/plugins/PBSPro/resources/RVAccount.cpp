@@ -62,7 +62,7 @@ CRVAccount::CRVAccount(void)
 
 void CRVAccount::GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value)
 {
-    name = Name;
+    name = "Account_Name";
     resource = NULL;
     value = Value;
 }
