@@ -75,23 +75,30 @@ int CInfo::Init(int argc,char* argv[])
 
 bool CInfo::Run(void)
 {
-    // init all subsystems
-    if( ABSConfig.LoadSystemConfig() == false ){
-        ES_ERROR("unable to load ABSConfig config");
-        return(false);
+    if( Options.GetOptTerminalStatus() == false ){
+
+        // init these subsystems only for full pinfo output, RT#201538
+
+        // init all subsystems
+        if( ABSConfig.LoadSystemConfig() == false ){
+            ES_ERROR("unable to load ABSConfig config");
+            return(false);
+        }
+
+        vout << low;
+
+        // user must be initializaed before ABSConfig.IsUserTicketValid()
+        User.InitUser();
+
+        // check if user has valid ticket
+        if( ABSConfig.IsUserTicketValid(vout) == false ){
+            vout << endl;
+            ES_TRACE_ERROR("user does not have valid ticket");
+            return(false);
+        }
     }
 
     vout << low;
-
-    // user must be initializaed before ABSConfig.IsUserTicketValid()
-    User.InitUser();
-
-    // check if user has valid ticket
-    if( ABSConfig.IsUserTicketValid(vout) == false ){
-        vout << endl;
-        ES_TRACE_ERROR("user does not have valid ticket");
-        return(false);
-    }
 
     // get list of info files
     if( Options.GetNumberOfProgArgs() > 0 ){
@@ -118,23 +125,26 @@ bool CInfo::Run(void)
     // sort them
     Jobs.SortByPrepareDateAndTime();
 
+    if( Options.GetOptTerminalStatus() == true ){
+        // here we do not want to contact the server, RT#201538
+        // thus we cannot call Jobs.UpdateJobStatuses();
+        Jobs.PrintTerminalJobStatus(vout);
+        return(true);
+    }
+
     // update status of live jobs
     Jobs.UpdateJobStatuses();
 
-    if( Options.GetOptTerminalStatus() == true ){
-        Jobs.PrintTerminalJobStatus(vout);
+    // print final information
+    if( Options.GetOptCompact() ){
+        Jobs.PrintInfosCompact(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
     } else {
-        // print final information
-        if( Options.GetOptCompact() ){
-            Jobs.PrintInfosCompact(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
-        } else {
-            Jobs.PrintInfos(vout);
-        }
-        if( Options.GetOptNoStatistics() == false ){
-            Jobs.PrintStatistics(vout);
-        }
-        vout << endl;
+        Jobs.PrintInfos(vout);
     }
+    if( Options.GetOptNoStatistics() == false ){
+        Jobs.PrintStatistics(vout);
+    }
+    vout << endl;
 
     return(true);
 }
