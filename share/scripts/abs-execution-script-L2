@@ -70,13 +70,20 @@ echo "W->L : $INF_WL_RSYNCOPTS"
 
 INF_L_FSTYPE="n.a."
 if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
+    # %m does not work in IT4I
+    # INF_L_MP=`stat "$INF_INPUT_DIR" --format="%m"`
+
     # is local input directory of nfs4:krb5 type?
-    INF_L_MP=`stat "$INF_INPUT_DIR" --format="%m"`
-    if [ -n "`grep $INF_L_MP /proc/self/mountinfo | grep 'sec=krb5'`" ]; then
+    INF_L_DEV=`stat "$INF_INPUT_DIR" --format="%d"
+    INF_L_DEV_MAJ=$(($INF_L_DEV / 256))
+    INF_L_DEV_MIN=$(($INF_L_DEV % 256))
+
+    if [ -n "`grep \"$INF_L_DEV_MAJ:$INF_L_DEV_MIN\" /proc/self/mountinfo | grep 'sec=krb5'`" ]; then
         INF_L_FSTYPE="nfs4:krb5"
     else
-        INF_L_FSTYPE=`grep $INF_L_MP /proc/self/mountinfo | awk '{ print $8; }'`
+        INF_L_FSTYPE=`grep "$INF_L_DEV_MAJ:$INF_L_DEV_MIN" /proc/self/mountinfo | awk '{ print $8; }'`
     fi
+    unset INF_L_DEV INF_L_DEV_MAJ INF_L_DEV_MIN
 fi
 export INF_L_FSTYPE
 echo "L FST: $INF_L_FSTYPE"
