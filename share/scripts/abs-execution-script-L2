@@ -109,18 +109,18 @@ if [ "$INF_BATCH_SERVER_GROUPNS" != "personal" ]; then
 fi
 echo ""
 export INF_INPUT_MACHINE_ENABLED_FOR_DATA
-echo "# Input machine enabled for data: $INF_INPUT_MACHINE_ENABLED_FOR_DATA $INF_INPUT_MACHINE_ENABLED_FOR_DATA_NOTICE"
+echo "# Input machine enabled for data : $INF_INPUT_MACHINE_ENABLED_FOR_DATA $INF_INPUT_MACHINE_ENABLED_FOR_DATA_NOTICE"
 export INF_INPUT_MACHINE_ENABLED_FOR_EXEC
-echo "# Input machine enabled for exec: $INF_INPUT_MACHINE_ENABLED_FOR_EXEC"
+echo "# Input machine enabled for exec : $INF_INPUT_MACHINE_ENABLED_FOR_EXEC"
 
 unset INF_INPUT_MACHINE_ENABLED_FOR_DATA_NOTICE
 
 # INF_SURROGATE_MACHINES is set in abs-restore-env
 
 if [ -z "$INF_SURROGATE_MACHINES" ]; then
-echo "# Surrogate machines for exec   : -none-"
+echo "# Surrogate machines for exec    : -none-"
 else
-echo "# Surrogate machines for exec   : $INF_SURROGATE_MACHINES"
+echo "# Surrogate machines for exec    : $INF_SURROGATE_MACHINES"
 fi
 
 echo ""
