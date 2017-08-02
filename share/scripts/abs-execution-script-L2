@@ -331,7 +331,9 @@ echo "# ------------------------------------------------------------------------
 #determine INF_EXEC_TYPE -------------------------------------------------------
 
 TMP_FILE=/tmp/$USER.$$.pbsnodes
-pbsnodes `cat $INF_NODEFILE | sort -u` > $TMP_FILE
+# this does not work in IT4I as the node file contains full node names
+# pbsnodes `cat $INF_NODEFILE | sort -u` > $TMP_FILE
+pbsnodes `pqstat -j 1361611 | grep exec_host | awk '{ print $3;}' | tr '+' '\n' | cut -f 1 -d '/' | sort -u` > $TMP_FILE
 INF_MAX_NCPUS=`awk 'BEGIN { ncpus = 0; } /resources_available.ncpus/ { ncpus += $3; } END { print ncpus; }' $TMP_FILE`
 rm -f $TMP_FILE
 unset TMP_FILE
