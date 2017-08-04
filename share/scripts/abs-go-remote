@@ -55,9 +55,9 @@ if [ -n "$INF_JOB_EMODS" ]; then
 fi
 echo "> Site and job exported modules were recovered."
 echo ""
-echo "> WARNING: This shell is not intended for manipulation with the job data"
-echo "           because the current umask and effective user group can be incompatible"
-echo "           with the job setup!"
+      # -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------------
+echo "> WARNING: This shell is not intended for manipulation with the job data because the current umask"
+echo "           and effective user group can be incompatible with the job setup!"
 echo ""
 exec bash -
 
