@@ -41,15 +41,18 @@ function inf-retry-cmd()
 
 function inf-copy-from-inputdir() 
 {
+    # any:workdir
+    INF_AW_RSYNCOPTS="--chown=:`id -g -n`"
+
     echo ""
     echo "# ------------------------------------------------------------------------------"
     echo "= inf-copy-from-inputdir:"
 
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "  > rsyncing the data from the local mount ... "
-        echo "    $INF_LW_RSYNCOPTS $INF_INPUT_DIR/$1 -> $2"
+        echo "    $INF_AW_RSYNCOPTS $INF_INPUT_DIR/$1 -> $2"
         echo ""
-        $ABS_RSYNC -av $INF_LW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+        $ABS_RSYNC -av $INF_AW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                 --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                 "$INF_INPUT_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
@@ -60,10 +63,10 @@ function inf-copy-from-inputdir()
     fi
 
     echo "  > rsyncing the data from the storage machine via scp ... "
-    echo "    $INF_SW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1 -> $2"
+    echo "    $INF_AW_RSYNCOPTS $INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1 -> $2"
     echo ""
     # do not use abs-rsync here, see RT#209118 and RT#209712
-    $ABS_RSYNC -av $INF_SW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+    $ABS_RSYNC -av $INF_AW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
             "$INF_STORAGE_MACHINE:$INF_STORAGE_DIR/$1" "$2"
     if [ $? -eq 0 ]; then
         echo "# ------------------------------------------------------------------------------"
@@ -73,9 +76,9 @@ function inf-copy-from-inputdir()
 
     if [ "$INF_INPUT_MACHINE_ENABLED_FOR_DATA" == "YES" ]; then
         echo "  > rsyncing the data from the input machine via scp ... "
-        echo "    $INF_IW_RSYNCOPTS  $INF_INPUT_MACHINE:$INF_INPUT_DIR/$1 -> $2"
+        echo "    $INF_AW_RSYNCOPTS  $INF_INPUT_MACHINE:$INF_INPUT_DIR/$1 -> $2"
         echo ""
-        $ABS_RSYNC -av $INF_IW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
+        $ABS_RSYNC -av $INF_AW_RSYNCOPTS -e "ssh -x $INF_SSH_OPTIONS" \
                 --rsync-path="LOC_RSYNC=rsync; if [ -f $ABS_RSYNC ]; then LOC_RSYNC=$ABS_RSYNC; fi; \$LOC_RSYNC" \
                 "$INF_INPUT_MACHINE:$INF_INPUT_DIR/$1" "$2"
         if [ $? -eq 0 ]; then
