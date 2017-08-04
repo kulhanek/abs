@@ -18,8 +18,8 @@ echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L2.0: Cross-host user group translation rules for rsync ..."
 echo "# ------------------------------------------------------------------------------"
-echo "# Legend: I - input machine; S - storage machine; L - local input directory; W - working directory"
-echo "#         FST - file system type"
+echo "# Legend: I - input machine; S - storage machine; L - local input directory;"
+echo "          W - working directory; FST - file system type"
 echo ""
 
 # workdir group
