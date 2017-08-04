@@ -24,7 +24,7 @@ echo
 echo "################################################################################"
 echo "#                          *** INFINITY JOB ***                                #"
 echo "#                                                                              #"
-echo "###                  Beggining of the script execution                      ####"
+echo "###                  Beginning of the script execution                      ####"
 echo "#                                                                              #"
 echo "# # Date: `printf %-67s \"$_DATE\"`# #"
 echo "#                                                                              #"

@@ -73,9 +73,6 @@ echo "# Coping the job info file to the temporary directory ..."
 inf-retry-cmd inf-copy-from-inputdir "${INF_WHOLE_NAME}.info" "$TMPDIR/${_TNAME_}.info"
 if [ $? -ne 0 ]; then exit 1; fi
 
-# correct group ownership
-chgrp "`id -g -n`" "$TMPDIR/${_TNAME_}.info"
-
 # ------------------------------------------------------------------------------
 echo ""
 echo "# Restoring the job environment variables ..."
