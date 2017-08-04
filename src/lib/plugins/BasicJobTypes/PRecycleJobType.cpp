@@ -151,8 +151,6 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         return(ERS_FAILED);
     }
 
-
-
     //--------------------------------------------------------------------------
     CSmallString beg_index = GetInputFileKeyValue("PRECYCLE_START");
     if( beg_index == NULL ){
@@ -196,20 +194,6 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         sout << endl;
         sout << "<b><red> ERROR: The number of internal cycles (PRECYCLE_ICYCLES) must be larger zero!</red></b>" << endl;
         return(ERS_FAILED);
-    }
-
-    //--------------------------------------------------------------------------
-    CSmallString comp_traj = GetInputFileKeyValue("PRECYCLE_COMPRESS_TRAJ");
-    if( comp_traj != NULL ){
-        sout << "# Compress trajectory : " << comp_traj << endl;
-        if( (comp_traj != "gzip") && (comp_traj != "bzip2") ){
-        sout << endl;
-        sout << "<b><red> ERROR: Unsupported compression format (PRECYCLE_COMPRESS_TRAJ)!</red></b>" << endl;
-        sout << "<b><red>        Supported formats: gzip, bzip2</red></b>" << endl;
-        return(ERS_FAILED);
-        }
-    } else {
-        sout << "# Compress trajectory : -no-" << endl;
     }
 
     //--------------------------------------------------------------------------
@@ -265,15 +249,29 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     int current = 0;
     CFileName last_found;
     for(int i=stop+1; i >= start; i--){
-        CFileName test_file_form;
-        test_file_form = storage / name_format + ".crd";
-        stringstream test_file_str;
-        test_file_str << format(test_file_form) % i;
-        CFileName test_file = test_file_str.str().c_str();
-        if( CFileSystem::IsFile(test_file) == true ){
-            current = i;
-            last_found = test_file;
-            break;
+        {
+            CFileName test_file_form;
+            test_file_form = storage / name_format + ".crd";
+            stringstream test_file_str;
+            test_file_str << format(test_file_form) % i;
+            CFileName test_file = test_file_str.str().c_str();
+            if( CFileSystem::IsFile(test_file) == true ){
+                current = i;
+                last_found = test_file;
+                break;
+            }
+        }
+        {
+            CFileName test_file_form;
+            test_file_form = storage / name_format + ".rst7";
+            stringstream test_file_str;
+            test_file_str << format(test_file_form) % i;
+            CFileName test_file = test_file_str.str().c_str();
+            if( CFileSystem::IsFile(test_file) == true ){
+                current = i;
+                last_found = test_file;
+                break;
+            }
         }
     }
     if( current == 0 ){
@@ -294,16 +292,31 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
 
     // determine possible collision between input file and production files
     for(int i=stop+1; i >= start; i--){
-        CFileName test_file_form;
-        test_file_form = name_format + ".crd";
-        stringstream test_file_str;
-        test_file_str << format(test_file_form) % i;
-        CFileName test_file = test_file_str.str().c_str();
-        if( test_file == crd_name ){
-            sout << endl;
-            sout << "<b><red> ERROR: The name of initial coordinates (" << crd_name;
-            sout << ") collides with the name of precycle run restart file (" << test_file << ")!</red></b>" << endl;
-            return(ERS_FAILED);
+        {
+            CFileName test_file_form;
+            test_file_form = name_format + ".crd";
+            stringstream test_file_str;
+            test_file_str << format(test_file_form) % i;
+            CFileName test_file = test_file_str.str().c_str();
+            if( test_file == crd_name ){
+                sout << endl;
+                sout << "<b><red> ERROR: The name of initial coordinates (" << crd_name;
+                sout << ") collides with the name of precycle run restart file (" << test_file << ")!</red></b>" << endl;
+                return(ERS_FAILED);
+            }
+        }
+        {
+            CFileName test_file_form;
+            test_file_form = name_format + ".rst7";
+            stringstream test_file_str;
+            test_file_str << format(test_file_form) % i;
+            CFileName test_file = test_file_str.str().c_str();
+            if( test_file == crd_name ){
+                sout << endl;
+                sout << "<b><red> ERROR: The name of initial coordinates (" << crd_name;
+                sout << ") collides with the name of precycle run restart file (" << test_file << ")!</red></b>" << endl;
+                return(ERS_FAILED);
+            }
         }
     }
 
