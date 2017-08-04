@@ -36,7 +36,7 @@ case "$INF_GO_JOB_NAME" in
                 amsmodule add $INF_GO_AGENT_MODULE; \
                 if [ \$? -ne 0 ]; then \
                     echo \"\" >&2; \
-                    echo \" >>> ERROR: Unable to activate CLI agent module '$INF_GO_AGENT_MODULE'!\" >&2; \
+                    echo \" >>> ERROR: Unable to activate a CLI agent module '$INF_GO_AGENT_MODULE'!\" >&2; \
                     echo \"\" >&2; \
                     exit 1; \
                 fi; \
@@ -51,7 +51,7 @@ case "$INF_GO_JOB_NAME" in
             amsmodule add "$INF_GO_AGENT_MODULE"
             if [ $? -ne 0 ]; then
                 echo "" >&2
-                echo " >>> ERROR: Unable to activate GUI agent module '$INF_GO_AGENT_MODULE'!" >&2
+                echo " >>> ERROR: Unable to activate a GUI agent module '$INF_GO_AGENT_MODULE'!" >&2
                 echo "" >&2
                 return 1
             fi
