@@ -154,7 +154,7 @@ echo "# parchive - manipulation with the job data archive"
 echo "# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 case $1 in
-    runtime | get | write | move )
+    runtime | get | tryget | write | move )
         INF_MODE=$1
         ;;
     * )
