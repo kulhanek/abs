@@ -162,9 +162,10 @@ case $1 in
         echo " >>> ERROR: Unsupported action: $1" 1>&2
         echo "            Supported action: runtime | get | write | move" 1>&2
         echo "                parchive runtime <start> <current> <format>" 1>&2
-        echo "                parchive get   <file1> [file2] ..." 1>&2
-        echo "                parchive write <file1> [file2] ..." 1>&2
-        echo "                parchive move  <file1> [file2] ..." 1>&2
+        echo "                parchive get    <file1> [file2] ..." 1>&2
+        echo "                parchive tryget <file1> [file2] ..." 1>&2
+        echo "                parchive write  <file1> [file2] ..." 1>&2
+        echo "                parchive move   <file1> [file2] ..." 1>&2
         echo "" 1>&2
         exit 1
         ;;
@@ -202,19 +203,27 @@ source $ABS_ROOT/share/scripts/abs-execution-script-LL
 case $INF_MODE in
     runtime )
         inf-retry-cmd archive_runtime_files "$@"
-        ;;
+        EXIT_CODE=$?
+        ;;     
     get )
         get_data_from_archive "$@"
+        EXIT_CODE=$?
+        ;;
+    tryget )
+        export INF_RSYNC_EXTRA_OPTS="--ignore-missing-args"
+        get_data_from_archive "$@"
+        EXIT_CODE=$?
+        unset INF_RSYNC_EXTRA_OPTS
         ;;
     write )
         write_to_archive "$@"
+        EXIT_CODE=$?
         ;;
     move )
         move_to_archive "$@"
+        EXIT_CODE=$?
         ;;
 esac
-
-EXIT_CODE=$?
 
 echo "# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo ""

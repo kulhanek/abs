@@ -369,6 +369,7 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     job.SetItem("basic/recycle","INF_RECYCLE_START",start);
     job.SetItem("basic/recycle","INF_RECYCLE_STOP",stop);
     job.SetItem("basic/recycle","INF_RECYCLE_CURRENT",current);
+    job.SetItem("basic/recycle","INF_ARCHIVE_DIR",storage);
 
     job.SetItem("basic/jobinput","INF_JOB_CHECK",PRecycleJobTypeID.GetFullStringForm());
     job.SetItem("basic/jobinput","INF_MD_MODULE",mname);
