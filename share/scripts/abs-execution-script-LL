@@ -25,15 +25,22 @@ function inf-retry-cmd()
     if [ -z "$INF_RETRY_TIME" ]; then
         INF_RETRY_TIME=600
     fi
+    # first execution
+    eval "$*"
+    if [ $? -eq 0 ]; then
+        return 0
+    fi
+    # additional executions
     local INF_I
-    for((INF_I=0; INF_I <= $INF_RETRY_COUNT; INF_I++)); do
+    for((INF_I=0; INF_I < $INF_RETRY_COUNT; INF_I++)); do
+        echo "! command failed - it will be re-executed in $INF_RETRY_TIME seconds ..."
+        sleep $INF_RETRY_TIME
         eval "$*"
         if [ $? -eq 0 ]; then
             return 0
         fi
-        echo "! command failed - it will be re-executed in $INF_RETRY_TIME seconds ..."
-        sleep $INF_RETRY_TIME
     done
+    echo "! command failed - final exit"
     return 1
 }
 
