@@ -2236,7 +2236,7 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
             ShellProcessor.SetVariable("INF_GO_AGENT_MODULE",tmp);
 
             tmp = NULL;
-            if( GetItem("terminal","INF_GUI_PROXY",tmp) == true ){
+            if( GetItem("terminal","INF_GUI_PROXY",tmp,true) == true ){
                 ShellProcessor.SetVariable("INF_GO_GUI_PROXY",tmp);
             }
         }
