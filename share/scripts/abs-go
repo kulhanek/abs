@@ -121,7 +121,7 @@ case "$INF_GO_JOB_NAME" in
             fi
             if ! [ -d "$INF_GO_INPUT_DIR" ]; then
                 echo "" >&2
-                echo " >>> ERROR: The job input directory does not exist on this host!" >&2
+                echo " >>> ERROR: The job input directory does not exist or is inaccessible on this host!" >&2
                 echo "            $INF_GO_INPUT_DIR" >&2
                 echo "" >&2
                 return 1

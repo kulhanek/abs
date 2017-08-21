@@ -41,6 +41,7 @@ MAIN_ENTRY(CNodes)
 
 CNodes::CNodes(void)
 {
+    ExtraEndLine = true;
 }
 
 //==============================================================================
@@ -82,6 +83,7 @@ bool CNodes::Run(void)
     vout << low;
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
+        ExtraEndLine = false;
         return(false);
     }
 
@@ -108,6 +110,7 @@ bool CNodes::Run(void)
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
+        ExtraEndLine = false;
         return(false);
     }
 
@@ -208,7 +211,6 @@ bool CNodes::Run(void)
         return(true);
     }
 
-
     return(true);
 }
 
@@ -233,7 +235,7 @@ void CNodes::Finalize(void)
         ErrorSystem.PrintErrors(vout);
     }
     if( Options.GetOptPrintNames() == false ){
-        vout << endl;
+        if( ExtraEndLine ) vout << endl;
     }
 }
 

@@ -315,7 +315,7 @@ void CBatchServers::PrintWarningIfUnavailable(std::ostream& vout)
 // any discrepancy
     if( size() != config_srv ) {
         vout << endl;
-        vout << "<b><blue> WARNING: Incomplete results because some batch servers are not accessible!</blue></b>" << endl;
+        vout << "<b><blue> >>> WARNING: Incomplete results because some batch servers are not accessible!</blue></b>" << endl;
     }
 }
 

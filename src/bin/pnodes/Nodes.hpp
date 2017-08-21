@@ -47,6 +47,7 @@ private:
     CNodesOptions   Options;
     CTerminalStr    Console;
     CVerboseStr     vout;
+    bool            ExtraEndLine;
 };
 
 // -----------------------------------------------------------------------------

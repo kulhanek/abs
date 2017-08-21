@@ -39,6 +39,7 @@ MAIN_ENTRY(CJobs)
 
 CJobs::CJobs(void)
 {
+    ExtraEndLine = true;
 }
 
 //==============================================================================
@@ -81,6 +82,7 @@ bool CJobs::Run(void)
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
+        ExtraEndLine = false;
         return(false);
     }
 
@@ -105,6 +107,7 @@ bool CJobs::Run(void)
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
+        ExtraEndLine = false;
         return(false);
     }
 
@@ -172,7 +175,7 @@ void CJobs::Finalize(void)
     vout << "# ==============================================================================" << endl;
 
     vout << low;
-    vout << endl;
+    if( ExtraEndLine ) vout << endl;
     if( ErrorSystem.IsError() || Options.GetOptVerbose() ){
         ErrorSystem.PrintErrors(vout);
         vout << endl;

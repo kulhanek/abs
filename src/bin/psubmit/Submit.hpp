@@ -49,6 +49,7 @@ private:
     CSubmitOptions  Options;
     CTerminalStr    Console;
     CVerboseStr     vout;
+    bool            ExtraEndLine;
 
     bool SubmitJobFull(void);
     bool SubmitJobHeader(void);

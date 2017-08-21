@@ -39,6 +39,7 @@ MAIN_ENTRY(CQueues)
 
 CQueues::CQueues(void)
 {
+    ExtraEndLine = true;
 }
 
 //==============================================================================
@@ -81,6 +82,7 @@ bool CQueues::Run(void)
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
+        ExtraEndLine = false;
         return(false);
     }
 
@@ -100,7 +102,7 @@ bool CQueues::Run(void)
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
-        vout << endl;
+        ExtraEndLine = false;
         return(false);
     }
 
@@ -129,7 +131,6 @@ bool CQueues::Run(void)
 
     QueueList.SortByName();
     QueueList.PrintInfos(vout);
-    vout << endl;
 
     return(true);
 }
@@ -154,7 +155,8 @@ bool CQueues::Finalize(void)
         ErrorSystem.PrintErrors(vout);
     }
 
-    vout << endl;
+    vout << low;
+    if( ExtraEndLine ) vout << endl;
 
     return(true);
 }

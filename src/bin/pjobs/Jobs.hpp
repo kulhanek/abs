@@ -50,6 +50,7 @@ private:
     CJobsOptions    Options;
     CTerminalStr    Console;
     CVerboseStr     vout;
+    bool            ExtraEndLine;
 };
 
 // -----------------------------------------------------------------------------

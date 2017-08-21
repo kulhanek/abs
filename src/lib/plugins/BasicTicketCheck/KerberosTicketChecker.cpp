@@ -85,7 +85,9 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
         sout <<  "<b><red> ERROR: Kerberos tickets are expired!</red></b>" << endl;
         sout <<          "        Obtain new tickets by the <b>kinit</b> command." << endl;
         sout << endl;
-        sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("kinit") << "</blue></b>" << endl;        return(false);
+        sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("kinit") << "</blue></b>" << endl;
+        sout << endl;
+        return(false);
     }
 
     // check the principal name
@@ -126,6 +128,7 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
         sout <<          "        Obtain the correct Kerberos tickets by the <b>kinit " << User.GetName() << "</b> command." << endl;
         sout << endl;
         sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("kinit") << "</blue></b>" << endl;
+        sout << endl;
         return(false);
     }
 

@@ -939,8 +939,9 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
             if( user_script == "gui" ){
                 sout << endl;
                 sout << "<b><blue>NOTE: This is an interactive job employing a graphics user interface (GUI).</blue></b>" << endl;
-                sout << "<b><blue>      Once the job is running, use the pgo command to establish an interactive connection.</blue></b>" << endl;
-                sout << "<b><blue>      This must be done on a machine, which has a local DISPLAY.</blue></b>" << endl;
+                sout << "<b><blue>      Once the job is running, use the pgo command to establish an interactive connection with the VNC GUI server:</blue></b>" << endl;
+                sout <<    "<blue>      a) on the machine with a local DISPLAY, type <b>pgo</b></blue>" << endl;
+                sout <<    "<blue>      b) on any other machine, type <b>pgo --proxy</b> and follow instructions</blue>" << endl;
             }
 
         } else {

@@ -87,6 +87,7 @@ bool CSSHTicketChecker::IsTicketValid(std::ostream& sout)
         sout <<  "<b><red>        Unable to open the public SSH key '" << public_key_name << "'!</red></b>" << endl;
         sout << endl;
         sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("passwordless") << "</blue></b>" << endl;
+        sout << endl;
         return(false);
     }
 
@@ -104,6 +105,7 @@ bool CSSHTicketChecker::IsTicketValid(std::ostream& sout)
         sout <<  "<b><red>        Unable to open the file with authorized keys '" << authorized_keys_name << "'!</red></b>" << endl;
         sout << endl;
         sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("passwordless") << "</blue></b>" << endl;
+        sout << endl;
         return(false);
     }
 
@@ -119,6 +121,7 @@ bool CSSHTicketChecker::IsTicketValid(std::ostream& sout)
     sout <<  "<b><red>        The public SSH key must be a member of authorized keys!</red></b>" << endl;
     sout << endl;
     sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("passwordless") << "</blue></b>" << endl;
+    sout << endl;
 
     return(false);
 }

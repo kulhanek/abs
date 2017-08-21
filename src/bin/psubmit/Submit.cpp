@@ -48,6 +48,7 @@ MAIN_ENTRY(CSubmit)
 
 CSubmit::CSubmit(void)
 {
+    ExtraEndLine = true;
 }
 
 //==============================================================================
@@ -94,6 +95,7 @@ bool CSubmit::Run(void)
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
+        ExtraEndLine = false;
         return(false);
     }
 
@@ -109,6 +111,7 @@ bool CSubmit::Run(void)
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
+        ExtraEndLine = false;
         return(false);
     }
 
@@ -514,7 +517,7 @@ bool CSubmit::Finalize(void)
     CSmallTimeAndDate dt;
     dt.GetActualTimeAndDate();
 
-    vout << endl;
+    if( ExtraEndLine ) vout << endl;
     vout << high;
     vout << "# ==============================================================================" << endl;
     vout << "# psubmit terminated at " << dt.GetSDateAndTime() << endl;

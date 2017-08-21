@@ -425,8 +425,7 @@ bool CABSConfig::IsABSAvailable(std::ostream& sout)
 
     if( CFileSystem::IsFile(config_name) == false ){
         sout << endl;
-        sout << "<blue> >>> INFO: The ABS (Advanced Batch System) is not configured for this site!</blue>" << endl;
-        sout << endl;
+        sout << "<b><blue> >>> INFO: The ABS (Advanced Batch System) is not configured for this site!</blue></b>" << endl;
         return(false);
     }
 
