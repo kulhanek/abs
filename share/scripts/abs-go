@@ -59,11 +59,11 @@ case "$INF_GO_JOB_NAME" in
                 vncviewer "$INF_GO_VNC_ID" -passwd "${INF_GO_WHOLE_NAME}.vncpsw"
                 return $?
             else
-                echo " >>> INFO: Starting VNC proxy .... "
+                echo " >>> INFO: Starting VNC proxy for $INF_GO_VNC_ID .... "
                 FREEPORT=0
                 set -o pipefail
                 for((PORT=1;PORT<=100;PORT++)); do
-                    netstat -lnpt 2> /dev/null | grep 0.0.0.0:$((5900+$PORT)) &> /dev/null
+                    netstat -lnpt 2> /dev/null | grep -e 0.0.0.0:$((5900+$PORT)) -e 127.0.0.1:$((5900+$PORT))  &> /dev/null
                     if [ $? -ne 0 ]; then
                         FREEPORT=$PORT;
                         break;
@@ -77,6 +77,7 @@ case "$INF_GO_JOB_NAME" in
                 fi
                 INF_REMOTE_NODE="`echo $INF_GO_VNC_ID | cut -d ':' -f 1`"
                 INF_REMOTE_PORT="`echo $INF_GO_VNC_ID | cut -d ':' -f 2`"
+                echo ""
                 echo "     Procedure for your site:"
                 echo "         1) Download the password file and secure it:"
                 echo "            $ scp `hostname -f`:$PWD/${INF_GO_WHOLE_NAME}.vncpsw ."
@@ -85,7 +86,7 @@ case "$INF_GO_JOB_NAME" in
                 echo "            $ module add tigervnc"
                 echo "            $ vncviewer `hostname -f`:$FREEPORT -passwd ${INF_GO_WHOLE_NAME}.vncpsw"
                 echo ""
-                echo "      To terminate the proxy, press Enter."
+                echo "     To terminate the proxy, press Enter."
                 ssh -L "$((5900+$FREEPORT)):0.0.0.0:$((5900+$INF_REMOTE_PORT))" "$INF_REMOTE_NODE" read
                 echo ""
             fi
