@@ -116,6 +116,12 @@ if [ -z "$SCRATCHDIR" ]; then
     export SCRATCHDIR="$INF_WORK_DIR"
 fi
 
+# create link to infout
+
+if [ -f "/var/spool/pbs/spool/${INF_JOBID}.OU" ]; then
+    ln -s "/var/spool/pbs/spool/${INF_JOBID}.OU" "${INF_WHOLE_NAME}.infout"
+fi
+
 # ------------------------------------------------
 
 case $INF_JOB_NAME in
@@ -173,7 +179,7 @@ case $INF_JOB_NAME in
             echo " >>> ERROR: Unable to update job status in the job info file!" >&2
             echo "" >&2
             kill $SCREEN_PID
-            return 1
+            exit 1
         fi
 
         case $INF_DATAIN in
@@ -340,7 +346,8 @@ case $INF_JOB_NAME in
         ;;
 esac
 
-# remove the kill script
+# remove the kill script and link to infout script
 rm -f "${INF_WHOLE_NAME}.kill"
+unlink "${INF_WHOLE_NAME}.infout"
 
 
