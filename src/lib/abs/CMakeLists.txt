@@ -6,6 +6,7 @@
 SET(ABS_SRC
         ABSMainHeader.cpp
         ABSModule.cpp
+        GlobalObjects.cpp
 
     # system -------------------------------------
         system/ABSConfig.cpp
