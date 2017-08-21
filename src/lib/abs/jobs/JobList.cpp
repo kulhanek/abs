@@ -842,13 +842,13 @@ bool CJobList::PrepareGoWorkingDirEnv(std::ostream& sout,bool noterm)
 
     CSmallString job_key = CShell::GetSystemVariable("INF_JOB_KEY");
     if( p_job->IsInteractiveJob() && job_key == p_job->GetJobKey() ){
-        sout << "<b><red>ERROR: pgo cannot be used once you are logged to the job terminal!</red></b>" << endl;
+        sout << "<b><red> ERROR: pgo cannot be used once you are logged to the job terminal!</red></b>" << endl;
         sout << endl;
         return(false);
     }
 
     if( p_job->PrepareGoWorkingDirEnv(noterm) == false ){
-        sout << "<b><red>ERROR: Unable to prepare environment for the pgo command as some items are missing in the info file!</red></b>" << endl;
+        sout << "<b><red> ERROR: Unable to prepare environment for the pgo command as some items are missing in the info file!</red></b>" << endl;
         sout << endl;
         return(false);
     }
