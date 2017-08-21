@@ -1679,6 +1679,7 @@ void CJobList::PrintTerminalJobStatus(std::ostream& sout)
             sout << " | THE JOB WILL BE TERMINATED SHORTLY";
         }
     }
+    sout << " | To detach the screen session, type Ctrl+a d";
     sout << endl;
 }
 
