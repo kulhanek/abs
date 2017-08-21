@@ -107,21 +107,21 @@ case "$INF_GO_JOB_NAME" in
 
         # go to input directory
         if [ -z "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_INPUT_MACHINE" ] && [ -n "$INF_GO_INPUT_DIR" ]; then
-            if [ "$INF_GO_INPUT_MACHINE" != "$HOSTNAME" ]; then
-                echo ""
-                echo " WARNING: The job input directory is located on the remote computer."
-                echo "          Job input dir: $INF_GO_INPUT_MACHINE:$INF_GO_INPUT_DIR"
-                echo "          Hostname     : $HOSTNAME"
-                echo ""
-                ssh -t -X $INF_SSH_OPTIONS $INF_GO_INPUT_MACHINE \
-                          INF_GO_SITE_ID="$INF_GO_SITE_ID" \
-                          INF_GO_WORK_DIR="$INF_GO_INPUT_DIR" \
-                          INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \
-                          INF_GO_EXPORTED_MODULES_2="" \
-                          "$ABS_ROOT/share/scripts/abs-go-remote"
-                return $?
-            fi
             if ! [ -d "$INF_GO_INPUT_DIR" ]; then
+                if [ "$INF_GO_INPUT_MACHINE" != "$HOSTNAME" ]; then
+                    echo ""
+                    echo " WARNING: The job input directory is located on the remote computer."
+                    echo "          Job input dir: $INF_GO_INPUT_MACHINE:$INF_GO_INPUT_DIR"
+                    echo "          Hostname     : $HOSTNAME"
+                    echo ""
+                    ssh -t -X $INF_SSH_OPTIONS $INF_GO_INPUT_MACHINE \
+                              INF_GO_SITE_ID="$INF_GO_SITE_ID" \
+                              INF_GO_WORK_DIR="$INF_GO_INPUT_DIR" \
+                              INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \
+                              INF_GO_EXPORTED_MODULES_2="" \
+                              "$ABS_ROOT/share/scripts/abs-go-remote"
+                    return $?
+                fi
                 echo "" >&2
                 echo " >>> ERROR: The job input directory does not exist or is inaccessible on this host!" >&2
                 echo "            $INF_GO_INPUT_DIR" >&2
