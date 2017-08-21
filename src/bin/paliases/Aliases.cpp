@@ -79,6 +79,7 @@ int CAliases::Init(int argc,char* argv[])
 
 bool CAliases::Run(void)
 {
+    vout << low;
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
         return(false);
@@ -140,6 +141,7 @@ bool CAliases::AddAlias(void)
     // user must be initializaed before ABSConfig.IsUserTicketValid()
     User.InitUser();
 
+    vout << low;
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
