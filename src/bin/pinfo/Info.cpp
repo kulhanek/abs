@@ -79,13 +79,18 @@ bool CInfo::Run(void)
 
         // init these subsystems only for full pinfo output, RT#201538
 
+        vout << low;
+
+        if( ABSConfig.IsABSAvailable(vout) == false ){
+            ES_TRACE_ERROR("abs not configured or available");
+            return(false);
+        }
+
         // init all subsystems
         if( ABSConfig.LoadSystemConfig() == false ){
             ES_ERROR("unable to load ABSConfig config");
             return(false);
         }
-
-        vout << low;
 
         // user must be initializaed before ABSConfig.IsUserTicketValid()
         User.InitUser();
