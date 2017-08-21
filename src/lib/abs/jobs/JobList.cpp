@@ -558,7 +558,7 @@ bool CJobList::SaveAllInfoFiles(void)
 
 //------------------------------------------------------------------------------
 
-bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
+bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy)
 {
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
@@ -592,20 +592,26 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force)
                 } else {
                     // interactive jobs
                     if( p_job->GetJobName() == "gui" ){
-                        // is the display local?
-                        string display = string(CShell::GetSystemVariable("DISPLAY"));
-                        vector<string> items;
-                        split(items,display,is_any_of(":"),boost::token_compress_on);
-                        if( (items.size() != 2) ){
-                            sout << "<b><blue> WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
+                        if( proxy == false ){
+                            // is the display local?
+                            string display = string(CShell::GetSystemVariable("DISPLAY"));
+                            vector<string> items;
+                            split(items,display,is_any_of(":"),boost::token_compress_on);
+                            if( (items.size() != 2) ){
+                                sout << "<b><blue> WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
+                                sout << endl;
+                                it = erase(it);
+                                break;
+                            } else if( items[0].empty() == false ){
+                                sout << "<b><blue> WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
+                                sout << endl;
+                                it = erase(it);
+                                break;
+                            }
+                        } else {
+                            sout << "<b><blue> INFO: The VNC proxy wil be started for this GUI job!</blue></b>" << endl;
                             sout << endl;
-                            it = erase(it);
-                            break;
-                        } else if( items[0].empty() == false ){
-                            sout << "<b><blue> WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
-                            sout << endl;
-                            it = erase(it);
-                            break;
+                            p_job->ActivateGUIProxy();
                         }
                     }
 

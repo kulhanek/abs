@@ -79,6 +79,11 @@ int CAliases::Init(int argc,char* argv[])
 
 bool CAliases::Run(void)
 {
+    if( ABSConfig.IsABSAvailable(vout) == false ){
+        ES_TRACE_ERROR("abs not configured or available");
+        return(false);
+    }
+
     if( Options.GetArgAction() == "list" ){
         return( ListAliases() );
     }

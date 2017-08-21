@@ -36,6 +36,24 @@ CInfoGoOptions::CInfoGoOptions(void)
 
 int CInfoGoOptions::CheckOptions(void)
 {
+    if( IsOptNoTerminalSet() ){
+        if( IsOptProxySet() ){
+            if( IsError == false ) fprintf(stderr,"\n");
+            fprintf(stderr,"%s: option --noterm is not compatible with --proxy option\n",
+                    (const char*)GetProgramName());
+            IsError = true;
+            return(SO_OPTS_ERROR);
+        }
+    }
+    if( IsOptForceSet() ){
+        if( IsOptProxySet() ){
+            if( IsError == false ) fprintf(stderr,"\n");
+            fprintf(stderr,"%s: option --force is not compatible with --proxy option\n",
+                    (const char*)GetProgramName());
+            IsError = true;
+            return(SO_OPTS_ERROR);
+        }
+    }
     return(SO_CONTINUE);
 }
 

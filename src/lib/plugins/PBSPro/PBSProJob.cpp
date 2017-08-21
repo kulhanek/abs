@@ -279,8 +279,6 @@ void CPBSProJob::DecodeBatchJobComment(struct attrl* p_item,CSmallString& commen
 
     if( (start_time > 0) && (exec_vnode != NULL) ){
         comment += " | planned start";
-    }
-    if( start_time > 0 ){
         CSmallTimeAndDate   date(start_time);
         CSmallTimeAndDate   cdate;
         CSmallTime          ddiff;
@@ -289,8 +287,6 @@ void CPBSProJob::DecodeBatchJobComment(struct attrl* p_item,CSmallString& commen
         if( ddiff > 0 ){
             comment += " within " + ddiff.GetSTimeAndDay();
         }
-    }
-    if( exec_vnode != NULL ){
         vector<string> nodes;
         string         list(exec_vnode);
         split(nodes,list,is_any_of("+"),boost::token_compress_on);

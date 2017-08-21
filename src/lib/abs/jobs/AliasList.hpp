@@ -48,9 +48,9 @@ public:
 
 // executive methods -----------------------------------------------------------
     /// add new alias
-    bool AddAlias(std::ostream& sout,bool expertmode,
+    bool AddAlias(std::ostream& sout,
                   const CSmallString& name,const CSmallString& queue,
-                  const CSmallString& resources);
+                  const CSmallString& resources,bool expertmode);
 
     /// remove the alias
     void RemoveAlias(const CSmallString& name);

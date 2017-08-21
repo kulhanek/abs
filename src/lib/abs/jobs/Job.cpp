@@ -2233,6 +2233,10 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
             tmp = NULL;
             result &= GetItem("terminal","INF_AGENT_MODULE",tmp);
             ShellProcessor.SetVariable("INF_GO_AGENT_MODULE",tmp);
+
+            tmp = NULL;
+            result &= GetItem("terminal","INF_GUI_PROXY",tmp);
+            ShellProcessor.SetVariable("INF_GUI_PROXY",tmp);
         }
         if( jobname == "cli" ){
             tmp = NULL;
@@ -3859,6 +3863,13 @@ bool CJob::IsInteractiveJob(void)
 bool CJob::IsTerminalReady(void)
 {
     return( IsInteractiveJob() && HasSection("terminal") );
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::ActivateGUIProxy(void)
+{
+    SetItem("terminal","INF_GUI_PROXY","ssh-proxy");
 }
 
 //------------------------------------------------------------------------------

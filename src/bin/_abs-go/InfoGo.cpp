@@ -81,6 +81,11 @@ int CInfoGo::Init(int argc,char* argv[])
 
 bool CInfoGo::Run(void)
 {
+    if( ABSConfig.IsABSAvailable(vout) == false ){
+        ES_TRACE_ERROR("abs not configured or available");
+        return(false);
+    }
+
     // init all subsystems
     if( ABSConfig.LoadSystemConfig() == false ){
         ES_ERROR("unable to load ABSConfig config");
@@ -158,7 +163,7 @@ bool CInfoGo::GoByInfoFiles(void)
 
     if( Options.GetOptForce() == false ) {
         // analyze jobs for pgo action
-        if( JobList.IsGoActionPossible(vout,false) == false ){
+        if( JobList.IsGoActionPossible(vout,false,Options.GetOptProxy()) == false ){
 
             if( JobList.GetNumberOfJobs() != 1 ) return(false); // no suitable job at all
 
@@ -174,7 +179,7 @@ bool CInfoGo::GoByInfoFiles(void)
         // we have one suitable job
     } else {
         // preprocess jobs but ignore final result - only exit if more than one job remains
-        JobList.IsGoActionPossible(vout,true);
+        JobList.IsGoActionPossible(vout,true,false);
 
         if( JobList.GetNumberOfJobs() != 1 ) return(false); // no suitable job at all
 

@@ -420,6 +420,25 @@ CXMLElement* CABSConfig::GetNodeGroupConfig(void)
 
 //------------------------------------------------------------------------------
 
+bool CABSConfig::IsABSAvailable(std::ostream& sout)
+{
+    CFileName      config_name;
+
+    // global abs config
+    config_name = GetABSRootDir() / "etc" / "sites" / AMSGlobalConfig.GetActiveSiteID() / "abs.xml";
+
+    if( CFileSystem::IsFile(config_name) == false ){
+        sout << endl;
+        sout << "<blue> >>> INFO: The ABS (Advanced Batch System) is not configured for this site!</blue>" << endl;
+        sout << endl;
+        return(false);
+    }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
 bool CABSConfig::IsUserTicketValid(std::ostream& sout)
 {
     CSmallString ticket_validator;

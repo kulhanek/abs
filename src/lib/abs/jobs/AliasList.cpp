@@ -234,8 +234,8 @@ bool CAliasList::SaveUserAliases(CXMLElement* p_ele)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CAliasList::AddAlias(std::ostream& sout,bool expertmode,const CSmallString& name,const CSmallString& queue,
-                          const CSmallString& resources)
+bool CAliasList::AddAlias(std::ostream& sout,const CSmallString& name,const CSmallString& queue,
+                          const CSmallString& resources,bool expertmode)
 {
     // remove previous occurences
     RemoveAlias(name);

@@ -392,6 +392,9 @@ public:
     /// is job interactive terminal ready?
     bool IsTerminalReady(void);
 
+    /// activate proxy for GUI job
+    void ActivateGUIProxy(void);
+
 // section of private data -----------------------------------------------------
 protected:
     bool            InfoFileLoaded;

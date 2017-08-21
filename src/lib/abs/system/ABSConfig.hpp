@@ -99,6 +99,9 @@ public:
     CXMLElement* GetNodeGroupConfig(void);
 
     /// have user valid ticket
+    bool IsABSAvailable(std::ostream& sout);
+
+    /// have user valid ticket
     bool IsUserTicketValid(std::ostream& sout);
 
 // configuration methods -------------------------------------------------------
