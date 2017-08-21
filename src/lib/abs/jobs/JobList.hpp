@@ -133,7 +133,7 @@ public:
     bool SaveAllInfoFiles(void);
 
     /// is pgo action allowed or possible
-    bool IsGoActionPossible(std::ostream& sout,bool force,bool proxy);
+    bool IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool noterm);
 
     /// wait until one job is running
     bool WaitForRunningJob(std::ostream& sout);

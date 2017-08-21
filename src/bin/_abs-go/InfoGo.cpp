@@ -163,14 +163,14 @@ bool CInfoGo::GoByInfoFiles(void)
 
     if( Options.GetOptForce() == false ) {
         // analyze jobs for pgo action
-        if( JobList.IsGoActionPossible(vout,false,Options.GetOptProxy()) == false ){
+        if( JobList.IsGoActionPossible(vout,false,Options.GetOptProxy(),Options.GetOptNoTerminal()) == false ){
 
             if( JobList.GetNumberOfJobs() != 1 ) return(false); // no suitable job at all
 
             // we have one job
             if( Options.GetOptNoWait() == true ) return(false); // we cannot wait
 
-            // we must wait until is in good conditions
+            // we must wait until it is in good conditions
             if( JobList.WaitForRunningJob(vout) == false ){
                 ES_TRACE_ERROR("pgo action is not possible");
                 return(false);
@@ -179,7 +179,7 @@ bool CInfoGo::GoByInfoFiles(void)
         // we have one suitable job
     } else {
         // preprocess jobs but ignore final result - only exit if more than one job remains
-        JobList.IsGoActionPossible(vout,true,false);
+        JobList.IsGoActionPossible(vout,true,false,false);
 
         if( JobList.GetNumberOfJobs() != 1 ) return(false); // no suitable job at all
 
@@ -194,7 +194,7 @@ bool CInfoGo::GoByInfoFiles(void)
     vout << endl;
 
     // prepare environment for pgo command
-    return(JobList.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal()));
+    return(JobList.PrepareGoWorkingDirEnv(vout,Options.GetOptNoTerminal()||Options.GetOptForce()));
 }
 
 //------------------------------------------------------------------------------
