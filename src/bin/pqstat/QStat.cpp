@@ -127,7 +127,7 @@ bool CQStat::Run(void)
         CSmallString full_srv,short_srv,queue_name;
         BatchServers.DecodeQueueName(Options.GetOptQueue(),full_srv,short_srv,queue_name);
         CSmallString full_q;
-        full_q << queue << "@" << short_srv;
+        full_q << queue_name << "@" << short_srv;
         if( BatchServers.GetQueueJobs(full_q,Options.GetOptKeepCompleted() || Options.GetOptFinished()) == false ){
             ES_ERROR("unable to get queue jobs");
             return(false);
