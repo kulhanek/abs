@@ -77,6 +77,8 @@ int CQueues::Init(int argc,char* argv[])
 
 bool CQueues::Run(void)
 {
+    vout << low;
+
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
         return(false);
@@ -87,7 +89,7 @@ bool CQueues::Run(void)
         ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
-    vout << low;
+
     vout << "#" << endl;
     BatchServers.PrintServerOverview(vout);
     vout << "#" << endl;

@@ -79,6 +79,8 @@ int CCollection::Init(int argc,char* argv[])
 
 bool CCollection::Run(void)
 {
+    vout << low;
+
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
         return(false);
@@ -89,8 +91,6 @@ bool CCollection::Run(void)
         ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
-
-    vout << low;
 
     // user must be initializaed before ABSConfig.IsUserTicketValid()
     User.InitUser();

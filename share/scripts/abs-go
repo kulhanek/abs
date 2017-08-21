@@ -88,7 +88,6 @@ case "$INF_GO_JOB_NAME" in
                 echo ""
                 echo "     To terminate the proxy, press Enter."
                 ssh -L "$((5900+$FREEPORT)):0.0.0.0:$((5900+$INF_REMOTE_PORT))" "$INF_REMOTE_NODE" read
-                echo ""
             fi
         fi
         ;;

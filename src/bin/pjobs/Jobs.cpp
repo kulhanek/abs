@@ -77,6 +77,8 @@ int CJobs::Init(int argc,char* argv[])
 
 bool CJobs::Run(void)
 {
+    vout << low;
+
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
         return(false);
@@ -88,7 +90,6 @@ bool CJobs::Run(void)
         return(false);
     }
 
-    vout << low;
     vout << "#" << endl;
     BatchServers.PrintServerOverview(vout);
     if( Options.IsOptSearchSet() ){

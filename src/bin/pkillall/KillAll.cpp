@@ -77,6 +77,8 @@ int CKillAll::Init(int argc,char* argv[])
 
 bool CKillAll::Run(void)
 {
+    vout << low;
+
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
         return(false);
@@ -88,7 +90,6 @@ bool CKillAll::Run(void)
         return(false);
     }
 
-    vout << low;
     vout << "#" << endl;
     BatchServers.PrintServerOverview(vout);
     if( Options.IsOptSearchSet() ){

@@ -119,7 +119,7 @@ fi
 # create link to infout
 
 if [ -f "/var/spool/pbs/spool/${INF_JOBID}.OU" ]; then
-    ln -s "/var/spool/pbs/spool/${INF_JOBID}.OU" "${INF_WHOLE_NAME}.infout"
+    ln -s "/var/spool/pbs/spool/${INF_JOBID}.OU" "${INF_WHOLE_NAME}.tmpinfout"
 fi
 
 # ------------------------------------------------
@@ -348,6 +348,6 @@ esac
 
 # remove the kill script and link to infout script
 rm -f "${INF_WHOLE_NAME}.kill"
-unlink "${INF_WHOLE_NAME}.infout"
+unlink "${INF_WHOLE_NAME}.tmpinfout"
 
 

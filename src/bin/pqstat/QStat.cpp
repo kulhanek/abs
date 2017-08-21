@@ -77,6 +77,8 @@ int CQStat::Init(int argc,char* argv[])
 
 bool CQStat::Run(void)
 {
+    vout << low;
+
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
         return(false);
@@ -88,7 +90,6 @@ bool CQStat::Run(void)
         return(false);
     }
 
-    vout << low;
     vout << "#" << endl;
     BatchServers.PrintServerOverview(vout);
     if( Options.IsOptSearchSet() ){
@@ -123,7 +124,11 @@ bool CQStat::Run(void)
     vout << low;
 
     if( Options.IsOptQueueSet() ){
-        if( BatchServers.GetQueueJobs(Options.GetOptQueue(),Options.GetOptKeepCompleted() || Options.GetOptFinished()) == false ){
+        CSmallString full_srv,short_srv,queue_name;
+        BatchServers.DecodeQueueName(Options.GetOptQueue(),full_srv,short_srv,queue_name);
+        CSmallString full_q;
+        full_q << queue << "@" << short_srv;
+        if( BatchServers.GetQueueJobs(full_q,Options.GetOptKeepCompleted() || Options.GetOptFinished()) == false ){
             ES_ERROR("unable to get queue jobs");
             return(false);
         }

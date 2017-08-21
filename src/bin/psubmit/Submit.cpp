@@ -90,6 +90,8 @@ int CSubmit::Init(int argc,char* argv[])
 
 bool CSubmit::Run(void)
 {
+    vout << medium;
+
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
         return(false);
@@ -100,8 +102,6 @@ bool CSubmit::Run(void)
         ES_ERROR("unable to load ABSConfig config");
         return(false);
     }
-
-    vout << medium;
 
     // user must be initializaed before ABSConfig.IsUserTicketValid()
     User.InitUser();

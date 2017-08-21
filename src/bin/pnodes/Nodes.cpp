@@ -79,6 +79,7 @@ int CNodes::Init(int argc,char* argv[])
 
 bool CNodes::Run(void)
 {
+    vout << low;
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
         return(false);
@@ -90,7 +91,6 @@ bool CNodes::Run(void)
         return(false);
     }
 
-    vout << low;
     if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) ){
         vout << "#" << endl;
         BatchServers.PrintServerOverview(vout);
