@@ -86,8 +86,9 @@ case "$INF_GO_JOB_NAME" in
                 echo "           $ module add tigervnc"
                 echo "           $ vncviewer `hostname -f`:$FREEPORT -passwd ${INF_GO_WHOLE_NAME}.vncpsw"
                 echo ""
-                echo "    To terminate the proxy, press Enter."
+                echo "    To terminate this proxy, press Enter."
                 ssh -L "$((5900+$FREEPORT)):0.0.0.0:$((5900+$INF_REMOTE_PORT))" "$INF_REMOTE_NODE" read
+                echo "    Terminated!"
             fi
         fi
         ;;

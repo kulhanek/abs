@@ -118,8 +118,14 @@ fi
 
 # create link to infout
 
+# MetaCentrum
 if [ -f "/var/spool/pbs/spool/${INF_JOB_ID}.OU" ]; then
     ln -s "/var/spool/pbs/spool/${INF_JOB_ID}.OU" "${INF_WHOLE_NAME}.tmpinfout"
+fi
+
+# IT4I
+if [ -f "/var/spool/PBS/spool/${INF_JOB_ID}.OU" ]; then
+    ln -s "/var/spool/PBS/spool/${INF_JOB_ID}.OU" "${INF_WHOLE_NAME}.tmpinfout"
 fi
 
 # ------------------------------------------------

@@ -596,17 +596,19 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool 
                                 split(items,display,is_any_of(":"),boost::token_compress_on);
                                 if( (items.size() != 2) ){
                                     sout << "<b><blue> WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
+                                    sout << "<b><blue>          You can also try to initialize the VNC proxy via the --proxy option.</blue></b>" << endl;
                                     sout << endl;
                                     it = erase(it);
                                     break;
                                 } else if( items[0].empty() == false ){
                                     sout << "<b><blue> WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
+                                    sout << "<b><blue>          You can also try to initialize the VNC proxy via the --proxy option.</blue></b>" << endl;
                                     sout << endl;
                                     it = erase(it);
                                     break;
                                 }
                             } else {
-                                sout << "<b><blue> INFO: The VNC proxy wil be started for this GUI job!</blue></b>" << endl;
+                                sout << "<b><blue> INFO: The VNC proxy wil be started for this GUI job.</blue></b>" << endl;
                                 sout << endl;
                                 p_job->ActivateGUIProxy();
                             }
@@ -678,14 +680,14 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool 
     }
 
     if( size() == 0 ){
-        sout << "<b><red>ERROR: No job is suitable for the pgo command!</red></b>" << endl;
+        sout << "<b><red> ERROR: No job is suitable for the pgo command!</red></b>" << endl;
         sout << endl;
         return(false);
     }
 
     if( size() > 1 ){
-        sout << "<b><red>ERROR: The pgo command cannot be applied to more than one job!</red></b>" << endl;
-        sout << "<b><red>       Specify the required job as the argument of the pgo command.</red></b>" << endl;
+        sout << "<b><red> ERROR: The pgo command cannot be applied to more than one job!</red></b>" << endl;
+        sout << "<b><red>        Specify the required job as the argument of the pgo command.</red></b>" << endl;
         sout << endl;
         return(false);
     }
