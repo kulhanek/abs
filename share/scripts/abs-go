@@ -59,7 +59,7 @@ case "$INF_GO_JOB_NAME" in
                 vncviewer "$INF_GO_VNC_ID" -passwd "${INF_GO_WHOLE_NAME}.vncpsw"
                 return $?
             else
-                echo " >>> INFO: Starting VNC proxy for $INF_GO_VNC_ID .... "
+                echo " >>> INFO: Starting VNC proxy for the GUI job .... "
                 FREEPORT=0
                 set -o pipefail
                 for((PORT=1;PORT<=100;PORT++)); do

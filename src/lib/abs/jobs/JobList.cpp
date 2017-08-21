@@ -1907,13 +1907,13 @@ void CJobList::PrintBatchInfoStat(std::ostream& sout)
     int ncpus,ngpus;
     GetNumberOfResFromBatchSys(EJS_SUBMITTED,ncpus,ngpus);
     sout << "# Queued:    " << setw(6) << GetNumberOfJobsFromBatchSys(EJS_SUBMITTED);
-    sout << " Requested NCPUs: " << setw(6) << ncpus << " NGPUs: " << setw(6) << ngpus << endl;
+    sout << " Requested NCPUs: " << setw(6) << ncpus << " NGPUs:  " << setw(6) << ngpus << endl;
     GetNumberOfResFromBatchSys(EJS_RUNNING,ncpus,ngpus);
     sout << "# Running:   " << setw(6) << GetNumberOfJobsFromBatchSys(EJS_RUNNING);
-    sout << " Allocated NCPUs: " << setw(6) << ncpus << " NGPUs: " << setw(6) << ngpus << endl;
+    sout << " Allocated NCPUs: " << setw(6) << ncpus << " NGPUs:  " << setw(6) << ngpus << endl;
     sout << "# Total(QR): " << setw(6) << GetNumberOfJobsFromBatchSys(EJS_SUBMITTED) + GetNumberOfJobsFromBatchSys(EJS_RUNNING);
-    sout << " Finished:  " << setw(6) << GetNumberOfJobsFromBatchSys(EJS_FINISHED);
-    sout << " Others:          " << setw(6) << GetNumberOfOtherJobsFromBatchSys() << endl;
+    sout << "       Finished:  " << setw(6) << GetNumberOfJobsFromBatchSys(EJS_FINISHED);
+    sout << " Others: " << setw(6) << GetNumberOfOtherJobsFromBatchSys() << endl;
 }
 
 //------------------------------------------------------------------------------

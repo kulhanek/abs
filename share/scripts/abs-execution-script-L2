@@ -348,6 +348,8 @@ echo "# ------------------------------------------------------------------------
 TMP_FILE=/tmp/$USER.$$.pbsnodes
 # this does not work in IT4I as the node file contains full node names
 # pbsnodes `cat $INF_NODEFILE | sort -u` > $TMP_FILE
+PBS_SERVER=`echo "$INF_JOB_ID" | tr '.' ' ' | awk '{ for(i=2;i<=NF;i++) { if( i> 2) printf("."); printf("%s",$i); }}'`
+export PBS_SERVER
 pbsnodes -v `pqstat -j "$INF_JOB_ID" | grep "exec_host =" | awk '{ print $3;}' | tr '+' '\n' | cut -f 1 -d '/' | sort -u` > $TMP_FILE
 INF_MAX_NCPUS=`awk 'BEGIN { ncpus = 0; } /resources_available.ncpus/ { ncpus += $3; } END { print ncpus; }' $TMP_FILE`
 rm -f $TMP_FILE

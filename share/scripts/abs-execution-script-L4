@@ -118,8 +118,8 @@ fi
 
 # create link to infout
 
-if [ -f "/var/spool/pbs/spool/${INF_JOBID}.OU" ]; then
-    ln -s "/var/spool/pbs/spool/${INF_JOBID}.OU" "${INF_WHOLE_NAME}.tmpinfout"
+if [ -f "/var/spool/pbs/spool/${INF_JOB_ID}.OU" ]; then
+    ln -s "/var/spool/pbs/spool/${INF_JOB_ID}.OU" "${INF_WHOLE_NAME}.tmpinfout"
 fi
 
 # ------------------------------------------------
