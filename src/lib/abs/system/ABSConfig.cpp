@@ -36,6 +36,7 @@
 #include <TicketChecker.hpp>
 #include <PluginDatabase.hpp>
 #include <XMLIterator.hpp>
+#include <fnmatch.h>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -423,14 +424,44 @@ bool CABSConfig::IsABSAvailable(std::ostream& sout)
     // global abs config
     config_name = GetABSRootDir() / "etc" / "sites" / AMSGlobalConfig.GetActiveSiteID() / "abs.xml";
 
+    bool enabled = true;
+
+    CXMLParser      xml_parser;
+    CXMLDocument    xml_config;
+    xml_parser.SetOutputXMLNode(&xml_config);
+
+    // load system setup ---------------------------
+
     if( CFileSystem::IsFile(config_name) == false ){
+        ES_TRACE_ERROR("no config file");
+        enabled = false;
+    }
+
+    if( enabled == true ){
+        if( xml_parser.Parse(config_name) == false ){
+            ES_TRACE_ERROR("unable to parse system config");
+            enabled = false;
+        }
+    }
+
+    if( enabled == true ){
+        CXMLElement* p_ele = xml_config.GetChildElementByPath("abs");
+        if( p_ele != NULL ){
+            p_ele->GetAttribute("enabled",enabled);
+            if( enabled == false ) ES_TRACE_ERROR("disabled by enabled=false in abs");
+        } else {
+            enabled = false;
+            ES_TRACE_ERROR("no abs element");
+        }
+    }
+
+    if( ! enabled ){
         sout << endl;
         sout << "<b><blue> >>> INFO: The ABS (Advanced Batch System) is not configured for this site!</blue></b>" << endl;
         sout << endl;
-        return(false);
     }
 
-    return(true);
+    return(enabled);
 }
 
 //------------------------------------------------------------------------------
@@ -465,6 +496,45 @@ bool CABSConfig::IsUserTicketValid(std::ostream& sout)
     delete p_chk;
 
     return(result);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSConfig::IsInputJobPathAllowed(const CFileName& path)
+{
+    CXMLElement* p_ele = SystemConfig.GetChildElementByPath("abs/inpdirs/filter");
+    if( p_ele == NULL ) return(true);
+
+    while( p_ele != NULL ){
+        CSmallString pattern;
+        if( p_ele->GetAttribute("path",pattern) == true ){
+            if( fnmatch(pattern,path,FNM_PATHNAME) == 0 ) return(true);
+        }
+        p_ele = p_ele->GetNextSiblingElement("filter");
+    }
+
+    return(false);
+}
+
+//------------------------------------------------------------------------------
+
+void CABSConfig::PrintAllowedJobInputPaths(std::ostream& sout)
+{
+    CXMLElement* p_ele = SystemConfig.GetChildElementByPath("abs/inpdirs/filter");
+    if( p_ele == NULL ) return;
+
+    //sout << "<b><red> ERROR: The job input directory '<u>" << outpath << "</u>' is not allowed!</red></b>";
+
+      sout <<         "        Allowed paths:" << endl;
+
+    while( p_ele != NULL ){
+        CSmallString pattern;
+        if( p_ele->GetAttribute("path",pattern) == true ){
+            sout <<         "        " << pattern << endl;
+        }
+
+        p_ele = p_ele->GetNextSiblingElement("filter");
+    }
 }
 
 //==============================================================================

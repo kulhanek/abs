@@ -104,6 +104,12 @@ public:
     /// have user valid ticket
     bool IsUserTicketValid(std::ostream& sout);
 
+    /// is input job path allowed?
+    bool IsInputJobPathAllowed(const CFileName& path);
+
+    /// print allowed job input paths
+    void PrintAllowedJobInputPaths(std::ostream& sout);
+
 // configuration methods -------------------------------------------------------
     /// return system configuration value
     bool GetSystemConfigItem(const CSmallString& item_name,

@@ -1509,7 +1509,7 @@ const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& s
     string soutpath(outpath);
     if( soutpath.find_first_not_of(legall_characters) != string::npos ){
         sout << endl;
-        sout << "<b><red> ERROR: The job directory name '<u>" << soutpath << "</u>' contains illegal characters!</red></b>" << endl;
+        sout << "<b><red> ERROR: The job input directory path '<u>" << soutpath << "</u>' contains illegal characters!</red></b>" << endl;
         sout <<         "        Legal characters are : " << legall_char_short << endl;
         return("");
     }
@@ -1517,7 +1517,7 @@ const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& s
     // check if job dir is really directory
     if( ! CFileSystem::IsDirectory(outpath) ){
         sout << endl;
-        sout << "<b><red> ERROR: The job directory '<u>" << outpath << "</u>' is not a directory!</red></b>";
+        sout << "<b><red> ERROR: The job input directory '<u>" << outpath << "</u>' is not a directory!</red></b>";
         return("");
     }
 
@@ -1528,10 +1528,18 @@ const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& s
     ofs << "________INFINITY_______" << endl;
     if( ! ofs ){
         sout << endl;
-        sout << "<b><red> ERROR: The job directory '<u>" << outpath << "</u>' is not writable!</red></b>" << endl;
+        sout << "<b><red> ERROR: The job input directory '<u>" << outpath << "</u>' is not writable!</red></b>" << endl;
         return("");
     } else {
         CFileSystem::RemoveFile(test_file);
+    }
+
+    // check if job input directory path is allowed
+    if( ABSConfig.IsInputJobPathAllowed(inpath) == false ){
+        sout << endl;
+        sout << "<b><red> ERROR: The job input directory '<u>" << outpath << "</u>' is not allowed!</red></b>";
+        ABSConfig.PrintAllowedJobInputPaths(sout);
+        return("");
     }
 
     // FIXME

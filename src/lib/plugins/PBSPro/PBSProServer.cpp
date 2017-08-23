@@ -108,7 +108,7 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
 {
     CSmallString libs_tok;
 
-    if( PluginDatabase.FindObjectConfigValue(PBSProServerID,"libname",libs_tok) == false ){
+    if( ABSConfig.GetSystemConfigItem("INF_PBSPRO_LIBS",libs_tok) == false ){
         ES_ERROR("unable to get paths to PBSPro client library");
         return(false);
     }
