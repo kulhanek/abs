@@ -110,6 +110,9 @@ public:
     /// print allowed job input paths
     void PrintAllowedJobInputPaths(std::ostream& sout);
 
+    /// is server configured
+    bool IsServerConfigured(const CSmallString& name);
+
 // configuration methods -------------------------------------------------------
     /// return system configuration value
     bool GetSystemConfigItem(const CSmallString& item_name,

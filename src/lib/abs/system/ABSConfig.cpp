@@ -537,6 +537,22 @@ void CABSConfig::PrintAllowedJobInputPaths(std::ostream& sout)
     }
 }
 
+//------------------------------------------------------------------------------
+
+bool CABSConfig::IsServerConfigured(const CSmallString& name)
+{
+    CXMLElement* p_ele = SystemConfig.GetChildElementByPath("abs/servers/server");
+    if( p_ele == NULL ) return(false);
+
+    while( p_ele != NULL ){
+        CSmallString lname;
+        if( p_ele->GetAttribute("name",lname) == true ){
+            if( name == lname ) return(true);
+        }
+        p_ele = p_ele->GetNextSiblingElement("server");
+    }
+}
+
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================

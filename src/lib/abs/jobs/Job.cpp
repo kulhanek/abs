@@ -1415,9 +1415,9 @@ bool CJob::KillJob(bool force)
     }
 
     // normal termination
-    if( GetSiteID() != AMSGlobalConfig.GetActiveSiteID() ){
-        // job was run under different site
-        ES_TRACE_ERROR("job runs under different site");
+    if( ABSConfig.IsServerConfigured(GetServerName()) == false ){
+        // job was run under different server
+        ES_TRACE_ERROR("job batch server is not availbale under the current site");
         return(false);
     }
 
@@ -1439,9 +1439,9 @@ bool CJob::KillJob(bool force)
 
 bool CJob::UpdateJobStatus(void)
 {
-    if( GetSiteID() != AMSGlobalConfig.GetActiveSiteID() ){
-        // job was run under different site
-        ES_TRACE_ERROR("job runs under different site");
+    if( ABSConfig.IsServerConfigured(GetServerName()) == false ){
+        // job was run under different server
+        ES_TRACE_ERROR("job batch server is not availbale under the current site");
         return(true);
     }
 
@@ -3381,13 +3381,13 @@ EJobStatus CJob::GetJobStatus(void)
         return(EJS_INCONSISTENT);
     }
 
-    if( GetSiteID() != AMSGlobalConfig.GetActiveSiteID() ){
+    if( ABSConfig.IsServerConfigured(GetServerName()) == false ){
         switch( GetJobInfoStatus() ){
             case EJS_SUBMITTED:
-                BatchJobComment = "the job was submitted to the batch system of different site";
+                BatchJobComment = "the job batch server is not availbale under the current site";
                 return(EJS_INCONSISTENT);
             case EJS_RUNNING:
-                BatchJobComment = "the job was submitted to the batch system of different site";
+                BatchJobComment = "the job batch server is not availbale under the current site";
                 return(EJS_INCONSISTENT);
             default:
                 return( GetJobInfoStatus() );
