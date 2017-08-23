@@ -508,7 +508,7 @@ bool CABSConfig::IsInputJobPathAllowed(const CFileName& path)
     while( p_ele != NULL ){
         CSmallString pattern;
         if( p_ele->GetAttribute("path",pattern) == true ){
-            if( fnmatch(pattern,path,FNM_PATHNAME) == 0 ) return(true);
+            if( fnmatch(pattern,path,0) == 0 ) return(true);
         }
         p_ele = p_ele->GetNextSiblingElement("filter");
     }
