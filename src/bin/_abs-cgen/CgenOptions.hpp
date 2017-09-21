@@ -40,16 +40,6 @@ class CCgenOptions : public CSimpleOptions {
         "Shell completion utility."
     CSO_PROG_DESC_END
 
-    // program arguments short description
-    CSO_PROG_ARGS_SHORT_DESC_BEGIN
-    "arguments"
-    CSO_PROG_ARGS_SHORT_DESC_END
-
-    // program arguments long description
-    CSO_PROG_ARGS_LONG_DESC_BEGIN
-    "test\n"
-    CSO_PROG_ARGS_LONG_DESC_END
-
     CSO_PROG_VERS_BEGIN
         LibBuildVersion_ABS
     CSO_PROG_VERS_END

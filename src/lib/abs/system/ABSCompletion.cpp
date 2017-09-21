@@ -349,14 +349,15 @@ bool CABSCompletion::FilterSuggestions(void)
         }
     }
 
-    // self suggestions
-    if( Suggestions.size() == 1 ){
-        if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
-        // FIXME - workaround for autocompetion in mc where "@" is word break?
-        // still does not work :-(
-        CSmallString tmp = Suggestions.front() + "@";
-        if( Words[CWord].FindSubString(tmp) == 0 ) Suggestions.clear();
-    }
+// FIXME - Words[CWord] is out of the legal range
+//    // self suggestions
+//    if( Suggestions.size() == 1 ){
+//        if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
+//        // FIXME - workaround for autocompetion in mc where "@" is word break?
+//        // still does not work :-(
+//        CSmallString tmp = Suggestions.front() + "@";
+//        if( Words[CWord].FindSubString(tmp) == 0 ) Suggestions.clear();
+//    }
 
     return(true);
 }
