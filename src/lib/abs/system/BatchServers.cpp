@@ -126,7 +126,7 @@ bool CBatchServers::InitAll(void)
             push_back(plg_obj);
         }
 
-        if( result == true ) break; // all is setup correctly
+        if( result == true ) return(true); // all is setup correctly
 
         if( rc == 0 ) break; // no retry allowed - exit with error
         if( i == rc ) break; // do not wait - no additional attempt - exit with error
@@ -226,7 +226,7 @@ bool CBatchServers::Init(const CSmallString& srv)
             p_sele = p_sele->GetNextSiblingElement();
         }
 
-        if( result == true ) break; // all is setup correctly
+        if( result == true ) return(true); // all is setup correctly
 
         if( rc == 0 ) break; // no retry allowed - exit with error
         if( i == rc ) break; // do not wait - no additional attempt - exit with error

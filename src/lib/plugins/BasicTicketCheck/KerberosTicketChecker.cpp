@@ -124,7 +124,7 @@ bool CKerberosTicketChecker::IsTicketValid(std::ostream& sout)
 
     if( principal_ok == false ){
         sout << endl;
-        sout <<  "<b><red> ERROR: The Kerberos principal '" << principal << "' does not match with the logged user!</red></b>" << endl;
+        sout <<  "<b><red> ERROR: The Kerberos principal '" << principal << "' does not match with the logged user '" << User.GetName() << "'!</red></b>" << endl;
         sout <<          "        Obtain the correct Kerberos tickets by the <b>kinit " << User.GetName() << "</b> command." << endl;
         sout << endl;
         sout << "<b><blue> HELP:  " << ABSConfig.GetDocURL("kinit") << "</blue></b>" << endl;
