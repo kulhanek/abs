@@ -1746,7 +1746,7 @@ void CJobList::PrintStatistics(std::ostream& sout)
             qt = p_job->GetRunningTime();
             rtime += qt;
 
-            ctime += qt*p_job->GetNCPUs();
+            ctime += qt*p_job->GetNumOfCPUs();
 
             if( run_stat == 1 ){
                 rtimel = qt;

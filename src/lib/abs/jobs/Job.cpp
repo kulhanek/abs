@@ -2100,14 +2100,6 @@ const CSmallTimeAndDate CJob::GetTimeOfLastChange(void)
 
 //------------------------------------------------------------------------------
 
-int CJob::GetNCPUs(void)
-{
-    CSmallString ncpu = GetItem("specific/resources","INF_NCPUS");
-    return(ncpu.ToInt());
-}
-
-//------------------------------------------------------------------------------
-
 bool CJob::IsJobDirLocal(bool no_deep)
 {
     if( GetItem("basic/jobinput","INF_INPUT_MACHINE",false) == ABSConfig.GetHostName() ){
@@ -3307,9 +3299,13 @@ const CSmallString CJob::GetQueue(void)
 //------------------------------------------------------------------------------
 
 int CJob::GetNumOfCPUs(void)
-{
-    CSmallString tmp;
-    tmp = GetItem("specific/resources","INF_NCPUS");
+{    
+    CSmallString tmp = GetItem("specific/resources","INF_NCPUS",true);
+    if( tmp == NULL ){
+        // be compatible wil older ABS versions ...
+        // RT#216417
+        tmp = GetItem("specific/resources","INF_NCPU");
+    }
     return(tmp.ToInt());
 }
 
@@ -3317,8 +3313,12 @@ int CJob::GetNumOfCPUs(void)
 
 int CJob::GetNumOfGPUs(void)
 {
-    CSmallString tmp;
-    tmp = GetItem("specific/resources","INF_NGPUS");
+    CSmallString tmp = GetItem("specific/resources","INF_NGPUS",true);
+    if( tmp == NULL ){
+        // be compatible wil older ABS versions ...
+        // RT#216417
+        tmp = GetItem("specific/resources","INF_NGPU");
+    }
     return(tmp.ToInt());
 }
 
@@ -3326,8 +3326,12 @@ int CJob::GetNumOfGPUs(void)
 
 int CJob::GetNumOfNodes(void)
 {
-    CSmallString tmp;
-    tmp = GetItem("specific/resources","INF_NNODES");
+    CSmallString tmp = GetItem("specific/resources","INF_NNODES",true);
+    if( tmp == NULL ){
+        // be compatible wil older ABS versions ...
+        // RT#216417
+        tmp = GetItem("specific/resources","INF_NNODE");
+    }
     return(tmp.ToInt());
 }
 
