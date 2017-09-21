@@ -57,34 +57,34 @@ CSubmit::CSubmit(void)
 
 int CSubmit::Init(int argc,char* argv[])
 {
-    // encode program options, all check procedures are done inside of CABFIntOpts
-        int result = Options.ParseCmdLine(argc,argv);
+// encode program options, all check procedures are done inside of CABFIntOpts
+    int result = Options.ParseCmdLine(argc,argv);
 
-    // should we exit or was it error?
-        if(result != SO_CONTINUE) return(result);
+// should we exit or was it error?
+    if(result != SO_CONTINUE) return(result);
 
-    // attach verbose stream to terminal stream and set desired verbosity level
-        vout.Attach(Console);
-        if( Options.GetOptSilent() ){
-            vout.Verbosity(CVerboseStr::low);
+// attach verbose stream to terminal stream and set desired verbosity level
+    vout.Attach(Console);
+    if( Options.GetOptSilent() ){
+        vout.Verbosity(CVerboseStr::low);
+    } else {
+        if( Options.GetOptVerbose() ) {
+            vout.Verbosity(CVerboseStr::high);
         } else {
-            if( Options.GetOptVerbose() ) {
-                vout.Verbosity(CVerboseStr::high);
-            } else {
-                vout.Verbosity(CVerboseStr::medium);
-            }
+            vout.Verbosity(CVerboseStr::medium);
         }
+    }
 
-        CSmallTimeAndDate dt;
-        dt.GetActualTimeAndDate();
+    CSmallTimeAndDate dt;
+    dt.GetActualTimeAndDate();
 
-        vout << high;
-        vout << endl;
-        vout << "# ==============================================================================" << endl;
-        vout << "# psubmit (ABS utility) started at " << dt.GetSDateAndTime() << endl;
-        vout << "# ==============================================================================" << endl;
+    vout << high;
+    vout << endl;
+    vout << "# ==============================================================================" << endl;
+    vout << "# psubmit (ABS utility) started at " << dt.GetSDateAndTime() << endl;
+    vout << "# ==============================================================================" << endl;
 
-        return(SO_CONTINUE);
+    return(SO_CONTINUE);
 }
 
 //------------------------------------------------------------------------------
@@ -136,6 +136,9 @@ bool CSubmit::Run(void)
         ES_TRACE_ERROR("unsupported: numofcopies > 0 and repeat == true");
         return(false);
     }
+
+    // setup retry setup mode
+    BatchServers.SetServerInitRetryMode(Options.GetOptResubmitMode());
 
     // submit a single job
     if( Options.GetOptNumOfCopies() == 0 ){
@@ -256,39 +259,9 @@ bool CSubmit::SubmitJobFull(void)
         return(false);
     }
 
-    if( Options.GetOptResubmitMode() ){
-
-        CSmallString src = ABSConfig.GetSystemConfigItem("INF_RETRY_COUNT");
-        CSmallString srt = ABSConfig.GetSystemConfigItem("INF_RETRY_TIME");
-        int rc = 3;
-        if( src != NULL ){
-            rc = src.ToInt();
-        }
-        int rt = 600;
-        if( srt != NULL ){
-            rt = srt.ToInt();
-        }
-
-        bool success = false;
-        for(int i = 0; i <= rc; i++){
-            if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == true ){
-                success = true;
-                break;
-            }
-            vout << endl;
-            vout << "ERROR: The job submission was not sucessfull! I will retry in " << rt << " seconds." << endl;
-            vout << endl;
-            sleep(rt);
-        }
-        if( ! success ){
-            ES_TRACE_ERROR("unable to submit job");
-            return(false);
-        }
-    } else {
-        if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
-            ES_TRACE_ERROR("unable to submit job");
-            return(false);
-        }
+    if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
+        ES_TRACE_ERROR("unable to submit job");
+        return(false);
     }
 
     // save job info

@@ -551,6 +551,7 @@ bool CABSConfig::IsServerConfigured(const CSmallString& name)
         }
         p_ele = p_ele->GetNextSiblingElement("server");
     }
+    return(false);
 }
 
 //==============================================================================

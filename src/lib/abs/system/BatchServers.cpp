@@ -40,12 +40,19 @@
 
 using namespace std;
 
+//------------------------------------------------------------------------------
+
+bool CBatchServers::RetrySeverInit = false;
+
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
 
 CBatchServers::CBatchServers(void)
 {
+    vout.Attach(Console);
+    vout.Verbosity(CVerboseStr::low);
+    vout << low;
 }
 
 //------------------------------------------------------------------------------
@@ -67,45 +74,72 @@ bool CBatchServers::InitAll(void)
     CSmallString plugin;
     p_ele->GetAttribute("plugin",plugin);
 
-    bool result = true;
+    CSmallString src = ABSConfig.GetSystemConfigItem("INF_RETRY_COUNT");
+    CSmallString srt = ABSConfig.GetSystemConfigItem("INF_RETRY_TIME");
+    int rc = 3;
+    if( src != NULL ){
+        rc = src.ToInt();
+    }
+    if( rc < 0 ) rc = 0;
+    if( RetrySeverInit == false ) rc = 0; // no retry init
 
-    CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
-    while( p_sele != NULL ){
-
-        CSmallString name, short_name;
-        p_sele->GetAttribute("name",name);
-        p_sele->GetAttribute("short",short_name);
-
-        p_sele = p_sele->GetNextSiblingElement();
-
-        // create plugin object
-        CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(plugin));
-        if( p_obj == NULL ){
-            ES_ERROR("unable to create batch server object");
-            result = false;
-            continue;
-        }
-
-        CBatchServerPtr plg_obj(dynamic_cast<CBatchServer*>(p_obj));
-        if( plg_obj == NULL ){
-            delete p_obj;
-            ES_ERROR("object is not of correct type");
-            result = false;
-            continue;
-        }
-
-        if( plg_obj->Init(name,short_name) == false ){
-            CSmallString error;
-            error << "unable to init server '" << name << "' (" << short_name << ")";
-            ES_TRACE_ERROR(error);
-            result = false;
-            continue;
-        }
-
-        push_back(plg_obj);
+    int rt = 600;
+    if( srt != NULL ){
+        rt = srt.ToInt();
     }
 
-    return(result);
+    for(int i = 0; i <= rc; i++){
+
+        bool result = true;
+
+        CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
+        while( p_sele != NULL ){
+
+            CSmallString name, short_name;
+            p_sele->GetAttribute("name",name);
+            p_sele->GetAttribute("short",short_name);
+
+            p_sele = p_sele->GetNextSiblingElement();
+
+            // create plugin object
+            CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(plugin));
+            if( p_obj == NULL ){
+                ES_ERROR("unable to create batch server object");
+                return(false); // this is FATAL error in configuration
+            }
+
+            CBatchServerPtr plg_obj(dynamic_cast<CBatchServer*>(p_obj));
+            if( plg_obj == NULL ){
+                delete p_obj;
+                ES_ERROR("object is not of correct type");
+                return(false); // this is FATAL error in configuration
+            }
+
+            if( plg_obj->Init(name,short_name) == false ){
+                CSmallString error;
+                error << "unable to init server '" << name << "' (" << short_name << ")";
+                ES_TRACE_ERROR(error);
+                result = false;
+                continue;
+            }
+
+            push_back(plg_obj);
+        }
+
+        if( result == true ) break; // all is setup correctly
+
+        if( rc == 0 ) break; // no retry allowed - exit with error
+        if( i == rc ) break; // do not wait - no additional attempt - exit with error
+
+        vout << endl;
+        vout << "ERROR: Initialization of batch servers was not sucessfull! I will retry in " << rt << " seconds." << endl;
+        vout << endl;
+        sleep(rt);
+    }
+
+    ES_ERROR("unable to init batch servers");
+
+    return(false);
 }
 
 //------------------------------------------------------------------------------
@@ -136,42 +170,74 @@ bool CBatchServers::Init(const CSmallString& srv)
     CSmallString plugin;
     p_ele->GetAttribute("plugin",plugin);
 
-    CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
-    while( p_sele != NULL ){
+    CSmallString src = ABSConfig.GetSystemConfigItem("INF_RETRY_COUNT");
+    CSmallString srt = ABSConfig.GetSystemConfigItem("INF_RETRY_TIME");
+    int rc = 3;
+    if( src != NULL ){
+        rc = src.ToInt();
+    }
+    if( rc < 0 ) rc = 0;
+    if( RetrySeverInit == false ) rc = 0; // no retry init
 
-        CSmallString name, short_name;
-        p_sele->GetAttribute("name",name);
-        p_sele->GetAttribute("short",short_name);
-
-        if( (name == srv) || (short_name == srv) ){
-            // create plugin object
-            CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(plugin));
-            if( p_obj == NULL ){
-                ES_ERROR("unable to create checker object");
-                return(false);
-            }
-
-            CBatchServerPtr plg_obj(dynamic_cast<CBatchServer*>(p_obj));
-            if( plg_obj == NULL ){
-                delete p_obj;
-                ES_ERROR("object is not of correct type");
-                return(false);
-            }
-
-            if( plg_obj->Init(name,short_name) == false ){
-                CSmallString error;
-                error << "unable to init server '" << name << "' (" << short_name << ")";
-                ES_ERROR(error);
-                return(false);
-            }
-
-            push_back(plg_obj);
-            return(true);
-        }
-
-        p_sele = p_sele->GetNextSiblingElement();
+    int rt = 600;
+    if( srt != NULL ){
+        rt = srt.ToInt();
     }
 
+    for(int i = 0; i <= rc; i++){
+
+        bool result = false;
+
+        CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
+        while( p_sele != NULL ){
+
+            CSmallString name, short_name;
+            p_sele->GetAttribute("name",name);
+            p_sele->GetAttribute("short",short_name);
+
+            if( (name == srv) || (short_name == srv) ){
+                // create plugin object
+                CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(plugin));
+                if( p_obj == NULL ){
+                    ES_ERROR("unable to create batch server object");
+                    return(false);
+                }
+
+                CBatchServerPtr plg_obj(dynamic_cast<CBatchServer*>(p_obj));
+                if( plg_obj == NULL ){
+                    delete p_obj;
+                    ES_ERROR("object is not of correct type");
+                    return(false);
+                }
+
+                if( plg_obj->Init(name,short_name) == false ){
+                    CSmallString error;
+                    error << "unable to init server '" << name << "' (" << short_name << ")";
+                    ES_TRACE_ERROR(error);
+                    result = false;
+                    break;
+                }
+
+                push_back(plg_obj);
+                result = true;
+                break;
+            }
+
+            p_sele = p_sele->GetNextSiblingElement();
+        }
+
+        if( result == true ) break; // all is setup correctly
+
+        if( rc == 0 ) break; // no retry allowed - exit with error
+        if( i == rc ) break; // do not wait - no additional attempt - exit with error
+
+        vout << endl;
+        vout << "ERROR: Initialization of batch server was not sucessfull! I will retry in " << rt << " seconds." << endl;
+        vout << endl;
+        sleep(rt);
+    }
+
+    ES_ERROR("unable to init batch server");
     return(false);
 }
 
@@ -256,6 +322,13 @@ const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_nam
 size_t CBatchServers::GetNumberOfServers(void) const
 {
     return(size());
+}
+
+//------------------------------------------------------------------------------
+
+void CBatchServers::SetServerInitRetryMode(bool set)
+{
+    RetrySeverInit = set;
 }
 
 //==============================================================================

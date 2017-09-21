@@ -27,6 +27,8 @@
 #include <Job.hpp>
 #include <BatchServer.hpp>
 #include <iostream>
+#include <VerboseStr.hpp>
+#include <TerminalStr.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -56,6 +58,9 @@ public:
 
     /// return number of batch servers
     size_t GetNumberOfServers(void) const;
+
+    /// setup RetrySeverInit
+    static void SetServerInitRetryMode(bool set);
 
 // -----------------------------------------------------------------------------
     /// print batch systems
@@ -141,6 +146,11 @@ private:
     /// number                  for default server
     /// the server name is stripped from the jobid
     const CBatchServerPtr FindBatchServerByJobID(CSmallString& jobid);
+
+    // global setup
+    CTerminalStr    Console;
+    CVerboseStr     vout;
+    static bool     RetrySeverInit; // if server initialization fails, retry
 };
 
 //------------------------------------------------------------------------------
