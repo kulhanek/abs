@@ -132,7 +132,7 @@ bool CBatchServers::InitAll(void)
         if( i == rc ) break; // do not wait - no additional attempt - exit with error
 
         vout << endl;
-        vout << "ERROR: Initialization of batch servers was not sucessfull! I will retry in " << rt << " seconds." << endl;
+        vout << "ERROR: Initialization of batch servers was not successfull! I will retry in " << rt << " seconds." << endl;
         vout << endl;
         sleep(rt);
     }
@@ -232,7 +232,7 @@ bool CBatchServers::Init(const CSmallString& srv)
         if( i == rc ) break; // do not wait - no additional attempt - exit with error
 
         vout << endl;
-        vout << "ERROR: Initialization of batch server was not sucessfull! I will retry in " << rt << " seconds." << endl;
+        vout << "ERROR: Initialization of batch server was not successfull! I will retry in " << rt << " seconds." << endl;
         vout << endl;
         sleep(rt);
     }
