@@ -454,7 +454,7 @@ else
     case "$INF_EXEC_TYPE" in
         cpuset|exclusive)
             export INF_OPENMPI1_SPEC="--not-supported-by-infinity"
-            export INF_OPENMPI2_SPEC="-report-bindings -map-to socket -bind-to core -machinefile $INF_MPIFILE"
+            export INF_OPENMPI2_SPEC="-report-bindings -map-by socket -bind-to core -machinefile $INF_MPIFILE"
             ;;
         *)
             echo "" >&2
