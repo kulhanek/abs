@@ -37,14 +37,14 @@ echo "# L5.1b: Status of filesystems  ..."
 echo "# ------------------------------------------------------------------------------"
 
 case $INF_DATAOUT in
-    copy-master)
+    copy-master|copy-shared)
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME -------------------------------------"
             ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
         done
         ;;
-    keep|copy-shared)
+    keep)
         echo ""
         echo ">>> $INF_MAIN_NODE ---------------------------------"
         timeout 30 df -h
