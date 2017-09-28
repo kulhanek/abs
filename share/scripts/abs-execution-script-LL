@@ -273,8 +273,17 @@ function inf-rsync-from-inputdir()
     # create file with excluded files
     # ${INF_WHOLE_NAME}.infout has to be excluded because of pstart
     echo "${INF_WHOLE_NAME}.infout" > $TMPDIR/${_TNAME_}.excluded
+    # other service files for exclusion
+    echo "${INF_WHOLE_NAME}.infex" >> $TMPDIR/${_TNAME_}.excluded
+    echo "${INF_WHOLE_NAME}.info" >> $TMPDIR/${_TNAME_}.excluded
+    echo "${INF_WHOLE_NAME}.nodes" >> $TMPDIR/${_TNAME_}.excluded
+    echo "${INF_WHOLE_NAME}.mpinodes" >> $TMPDIR/${_TNAME_}.excluded
+    echo "${INF_WHOLE_NAME}.gpus" >> $TMPDIR/${_TNAME_}.excluded
+    echo "${INF_WHOLE_NAME}.kill" >> $TMPDIR/${_TNAME_}.excluded
+    echo "${INF_WHOLE_NAME}.stdout" >> $TMPDIR/${_TNAME_}.excluded
     echo "*#???.*"  >> $TMPDIR/${_TNAME_}.excluded
     echo "pjob???" >> $TMPDIR/${_TNAME_}.excluded
+
     if [ -n "$INF_EXCLUDED_FILES" ]; then
         echo "$INF_EXCLUDED_FILES" | tr ";" "\n" >> $TMPDIR/${_TNAME_}.excluded
     fi
