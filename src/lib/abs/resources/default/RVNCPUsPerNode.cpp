@@ -24,6 +24,7 @@
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 #include <ResourceList.hpp>
+#include <sstream>
 
 // -----------------------------------------------------------------------------
 
@@ -101,7 +102,10 @@ void CRVNCPUsPerNode::ResolveDynamicResource(CResourceList* p_rl,bool& delete_me
         ncpus = res->GetNumber();
     }
     long long nnodes = ncpus / GetNumber();
-    p_rl->AddSizeResource("nnodes",nnodes);
+    stringstream    str;
+    str << nnodes;
+
+    p_rl->AddRawResource("nnodes",str.str().c_str());
 }
 
 //==============================================================================
