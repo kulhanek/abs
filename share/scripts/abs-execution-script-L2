@@ -177,7 +177,6 @@ case $INF_DATAIN in
             fi
             exit $EXIT_CODE
         )
-        timeout 30 df -h
         if [ $? -ne 0 ]; then
             echo ">>> WARNING: the df command was not completed due to an error or timeout."
         fi
