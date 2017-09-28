@@ -85,12 +85,27 @@ bool CGetWorkDir::Run(void)
             std::cout << "/scratch/$USER/$INF_JOB_ID/$INF_IJOB_ID";
         } else if ( Options.GetOptMode() == "clean" ){
             std::cout << "/scratch/$USER/$INF_JOB_ID";
+        } else if ( Options.GetOptMode() == "preinit" ){
+            std::cout << "";
         } else {
             RUNTIME_ERROR("unsupported scratch mode " + Options.GetOptMode());
         }
     }
+
     CSmallString value;
-    p_mele->GetAttribute("path",value);
+
+    if( Options.GetOptMode() == "main" ){
+        p_mele->GetAttribute("path",value);
+    } else if ( Options.GetOptMode() == "ijob" ){
+        p_mele->GetAttribute("path",value);
+    } else if ( Options.GetOptMode() == "clean" ){
+        p_mele->GetAttribute("path",value);
+    } else if ( Options.GetOptMode() == "preinit" ){
+        p_mele->GetAttribute("script",value);
+    } else {
+        RUNTIME_ERROR("unsupported scratch mode " + Options.GetOptMode());
+    }
+
     std::cout << value;
 
     return(true);

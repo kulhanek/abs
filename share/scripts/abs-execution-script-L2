@@ -150,7 +150,33 @@ echo "# Working directory  : $INF_WORK_DIR"
 echo ""
 case $INF_DATAIN in
     keep)
+        echo "# Already in the working directory on the main working node ..."
+        echo ""
         echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
+        timeout 30 df -h
+        if [ $? -ne 0 ]; then
+            echo ">>> WARNING: the df command was not completed due to an error or timeout."
+        fi
+    ;;
+    shared)
+        echo "# Creating the working directory on the main working node ..."
+        echo ""
+        echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
+        (
+            umask $INF_UMASK
+            if ! [ -d "$INF_WORK_DIR" ]; then
+                mkdir -p "$INF_WORK_DIR"
+            fi
+            EXIT_CODE=$?
+            if [ -n "$INF_UBATCHGROUP" ]; then
+                chgrp "$INF_BATCHGROUP" "$INF_WORK_DIR"
+            fi
+            timeout 30 df -h
+            if [ $? -ne 0 ]; then
+                echo ">>> WARNING: the df command was not completed due to an error or timeout."
+            fi
+            exit $EXIT_CODE
+        )
         timeout 30 df -h
         if [ $? -ne 0 ]; then
             echo ">>> WARNING: the df command was not completed due to an error or timeout."
@@ -174,6 +200,47 @@ case $INF_DATAIN in
 esac
 
 export INF_WORK_DIR
+
+# ------------------------------------------------------------------------------
+
+INF_WORK_PREINIT="`$ABS_ROOT/sbin/abs-get-work-dir --type preinit $INF_WORK_DIR_TYPE`"
+
+if [ -n "$INF_WORK_PREINIT" ]; then
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.1a: Pre-init working directory ..."
+echo "# ------------------------------------------------------------------------------"
+echo ""
+echo "# Preinit script     : $INF_WORK_PREINIT"
+case $INF_DATAIN in
+    keep|shared)
+        echo ""
+        echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
+        eval "$INF_WORK_PREINIT"
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " >>> ERROR: Unable to pre-init the working directory on the specified node!" >&2
+            echo "" >&2
+            exit 1
+        fi
+    ;;
+    copy)
+        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "eval \"$INF_WORK_PREINIT\""
+            if [ $? -ne 0 ]; then
+                echo "" >&2
+                echo " >>> ERROR: Unable to pre-init the working directory on the specified node!" >&2
+                echo "" >&2
+                exit 1
+            fi
+        done
+    ;;
+esac
+
+fi
+
 
 # ------------------------------------------------------------------------------
 # go to working directory
@@ -230,8 +297,15 @@ export INF_MPIFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.mpinodes"
 rm -f "$INF_MPIFILE"
 export HOSTNAME=`hostname -f`
 
+INF_MPI_NCPUS=0
+
 for NODE in $HOSTNAME `cat "$INF_NODEFILE" | sort -u | grep -v "$HOSTNAME"`; do
-    NCPUS="`cat $INF_NODEFILE | grep $NODE | wc -l`"
+    if [ -z "$INF_MPI_SLOTS_PER_NODE" ]; then
+        NCPUS="`cat $INF_NODEFILE | grep $NODE | wc -l`"
+    else
+        NCPUS=$INF_MPI_SLOTS_PER_NODE
+    fi
+    ((INF_MPI_NCPUS = INF_MPI_NCPUS + NCPUS))
     echo "$NODE slots=$NCPUS" >> "$INF_MPIFILE"
     if [ $? -ne 0 ]; then exit 1; fi
 done 
@@ -279,7 +353,7 @@ case $INF_DATAIN in
     keep)
         echo " > already updated in the keep datain mode ..."
     ;;
-    copy)
+    copy|shared)
         inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
         if [ $? -ne 0 ]; then exit 1; fi
     ;;
@@ -368,25 +442,46 @@ fi
 
 # setup OpenMPI ----------------------------------------------------------------
 
-case "$INF_EXEC_TYPE" in
-    cpuset|exclusive)
-        export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
-        export INF_OPENMPI2_SPEC="-report-bindings -bind-to core"
+if [ "$INF_MPI_NCPUS" == "$INF_NCPUS" ]; then
+    # all CPUs
+    case "$INF_EXEC_TYPE" in
+        cpuset|exclusive)
+            export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
+            export INF_OPENMPI2_SPEC="-report-bindings -bind-to core"
+            ;;
+    esac
+else
+    # number of used CPUs is smaller
+    case "$INF_EXEC_TYPE" in
+        cpuset|exclusive)
+            export INF_OPENMPI1_SPEC="--not-supported-by-infinity"
+            export INF_OPENMPI2_SPEC="-report-bindings -map-to socket -bind-to core -machinefile $INF_MPIFILE"
+            ;;
+        *)
+            echo "" >&2
+            echo " >>> ERROR: Unsupported OpenMPI mode (INF_MPI_SLOTS_PER_NODE requires cpuset or exclusive allocation)!" >&2
+            echo "" >&2
+            exit 1
         ;;
-esac
+    esac
+fi
 
 export INF_MAX_NCPUS
 export INF_CPUSET
 export INF_EXEC_TYPE
+export INF_MPI_NCPUS
 
 # final reporting --------------------------------------------------------------
 
-echo "INF_MAX_NCPUS     = $INF_MAX_NCPUS"
-echo "INF_NCPUS         = $INF_NCPUS"
-echo "INF_CPUSET        = $INF_CPUSET"
-echo "INF_EXEC_TYPE     = $INF_EXEC_TYPE"
-echo "INF_OPENMPI1_SPEC = $INF_OPENMPI1_SPEC"
-echo "INF_OPENMPI2_SPEC = $INF_OPENMPI2_SPEC"
+echo "INF_MAX_NCPUS          = $INF_MAX_NCPUS"
+echo "INF_NCPUS              = $INF_NCPUS"
+echo "INF_NNODES             = $INF_NNODES"
+echo "INF_MPI_SLOTS_PER_NODE = $INF_MPI_SLOTS_PER_NODE"
+echo "INF_MPI_NCPUS          = $INF_MPI_NCPUS"
+echo "INF_CPUSET             = $INF_CPUSET"
+echo "INF_EXEC_TYPE          = $INF_EXEC_TYPE"
+echo "INF_OPENMPI1_SPEC      = $INF_OPENMPI1_SPEC"
+echo "INF_OPENMPI2_SPEC      = $INF_OPENMPI2_SPEC"
 
 
 

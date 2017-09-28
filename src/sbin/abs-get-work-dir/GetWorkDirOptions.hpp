@@ -70,8 +70,14 @@ public:
                     't',                           /* short option name */
                     "type",                      /* long option name */
                     "STRING",                           /* parametr name */
-                    "workdir mode, supported: main, ijobs, clean")   /* option description */
-        //----------------------------------------------------------------------
+                    "workdir mode, supported: main, ijobs, clean, preinit")   /* option description */
+//    /*
+//     * main - path to main work dir
+//     * jobs - path to ijobs master dir
+//     * clean - path to entire work dir for cleaning
+//     * preinit - script that is executed after the work dir is initialized but before the job
+//     * /
+    //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
                     false,                          /* default value */

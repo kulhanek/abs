@@ -3,3 +3,4 @@ src/lib/abs/jobs/search/nodes
 src/lib/torque
 bin
 src/lib/abs
+src/lib/abs/resources/default

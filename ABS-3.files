@@ -123,6 +123,10 @@ src/lib/abs/old/InfoFile.cpp
 src/lib/abs/old/InfoFile.hpp
 src/lib/abs/old/Resources.cpp
 src/lib/abs/old/Resources.hpp
+src/lib/abs/resources/default/RVMPISlotsPerNode.cpp
+src/lib/abs/resources/default/RVMPISlotsPerNode.hpp
+src/lib/abs/resources/default/RVNCPUsPerNode.cpp
+src/lib/abs/resources/default/RVNCPUsPerNode.hpp
 src/lib/abs/system/CategoryUUID.cpp
 src/lib/abs/system/CategoryUUID.hpp
 src/lib/abs/system/ABSCompletion.cpp

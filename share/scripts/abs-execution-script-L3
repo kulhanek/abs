@@ -31,7 +31,7 @@ case $INF_DATAIN in
     keep )
         echo "# Data are left in the working directory, which is presumably the input directory ..."
     ;;
-    copy )
+    copy|shared )
         echo "# Data are copied to the main working node only ..."
         inf-retry-cmd inf-rsync-from-inputdir
         if [ $? -ne 0 ]; then exit 1; fi

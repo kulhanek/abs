@@ -189,7 +189,7 @@ case $INF_JOB_NAME in
         fi
 
         case $INF_DATAIN in
-            copy)
+            copy|shared)
                 inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
             ;;
         esac
@@ -295,7 +295,7 @@ case $INF_JOB_NAME in
         fi
 
         case $INF_DATAIN in
-            copy)
+            copy|shared)
                 inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info"   "${INF_WHOLE_NAME}.info"
                 inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw" "${INF_WHOLE_NAME}.vncpsw"
             ;;
