@@ -77,33 +77,33 @@ bool CGetWorkDir::Run(void)
         p_mele = p_wele->GetFirstChildElement(Options.GetOptMode());
     }
 
-    if( p_mele == NULL ){
-        // fallback defaults
+    CSmallString value;
+
+    if( p_mele != NULL ){
         if( Options.GetOptMode() == "main" ){
-            std::cout << "/scratch/$USER/$INF_JOB_ID/main";
+            p_mele->GetAttribute("path",value);
         } else if ( Options.GetOptMode() == "ijob" ){
-            std::cout << "/scratch/$USER/$INF_JOB_ID/$INF_IJOB_ID";
+            p_mele->GetAttribute("path",value);
         } else if ( Options.GetOptMode() == "clean" ){
-            std::cout << "/scratch/$USER/$INF_JOB_ID";
+            p_mele->GetAttribute("path",value);
         } else if ( Options.GetOptMode() == "preinit" ){
-            std::cout << "";
+            p_mele->GetAttribute("script",value);
         } else {
             RUNTIME_ERROR("unsupported scratch mode " + Options.GetOptMode());
         }
-    }
-
-    CSmallString value;
-
-    if( Options.GetOptMode() == "main" ){
-        p_mele->GetAttribute("path",value);
-    } else if ( Options.GetOptMode() == "ijob" ){
-        p_mele->GetAttribute("path",value);
-    } else if ( Options.GetOptMode() == "clean" ){
-        p_mele->GetAttribute("path",value);
-    } else if ( Options.GetOptMode() == "preinit" ){
-        p_mele->GetAttribute("script",value);
     } else {
-        RUNTIME_ERROR("unsupported scratch mode " + Options.GetOptMode());
+        // fallback defaults
+        if( Options.GetOptMode() == "main" ){
+            value = "/scratch/$USER/$INF_JOB_ID/main";
+        } else if ( Options.GetOptMode() == "ijob" ){
+            value = "/scratch/$USER/$INF_JOB_ID/$INF_IJOB_ID";
+        } else if ( Options.GetOptMode() == "clean" ){
+            value = "/scratch/$USER/$INF_JOB_ID";
+        } else if ( Options.GetOptMode() == "preinit" ){
+            value = "";
+        } else {
+            RUNTIME_ERROR("unsupported scratch mode " + Options.GetOptMode());
+        }
     }
 
     std::cout << value;
