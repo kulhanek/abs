@@ -72,12 +72,15 @@ void CRVNGPUs::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         return;
     }
     int nnodes = p_rl->GetNumOfNodes();
-    if( size % nnodes != 0 ){
-        if( rstatus == true ) sout << endl;
-        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        ngpus=" << size << " must be divisible by nnodes=" << nnodes << "!</red></b>" << endl;
-        rstatus = false;
-        return;
+    // nnodes <= 0 is illegal and tested elsewhere
+    if( nnodes > 0 ){
+        if( size % nnodes != 0 ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout <<         "        ngpus=" << size << " must be divisible by nnodes=" << nnodes << "!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
     }
 }
 

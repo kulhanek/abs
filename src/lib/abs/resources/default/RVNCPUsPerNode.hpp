@@ -1,5 +1,5 @@
-#ifndef RVNNodesH
-#define RVNNodesH
+#ifndef RVNCPUsPerNodeH
+#define RVNCPUsPerNodeH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -29,17 +29,17 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CRVNNodes : public CResourceValue {
+class ABS_PACKAGE CRVNCPUsPerNode : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CRVNNodes(void);
+        CRVNCPUsPerNode(void);
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
     virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
-    /// resolve conflicts
-    virtual void ResolveConflicts(CResourceList* p_rl);
+    /// resolve dynamic resource
+    virtual void ResolveDynamicResource(CResourceList* p_rl,bool& delete_me);
 };
 
 // -----------------------------------------------------------------------------

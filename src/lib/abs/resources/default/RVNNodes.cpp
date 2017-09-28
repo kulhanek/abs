@@ -23,6 +23,7 @@
 #include <RVNNodes.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
+#include <ResourceList.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -70,6 +71,12 @@ void CRVNNodes::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         rstatus = false;
         return;
     }
+}
+//------------------------------------------------------------------------------
+
+void CRVNNodes::ResolveConflicts(CResourceList* p_rl)
+{
+    p_rl->RemoveResource("ncpuspernode");
 }
 
 //==============================================================================
