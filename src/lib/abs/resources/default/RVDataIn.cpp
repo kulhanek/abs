@@ -62,7 +62,7 @@ CRVDataIn::CRVDataIn(void)
 
 void CRVDataIn::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    if( TestKeyValue(sout,rstatus,"keep,copy,shared") == false ) return;
+    if( TestKeyValue(sout,rstatus,"keep,copy-master,copy-shared") == false ) return;
 
     CResourceValuePtr val_ptr = p_rl->FindResource("workdir");
     if( val_ptr != NULL ){
