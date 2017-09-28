@@ -457,9 +457,12 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
     bool result = true;
-    // add required default resources
-    ResourceList.AddRawResource("ncpus","1");
-    ResourceList.AddRawResource("nnodes","1");
+
+// this cannot be here because of ncpuspernode resource token
+// default value of ncpus and nnodes is resolved at CResourceList::GetNumOfCPUs() ...
+// add required default resources
+//    ResourceList.AddRawResource("ncpus","1");
+//    ResourceList.AddRawResource("nnodes","1");
 
     // add default resources
     CSmallString  sdef_res;
