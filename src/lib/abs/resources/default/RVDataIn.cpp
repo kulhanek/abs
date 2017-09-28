@@ -73,7 +73,7 @@ void CRVDataIn::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
             rstatus = false;
             return;
         }
-        if( (val_ptr->GetValue() != "jobdir") && ( (Value != "copy") || (Value != "shared") ) ){
+        if( (val_ptr->GetValue() != "jobdir") && ( (Value != "copy") && (Value != "shared") ) ){
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
             sout << "<b><red>        workdir!=jobdir must have datain=copy or datain=shared!</red></b>" << endl;
