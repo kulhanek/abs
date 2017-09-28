@@ -158,7 +158,7 @@ case $INF_DATAIN in
             echo ">>> WARNING: the df command was not completed due to an error or timeout."
         fi
     ;;
-    shared)
+    copy-shared)
         echo "# Creating the working directory on the main working node ..."
         echo ""
         echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
@@ -181,7 +181,7 @@ case $INF_DATAIN in
             echo ">>> WARNING: the df command was not completed due to an error or timeout."
         fi
     ;;
-    copy)
+    copy-master)
         echo "# Creating working directories on the working nodes ..."
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
@@ -212,7 +212,7 @@ echo "# ------------------------------------------------------------------------
 echo ""
 echo "# Preinit script     : $INF_WORK_PREINIT"
 case $INF_DATAIN in
-    keep|shared)
+    keep|copy-shared)
         echo ""
         echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
         eval "$INF_WORK_PREINIT"
@@ -223,7 +223,7 @@ case $INF_DATAIN in
             exit 1
         fi
     ;;
-    copy)
+    copy-master)
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
@@ -352,7 +352,7 @@ case $INF_DATAIN in
     keep)
         echo " > already updated in the keep datain mode ..."
     ;;
-    copy|shared)
+    copy-master|copy-shared)
         inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info" "${INF_WHOLE_NAME}.info"
         if [ $? -ne 0 ]; then exit 1; fi
     ;;

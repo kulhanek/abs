@@ -61,13 +61,25 @@ echo "# Clean directory    : $INF_CLEAN_DIR"
 
 echo ""
 case $INF_DATAOUT in
-    copy)
-        echo "# Removing working directories on nodes ..."
+    copy-master)
+        echo "# Removing the working directories on the working nodes ..."
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_CLEAN_DIR ---"
             ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi; rm -rf $INF_CLEAN_DIR"
         done
+        ;;
+    copy-shared)
+        echo "# Removing the working directory on the main working node ..."
+        echo ""
+        echo ">>> $INF_MAIN_NODE:$INF_CLEAN_DIR ---"
+        (
+            timeout 30 df -h
+            if [ $? -ne 0 ]; then
+                echo ">>> WARNING: the df command was not completed due to an error or timeout."
+            fi
+            rm -rf $INF_CLEAN_DIR
+        )
         ;;
     keep)
         echo "# No directory will be removed ..."

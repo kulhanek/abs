@@ -73,6 +73,13 @@ void CRVDataOut::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
             rstatus = false;
             return;
         }
+        if( (val_ptr->GetValue() != "jobdir") && ( (Value != "copy-master") && (Value != "copy-shared") ) ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout << "<b><red>        workdir!=jobdir must have dataout=copy-master or dataout=copy-shared!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
     }
 }
 

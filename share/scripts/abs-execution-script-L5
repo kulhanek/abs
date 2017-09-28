@@ -17,14 +17,14 @@ echo "# L5.1a: Data in the working directory ..."
 echo "# ------------------------------------------------------------------------------"
 
 case $INF_DATAOUT in
-    copy)
+    copy-master)
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_WORK_DIR -----------------------"
             ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "cd $INF_WORK_DIR; ls -la"
         done
         ;;
-    keep)
+    keep|copy-shared)
         echo ""
         echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR -------------------"
         ls -la
@@ -37,14 +37,14 @@ echo "# L5.1b: Status of filesystems  ..."
 echo "# ------------------------------------------------------------------------------"
 
 case $INF_DATAOUT in
-    copy)
+    copy-master)
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME -------------------------------------"
             ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
         done
         ;;
-    keep)
+    keep|copy-shared)
         echo ""
         echo ">>> $INF_MAIN_NODE ---------------------------------"
         timeout 30 df -h
@@ -66,10 +66,10 @@ echo "# Data OUT copy mode : $INF_DATAOUT"
 
 echo ""
 case $INF_DATAOUT in
-    keep )
+    keep)
         echo "# Data are left in the working directory, which is presumably the input directory ..."
     ;;
-    copy)
+    copy-master|copy-shared)
         echo "# Data are copied from the main working node only ..."
         inf-retry-cmd inf-rsync-to-inputdir
         if [ $? -ne 0 ]; then exit 1; fi
