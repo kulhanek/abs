@@ -76,6 +76,9 @@ public:
     /// get number from Value
     long long GetNumber(void);
 
+    /// get float number from Value
+    double GetFloatNumber(void);
+
     /// get value
     const CSmallString& GetValue(void);
 

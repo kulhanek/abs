@@ -1,7 +1,7 @@
 // =============================================================================
 //  ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2012 Petr Kulhanek (kulhanek@chemi.muni.cz)
+//    Copyright (C) 2017 Petr Kulhanek (kulhanek@chemi.muni.cz)
 //
 //     This program is free software; you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include "GaussianJobType.hpp"
+#include "OrcaJobType.hpp"
 #include "BasicJobTypesModule.hpp"
 #include <CategoryUUID.hpp>
 #include <FileName.hpp>
@@ -44,22 +44,22 @@ using namespace boost::algorithm;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CComObject* GaussianJobTypeCB(void* p_data);
+CComObject* OrcaJobTypeCB(void* p_data);
 
-CExtUUID        GaussianJobTypeID(
-                    "{GAUSSIAN_JOB_TYPE:f8e7aa03-4c20-4d38-88d8-3e6dd9171430}",
-                    "Gaussian Job Type",
-                    "autodetection of Gaussian jobs, update resource specification in the input file");
+CExtUUID        OrcaJobTypeID(
+                    "{ORCA_JOB_TYPE:37b32314-0500-417b-a5b8-0dedf32a1fde}",
+                    "Orca Job Type",
+                    "autodetection of orca jobs, update resource specification in the input file");
 
-CPluginObject   GaussianJobTypeObject(&BasicJobTypesPlugin,
-                    GaussianJobTypeID,JOB_TYPE_CAT,
-                    GaussianJobTypeCB);
+CPluginObject   OrcaJobTypeObject(&BasicJobTypesPlugin,
+                    OrcaJobTypeID,JOB_TYPE_CAT,
+                    OrcaJobTypeCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* GaussianJobTypeCB(void* p_data)
+CComObject* OrcaJobTypeCB(void* p_data)
 {
-    CComObject* p_object = new CGaussianJobType();
+    CComObject* p_object = new COrcaJobType();
     return(p_object);
 }
 
@@ -67,8 +67,8 @@ CComObject* GaussianJobTypeCB(void* p_data)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CGaussianJobType::CGaussianJobType(void)
-    : CJobType(&GaussianJobTypeObject)
+COrcaJobType::COrcaJobType(void)
+    : CJobType(&OrcaJobTypeObject)
 {
 }
 
@@ -76,56 +76,28 @@ CGaussianJobType::CGaussianJobType(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream& sout)
+ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& sout)
 {
     detected = false;
 
     CSmallString job_type;
-    if( PluginDatabase.FindObjectConfigValue(GaussianJobTypeID,"_type",job_type) == false ){
+    if( PluginDatabase.FindObjectConfigValue(OrcaJobTypeID,"_type",job_type) == false ){
         ES_ERROR("_type key is not provided");
         return(ERS_FAILED);
     }
 
     CFileName arg_job = job.GetItem("basic/arguments","INF_ARG_JOB");
 
-    // is the job name a file with .com or .gjf extension?
-    if( arg_job.GetFileNameExt() == ".com" ){
-        job.SetItem("basic/jobinput","INF_JOB_INPUT_EXT",".com");
-        detected = true;
-    } else if ( arg_job.GetFileNameExt() == ".gjf" ){
-        job.SetItem("basic/jobinput","INF_JOB_INPUT_EXT",".gjf");
+    // is the job name a file with .orca extension?
+    if( arg_job.GetFileNameExt() == ".orca" ){
+        job.SetItem("basic/jobinput","INF_JOB_INPUT_EXT",".orca");
         detected = true;
     }
     if( detected == false ) return(ERS_OK);
 
     if( CFileSystem::IsFile(arg_job) == false ){
         sout << endl;
-        sout << "<b><red> ERROR: The gaussian job was detected but the input file '" << arg_job << "' does not exist!</red></b>" << endl;
-        return(ERS_FAILED);
-    }
-
-    // get module name
-    CSmallString gmodule;
-    if( PluginDatabase.FindObjectConfigValue(GaussianJobTypeID,"_module",gmodule) == false ){
-        ES_ERROR("_module key is not provide");
-        return(ERS_FAILED);
-    }
-
-    // is gaussian module loaded?
-    if( AMSGlobalConfig.IsModuleActive(gmodule) == false ){
-        sout << endl;
-        sout << "<b><red> ERROR: The gaussian job was detected but none gaussian module is active!</red></b>" << endl;
-        sout << "<b><red>        Type 'module add gaussian' and resubmit the job.</red></b>" << endl;
-        return(ERS_FAILED);
-    }
-
-    CSmallString gmodver;
-    AMSGlobalConfig.GetActiveModuleVersion(gmodule,gmodver);
-    CSmallString gexec;
-    if( PluginDatabase.FindObjectConfigValue(GaussianJobTypeID,gmodver,gexec) == false ){
-        CSmallString error;
-        error << "unable to find key '" << gmodver << "'";
-        ES_ERROR(error);
+        sout << "<b><red> ERROR: The orca job was detected but the input file '" << arg_job << "' does not exist!</red></b>" << endl;
         return(ERS_FAILED);
     }
 
@@ -136,7 +108,7 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         ofstream ofs(job_file);
         if( ! ofs ) {
             sout << endl;
-            sout << "<b><red> ERROR: The gaussian job was detected but unable to open the job script '" << job_file << "' for writing!</red></b>" << endl;
+            sout << "<b><red> ERROR: The orca job was detected but unable to open the job script '" << job_file << "' for writing!</red></b>" << endl;
             sout << "<b><red>        Remove the file and check if you have the write permission in the job directory.</red></b>" << endl;
             return(ERS_FAILED);
         }
@@ -144,19 +116,14 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         ofs << "#!/usr/bin/env infinity-env" << endl;
         ofs << "# ----------------------------------------------------------" << endl;
         ofs << endl;
-        ofs << "# activate gaussian module -----------------------" << endl;
-        ofs << "module add " << gmodule << ":" << gmodver << endl;
+        ofs << "module add orca" << endl;
         ofs << endl;
-        ofs << "# start job --------------------------------------" << endl;
-        ofs << gexec << " " << job_file << endl;
-        ofs << endl;
-        ofs << "# clean ------------------------------------------" << endl;
-        ofs << "rm -f core" << endl;
+        ofs << "orca " << job_file << endl;
         ofs << endl;
 
         if( ! ofs ) {
             sout << endl;
-            sout << "<b><red> ERROR: The gaussian job was detected but unable to write data to the job script '" << job_file << "'!</red></b>" << endl;
+            sout << "<b><red> ERROR: The orca job was detected but unable to write data to the job script '" << job_file << "'!</red></b>" << endl;
             sout << "<b><red>        Check if you have the write permission to the job input directory.</red></b>" << endl;
             return(ERS_FAILED);
         }
@@ -164,78 +131,65 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
 
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
     job.SetItem("basic/jobinput","INF_JOB_TYPE",job_type);
-    job.SetItem("basic/jobinput","INF_JOB_CHECK",GaussianJobTypeID.GetFullStringForm());
+    job.SetItem("basic/jobinput","INF_JOB_CHECK",OrcaJobTypeID.GetFullStringForm());
 
     return(ERS_OK);
 }
 
 //------------------------------------------------------------------------------
 
-bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
+bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
 {
-    // check if there is no more than one node request
-    CSmallString snnodes = job.GetItem("specific/resources","INF_NNODES");
-    int nnodes = snnodes.ToInt();
-
-    if( nnodes > 1 ){
-        sout << endl;
-        sout << "<b><red> ERROR: The parallel execution of gaussian job is allowed only within</red></b>" << endl;
-        sout << "<b><red>        a single computational node!</red></b>" << endl;
-        sout << endl;
-        sout << "<b><red>        The number of requested computational nodes : " << nnodes << "</red></b>" << endl;
-        return(false);
-    }
-
     // check if the input file contains correct number of CPUs
     CSmallString sncpus = job.GetItem("specific/resources","INF_NCPUS");
     int ncpus = sncpus.ToInt();
 
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");
-    int uncpus = GetNProcShared(job,job_name);
+    int uncpus = GetNProcs(job,job_name);
 
     if( uncpus != ncpus ){
         sout << endl;
         sout << "<b><blue> WARNING: Inconsistency in the number of requested CPUs was detected</blue></b>" << endl;
-        sout << "<b><blue>          in the gaussian input file!</blue></b>" << endl;
+        sout << "<b><blue>          in the orca input file!</blue></b>" << endl;
         sout << endl;
-        sout << "<b><blue>          The number of CPUs requested via psubmit command        : " << ncpus << "</blue></b>" << endl;
-        sout << "<b><blue>          The number of CPUs requested in the gaussian input file : " << uncpus << " (via %NProcShared)</blue></b>" << endl;
+        sout << "<b><blue>          The number of CPUs requested via psubmit command    : " << ncpus << "</blue></b>" << endl;
+        sout << "<b><blue>          The number of CPUs requested in the orca input file : " << uncpus << " (via %pal nprocs)</blue></b>" << endl;
 
-        if( UpdateNProcShared(job,job_name,ncpus) == false ){
+        if( UpdateNProcs(job,job_name,ncpus) == false ){
             sout << endl;
-            sout << "<b><red> ERROR: Unable to save updated gaussian input file (NProcShared)!</red></b>" << endl;
+            sout << "<b><red> ERROR: Unable to save updated orca input file (%pal nprocs)!</red></b>" << endl;
             return(false);
         }
     }
 
-    // what amount should be dedicated to the gaussian job
-    long long perc = 95; // in %
+    // what amount should be dedicated to the orca job
+    int perc = 80; // in %
     CResourceValuePtr p_rv = job.ResourceList.FindResource("appmem");
     if( p_rv != NULL ){
         perc = p_rv->GetFloatNumber()*100;
     }
 
     // check memory keyword
-    CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
-    long long mem = CResourceValue::GetSize(smem)*1024;
+    CSmallString smem = job.GetItem("specific/resources","INF_MEMORY"); // in kb
+    long long mem = CResourceValue::GetSize(smem)*perc/100/1024/ncpus;
     long long umem = GetMemory(job,job_name);
 
-    if( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ){
+    if( abs(umem - mem) > 2 ){
         sout << endl;
         sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
-        sout << "<b><blue>          in the gaussian input file!</blue></b>" << endl;
+        sout << "<b><blue>          in the orca input file!</blue></b>" << endl;
         sout << endl;
-        sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem*perc/100/1024/1024 << " MB</blue></b>" << endl;
-        sout << "<b><blue>          The ammount of memory requested in the gaussian input file : " << setw(7) << umem/1024/1024 << " MB (via %Mem)</blue></b>" << endl;
+        sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem << " MB</blue></b>" << endl;
+        sout << "<b><blue>          The ammount of memory requested in the orca input file : " << setw(7) << umem << " MB (via %memcore)</blue></b>" << endl;
 
-        if( UpdateMemory(job,job_name,mem*perc/100) == false ){
+        if( UpdateMemory(job,job_name,mem) == false ){
             sout << endl;
-            sout << "<b><red> ERROR: Unable to save updated gaussian input file (%Mem)!</red></b>" << endl;
+            sout << "<b><red> ERROR: Unable to save updated orca input file (%memcore)!</red></b>" << endl;
             return(false);
         }
     }
 
-    if( ( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ) || (uncpus != ncpus) ){
+    if( ( abs(umem - mem) > 2 ) || (uncpus != ncpus) ){
         sout << endl;
         sout << "<b><blue> WARNING: The input file was updated!</blue></b>" << endl;
     }
@@ -245,7 +199,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CGaussianJobType::UpdateNProcShared(CJob& job,const CSmallString& name,int nprocshared)
+bool COrcaJobType::UpdateNProcs(CJob& job,const CSmallString& name,int nprocs)
 {
     CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
@@ -255,25 +209,35 @@ bool CGaussianJobType::UpdateNProcShared(CJob& job,const CSmallString& name,int 
     vector<string>  lines;
     bool            transformed = false;
 
+    bool find_end = false;
+
     while( getline(ifs,line) ){
         string iline = line;
-        to_lower(iline);
-        if( iline.find("%nprocshared") != string::npos ){
-            transformed = true;
+        if( find_end ) {
+            if( iline.find("end") != string::npos ){
+                find_end = false;
+            }
         } else {
-            lines.push_back(line);
+            to_lower(iline);
+            if( iline.find("%pal") != string::npos ){
+                transformed = true;
+                find_end = true;
+            } else {
+                lines.push_back(line);
+            }
         }
     }
     ifs.close();
 
     // no change
-    if( (transformed == false) && (nprocshared == 1) ) return(true);
+    if( (transformed == false) && (nprocs == 1) ) return(true);
 
     // save changed file
     ofstream ofs(full_name);
 
-    if( nprocshared > 1 ){
-        ofs << "%NProcShared=" << left << nprocshared << endl;
+    if( nprocs > 1 ){
+        ofs << "%pal nprocs " << nprocs << endl;
+        ofs << "     end" << endl;
     }
 
     vector<string>::iterator    it = lines.begin();
@@ -294,7 +258,7 @@ bool CGaussianJobType::UpdateNProcShared(CJob& job,const CSmallString& name,int 
 
 //------------------------------------------------------------------------------
 
-bool CGaussianJobType::UpdateMemory(CJob& job,const CSmallString& name,long long mem)
+bool COrcaJobType::UpdateMemory(CJob& job,const CSmallString& name,long long mem)
 {
     CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
@@ -307,7 +271,7 @@ bool CGaussianJobType::UpdateMemory(CJob& job,const CSmallString& name,long long
     while( getline(ifs,line) ){
         string iline = line;
         to_lower(iline);
-        if( iline.find("%mem") != string::npos ){
+        if( iline.find("%maxcore") != string::npos ){
             transformed = true;
         } else {
             lines.push_back(line);
@@ -322,7 +286,7 @@ bool CGaussianJobType::UpdateMemory(CJob& job,const CSmallString& name,long long
     ofstream ofs(full_name);
 
     if( mem > 1024*1024 ){
-        ofs << "%Mem=" << left << mem/1024/1024 << "MB" << endl;
+        ofs << "%maxcore " << mem << endl;
     }
 
     vector<string>::iterator    it = lines.begin();
@@ -343,7 +307,7 @@ bool CGaussianJobType::UpdateMemory(CJob& job,const CSmallString& name,long long
 
 //------------------------------------------------------------------------------
 
-int CGaussianJobType::GetNProcShared(CJob& job,const CSmallString& name)
+int COrcaJobType::GetNProcs(CJob& job,const CSmallString& name)
 {
     CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
@@ -372,7 +336,7 @@ int CGaussianJobType::GetNProcShared(CJob& job,const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-long long CGaussianJobType::GetMemory(CJob& job,const CSmallString& name)
+long long COrcaJobType::GetMemory(CJob& job,const CSmallString& name)
 {
     CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
@@ -383,25 +347,13 @@ long long CGaussianJobType::GetMemory(CJob& job,const CSmallString& name)
     while( getline(ifs,line) ){
         string iline = line;
         to_lower(iline);
-        if( iline.find("%mem") != string::npos ){
+        if( iline.find("%maxcore") != string::npos ){
             vector<string>  items;
-            split(items,iline,is_any_of("="));
+            split(items,iline,is_any_of(" "));
             if( items.size() == 2 ){
                 long long mem = 0;
-                string munit;
                 stringstream sstr(items[1]);
-                sstr >> mem >> munit;
-                to_lower(munit);
-                if( munit == "b" )  mem = mem * 1;
-                if( munit == "kb" ) mem = mem * 1024;
-                if( munit == "mb" ) mem = mem * 1024 * 1024;
-                if( munit == "gb" ) mem = mem * 1024 * 1024 * 1024;
-                if( munit == "tb" ) mem = mem * 1024 * 1024 * 1024 * 1024;
-                if( munit == "w" )  mem = mem * 8;
-                if( munit == "kw" ) mem = mem * 8 * 1024;
-                if( munit == "mw" ) mem = mem * 8 * 1024 * 1024;
-                if( munit == "gw" ) mem = mem * 8 * 1024 * 1024 * 1024;
-                if( munit == "tw" ) mem = mem * 8 * 1024 * 1024 * 1024 * 1024;
+                sstr >> mem;
                 return(mem);
             }
         }

@@ -1,9 +1,12 @@
-#ifndef GaussianJobTypeH
-#define GaussianJobTypeH
+#ifndef RVAppMemH
+#define RVAppMemH
 // =============================================================================
-//  ABS - Advanced Batch System
+// ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2012 Petr Kulhanek (kulhanek@chemi.muni.cz)
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
 //     This program is free software; you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -20,34 +23,20 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include "BasicJobTypesMainHeader.hpp"
-#include <JobType.hpp>
+#include <ABSMainHeader.hpp>
+#include <ResourceValue.hpp>
+#include <iostream>
 
 // -----------------------------------------------------------------------------
 
-class CGaussianJobType : public CJobType {
+class ABS_PACKAGE CRVAppMem : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CGaussianJobType(void);
+        CRVAppMem(void);
 
-// executive methods -----------------------------------------------------------
-    /// determine if the job is job of given type
-    virtual ERetStatus DetectJobType(CJob& job,bool& detected,std::ostream& sout);
-
-    /// check job input file
-    virtual bool CheckInputFile(CJob& job,std::ostream& sout);
-
-    /// update number of ncpus in job input file
-    bool UpdateNProcShared(CJob& job,const CSmallString& name,int nprocshared);
-
-    /// get number of ncpus specified in the job input file
-    int GetNProcShared(CJob& job,const CSmallString& name);
-
-    /// update memory
-    bool UpdateMemory(CJob& job,const CSmallString& name,long long mem);
-
-    /// get memory from the file
-    long long GetMemory(CJob& job,const CSmallString& name);
+// information methods ---------------------------------------------------------
+    /// test value if it is in expected range
+    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 };
 
 // -----------------------------------------------------------------------------

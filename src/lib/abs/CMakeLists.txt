@@ -21,6 +21,7 @@ SET(ABS_SRC
         resources/ResourceValue.cpp
         resources/ResourceList.cpp
         resources/default/RVEmail.cpp
+        resources/default/RVAppMem.cpp
         resources/default/RVMem.cpp
         resources/default/RVMemPerCPU.cpp
         resources/default/RVNCPUs.cpp

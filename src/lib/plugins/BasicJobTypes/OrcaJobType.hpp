@@ -1,9 +1,9 @@
-#ifndef GaussianJobTypeH
-#define GaussianJobTypeH
+#ifndef OrcaJobTypeH
+#define OrcaJobTypeH
 // =============================================================================
 //  ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2012 Petr Kulhanek (kulhanek@chemi.muni.cz)
+//    Copyright (C) 2017 Petr Kulhanek (kulhanek@chemi.muni.cz)
 //
 //     This program is free software; you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@
 
 // -----------------------------------------------------------------------------
 
-class CGaussianJobType : public CJobType {
+class COrcaJobType : public CJobType {
 public:
 // constructor -----------------------------------------------------------------
-        CGaussianJobType(void);
+        COrcaJobType(void);
 
 // executive methods -----------------------------------------------------------
     /// determine if the job is job of given type
@@ -38,15 +38,15 @@ public:
     virtual bool CheckInputFile(CJob& job,std::ostream& sout);
 
     /// update number of ncpus in job input file
-    bool UpdateNProcShared(CJob& job,const CSmallString& name,int nprocshared);
+    bool UpdateNProcs(CJob& job,const CSmallString& name,int nprocs);
 
     /// get number of ncpus specified in the job input file
-    int GetNProcShared(CJob& job,const CSmallString& name);
+    int GetNProcs(CJob& job,const CSmallString& name);
 
-    /// update memory
+    /// update memory - mem is in MB - memory per core
     bool UpdateMemory(CJob& job,const CSmallString& name,long long mem);
 
-    /// get memory from the file
+    /// get memory from the file in MB - memory per core
     long long GetMemory(CJob& job,const CSmallString& name);
 };
 

@@ -123,6 +123,8 @@ src/lib/abs/old/InfoFile.cpp
 src/lib/abs/old/InfoFile.hpp
 src/lib/abs/old/Resources.cpp
 src/lib/abs/old/Resources.hpp
+src/lib/abs/resources/default/RVAppMem.cpp
+src/lib/abs/resources/default/RVAppMem.hpp
 src/lib/abs/resources/default/RVMPISlotsPerNode.cpp
 src/lib/abs/resources/default/RVMPISlotsPerNode.hpp
 src/lib/abs/resources/default/RVNCPUsPerNode.cpp
@@ -157,6 +159,8 @@ src/lib/plugins/BasicJobTypes/MultiWfnJobType.cpp
 src/lib/plugins/BasicJobTypes/MultiWfnJobType.hpp
 src/lib/plugins/BasicJobTypes/NWChemJobType.cpp
 src/lib/plugins/BasicJobTypes/NWChemJobType.hpp
+src/lib/plugins/BasicJobTypes/OrcaJobType.cpp
+src/lib/plugins/BasicJobTypes/OrcaJobType.hpp
 src/lib/plugins/BasicJobTypes/PEquiJobType.cpp
 src/lib/plugins/BasicJobTypes/PEquiJobType.hpp
 src/lib/plugins/BasicJobTypes/PRecycleCPMDJobType.cpp

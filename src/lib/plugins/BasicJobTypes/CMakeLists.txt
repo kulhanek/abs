@@ -20,6 +20,7 @@ SET(BASICJOBTYPES_SRC
         STMClientJobTypeOptions.cpp
         LoopJobType.cpp
         MultiWfnJobType.cpp
+        OrcaJobType.cpp
         )
 
 # create shared library --------------------------------------------------------

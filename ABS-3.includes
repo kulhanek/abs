@@ -4,3 +4,4 @@ src/lib/torque
 bin
 src/lib/abs
 src/lib/abs/resources/default
+src/lib/plugins/BasicJobTypes
