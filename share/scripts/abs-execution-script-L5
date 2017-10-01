@@ -13,7 +13,7 @@
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L5.1a: Data in the working directory ..."
+echo "# L5.1: Data in the working directory ..."
 echo "# ------------------------------------------------------------------------------"
 
 case $INF_DATAOUT in
@@ -21,38 +21,27 @@ case $INF_DATAOUT in
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
             echo ">>> $NODE_NAME:$INF_WORK_DIR -----------------------"
-            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "cd $INF_WORK_DIR; ls -la"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "cd $INF_WORK_DIR; ls -la; echo \"Total size: `du -sh`\""
         done
         ;;
     keep|copy-shared)
         echo ""
         echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR -------------------"
         ls -la
+        echo "Total size: `du -sh`"
         ;;
 esac
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L5.1b: Status of filesystems  ..."
+echo "# L5.2: Filesystem states  ..."
 echo "# ------------------------------------------------------------------------------"
 
-case $INF_DATAOUT in
-    copy-master|copy-shared)
-        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-            echo ""
-            echo ">>> $NODE_NAME -------------------------------------"
-            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
-        done
-        ;;
-    keep)
-        echo ""
-        echo ">>> $INF_MAIN_NODE ---------------------------------"
-        timeout 30 df -h
-        if [ $? -ne 0 ]; then
-            echo ">>> WARNING: the df command was not completed due to an error or timeout."
-        fi
-        ;;
-esac
+for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+    echo ""
+    echo ">>> $NODE_NAME -------------------------------------"
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
+done
 
 echo ""
 echo "# ------------------------------------------------------------------------------"

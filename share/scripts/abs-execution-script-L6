@@ -45,7 +45,7 @@ echo ""
 echo "# Working directory  : $INF_WORK_DIR"
 echo "# Data OUT copy mode : $INF_DATAOUT"
 
-# switch to HOME directory because next commands can remove current directory
+# switch to HOME directory because next commands can remove the current directory
 cd
 
 CLEAN_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type clean $INF_WORK_DIR_TYPE`"
@@ -55,42 +55,35 @@ if [ $? -ne -0 ]; then
     echo ""
     exit 1
 fi
+echo "# Clean directory    : $CLEAN_DIR"
 INF_CLEAN_DIR="`eval echo "$CLEAN_DIR"`"
 
+if [ -n "$INF_CLEAN_DIR" ]; then
 echo "# Clean directory    : $INF_CLEAN_DIR"
-
 echo ""
 case $INF_DATAOUT in
     copy-master)
-        echo "# Removing the working directories on the working nodes ..."
+            echo "# Removing the working directories on the working nodes ..."
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-            echo ""
-            echo ">>> $NODE_NAME:$INF_CLEAN_DIR ---"
-            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi; rm -rf $INF_CLEAN_DIR"
+            echo "  >>> $NODE_NAME:$INF_CLEAN_DIR ---"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "rm -rf \"$INF_CLEAN_DIR\""
         done
         ;;
     copy-shared)
         echo "# Removing the working directory on the main working node ..."
-        echo ""
-        echo ">>> $INF_MAIN_NODE:$INF_CLEAN_DIR ---"
-        (
-            timeout 30 df -h
-            if [ $? -ne 0 ]; then
-                echo ">>> WARNING: the df command was not completed due to an error or timeout."
-            fi
-            rm -rf $INF_CLEAN_DIR
-        )
+        echo "  >>> $INF_MAIN_NODE:$INF_CLEAN_DIR ---"
+        rm -rf "$INF_CLEAN_DIR"
         ;;
     keep)
         echo "# No directory will be removed ..."
-        echo ""
-        echo ">>> $INF_MAIN_NODE ------------------------------"
-        timeout 30 df -h
-        if [ $? -ne 0 ]; then
-            echo ">>> WARNING: the df command was not completed due to an error or timeout."
-        fi
         ;;
     esac
+else
+echo "# Clean directory    : -not specified-"
+fi
+
+# ------------------------------------------------------------------------------
+# clean IPC
 
 IPC_SCRIPT="$ABS_ROOT/share/scripts/abs-cleanipcs"
 if [ -f "$IPC_SCRIPT" ]; then

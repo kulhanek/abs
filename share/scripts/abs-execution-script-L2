@@ -12,8 +12,6 @@
 # (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
 # =============================================================================
 
-# ------------------------------------------------------------------------------
-
 echo ""
 echo "# ------------------------------------------------------------------------------"
 echo "# L2.0: Cross-host user group translation rules for rsync ..."
@@ -135,7 +133,7 @@ echo "# Work directory type: $INF_WORK_DIR_TYPE"
 echo "# Data IN copy mode  : $INF_DATAIN"
 
 # ------------------------------------------------------------------------------
-# set working directory
+# get working directory
 
 INF_WORK_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type main $INF_WORK_DIR_TYPE`"
 if [ $? -ne -0 ]; then
@@ -144,49 +142,38 @@ fi
 echo "# Working directory  : $INF_WORK_DIR"
 INF_WORK_DIR="`eval echo "$INF_WORK_DIR"`"
 echo "# Working directory  : $INF_WORK_DIR"
+export INF_WORK_DIR
 
 # ------------------------------------------------------------------------------
 # create working directories if necessary
+
 echo ""
 case $INF_DATAIN in
     keep)
         echo "# Already in the working directory on the main working node ..."
-        echo ""
-        echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
-        timeout 30 df -h
-        if [ $? -ne 0 ]; then
-            echo ">>> WARNING: the df command was not completed due to an error or timeout."
-        fi
     ;;
     copy-shared)
         echo "# Creating the working directory on the main working node ..."
-        echo ""
-        echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
+        echo "  >>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
         (
             umask $INF_UMASK
             if ! [ -d "$INF_WORK_DIR" ]; then
                 mkdir -p "$INF_WORK_DIR"
             fi
-            EXIT_CODE=$?
-            if [ -n "$INF_UBATCHGROUP" ]; then
-                chgrp "$INF_BATCHGROUP" "$INF_WORK_DIR"
-            fi
-            timeout 30 df -h
-            if [ $? -ne 0 ]; then
-                echo ">>> WARNING: the df command was not completed due to an error or timeout."
-            fi
-            exit $EXIT_CODE
+            # the ownership should be INF_BATCHGROUP as the directory is created by the main job process
         )
         if [ $? -ne 0 ]; then
-            echo ">>> WARNING: the df command was not completed due to an error or timeout."
+            echo "" >&2
+            echo " >>> ERROR: Unable to create the working directory on the main node!" >&2
+            echo "" >&2
+            exit 1
         fi
     ;;
     copy-master)
-        echo "# Creating working directories on the working nodes ..."
+            echo "# Creating working directories on the working nodes ..."
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-            echo ""
-            echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
-            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "umask $INF_UMASK; if ! [ -d \"$INF_WORK_DIR\" ]; then mkdir -p \"$INF_WORK_DIR\"; fi; EXIT_CODE=\$?; if [ -n \"$INF_UBATCHGROUP\" ]; then chgrp \"$INF_BATCHGROUP\" \"$INF_WORK_DIR\"; fi; timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi; exit \$EXIT_CODE;"
+            echo "  >>> $NODE_NAME:$INF_WORK_DIR ---"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "umask $INF_UMASK; if ! [ -d \"$INF_WORK_DIR\" ]; then mkdir -p \"$INF_WORK_DIR\"; fi; EXIT_CODE=\$?; if [ -n \"$INF_UBATCHGROUP\" ]; then chgrp \"$INF_BATCHGROUP\" \"$INF_WORK_DIR\"; fi; exit \$EXIT_CODE;"
 
             if [ $? -ne 0 ]; then
                 echo "" >&2
@@ -198,19 +185,32 @@ case $INF_DATAIN in
     ;;
 esac
 
-export INF_WORK_DIR
+# ------------------------------------------------------------------------------
+# go to working directory
+echo ""
+echo "# Changing the current directory to the working directory ..."
+cd "$INF_WORK_DIR"
+
+if [ $? -ne 0 ]; then
+    echo "" >&2
+    echo " >>> ERROR: Unable to change the current directory to the working directory." >&2
+    echo "" >&2
+    exit 1
+fi
 
 # ------------------------------------------------------------------------------
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.2: Pre-init working directory ..."
+echo "# ------------------------------------------------------------------------------"
+echo ""
 
 INF_WORK_PREINIT="`$ABS_ROOT/sbin/abs-get-work-dir --type preinit $INF_WORK_DIR_TYPE`"
 
 if [ -n "$INF_WORK_PREINIT" ]; then
-echo ""
-echo "# ------------------------------------------------------------------------------"
-echo "# L2.1a: Pre-init working directory ..."
-echo "# ------------------------------------------------------------------------------"
-echo ""
 echo "# Preinit script     : $INF_WORK_PREINIT"
+
 case $INF_DATAIN in
     keep|copy-shared)
         echo ""
@@ -237,21 +237,8 @@ case $INF_DATAIN in
         done
     ;;
 esac
-
-fi
-
-
-# ------------------------------------------------------------------------------
-# go to working directory
-echo ""
-echo "# Changing the current directory to the working directory ..."
-cd "$INF_WORK_DIR"
-
-if [ $? -ne 0 ]; then
-    echo "" >&2
-    echo " >>> ERROR: Unable to change the current directory to the working directory." >&2
-    echo "" >&2
-    exit 1
+else
+echo "# Preinit script     : -nothing to setup-"
 fi
 
 # ------------------------------------------------------------------------------
@@ -265,9 +252,25 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# ------------------------------------------------------------------------------
+# filesystem status
+
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.2: Resources files ..."
+echo "# L2.3: Filesystem states  ..."
+echo "# ------------------------------------------------------------------------------"
+
+for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+    echo ""
+    echo ">>> $NODE_NAME -------------------------------------"
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
+done
+
+# ------------------------------------------------------------------------------
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.4: Resources files ..."
 echo "# ------------------------------------------------------------------------------"
 
 echo ""
@@ -321,7 +324,7 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     rm -f "$INF_GPUFILE"
     cat $INF_MPIFILE | while read NODE MPISPEC; do
         (
-            # the is quite complicated but both pbsdsh and pbs_tmrsh write output directly to output and error files
+            # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files
             # and not to the standard and error outputs
             echo "# Scanning GPU node : $NODE"
             pbs_tmrsh $NODE sh -c "echo \$(hostname -f) gpus=\$CUDA_VISIBLE_DEVICES | ssh $HOSTNAME \"cat >> $INF_GPUFILE\""
@@ -358,10 +361,12 @@ case $INF_DATAIN in
     ;;
 esac
 
+# ------------------------------------------------------------------------------
+# various statistics
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.3: Current node utilizations ..."
+echo "# L2.5: Current node utilizations ..."
 echo "# ------------------------------------------------------------------------------"
 
 for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
@@ -372,36 +377,93 @@ done
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.4: Machine hardware info ..."
+echo "# L2.6: Machine hardware info ..."
 echo "# ------------------------------------------------------------------------------"
 
 echo
-echo "# CPU info"
+echo "# CPU info (All CPUs)"
 echo "# ============================================================================="
 type lscpu &> /dev/null
 
 if [ $? -eq 0 ]; then
-    lscpu
+    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ----------------------------------"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME lscpu
+    done
 else
     echo ">>> INFO: the lscpu command not available ... skipping"
 fi
 
-if [ $INF_NGPUS -gt 0 ]; then
-    echo ""
-    echo "# GPU info"
-    echo "# ============================================================================="
-    echo "# CUDA_VISIBLE_DEVICES = $CUDA_VISIBLE_DEVICES"
-    type nvidia-smi &> /dev/null
-    if [ $? -eq 0 ]; then
-        nvidia-smi
-    fi
+echo ""
+echo "# GPU info (ALL GPUs)"
+echo "# ============================================================================="
+type nvidia-smi &> /dev/null
+if [ $? -eq 0 ]; then
+    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ----------------------------------"
+        # unset CUDA_VISIBLE_DEVICES to get all data
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "CUDA_VISIBLE_DEVICES= nvidia-smi"
+    done
+else
+    echo ">>> INFO: the nvidia-smi command is not available ... skipping"
+fi
+
+echo
+echo "# infiniband (fast interconnect)"
+echo "# ============================================================================="
+type lscpu &> /dev/null
+
+if [ $? -eq 0 ]; then
+    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ----------------------------------"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME lscpu
+    done
+else
+    echo ">>> INFO: the ibv_devinfo command is not available ... skipping"
 fi
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.5: Current NUMA settings on the master node ..."
+echo "# L2.7: Machine software info ..."
 echo "# ------------------------------------------------------------------------------"
 
+echo
+echo "# ulimits"
+echo "# ============================================================================="
+type ulimit &> /dev/null
+
+if [ $? -eq 0 ]; then
+    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ----------------------------------"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ulimit -a
+    done
+else
+    echo ">>> INFO: the ulimit command not available ... skipping"
+fi
+
+echo
+echo "# IPCs"
+echo "# ============================================================================="
+type ipcs &> /dev/null
+
+if [ $? -eq 0 ]; then
+    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ----------------------------------"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ipcs
+    done
+else
+    echo ">>> INFO: the ipcs command not available ... skipping"
+fi
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.8: Current NUMA settings on the master node ..."
+echo "# ------------------------------------------------------------------------------"
 type numactl &> /dev/null
 
 if [ $? -eq 0 ]; then
@@ -410,9 +472,12 @@ else
     echo ">>> INFO: the numactl command not available ... skipping"
 fi
 
+# ------------------------------------------------------------------------------
+# MPI setup
+
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.6: Determining type of executive environment ..."
+echo "# L2.9: Determining type of executive environment ..."
 echo "#       Supported types: raw, cpuset, exclusive"
 echo "# ------------------------------------------------------------------------------"
 

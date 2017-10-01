@@ -115,15 +115,15 @@ bool CTurbomoleJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     if( nnodes <= 1 ) return(true);
 
-    CSmallString workdir = job.GetItem("specific/resources","INF_WORK_DIR_TYPE");
+    CSmallString datain = job.GetItem("specific/resources","INF_DATAIN");
 
-    if( workdir != "jobdir" ){
+    if( (datain != "copy-shared") && (datain != "keep") ){
         sout << endl;
         sout << "<b><red> ERROR: The parallel execution of turbomole job on more than one computational node</red></b>" << endl;
-        sout << "<b><red>        is allowed only when the workdir is jobdir!</red></b>" << endl;
+        sout << "<b><red>        is allowed only when the datain resource is copy-shared or keep!</red></b>" << endl;
         sout << endl;
         sout << "<b><red>        The number of requested computational nodes : " << nnodes << "</red></b>" << endl;
-        sout << "<b><red>        Currently requested workdir type            : " << workdir << "</red></b>" << endl;
+        sout << "<b><red>        Currently requested datain mode             : " << datain << "</red></b>" << endl;
         return(false);
     }
 
