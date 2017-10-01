@@ -81,7 +81,7 @@ if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
     if [ -n "`grep \"$INF_L_DEV_MAJ:$INF_L_DEV_MIN\" /proc/self/mountinfo | grep 'sec=krb5'`" ]; then
         INF_L_FSTYPE="nfs4:krb5"
     else
-        INF_L_FSTYPE=`grep "$INF_L_DEV_MAJ:$INF_L_DEV_MIN" /proc/self/mountinfo | awk '{ print $8; }'`
+        INF_L_FSTYPE=`grep "$INF_L_DEV_MAJ:$INF_L_DEV_MIN" /proc/self/mountinfo | awk '{ for(i=1; i<=NF; i++){ if( $i == "-" ) break; } i++; { print $i; } }' | head -1`
     fi
     unset INF_L_DEV INF_L_DEV_MAJ INF_L_DEV_MIN
 fi
