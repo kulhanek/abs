@@ -90,7 +90,6 @@ if [ -f "$IPC_SCRIPT" ]; then
     echo ""
         echo "# Cleaning IPC stuff on nodes:"
     for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-        echo ""
         echo "  >>> $NODE_NAME ---"
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "$IPC_SCRIPT"
     done
@@ -105,7 +104,7 @@ echo "# ------------------------------------------------------------------------
 
 for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
     echo ""
-    echo ">>> $NODE_NAME ----------------------------------"
+    echo ">>> $NODE_NAME ---"
     ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /PID USER/ { start = 1; }'"
 done
 
@@ -118,13 +117,13 @@ echo "# ------------------------------------------------------------------------
 if dmesg -T 2> /dev/null 1> /dev/null; then
     for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
         echo ""
-        echo ">>> $NODE_NAME ----------------------------------"
+        echo ">>> $NODE_NAME ---"
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "uname -a; dmesg -T | tail -1000"
     done
 else
     for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
         echo ""
-        echo ">>> $NODE_NAME ----------------------------------"
+        echo ">>> $NODE_NAME ---"
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "uname -a; dmesg | tail -1000"
     done
 fi

@@ -114,11 +114,10 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
         }
 
         ofs << "#!/usr/bin/env infinity-env" << endl;
-        ofs << "# ----------------------------------------------------------" << endl;
         ofs << endl;
         ofs << "module add orca" << endl;
         ofs << endl;
-        ofs << "orca " << job_file << endl;
+        ofs << "orca " << arg_job << endl;
         ofs << endl;
 
         if( ! ofs ) {
@@ -192,8 +191,8 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
             sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
             sout << "<b><blue>          in the orca input file!</blue></b>" << endl;
             sout << endl;
-            sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem << " MB</blue></b>" << endl;
-            sout << "<b><blue>          The ammount of memory requested in the orca input file : " << setw(7) << umem << " MB (via %memcore)</blue></b>" << endl;
+            sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%): " << setw(7) << mem << " MB</blue></b>" << endl;
+            sout << "<b><blue>          The ammount of memory requested in the orca input file :   " << setw(7) << umem << " MB (via %memcore)</blue></b>" << endl;
 
             if( UpdateMemory(job,job_name,mem) == false ){
                 sout << endl;
@@ -300,7 +299,7 @@ bool COrcaJobType::UpdateMemory(CJob& job,const CSmallString& name,long long mem
     // save changed file
     ofstream ofs(full_name);
 
-    if( mem > 1024*1024 ){
+    if( mem > 0 ){
         ofs << "%maxcore " << mem << endl;
     }
 
