@@ -332,12 +332,12 @@ int COrcaJobType::GetNProcs(CJob& job,const CSmallString& name)
     while( getline(ifs,line) ){
         string iline = line;
         to_lower(iline);
-        if( iline.find("%nprocshared") != string::npos ){
+        if( iline.find("%pal") != string::npos ){
             vector<string>  items;
-            split(items,iline,is_any_of("="));
-            if( items.size() == 2 ){
+            split(items,iline,is_any_of(" "));
+            if( items.size() == 3 ){
                 int ncpu = 0;
-                stringstream sstr(items[1]);
+                stringstream sstr(items[2]);
                 sstr >> ncpu;
                 return(ncpu);
             }
