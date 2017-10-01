@@ -144,6 +144,16 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
     CSmallString sncpus = job.GetItem("specific/resources","INF_NCPUS");
     int ncpus = sncpus.ToInt();
 
+    CSmallString snnodes = job.GetItem("specific/resources","INF_NNODES");
+    int nnodes = snnodes.ToInt();
+
+    CResourceValuePtr p_rv;
+    p_rv = job.ResourceList.FindResource("mpislotspernode");
+    if( p_rv != NULL ){
+        // update number of CPUs according to mpislotspernode setup
+        ncpus = nnodes*p_rv->GetNumber();
+    }
+
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");
     int uncpus = GetNProcs(job,job_name);
 
@@ -164,32 +174,37 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     // what amount should be dedicated to the orca job
     int perc = 80; // in %
-    CResourceValuePtr p_rv = job.ResourceList.FindResource("appmem");
+    p_rv = job.ResourceList.FindResource("appmem");
     if( p_rv != NULL ){
         perc = p_rv->GetFloatNumber()*100;
     }
 
+    bool mem_changed = false;
+
     // check memory keyword
     CSmallString smem = job.GetItem("specific/resources","INF_MEMORY"); // in kb
-    long long mem = CResourceValue::GetSize(smem)*perc/100/1024/ncpus;
-    long long umem = GetMemory(job,job_name);
+    if( smem != NULL ){
+        long long mem = CResourceValue::GetSize(smem)*perc/100/1024/ncpus;
+        long long umem = GetMemory(job,job_name);
 
-    if( abs(umem - mem) > 2 ){
-        sout << endl;
-        sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
-        sout << "<b><blue>          in the orca input file!</blue></b>" << endl;
-        sout << endl;
-        sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem << " MB</blue></b>" << endl;
-        sout << "<b><blue>          The ammount of memory requested in the orca input file : " << setw(7) << umem << " MB (via %memcore)</blue></b>" << endl;
-
-        if( UpdateMemory(job,job_name,mem) == false ){
+        if( abs(umem - mem) > 2 ){
             sout << endl;
-            sout << "<b><red> ERROR: Unable to save updated orca input file (%memcore)!</red></b>" << endl;
-            return(false);
+            sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
+            sout << "<b><blue>          in the orca input file!</blue></b>" << endl;
+            sout << endl;
+            sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem << " MB</blue></b>" << endl;
+            sout << "<b><blue>          The ammount of memory requested in the orca input file : " << setw(7) << umem << " MB (via %memcore)</blue></b>" << endl;
+
+            if( UpdateMemory(job,job_name,mem) == false ){
+                sout << endl;
+                sout << "<b><red> ERROR: Unable to save updated orca input file (%memcore)!</red></b>" << endl;
+                return(false);
+            }
+            mem_changed = true;
         }
     }
 
-    if( ( abs(umem - mem) > 2 ) || (uncpus != ncpus) ){
+    if( mem_changed || (uncpus != ncpus) ){
         sout << endl;
         sout << "<b><blue> WARNING: The input file was updated!</blue></b>" << endl;
     }

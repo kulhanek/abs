@@ -215,27 +215,32 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
         perc = p_rv->GetFloatNumber()*100;
     }
 
+    bool mem_changed = false;
+
     // check memory keyword
     CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
-    long long mem = CResourceValue::GetSize(smem)*1024;
-    long long umem = GetMemory(job,job_name);
+    if( smem != NULL ){
+        long long mem = CResourceValue::GetSize(smem)*1024;
+        long long umem = GetMemory(job,job_name);
 
-    if( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ){
-        sout << endl;
-        sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
-        sout << "<b><blue>          in the gaussian input file!</blue></b>" << endl;
-        sout << endl;
-        sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem*perc/100/1024/1024 << " MB</blue></b>" << endl;
-        sout << "<b><blue>          The ammount of memory requested in the gaussian input file : " << setw(7) << umem/1024/1024 << " MB (via %Mem)</blue></b>" << endl;
-
-        if( UpdateMemory(job,job_name,mem*perc/100) == false ){
+        if( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ){
             sout << endl;
-            sout << "<b><red> ERROR: Unable to save updated gaussian input file (%Mem)!</red></b>" << endl;
-            return(false);
+            sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
+            sout << "<b><blue>          in the gaussian input file!</blue></b>" << endl;
+            sout << endl;
+            sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem*perc/100/1024/1024 << " MB</blue></b>" << endl;
+            sout << "<b><blue>          The ammount of memory requested in the gaussian input file : " << setw(7) << umem/1024/1024 << " MB (via %Mem)</blue></b>" << endl;
+
+            if( UpdateMemory(job,job_name,mem*perc/100) == false ){
+                sout << endl;
+                sout << "<b><red> ERROR: Unable to save updated gaussian input file (%Mem)!</red></b>" << endl;
+                return(false);
+            }
+            mem_changed = true;
         }
     }
 
-    if( ( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ) || (uncpus != ncpus) ){
+    if( mem_changed || (uncpus != ncpus) ){
         sout << endl;
         sout << "<b><blue> WARNING: The input file was updated!</blue></b>" << endl;
     }
