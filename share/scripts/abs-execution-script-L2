@@ -262,7 +262,7 @@ echo "# ------------------------------------------------------------------------
 
 for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
     echo ""
-    echo ">>> $NODE_NAME -------------------------------------"
+    echo ">>> $NODE_NAME ---"
     ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
 done
 
@@ -388,7 +388,7 @@ type lscpu &> /dev/null
 if [ $? -eq 0 ]; then
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
-        echo ">>> $NODE_NAME ----------------------------------"
+        echo ">>> $NODE_NAME ---"
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME lscpu
     done
 else
@@ -402,7 +402,7 @@ type nvidia-smi &> /dev/null
 if [ $? -eq 0 ]; then
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
-        echo ">>> $NODE_NAME ----------------------------------"
+        echo ">>> $NODE_NAME ---"
         # unset CUDA_VISIBLE_DEVICES to get all data
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "CUDA_VISIBLE_DEVICES= nvidia-smi"
     done
@@ -413,13 +413,13 @@ fi
 echo
 echo "# infiniband (fast interconnect)"
 echo "# ============================================================================="
-type lscpu &> /dev/null
+type ibv_devinfo &> /dev/null
 
 if [ $? -eq 0 ]; then
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
-        echo ">>> $NODE_NAME ----------------------------------"
-        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME lscpu
+        echo ">>> $NODE_NAME ---"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ibv_devinfo
     done
 else
     echo ">>> INFO: the ibv_devinfo command is not available ... skipping"
@@ -438,7 +438,7 @@ type ulimit &> /dev/null
 if [ $? -eq 0 ]; then
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
-        echo ">>> $NODE_NAME ----------------------------------"
+        echo ">>> $NODE_NAME ---"
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ulimit -a
     done
 else
@@ -453,7 +453,7 @@ type ipcs &> /dev/null
 if [ $? -eq 0 ]; then
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
-        echo ">>> $NODE_NAME ----------------------------------"
+        echo ">>> $NODE_NAME ---"
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ipcs
     done
 else

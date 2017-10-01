@@ -88,9 +88,10 @@ fi
 IPC_SCRIPT="$ABS_ROOT/share/scripts/abs-cleanipcs"
 if [ -f "$IPC_SCRIPT" ]; then
     echo ""
-    echo "# Cleaning IPC stuff on nodes:"
+        echo "# Cleaning IPC stuff on nodes:"
     for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-        echo "      $NODE_NAME"
+        echo ""
+        echo "  >>> $NODE_NAME ---"
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "$IPC_SCRIPT"
     done
 fi

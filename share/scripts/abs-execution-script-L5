@@ -20,13 +20,13 @@ case $INF_DATAOUT in
     copy-master)
         for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
             echo ""
-            echo ">>> $NODE_NAME:$INF_WORK_DIR -----------------------"
+            echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
             ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "cd $INF_WORK_DIR; ls -la; echo \"Total size: `du -sh`\""
         done
         ;;
     keep|copy-shared)
         echo ""
-        echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR -------------------"
+        echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
         ls -la
         echo "Total size: `du -sh`"
         ;;
@@ -39,7 +39,7 @@ echo "# ------------------------------------------------------------------------
 
 for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
     echo ""
-    echo ">>> $NODE_NAME -------------------------------------"
+    echo ">>> $NODE_NAME ---"
     ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
 done
 
