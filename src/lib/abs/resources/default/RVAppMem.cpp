@@ -97,7 +97,7 @@ void CRVAppMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         } else {
             const CResourceValuePtr p_rv1 = p_rl->FindResource("mempercpus");
             const CResourceValuePtr p_rv2 = p_rl->FindResource("ncpus");
-            if( (p_rv != NULL) && (p_rv2 != NULL) ){
+            if( (p_rv1 != NULL) && (p_rv2 != NULL) ){
                 mem = p_rv1->GetSize()  * p_rv2->GetNumber();
             }
         }
