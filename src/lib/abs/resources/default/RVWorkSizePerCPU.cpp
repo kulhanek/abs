@@ -66,7 +66,7 @@ void CRVWorkSizePerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& r
 {
     if( TestSizeValue(sout,rstatus) == false ) return;
     long long size = GetSize();
-    if( size <= 0 ) {
+    if( size <= 1 ) {
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
         sout <<         "        Size must be larger than 1kb but " << GetSizeString() << " is specified!</red></b>" << endl;

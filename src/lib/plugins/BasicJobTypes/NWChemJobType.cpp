@@ -173,30 +173,53 @@ bool CNWChemJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");
 
-    // what amount should be dedicated to the gaussian job
-    int perc = 95; // in %
+    // what amount of memory should be dedicated to the orca job
+    int             perc = 80; // in %
+    long long       mem = 0; // in MB
+    stringstream    minfo;
 
-    // check memory keyword - convert to B
-    CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
-    long int mem = CResourceValue::GetSize(smem)*1024;
-    long int umem = GetMemory(job_name);
+    CSmallString appmem = job.GetItem("specific/resources","INF_APPMEM");
+    long long    amem = CResourceValue::GetSize(appmem); // in kB
+    if( (appmem != NULL) && (amem > 0) ){
+        // provided as memory value
+        mem = amem / 1024; // in MB
+        minfo << "appmem("<< appmem << ") = " << mem << " MB";
+    } else {
+        // provided as fraction of memory request
+        if( appmem != NULL ){
+            perc = appmem.ToDouble()*100.0;
+        }
+        CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
+        mem = CResourceValue::GetSize(smem); // in kb
+        if( mem > 0 ){
+            mem = mem * perc / 1024 / 100; // in MB
+            minfo << "appmem("<< perc << "%)*mem("<< smem << ") = " << mem << " MB";
+        } else {
+            mem = 0;
+        }
+    }
 
-    if( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ){
+    bool memory_changed = false;
+
+    long int umem = GetMemory(job_name); // in MB
+
+    if( abs(umem - mem) > 2 ){
         sout << endl;
         sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
         sout << "<b><blue>          in the nwchem input file!</blue></b>" << endl;
         sout << endl;
-        sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%) : " << setw(7) << mem*perc/100/1024/1024 << " MB</blue></b>" << endl;
-        sout << "<b><blue>          The ammount of memory requested in the nwchem input file  : " << setw(7) << umem/1024/1024 << " MB (via memory)</blue></b>" << endl;
+        sout << "<b><blue>          The ammount of memory requested via psubmit command      : " << setw(7) <<  mem << " MB (" << minfo.str() << ")</blue></b>" << endl;
+        sout << "<b><blue>          The ammount of memory requested in the nwchem input file : " << setw(7) << umem << " MB (via memory)</blue></b>" << endl;
 
-        if( UpdateMemory(job_name,mem*perc/100) == false ){
+        if( UpdateMemory(job_name,mem) == false ){
             sout << endl;
             sout << "<b><red> ERROR: Unable to save updated nwchem input file!</red></b>" << endl;
             return(false);
         }
+        memory_changed = true;
     }
 
-    if( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ){
+    if( memory_changed ){
         sout << endl;
         sout << "<b><blue> WARNING: The input file was updated!</blue></b>" << endl;
     }
@@ -232,9 +255,9 @@ bool CNWChemJobType::UpdateMemory(const CSmallString& name,long int mem)
     // save changed file
     ofstream ofs(full_name);
 
-    if( mem > 1024*1024 ){
+    if( mem > 0 ){
         ofs << endl;
-        ofs << "memory " << left << mem/1024/1024 << " mb" << endl;
+        ofs << "memory " << left << mem << " mb" << endl;
         ofs << endl;
     }
 
@@ -285,6 +308,8 @@ long int CNWChemJobType::GetMemory(const CSmallString& name)
                 if( munit == "mw" ) mem = mem * 8 * 1024 * 1024;
                 if( munit == "gw" ) mem = mem * 8 * 1024 * 1024 * 1024;
                 if( munit == "tw" ) mem = mem * 8 * 1024 * 1024 * 1024 * 1024;
+                // to MB
+                mem = mem / 1024 / 1024;
                 return(mem);
             }
         }

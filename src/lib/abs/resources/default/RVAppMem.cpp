@@ -75,7 +75,7 @@ void CRVAppMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         if( (ratio <= 0) || (ratio > 1.0) ) {
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        Memory fraction must be within (0.0; 1.0> interval but " << GetFloatNumber() << " is specified!</red></b>" << endl;
+            sout <<         "        Application memory fraction must be within (0.0; 1.0> interval but " << GetFloatNumber() << " is specified!</red></b>" << endl;
             rstatus = false;
             return;
         }
@@ -85,10 +85,30 @@ void CRVAppMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         if( size <= 0 ) {
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        Memory size must be larger than 1kb but " << GetSizeString() << " is specified!</red></b>" << endl;
+            sout <<         "        Application memory size must be larger than zero but " << GetSizeString() << " is specified!</red></b>" << endl;
             rstatus = false;
             return;
         }
+        // get requested memory from batch system and test if provided appmem is smaller
+        long long mem = 0;
+        const CResourceValuePtr p_rv = p_rl->FindResource("mem");
+        if( p_rv != NULL ){
+            mem = p_rv->GetSize();
+        } else {
+            const CResourceValuePtr p_rv1 = p_rl->FindResource("mempercpus");
+            const CResourceValuePtr p_rv2 = p_rl->FindResource("ncpus");
+            if( (p_rv != NULL) && (p_rv2 != NULL) ){
+                mem = p_rv1->GetSize()  * p_rv2->GetNumber();
+            }
+        }
+        if( (mem > 0) && (size > mem) ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout <<         "        Application memory size must be smaler than " << GetSizeString(mem) << " but " << GetSizeString() << " is specified!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+
     }
 }
 

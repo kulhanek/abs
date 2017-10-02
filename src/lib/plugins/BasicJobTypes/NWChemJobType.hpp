@@ -37,10 +37,10 @@ public:
     /// check job input file
     virtual bool CheckInputFile(CJob& job,std::ostream& sout);
 
-    /// update memory
+    /// update memory - in MB
     bool UpdateMemory(const CSmallString& name,long int mem);
 
-    /// get memory from the file
+    /// get memory from the file - in MB
     long int GetMemory(const CSmallString& name);
 };
 

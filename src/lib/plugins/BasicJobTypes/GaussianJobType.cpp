@@ -208,39 +208,57 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
         }
     }
 
-    // what amount should be dedicated to the gaussian job
-    long long perc = 95; // in %
-    CResourceValuePtr p_rv = job.ResourceList.FindResource("appmem");
-    if( p_rv != NULL ){
-        perc = p_rv->GetFloatNumber()*100;
+    // what amount of memory should be dedicated to the orca job
+    int             perc = 80; // in %
+    long long       mem = 0; // in MB
+    stringstream    minfo;
+
+    CSmallString appmem = job.GetItem("specific/resources","INF_APPMEM");
+    long long    amem = CResourceValue::GetSize(appmem); // in kB
+    if( (appmem != NULL) && (amem > 0) ){
+        // provided as memory value
+        mem = amem / 1024; // in MB
+        minfo << "appmem("<< appmem << ") = " << mem << " MB";
+    } else {
+        // provided as fraction of memory request
+        if( appmem != NULL ){
+            perc = appmem.ToDouble()*100.0;
+        }
+        CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
+        mem = CResourceValue::GetSize(smem); // in kb
+        if( mem > 0 ){
+            mem = mem * perc / 1024 / 100; // in MB
+            minfo << "appmem("<< perc << "%)*mem("<< smem << ") = " << mem << " MB";
+        } else {
+            mem = 0;
+        }
     }
 
-    bool mem_changed = false;
+    bool memory_changed = false;
 
     // check memory keyword
     CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
     if( smem != NULL ){
-        long long mem = CResourceValue::GetSize(smem)*1024;
-        long long umem = GetMemory(job,job_name);
+        long long umem = GetMemory(job,job_name); // in MB
 
-        if( abs(umem/1024/1024 - mem*perc/100/1024/1024) > 2 ){
+        if( abs(umem - mem) > 2 ){
             sout << endl;
             sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
             sout << "<b><blue>          in the gaussian input file!</blue></b>" << endl;
             sout << endl;
-            sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%)  : " << setw(7) << mem*perc/100/1024/1024 << " MB</blue></b>" << endl;
-            sout << "<b><blue>          The ammount of memory requested in the gaussian input file : " << setw(7) << umem/1024/1024 << " MB (via %Mem)</blue></b>" << endl;
+            sout << "<b><blue>          The ammount of memory requested via psubmit command        : " << setw(7) << mem  << " MB (" << minfo.str() << ")</blue></b>" << endl;
+            sout << "<b><blue>          The ammount of memory requested in the gaussian input file : " << setw(7) << umem << " MB (via %Mem)</blue></b>" << endl;
 
-            if( UpdateMemory(job,job_name,mem*perc/100) == false ){
+            if( UpdateMemory(job,job_name,mem) == false ){
                 sout << endl;
                 sout << "<b><red> ERROR: Unable to save updated gaussian input file (%Mem)!</red></b>" << endl;
                 return(false);
             }
-            mem_changed = true;
+            memory_changed = true;
         }
     }
 
-    if( mem_changed || (uncpus != ncpus) ){
+    if( memory_changed || (uncpus != ncpus) ){
         sout << endl;
         sout << "<b><blue> WARNING: The input file was updated!</blue></b>" << endl;
     }
@@ -300,7 +318,7 @@ bool CGaussianJobType::UpdateNProcShared(CJob& job,const CSmallString& name,int 
 //------------------------------------------------------------------------------
 
 bool CGaussianJobType::UpdateMemory(CJob& job,const CSmallString& name,long long mem)
-{
+{  
     CSmallString full_name = name + job.GetItem("basic/jobinput","INF_JOB_INPUT_EXT");
     ifstream ifs(full_name);
     if( ! ifs ) return(false);
@@ -326,8 +344,8 @@ bool CGaussianJobType::UpdateMemory(CJob& job,const CSmallString& name,long long
     // save changed file
     ofstream ofs(full_name);
 
-    if( mem > 1024*1024 ){
-        ofs << "%Mem=" << left << mem/1024/1024 << "MB" << endl;
+    if( mem > 0 ){
+        ofs << "%Mem=" << left << mem << "MB" << endl;
     }
 
     vector<string>::iterator    it = lines.begin();
@@ -407,6 +425,8 @@ long long CGaussianJobType::GetMemory(CJob& job,const CSmallString& name)
                 if( munit == "mw" ) mem = mem * 8 * 1024 * 1024;
                 if( munit == "gw" ) mem = mem * 8 * 1024 * 1024 * 1024;
                 if( munit == "tw" ) mem = mem * 8 * 1024 * 1024 * 1024 * 1024;
+                // convert to MB
+                mem = mem / 1024 / 1024;
                 return(mem);
             }
         }

@@ -43,10 +43,10 @@ public:
     /// get number of ncpus specified in the job input file
     int GetNProcShared(CJob& job,const CSmallString& name);
 
-    /// update memory
+    /// update memory - in MB
     bool UpdateMemory(CJob& job,const CSmallString& name,long long mem);
 
-    /// get memory from the file
+    /// get memory from the file - in MB
     long long GetMemory(CJob& job,const CSmallString& name);
 };
 

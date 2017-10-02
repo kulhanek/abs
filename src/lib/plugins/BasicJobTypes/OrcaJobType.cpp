@@ -202,7 +202,7 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     // check memory keyword
     if( ! minfo.str().empty() ){
-        long long umem = GetMemory(job,job_name);
+        long long umem = GetMemory(job,job_name); // in MB
         if( abs(umem - mem) > 2 ){
             sout << endl;
             sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
