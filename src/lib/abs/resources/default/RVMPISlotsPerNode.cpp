@@ -100,14 +100,6 @@ void CRVMPISlotsPerNode::TestValue(CResourceList* p_rl,std::ostream& sout,bool& 
     }
 }
 
-//------------------------------------------------------------------------------
-
-void CRVMPISlotsPerNode::GetVariable(CSmallString& name, CSmallString& value)
-{
-    name = "INF_MPI_SLOTS_PER_NODE";
-    value = Value;
-}
-
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================

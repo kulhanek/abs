@@ -62,13 +62,33 @@ CRVAppMem::CRVAppMem(void)
 
 void CRVAppMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
-    double ratio = GetFloatNumber();
-    if( (ratio <= 0) || (ratio > 1.0) ) {
-        if( rstatus == true ) sout << endl;
-        sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        Memory fraction must be within (0.0; 1.0> interval but " << GetFloatNumber() << " is specified!</red></b>" << endl;
-        rstatus = false;
-        return;
+    string svalue(Value);
+
+    bool fraction = true;
+    string legall_characters_size = "01234567890.";
+    if( svalue.find_first_not_of(legall_characters_size) != string::npos ){
+        fraction = false;
+    }
+
+    if( fraction ){
+        double ratio = GetFloatNumber();
+        if( (ratio <= 0) || (ratio > 1.0) ) {
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout <<         "        Memory fraction must be within (0.0; 1.0> interval but " << GetFloatNumber() << " is specified!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+    } else {
+        if( TestSizeValue(sout,rstatus) == false ) return;
+        long long size = GetSize();
+        if( size <= 0 ) {
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
+            sout <<         "        Memory size must be larger than 1kb but " << GetSizeString() << " is specified!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
     }
 }
 

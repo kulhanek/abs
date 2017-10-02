@@ -139,10 +139,25 @@ long long CResourceValue::GetSize(const CSmallString& value)
 
     to_lower(munit);
 
-//    if( munit == "kb" ) size = size;
-    if( munit == "mb" ) size = size * 1024;
-    if( munit == "gb" ) size = size * 1024 * 1024;
-    if( munit == "tb" ) size = size * 1024 * 1024 * 1024;
+    bool detected = false;
+
+    if( munit == "kb" ) {
+        detected = true;
+    }
+    if( munit == "mb" ) {
+        detected = true;
+        size = size * 1024;
+    }
+    if( munit == "gb" ) {
+        detected = true;
+        size = size * 1024 * 1024;
+    }
+    if( munit == "tb" ) {
+        detected = true;
+        size = size * 1024 * 1024 * 1024;
+    }
+
+    if( detected == false ) size = 0;
 
     return( size );
 }

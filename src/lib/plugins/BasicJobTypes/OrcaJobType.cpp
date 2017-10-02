@@ -146,11 +146,12 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
     CSmallString snnodes = job.GetItem("specific/resources","INF_NNODES");
     int nnodes = snnodes.ToInt();
 
-    CResourceValuePtr p_rv;
-    p_rv = job.ResourceList.FindResource("mpislotspernode");
-    if( p_rv != NULL ){
+    CSmallString smpislots = job.GetItem("specific/resources","INF_MPI_SLOTS_PER_NODE");
+    int mpislots = smpislots.ToInt();
+
+    if( mpislots > 0 ){
         // update number of CPUs according to mpislotspernode setup
-        ncpus = nnodes*p_rv->GetNumber();
+        ncpus = nnodes*mpislots;
     }
 
     CSmallString job_name = job.GetItem("basic/jobinput","INF_JOB_NAME");
@@ -171,28 +172,44 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
         }
     }
 
-    // what amount should be dedicated to the orca job
-    int perc = 80; // in %
-    p_rv = job.ResourceList.FindResource("appmem");
-    if( p_rv != NULL ){
-        perc = p_rv->GetFloatNumber()*100;
+    // what amount of memory should be dedicated to the orca job
+    int             perc = 80; // in %
+    long long       mem = 0;
+    stringstream    minfo;
+
+    CSmallString appmem = job.GetItem("specific/resources","INF_APPMEM");
+    long long    amem = CResourceValue::GetSize(appmem); // in kB
+    if( (appmem != NULL) && (amem > 0) ){
+        // provided as memory value
+        mem = amem / ncpus / 1024; // in MB
+        minfo << "appmem/ncpus = " << mem << " MB";
+    } else {
+        // provided as fraction of memory request
+        if( appmem != NULL ){
+            perc = appmem.ToDouble()*100.0;
+        }
+        CSmallString smem = job.GetItem("specific/resources","INF_MEMORY");
+        mem = CResourceValue::GetSize(smem); // in kb
+        if( mem > 0 ){
+            mem = mem * perc / ncpus / 1024 / 100; // in MB
+            minfo << "appmem*mem/ncpus = " << mem << " MB";
+        } else {
+            mem = 0;
+        }
     }
 
     bool mem_changed = false;
 
     // check memory keyword
-    CSmallString smem = job.GetItem("specific/resources","INF_MEMORY"); // in kb
-    if( smem != NULL ){
-        long long mem = CResourceValue::GetSize(smem)*perc/100/1024/ncpus;
+    if( minfo != NULL ){
         long long umem = GetMemory(job,job_name);
-
         if( abs(umem - mem) > 2 ){
             sout << endl;
             sout << "<b><blue> WARNING: Inconsistency in the amount of requested memory was detected</blue></b>" << endl;
             sout << "<b><blue>          in the orca input file!</blue></b>" << endl;
             sout << endl;
-            sout << "<b><blue>          The ammount of memory requested via psubmit command (" << perc << "%): " << setw(7) << mem << " MB</blue></b>" << endl;
-            sout << "<b><blue>          The ammount of memory requested in the orca input file :   " << setw(7) << umem << " MB (via %memcore)</blue></b>" << endl;
+            sout << "<b><blue>          The ammount of memory requested via psubmit command    : " << setw(7) <<  mem << " MB (" << minfo.str() << ")</blue></b>" << endl;
+            sout << "<b><blue>          The ammount of memory requested in the orca input file : " << setw(7) << umem << " MB (via %memcore)</blue></b>" << endl;
 
             if( UpdateMemory(job,job_name,mem) == false ){
                 sout << endl;

@@ -607,6 +607,8 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_MEMORY",ResourceList.GetMemoryString());
     SetItem("specific/resources","INF_WALLTIME",ResourceList.GetWallTimeString());
     SetItem("specific/resources","INF_RESOURCES",ResourceList.ToString(false));
+    SetItem("specific/resources","INF_MPI_SLOTS_PER_NODE",ResourceList.GetResourceValue("mpislotspernode"));
+    SetItem("specific/resources","INF_APPMEM",ResourceList.GetResourceValue("appmem"));
 
 // umask and group
     SetItem("specific/resources","INF_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
