@@ -182,7 +182,7 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
     if( (appmem != NULL) && (amem > 0) ){
         // provided as memory value
         mem = amem / ncpus / 1024; // in MB
-        minfo << "appmem/ncpus = " << mem << " MB";
+        minfo << "appmem("<< appmem << ")/ncpus(" << ncpus <<") = " << mem << " MB";
     } else {
         // provided as fraction of memory request
         if( appmem != NULL ){
@@ -192,16 +192,14 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
         mem = CResourceValue::GetSize(smem); // in kb
         if( mem > 0 ){
             mem = mem * perc / ncpus / 1024 / 100; // in MB
-            minfo << "appmem*mem/ncpus = " << mem << " MB";
+            minfo << "appmem("<< perc << "%)*mem("<< smem << ")/ncpus(" << ncpus <<") = " << mem << " MB";
         } else {
             mem = 0;
         }
     }
 
-    bool mem_changed = false;
-
     // check memory keyword
-    if( minfo != NULL ){
+    if( ! minfo.str().empty() ){
         long long umem = GetMemory(job,job_name);
         if( abs(umem - mem) > 2 ){
             sout << endl;
@@ -216,11 +214,10 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
                 sout << "<b><red> ERROR: Unable to save updated orca input file (%memcore)!</red></b>" << endl;
                 return(false);
             }
-            mem_changed = true;
         }
     }
 
-    if( mem_changed || (uncpus != ncpus) ){
+    if( (! minfo.str().empty()) || (uncpus != ncpus) ){
         sout << endl;
         sout << "<b><blue> WARNING: The input file was updated!</blue></b>" << endl;
     }
