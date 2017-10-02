@@ -198,6 +198,8 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
         }
     }
 
+    bool memory_changed = false;
+
     // check memory keyword
     if( ! minfo.str().empty() ){
         long long umem = GetMemory(job,job_name);
@@ -214,10 +216,11 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
                 sout << "<b><red> ERROR: Unable to save updated orca input file (%memcore)!</red></b>" << endl;
                 return(false);
             }
+            memory_changed = true;
         }
     }
 
-    if( (! minfo.str().empty()) || (uncpus != ncpus) ){
+    if( memory_changed || (uncpus != ncpus) ){
         sout << endl;
         sout << "<b><blue> WARNING: The input file was updated!</blue></b>" << endl;
     }
