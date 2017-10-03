@@ -128,8 +128,12 @@ bool CJobs::Run(void)
     }
 
     if( Options.GetOptFinished() ) {
+        // show only finished jobs
         JobList.KeepOnlyCompletedJobs();
         JobList.SortByFinishDateAndTime();
+    } else {
+        // this is important in the multibatch environment
+        JobList.SortByBatchSubmitDateAndTime();
     }
 
     if( Options.IsOptSearchSet() ){
@@ -144,9 +148,6 @@ bool CJobs::Run(void)
         //print_expression_tree(get_expression_tree());
         free_mask_tree();
     }
-
-    // this is important in the multibatch environment
-    JobList.SortByBatchSubmitDateAndTime();
 
     // print info about jobs
     JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
