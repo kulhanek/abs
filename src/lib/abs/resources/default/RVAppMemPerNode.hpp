@@ -1,5 +1,5 @@
-#ifndef RVAppMemH
-#define RVAppMemH
+#ifndef RVAppMemPerNodeH
+#define RVAppMemPerNodeH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
@@ -29,17 +29,17 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CRVAppMem : public CResourceValue {
+class ABS_PACKAGE CRVAppMemPerNode : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CRVAppMem(void);
+        CRVAppMemPerNode(void);
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
     virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
-    /// resolve conflicts
-    virtual void ResolveConflicts(CResourceList* p_rl);
+    /// resolve dynamic resource
+    virtual void ResolveDynamicResource(CResourceList* p_rl,bool& delete_me);
 };
 
 // -----------------------------------------------------------------------------
