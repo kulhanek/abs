@@ -1211,6 +1211,10 @@ bool CJob::ResubmitJob(bool verbose)
     // go to job directory
     CFileSystem::SetCurrentDir(GetInputDir());
 
+    // re-decode resources
+    std::ofstream tout;
+    DecodeResources(tout,true);
+
     // submit job to torque
     if( BatchServers.SubmitJob(*this,verbose) == false ){
         ES_TRACE_ERROR("unable to resubmit job to batch system");
