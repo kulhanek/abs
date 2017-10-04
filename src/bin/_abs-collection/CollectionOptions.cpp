@@ -79,13 +79,13 @@ int CCollectionOptions::CheckArguments(void)
 
     if( GetNumberOfProgArgs() == 1 ) return(SO_CONTINUE); // info action
 
-    if( (GetNumberOfProgArgs() == 2) &&
-        (GetProgArg(1) != "info") &&
-        (GetProgArg(1) != "open") &&
-        (GetProgArg(1) != "create") &&
-        (GetProgArg(1) != "close") &&
-        (GetProgArg(1) != "submit") &&
-        (GetProgArg(1) != "kill")){
+    if( (GetNumberOfProgArgs() != 2) && (
+        (GetProgArg(1) == "info") ||
+        (GetProgArg(1) == "open") ||
+        (GetProgArg(1) == "create") ||
+        (GetProgArg(1) == "close") ||
+        (GetProgArg(1) == "submit") ||
+        (GetProgArg(1) == "kill") ) ){
         if( IsVerbose() ) {
             if( IsError == false ) fprintf(stderr,"\n");
             fprintf(stderr,"%s: wrong number of arguments, only two arguments for action %s\n",
@@ -95,8 +95,8 @@ int CCollectionOptions::CheckArguments(void)
         return(SO_OPTS_ERROR);
     }
 
-    if( (GetNumberOfProgArgs() == 3) &&
-        (GetProgArg(1) != "rmjob") ){
+    if( (GetNumberOfProgArgs() != 3) &&
+        (GetProgArg(1) == "rmjob") ){
         if( IsVerbose() ) {
             if( IsError == false ) fprintf(stderr,"\n");
             fprintf(stderr,"%s: wrong number of arguments, only tree arguments for action %s\n",
@@ -107,7 +107,7 @@ int CCollectionOptions::CheckArguments(void)
     }
 
     if( (GetNumberOfProgArgs() < 4) &&
-        (GetProgArg(1) != "prepare") ){
+        (GetProgArg(1) == "prepare") ){
         if( IsVerbose() ) {
             if( IsError == false ) fprintf(stderr,"\n");
             fprintf(stderr,"%s: wrong number of arguments, at least four arguments for action %s\n",
