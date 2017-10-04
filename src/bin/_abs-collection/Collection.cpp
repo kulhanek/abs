@@ -297,7 +297,7 @@ bool CCollection::Run(void)
             ShellProcessor.CapturePWD();
             while( it != ie ){
                 CFileName path = *it;
-                vout << path << endl;
+                vout << "  " << path << endl;
                 ShellProcessor.ChangeCurrentDir(path);
                 ShellProcessor.ExitIfError();
                 ShellProcessor.ExecuteCMD(cmd);
@@ -573,7 +573,7 @@ void CCollection::FindJobs(std::vector<CFileName>& jobs,const CFileName& cwd,con
     // find all jobs matching job criteria
     CDirectoryEnum dir;
     CFileName path;
-    if( root == NULL ){
+    if( root != NULL ){
         path = cwd/root;
     } else {
         path = cwd;
@@ -585,7 +585,7 @@ void CCollection::FindJobs(std::vector<CFileName>& jobs,const CFileName& cwd,con
     while( dir.FindFile(file) ){
         if( (file == "..") || (file == ".") ) continue;
         CFileName fdir;
-        if( root == NULL ){
+        if( root != NULL ){
             fdir = root / file;
         } else {
             fdir = file;
