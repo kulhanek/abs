@@ -1213,28 +1213,31 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
     }
     CXMLElement* p_jele = p_ele->GetFirstChildElement("job");
     while( p_jele != NULL ){
-        // CJobPtr p_job(new CJob);
 
-        bool result = true;
         CSmallString name;
         CSmallString machine;
         CSmallString path;
 
-        result &= p_jele->GetAttribute("name",name);
-        result &= p_jele->GetAttribute("machine",machine);
-        result &= p_jele->GetAttribute("path",path);
+        p_jele->GetAttribute("name",name);
+        p_jele->GetAttribute("machine",machine);
+        p_jele->GetAttribute("path",path);
 
         // ignore all invalid jobs
+        if( (name != NULL) && (machine != NULL) && (path != NULL) ){
             // this is fallback job
-            // p_job->SetSimpleJobIdentification(name,machine,path);
+            CJobPtr p_job(new CJob);
+            p_job->SetSimpleJobIdentification(name,machine,path);
 
-        if( result == true ){
             // try to locate last valid job info in the job directory
             CJobList jobs;
-            jobs.InitByInfoFiles(path);
-            jobs.SortByPrepareDateAndTime();
+            if( CFileSystem::IsDirectory(path) ){
+                jobs.InitByInfoFiles(path);
+                jobs.SortByPrepareDateAndTime();
+            }
             if( jobs.size() >= 1 ){
-                push_back(jobs.back());
+                AddJob(jobs.back());
+            } else {
+                AddJob(p_job);
             }
         }
 
