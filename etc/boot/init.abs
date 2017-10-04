@@ -22,7 +22,7 @@ pgo(){
     unset INF_GO_WHOLE_NAME
     unset INF_GO_SITE_ID
 
-    eval `_abs-go $*`
+    eval "`_abs-go $*`"
     if [ "$AMS_EXIT_CODE" -eq 0 ]; then
         source $ABS_ROOT/share/scripts/abs-go
         AMS_EXIT_CODE=$?
@@ -52,7 +52,7 @@ pkill(){
     unset INF_KILL_WHOLE_NAME
     unset INF_KILL_JOB_KEY
 
-    eval `_abs-kill $*`
+    eval "`_abs-kill $*`"
     if [ "$AMS_EXIT_CODE" -eq 0 ]; then
         $ABS_ROOT/share/scripts/abs-kill
         AMS_EXIT_CODE=$?
@@ -80,7 +80,7 @@ psync(){
     unset INF_SYNC_WHOLE_NAME
     unset INF_SYNC_ALL
 
-    eval `_abs-sync $*`
+    eval "`_abs-sync $*`"
     if [ "$AMS_EXIT_CODE" -eq 0 ]; then
         $ABS_ROOT/share/scripts/abs-sync $*
         AMS_EXIT_CODE=$?
@@ -104,7 +104,7 @@ psync(){
 pcollection(){
     AMS_EXIT_CODE=1
 
-    eval `_abs-collection $*`
+    eval "`_abs-collection $*`"
     if [ "$AMS_EXIT_CODE" -ne 0 ]; then
         return "$AMS_EXIT_CODE"
     fi

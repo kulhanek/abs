@@ -130,7 +130,7 @@ bool CABSCompletion::GetSuggestions(void)
             PrintSuggestions();
             return(true);
         case 2:
-            AddSuggestions("create open close info submit stat");
+            AddSuggestions("create open close info submit stat prepare rmjob");
             FilterSuggestions();
             PrintSuggestions();
             return(true);
