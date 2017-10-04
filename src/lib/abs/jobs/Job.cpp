@@ -2142,7 +2142,7 @@ void CJob::SetSimpleJobIdentification(const CSmallString& name, const CSmallStri
     SetItem("basic/jobinput","INF_JOB_TITLE",name);
     SetItem("basic/jobinput","INF_JOB_NAME",name);
     SetItem("basic/jobinput","INF_INPUT_MACHINE",machine);
-    SetItem("basic/jobinput","INF_INPUT_PATH",path);
+    SetItem("basic/jobinput","INF_INPUT_DIR",path);
 }
 
 //------------------------------------------------------------------------------

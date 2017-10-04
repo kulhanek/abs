@@ -1213,7 +1213,7 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
     }
     CXMLElement* p_jele = p_ele->GetFirstChildElement("job");
     while( p_jele != NULL ){
-        CJobPtr p_job(new CJob);
+        // CJobPtr p_job(new CJob);
 
         bool result = true;
         CSmallString name;
@@ -1224,8 +1224,9 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
         result &= p_jele->GetAttribute("machine",machine);
         result &= p_jele->GetAttribute("path",path);
 
-        // this is fallback job
-        p_job->SetSimpleJobIdentification(name,machine,path);
+        // ignore all invalid jobs
+            // this is fallback job
+            // p_job->SetSimpleJobIdentification(name,machine,path);
 
         if( result == true ){
             // try to locate last valid job info in the job directory
@@ -1234,12 +1235,10 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
             jobs.SortByPrepareDateAndTime();
             if( jobs.size() >= 1 ){
                 push_back(jobs.back());
-            } else {
-                push_back(p_job);
             }
-        } else {
-            push_back(p_job);
         }
+
+
 
         p_jele = p_jele->GetNextSiblingElement("job");
     }
@@ -1280,10 +1279,21 @@ void CJobList::SaveCollectionJobs(CXMLElement* p_ele)
 
     while( it != ie ){
         CJobPtr p_job = *it;
-        CXMLElement* p_jele = p_ele->CreateChildElement("job");
-        p_jele->SetAttribute("name",p_job->GetJobName());
-        p_jele->SetAttribute("machine",p_job->GetInputMachine());
-        p_jele->SetAttribute("path",p_job->GetInputDir());
+
+        CSmallString name;
+        CSmallString mach;
+        CSmallString path;
+        name = p_job->GetItem("basic/jobinput","INF_JOB_NAME",true);
+        mach = p_job->GetItem("basic/jobinput","INF_INPUT_MACHINE",true);
+        path = p_job->GetItem("basic/jobinput","INF_INPUT_DIR",true);
+
+        // keep only jobs with full data
+        if( (name != NULL) && (mach != NULL) && (path != NULL) ){
+            CXMLElement* p_jele = p_ele->CreateChildElement("job");
+            p_jele->SetAttribute("name",name);
+            p_jele->SetAttribute("machine",mach);
+            p_jele->SetAttribute("path",path);
+        }
         it++;
     }
 }
@@ -1596,6 +1606,7 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
         switch( p_job->GetJobStatus() ){
             case EJS_NONE:
             case EJS_PREPARED:
+                break;
             case EJS_ERROR:
             case EJS_KILLED:
                 sout << " " << p_job->GetJobBatchComment();
@@ -1643,21 +1654,29 @@ bool CJobList::CollectionResubmitJobs(std::ostream& sout)
 
         result &= p_job->ResubmitJob(false);
         sout << right << setw(6) << i;
-        if( p_job->GetJobID() != NULL ){
-        CSmallString id = p_job->GetJobID();
-        if( id.GetLength() > 20 ){
-            id = id.GetSubStringFromTo(0,19);
-        }
-        sout << " " << left << setw(20) << id;
+
+        if( p_job->GetItem("submit/job","INF_JOB_ID",true) != NULL ){
+            CSmallString id = p_job->GetItem("submit/job","INF_JOB_ID");
+            CSmallString srv = p_job->GetItem("specific/resources","INF_SERVER_SHORT");
+            string stmp(id);
+            vector<string> items;
+            split(items,stmp,is_any_of("."));
+            if( items.size() >= 1 ){
+                id = items[0];
+            }
+            id << srv;
+            sout << " " << right << setw(12) << id;
         } else {
-        sout << "                     ";
+            sout << "             ";
         }
+
         CSmallString name = p_job->GetJobName();
         if( name.GetLength() > 15 ){
             name = name.GetSubStringFromTo(0,14);
         }
         sout << " " << setw(15) << name;
-        sout << " " << left << p_job->GetJobBatchComment();
+
+        // no comment here
         sout << endl;
 
         it++;
