@@ -483,7 +483,7 @@ void CResourceList::ResolveDependencies(CResourceValuePtr& p_rv,std::ostream& so
             }
             if( p_reqrv ){
                 found = true;
-                if( find(Dependencies.begin(),Dependencies.end(),p_reqrv) != Dependencies.end() ){
+                if( find(Dependencies.begin(),Dependencies.end(),p_reqrv) == Dependencies.end() ){
                     Dependencies.push_back(p_reqrv);
                 }
             }
@@ -502,7 +502,7 @@ void CResourceList::ResolveDependencies(CResourceValuePtr& p_rv,std::ostream& so
     }
 
     // insert this resource
-    if( find(Dependencies.begin(),Dependencies.end(),p_rv) != Dependencies.end() ){
+    if( find(Dependencies.begin(),Dependencies.end(),p_rv) == Dependencies.end() ){
         Dependencies.push_back(p_rv);
     }
 }
