@@ -357,7 +357,7 @@ bool CCollection::Run(void)
         // ask for resubmission?
         if( ! Options.GetOptAssumeYes() ){
             vout << endl;
-            vout << "Do you want to submit jobs to the Torque server (YES/NO)?" << endl;
+            vout << "Do you want to submit jobs to the batch server (YES/NO)?" << endl;
             vout << "> ";
 
             string answer;
@@ -366,9 +366,15 @@ bool CCollection::Run(void)
             CSmallString sanswer(answer.c_str());
             sanswer.ToUpperCase();
 
-            if( sanswer != "YES" ) return(true);
-            vout << "Listed jobs will be resubmitted to the Torque server!" << endl;
+            if( sanswer != "YES" ){
+                vout << "No jobs were resubmitted!" << endl;
+                return(true);
+            }
+        } else {
+            vout << endl;
         }
+
+        vout << "Listed jobs will be resubmitted to the batch server!" << endl;
 
         // resubmit jobs
         Jobs.CollectionResubmitJobs(vout);
