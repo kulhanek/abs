@@ -2161,7 +2161,7 @@ int CJob::GetNumberOfRecycleJobs(void)
 
 //------------------------------------------------------------------------------
 
-int CJob::GetCurrentOfRecycleJob(void)
+int CJob::GetCurrentRecycleJob(void)
 {
     CSmallString start;
     GetItem("basic/recycle","INF_RECYCLE_START",start,true);
@@ -2487,7 +2487,7 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
         sout << " " ;
 
         int tot = GetNumberOfRecycleJobs();
-        int cur = GetCurrentOfRecycleJob();
+        int cur = GetCurrentRecycleJob();
         int per = 0;
 
         switch( GetJobStatus() ){
@@ -3346,6 +3346,17 @@ int CJob::GetNumOfNodes(void)
         // be compatible wil older ABS versions ...
         // RT#216417
         tmp = GetItem("specific/resources","INF_NNODE");
+    }
+    return(tmp.ToInt());
+}
+
+//------------------------------------------------------------------------------
+
+int CJob::GetJobExitCode(void)
+{
+    CSmallString tmp = GetItem("stop/result","INF_JOB_EXIT_CODE",true);
+    if( tmp == NULL ){
+        return(0);
     }
     return(tmp.ToInt());
 }

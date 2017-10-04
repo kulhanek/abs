@@ -227,6 +227,9 @@ public:
     /// get num of nodes
     int GetNumOfNodes(void);
 
+    /// return job exit code
+    int GetJobExitCode(void);
+
     /// get job status from info file
     EJobStatus GetJobInfoStatus(void);
 
@@ -363,7 +366,7 @@ public:
     int GetNumberOfRecycleJobs(void);
 
     /// get current recycle job or 1 if general job
-    int GetCurrentOfRecycleJob(void);
+    int GetCurrentRecycleJob(void);
 
     /// is info file loaded
     bool IsInfoFileLoaded(void);

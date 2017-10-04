@@ -1348,7 +1348,7 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
         p_job->PrintJobInfoForCollection(sout,includepath,includecomment);
 
         int totrecycle = p_job->GetNumberOfRecycleJobs();
-        int currecycle = p_job->GetCurrentOfRecycleJob();
+        int currecycle = p_job->GetCurrentRecycleJob();
 
         total += totrecycle;
         if( currecycle - 1 > 0 ){
@@ -1448,6 +1448,52 @@ void CJobList::PrintCollectionStat(std::ostream& sout,bool compact,bool includep
 
 //------------------------------------------------------------------------------
 
+void CJobList::KeepCollectionJobsForResubmit(void)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    while( it != ie ){
+        CJobPtr p_job = *it;
+
+        switch( p_job->GetJobStatus() ){
+            case EJS_NONE:
+            case EJS_PREPARED:
+            case EJS_ERROR:
+            case EJS_KILLED:
+                // keep
+                it++;
+                break;
+            case EJS_FINISHED:{
+                    int totrecycle = p_job->GetNumberOfRecycleJobs();
+                    int currecycle = p_job->GetCurrentRecycleJob();
+                    if( currecycle != totrecycle ){
+                        // keep  - all recycle stages are not process
+                        it++;
+                        break;
+                    }
+                    if( p_job->GetJobExitCode() != 0 ){
+                        // keep  - the job did not finished well
+                        it++;
+                        break;
+                    }
+                    // delete
+                    it = erase(it);
+                }
+                break;
+            case EJS_SUBMITTED:
+            case EJS_RUNNING:
+            case EJS_INCONSISTENT:
+            default:
+                // delete
+                it = erase(it);
+                break;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
 void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
 {
     sout << endl;
@@ -1463,102 +1509,78 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
     int i=1;
     while( it != ie ){
         CJobPtr p_job = *it;
-
-        switch( p_job->GetJobStatus() ){
-            case EJS_NONE:
-            case EJS_PREPARED:
-            case EJS_ERROR:
-                sout << right << setw(6) << i << " ";
-                break;
-            case EJS_SUBMITTED:
-            case EJS_RUNNING:
-            case EJS_FINISHED:
-            case EJS_KILLED:
-            case EJS_INCONSISTENT:
-                break;
-        }
+        sout << right << setw(6) << i << " ";
 
         switch( p_job->GetJobStatus() ){
             case EJS_NONE:
                 sout << "UN";
                 break;
             case EJS_PREPARED:
-                sout << "P ";
-                break;
-            case EJS_ERROR:
-                sout << "ER";
+                sout << "<yellow>P</yellow> ";
                 break;
             case EJS_SUBMITTED:
-            case EJS_RUNNING:
-            case EJS_FINISHED:
-            case EJS_KILLED:
-            case EJS_INCONSISTENT:
+                sout << "<purple>Q</purple> ";
                 break;
+            case EJS_RUNNING:
+                sout << "<green>R</green> ";
+                break;
+            case EJS_FINISHED:
+                sout << "F ";
+                break;
+            case EJS_KILLED:
+                sout << "<red>KI</red>";
+                break;
+            case EJS_ERROR:
+                sout << "<red>ER</red>";
+                break;
+            case EJS_INCONSISTENT:
+                sout << "<red>IN</red>";
+                break;
+        }
+
+        if( p_job->GetJobID() != NULL ){
+            CSmallString id = p_job->GetJobID();
+            if( id.GetLength() > 20 ){
+                id = id.GetSubStringFromTo(0,19);
+            }
+            sout << " " << left << setw(20) << id;
+        } else {
+            sout << "                     ";
+        }
+        CSmallString name = p_job->GetJobName();
+        if( name.GetLength() > 15 ){
+            name = name.GetSubStringFromTo(0,14);
         }
 
         switch( p_job->GetJobStatus() ){
             case EJS_NONE:
             case EJS_PREPARED:
-            case EJS_ERROR:{
-                if( p_job->GetJobID() != NULL ){
-                CSmallString id = p_job->GetJobID();
-                if( id.GetLength() > 20 ){
-                    id = id.GetSubStringFromTo(0,19);
-                }
-                sout << " " << left << setw(20) << id;
-                } else {
-                sout << "                     ";
-                }
-                CSmallString name = p_job->GetJobName();
-                if( name.GetLength() > 15 ){
-                    name = name.GetSubStringFromTo(0,14);
-                }
+            case EJS_ERROR:
+            case EJS_KILLED:
                 sout << " " << p_job->GetJobBatchComment();
-                sout << endl;
+                break;
+            case EJS_FINISHED:{
+                    int totrecycle = p_job->GetNumberOfRecycleJobs();
+                    int currecycle = p_job->GetCurrentRecycleJob();
+                    if( currecycle != totrecycle ){
+                        sout << " " << "recycle batch is not finished (" << currecycle << "/" << totrecycle << ")";
+                    }
+                    if( p_job->GetJobExitCode() != 0 ){
+                        sout << " " << "job finished with error (" << p_job->GetJobExitCode() << ")";
+                    }
                 }
                 break;
             case EJS_SUBMITTED:
             case EJS_RUNNING:
-            case EJS_FINISHED:
-            case EJS_KILLED:
             case EJS_INCONSISTENT:
+            default:
                 break;
         }
+        sout << endl;
 
         it++;
         i++;
     }
-}
-
-//------------------------------------------------------------------------------
-
-int CJobList::NumOfJobsToBeResubmitted(void)
-{
-    list<CJobPtr>::iterator it = begin();
-    list<CJobPtr>::iterator ie = end();
-
-    int resubmit = 0;
-
-    while( it != ie ){
-        CJobPtr p_job = *it;
-
-        switch( p_job->GetJobStatus() ){
-            case EJS_NONE:
-            case EJS_PREPARED:
-            case EJS_ERROR:
-                resubmit++;
-                break;
-            case EJS_SUBMITTED:
-            case EJS_RUNNING:
-            case EJS_FINISHED:
-            case EJS_KILLED:
-            case EJS_INCONSISTENT:
-                break;
-        }
-        it++;
-    }
-
-    return(resubmit);
 }
 
 //------------------------------------------------------------------------------
@@ -1578,37 +1600,25 @@ bool CJobList::CollectionResubmitJobs(std::ostream& sout)
     while( it != ie ){
         CJobPtr p_job = *it;
 
-        switch( p_job->GetJobStatus() ){
-            case EJS_NONE:
-            case EJS_PREPARED:
-            case EJS_ERROR:{
-                result &= p_job->ResubmitJob(false);
-                sout << right << setw(6) << i;
-                if( p_job->GetJobID() != NULL ){
-                CSmallString id = p_job->GetJobID();
-                if( id.GetLength() > 20 ){
-                    id = id.GetSubStringFromTo(0,19);
-                }
-                sout << " " << left << setw(20) << id;
-                } else {
-                sout << "                     ";
-                }
-                CSmallString name = p_job->GetJobName();
-                if( name.GetLength() > 15 ){
-                    name = name.GetSubStringFromTo(0,14);
-                }
-                sout << " " << setw(15) << name;
-                sout << " " << left << p_job->GetJobBatchComment();
-                sout << endl;
-                }
-                break;
-            case EJS_SUBMITTED:
-            case EJS_RUNNING:
-            case EJS_FINISHED:
-            case EJS_KILLED:
-            case EJS_INCONSISTENT:
-                break;
+        result &= p_job->ResubmitJob(false);
+        sout << right << setw(6) << i;
+        if( p_job->GetJobID() != NULL ){
+        CSmallString id = p_job->GetJobID();
+        if( id.GetLength() > 20 ){
+            id = id.GetSubStringFromTo(0,19);
         }
+        sout << " " << left << setw(20) << id;
+        } else {
+        sout << "                     ";
+        }
+        CSmallString name = p_job->GetJobName();
+        if( name.GetLength() > 15 ){
+            name = name.GetSubStringFromTo(0,14);
+        }
+        sout << " " << setw(15) << name;
+        sout << " " << left << p_job->GetJobBatchComment();
+        sout << endl;
+
         it++;
         i++;
     }

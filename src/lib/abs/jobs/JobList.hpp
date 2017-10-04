@@ -83,11 +83,11 @@ public:
     /// generate collection statistics
     void PrintCollectionStat(std::ostream& sout,bool compact,bool includepath,bool includecomment);
 
+    /// keep only jobs suitable for resubmit
+    void KeepCollectionJobsForResubmit(void);
+
     /// print jobs that need to be resubmitted
     void PrintCollectionResubmitJobs(std::ostream& sout);
-
-    /// return number of jobs to be resubmitted
-    int NumOfJobsToBeResubmitted(void);
 
     /// resubmit jobs
     bool CollectionResubmitJobs(std::ostream& sout);

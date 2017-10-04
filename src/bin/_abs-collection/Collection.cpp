@@ -243,7 +243,9 @@ bool CCollection::Run(void)
         }
 
         // are there jobs for resubmission?
-        int njobs = Jobs.NumOfJobsToBeResubmitted();
+        Jobs.KeepCollectionJobsForResubmit();
+
+        int njobs = Jobs.GetNumberOfJobs();
         if( njobs <= 0 ){
             vout << endl;
             vout << "<blue> INFO: No jobs that require resubmission were found.</blue>" << endl;
