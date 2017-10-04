@@ -1238,8 +1238,6 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
             }
         }
 
-
-
         p_jele = p_jele->GetNextSiblingElement("job");
     }
 
