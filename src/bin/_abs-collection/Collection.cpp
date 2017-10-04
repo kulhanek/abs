@@ -125,7 +125,7 @@ bool CCollection::Run(void)
     }    
 
     CSmallString action = "info";
-    if( Options.GetNumberOfProgArgs() >= 1 ){
+    if( Options.GetNumberOfProgArgs() >= 2 ){
         action = Options.GetProgArg(1);
     }
 
