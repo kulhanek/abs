@@ -2439,29 +2439,29 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
             sout << "UN";
             break;
         case EJS_PREPARED:
-            sout << "P ";
+            sout << "<yellow>P</yellow> ";
             break;
         case EJS_SUBMITTED:
-            sout << "Q ";
+            sout << "<purple>Q</purple> ";
             break;
         case EJS_RUNNING:
-            sout << "R ";
+            sout << "<green>R</green> ";
             break;
         case EJS_FINISHED:
             if( GetJobExitCode() == 0 ){
                 sout << "F ";
             } else {
-                sout << "FE";
+                sout << "<red>FE</red>";
             }
             break;
         case EJS_KILLED:
-            sout << "K ";
+            sout << "<red>K</red> ";
             break;
         case EJS_ERROR:
-            sout << "ER";
+            sout << "<red>ER</red>";
             break;
         case EJS_INCONSISTENT:
-            sout << "IN";
+            sout << "<red>IN</red>";
             break;
     }
     CSmallString name = GetItem("basic/jobinput","INF_JOB_NAME");
@@ -2676,7 +2676,11 @@ void CJob::PrintJobStatus(std::ostream& sout)
     }
 
     if( HasSection("stop",stad) == true ){
-        sout << "F";
+        if( GetJobExitCode() == 0 ){
+            sout << "F";
+        } else {
+            sout << "FE";
+        }
         return;
     }
 
@@ -3577,7 +3581,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
             if( GetJobExitCode() == 0 ){
                 sout << "F ";
             } else {
-                sout << "FE";
+                sout << "<red>FE</red>";
             }
             break;
         case EJS_KILLED:

@@ -1531,8 +1531,8 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
     sout << "# List of jobs that will be resubmitted ..." << endl;
 
     sout << endl;
-    sout << "# CID  ST    Job ID        Job Name     Comment" << endl;
-    sout << "# ---- -- ------------- --------------- -----------------------------------------------------" << endl;
+    sout << "# CID  ST    Job ID       Job Name     Comment" << endl;
+    sout << "# ---- -- ------------ --------------- -----------------------------------------------------" << endl;
 
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
@@ -1556,8 +1556,11 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
                 sout << "<green>R</green> ";
                 break;
             case EJS_FINISHED:
-                sout << "F ";
-                break;
+                if( p_job->GetJobExitCode() == 0 ){
+                    sout << "F ";
+                } else {
+                    sout << "<red>FE</red>";
+                }
             case EJS_KILLED:
                 sout << "<red>KI</red>";
                 break;

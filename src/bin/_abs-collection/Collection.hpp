@@ -25,6 +25,8 @@
 #include <VerboseStr.hpp>
 #include <TerminalStr.hpp>
 #include <JobList.hpp>
+#include <vector>
+#include <FileName.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -45,10 +47,12 @@ public:
 
 // section of private data ----------------------------------------------------
 private:
-    CCollectionOptions    Options;
-    CTerminalStr    Console;
-    CVerboseStr     vout;
-    CJobList        Jobs;
+    CCollectionOptions      Options;
+    CTerminalStr            Console;
+    CVerboseStr             vout;
+    CJobList                Jobs;
+
+    void FindJobs(std::vector<CFileName>& jobs,const CFileName& cwd,const CFileName& root,const CFileName& job);
 };
 
 // -----------------------------------------------------------------------------

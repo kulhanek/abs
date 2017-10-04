@@ -46,16 +46,16 @@ class CCollectionOptions : public CSimpleOptions {
 
     CSO_PROG_ARGS_LONG_DESC_BEGIN
         "<b>Actions:</b>\n"
-        "   <b><cyan>info</cyan></b>        list jobs in collection (default action)\n\n"
-        "   <b><cyan>create</cyan></b>      create new collection <u>collname</u>\n\n"
-        "   <b><cyan>open</cyan></b>        open existing collection <u>collname</u> if collection does not exist it is created\n\n"
-        "   <b><cyan>close</cyan></b>       close <u>collname</u> collection\n\n"
+        "   <b><cyan>info</cyan></b>        list jobs in collection (default action)\n"
+        "   <b><cyan>create</cyan></b>      create new collection <u>collname</u>\n"
+        "   <b><cyan>open</cyan></b>        open existing collection <u>collname</u> if collection does not exist it is created\n"
+        "   <b><cyan>close</cyan></b>       close <u>collname</u> collection\n"
         "   <b><cyan>prepare</cyan></b> destination job [resources]\n"
-        "                                   add all <u>job</u> to <u>collname</u> collection\n\n"
+        "               add all <u>job</u> to <u>collname</u> collection\n"
         "   <b><cyan>submit</cyan></b>      submit all jobs in the collection <u>collname</u>\n"
         "   <b><cyan>kill</cyan></b>        kill all jobs in the collection <u>collname</u>\n"
         "   <b><cyan>rmjob</cyan></b> jobcid\n"
-        "                                   remove job with <u>jobcid</u> from <u>collname</u>\n"
+        "               remove job with <u>jobcid</u> from <u>collname</u>\n"
     CSO_PROG_ARGS_LONG_DESC_END
 
     CSO_PROG_VERS_BEGIN

@@ -67,6 +67,56 @@ int CCollectionOptions::FinalizeOptions(void)
 
 int CCollectionOptions::CheckArguments(void)
 {
+    if( GetNumberOfArgs() < 1 ){
+        if( IsVerbose() ) {
+            if( IsError == false ) fprintf(stderr,"\n");
+            fprintf(stderr,"%s: wrong number of arguments, at least one is required\n",
+                    (const char*)GetProgramName());
+            IsError = true;
+        }
+        return(SO_OPTS_ERROR);
+    }
+
+    if( GetNumberOfArgs() == 1 ) return(SO_CONTINUE); // info action
+
+    if( (GetNumberOfArgs() == 2) &&
+        (GetProgArg(1) != "info") &&
+        (GetProgArg(1) != "open") &&
+        (GetProgArg(1) != "create") &&
+        (GetProgArg(1) != "close") &&
+        (GetProgArg(1) != "submit") &&
+        (GetProgArg(1) != "kill")){
+        if( IsVerbose() ) {
+            if( IsError == false ) fprintf(stderr,"\n");
+            fprintf(stderr,"%s: wrong number of arguments, only two arguments for action %s\n",
+                    (const char*)GetProgramName(), (const char*)GetProgArg(1));
+            IsError = true;
+        }
+        return(SO_OPTS_ERROR);
+    }
+
+    if( (GetNumberOfArgs() == 3) &&
+        (GetProgArg(1) != "rmjob") ){
+        if( IsVerbose() ) {
+            if( IsError == false ) fprintf(stderr,"\n");
+            fprintf(stderr,"%s: wrong number of arguments, only tree arguments for action %s\n",
+                    (const char*)GetProgramName(), (const char*)GetProgArg(1));
+            IsError = true;
+        }
+        return(SO_OPTS_ERROR);
+    }
+
+    if( (GetNumberOfArgs() < 4) &&
+        (GetProgArg(1) != "prepare") ){
+        if( IsVerbose() ) {
+            if( IsError == false ) fprintf(stderr,"\n");
+            fprintf(stderr,"%s: wrong number of arguments, at least four arguments for action %s\n",
+                    (const char*)GetProgramName(), (const char*)GetProgArg(1));
+            IsError = true;
+        }
+        return(SO_OPTS_ERROR);
+    }
+
     return(SO_CONTINUE);
 }
 
