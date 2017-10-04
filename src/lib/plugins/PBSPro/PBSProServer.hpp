@@ -40,7 +40,8 @@ typedef int (*PBS_CONNECT)(const char*);
 typedef int (*PBS_DISCONNECT)(int);
 typedef struct batch_status* (*PBS_STATSERVER)(int,struct attrl*,char*);
 typedef struct batch_status* (*PBS_STATQUE)(int,char*,struct attrl*,char*);
-typedef struct batch_status* (*PBS_STATNODE)(int,char*,struct attrl*,char*);
+typedef struct batch_status* (*PBS_STATHOST)(int,char*,struct attrl*,char*);
+typedef struct batch_status* (*PBS_STATVNODE)(int,char*,struct attrl*,char*);
 typedef struct batch_status* (*PBS_STATJOB)(int,char*,struct attrl*,char*);
 // the last argument is due to PBSPro
 typedef struct batch_status* (*PBS_SELSTATJOB)(int,struct attropl*,char*,char*);
@@ -151,7 +152,8 @@ private:
     PBS_DISCONNECT  pbspro_disconnect;
     PBS_STATSERVER  pbspro_statserver;
     PBS_STATQUE     pbspro_statque;
-    PBS_STATNODE    pbspro_statnode;
+    PBS_STATHOST    pbspro_stathost;
+    PBS_STATVNODE   pbspro_statvnode;
     PBS_STATJOB     pbspro_statjob;
     PBS_SELSTATJOB  pbspro_selstat;
     PBS_STATFREE    pbspro_statfree;

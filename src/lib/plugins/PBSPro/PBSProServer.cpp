@@ -82,7 +82,8 @@ CPBSProServer::CPBSProServer(void)
     pbspro_disconnect = NULL;
     pbspro_statserver = NULL;
     pbspro_statque = NULL;
-    pbspro_statnode = NULL;
+    pbspro_stathost = NULL;
+    pbspro_statvnode = NULL;
     pbspro_statjob = NULL;
     pbspro_selstat = NULL;
     pbspro_statfree = NULL;
@@ -178,9 +179,14 @@ bool CPBSProServer::InitSymbols(void)
         ES_ERROR("unable to bind to pbs_statque");
         status = false;
     }
-    pbspro_statnode  = (PBS_STATNODE)PBSProLib.GetProcAddress("pbs_statnode");
-    if( pbspro_statnode == NULL ){
-        ES_ERROR("unable to bind to pbs_statnode");
+    pbspro_stathost  = (PBS_STATHOST)PBSProLib.GetProcAddress("pbs_stathost");
+    if( pbspro_stathost == NULL ){
+        ES_ERROR("unable to bind to pbs_stathost");
+        status = false;
+    }
+    pbspro_statvnode  = (PBS_STATVNODE)PBSProLib.GetProcAddress("pbs_statvnode");
+    if( pbspro_statvnode == NULL ){
+        ES_ERROR("unable to bind to pbs_statvnode");
         status = false;
     }
     pbspro_statjob  = (PBS_STATJOB)PBSProLib.GetProcAddress("pbs_statjob");
@@ -324,7 +330,7 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
 
 bool CPBSProServer::GetNodes(CNodeList& nodes)
 {
-    struct batch_status* p_node_attrs = pbspro_statnode(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_node_attrs = pbspro_stathost(ServerID,NULL,NULL,NULL);
 
     bool result = true;
     while( p_node_attrs != NULL ){
@@ -498,31 +504,38 @@ bool CPBSProServer::PrintQueues(std::ostream& sout)
         PrintBatchStatus(sout,p_queues);
         pbspro_statfree(p_queues);
     }
-    return(true);
+    return(p_queues != NULL);
 }
 
 //------------------------------------------------------------------------------
 
 bool CPBSProServer::PrintNodes(std::ostream& sout)
 {
-    struct batch_status* p_nodes = pbspro_statnode(ServerID,NULL,NULL,NULL);
+    struct batch_status* p_nodes = pbspro_stathost(ServerID,NULL,NULL,NULL);
     if( p_nodes != NULL ) {
         PrintBatchStatus(sout,p_nodes);
         pbspro_statfree(p_nodes);
     }
-    return(true);
+    return(p_nodes != NULL);
 }
 
 //------------------------------------------------------------------------------
 
 bool CPBSProServer::PrintNode(std::ostream& sout,const CSmallString& name)
 {
-    struct batch_status* p_nodes = pbspro_statnode(ServerID,(char*)name.GetBuffer(),NULL,NULL);
+    struct batch_status* p_nodes = pbspro_stathost(ServerID,(char*)name.GetBuffer(),NULL,NULL);
     if( p_nodes != NULL ) {
         PrintBatchStatus(sout,p_nodes);
         pbspro_statfree(p_nodes);
+    } else {
+        // try vhost
+        p_nodes = pbspro_statvnode(ServerID,(char*)name.GetBuffer(),NULL,NULL);
+        if( p_nodes != NULL ) {
+            PrintBatchStatus(sout,p_nodes);
+            pbspro_statfree(p_nodes);
+        }
     }
-    return(true);
+    return(p_nodes != NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -534,7 +547,7 @@ bool CPBSProServer::PrintJobs(std::ostream& sout)
         PrintBatchStatus(sout,p_jobs);
         pbspro_statfree(p_jobs);
     }
-    return(true);
+    return(p_jobs != NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -549,7 +562,7 @@ bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid)
         PrintBatchStatus(sout,p_jobs);
         pbspro_statfree(p_jobs);
     }
-    return(true);
+    return(p_jobs != NULL);
 }
 
 //==============================================================================
