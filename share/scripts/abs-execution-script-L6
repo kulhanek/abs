@@ -91,7 +91,7 @@ echo "# ========================================================================
 type ipcs &> /dev/null
 
 if [ $? -eq 0 ]; then
-    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
         echo ""
         echo ">>> $NODE_NAME ---"
         ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ipcs
