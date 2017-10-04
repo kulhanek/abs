@@ -413,7 +413,7 @@ void CResourceList::ResolveDynamicResources(std::ostream& sout,bool& rstatus)
     ie = end();
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        if( find(Dependencies.begin(),Dependencies.end(),p_rv) != Dependencies.end() ){
+        if( find(Dependencies.begin(),Dependencies.end(),p_rv) == Dependencies.end() ){
             // is not in the list yet
             ResolveDependencies(p_rv,sout,rstatus);
         }
