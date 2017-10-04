@@ -426,6 +426,7 @@ void CResourceList::ResolveDynamicResources(std::ostream& sout,bool& rstatus)
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
+        cout << p_rv->Name << endl;
         bool delete_me = false;
         p_rv->ResolveDynamicResource(this,delete_me);
         if( delete_me ){
