@@ -1641,8 +1641,8 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
 bool CJobList::CollectionResubmitJobs(std::ostream& sout)
 {
     sout << endl;
-    sout << "# CID          Job ID          Job Name     Comment" << endl;
-    sout << "# ---- -------------------- --------------- -----------------------------------------------------" << endl;
+    sout << "# CID    Job ID        Job Name     Comment" << endl;
+    sout << "# ---- ------------ --------------- -----------------------------------------------------" << endl;
 
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
