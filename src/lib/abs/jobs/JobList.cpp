@@ -1365,6 +1365,16 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
                 processing++;
                 break;
             case EJS_FINISHED:
+                if( p_job->GetJobExitCode() != 0 ){
+                    resubmit++;
+                } else {
+                    if( currecycle < totrecycle ){
+                        resubmit++;
+                    } else {
+                        finished++;
+                    }
+                }
+                break;
             case EJS_KILLED:
                 finished++;
                 break;
@@ -1500,8 +1510,8 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
     sout << "# List of jobs that will be resubmitted ..." << endl;
 
     sout << endl;
-    sout << "# CID  ST         Job ID          Job Name     Comment" << endl;
-    sout << "# ---- -- -------------------- --------------- -----------------------------------------------------" << endl;
+    sout << "# CID  ST    Job ID        Job Name     Comment" << endl;
+    sout << "# ---- -- ------------- --------------- -----------------------------------------------------" << endl;
 
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
@@ -1538,19 +1548,26 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
                 break;
         }
 
-        if( p_job->GetJobID() != NULL ){
-            CSmallString id = p_job->GetJobID();
-            if( id.GetLength() > 20 ){
-                id = id.GetSubStringFromTo(0,19);
+        if( p_job->GetItem("submit/job","INF_JOB_ID",true) != NULL ){
+            CSmallString id = p_job->GetItem("submit/job","INF_JOB_ID");
+            CSmallString srv = p_job->GetItem("specific/resources","INF_SERVER_SHORT");
+            string stmp(id);
+            vector<string> items;
+            split(items,stmp,is_any_of("."));
+            if( items.size() >= 1 ){
+                id = items[0];
             }
-            sout << " " << left << setw(20) << id;
+            id << srv;
+            sout << " " << right << setw(12) << id;
         } else {
-            sout << "                     ";
+            sout << "             ";
         }
+
         CSmallString name = p_job->GetJobName();
         if( name.GetLength() > 15 ){
             name = name.GetSubStringFromTo(0,14);
         }
+        sout << " " << setw(15) << name;
 
         switch( p_job->GetJobStatus() ){
             case EJS_NONE:

@@ -3604,6 +3604,9 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
     sout << " " << left << setw(12) << user;
 
     CSmallString title = GetItem("basic/jobinput","INF_JOB_TITLE");
+    if( title.GetLength() > 15 ){
+        title = title.GetSubStringFromTo(0,14);
+    }
     sout << " " << setw(15) << title;
     CSmallString queue = GetItem("specific/resources","INF_QUEUE");
     if( queue.GetLength() > 15 ){
