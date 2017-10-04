@@ -67,7 +67,7 @@ int CCollectionOptions::FinalizeOptions(void)
 
 int CCollectionOptions::CheckArguments(void)
 {
-    if( GetNumberOfArgs() < 1 ){
+    if( GetNumberOfProgArgs() < 1 ){
         if( IsVerbose() ) {
             if( IsError == false ) fprintf(stderr,"\n");
             fprintf(stderr,"%s: wrong number of arguments, at least one is required\n",
@@ -77,9 +77,9 @@ int CCollectionOptions::CheckArguments(void)
         return(SO_OPTS_ERROR);
     }
 
-    if( GetNumberOfArgs() == 1 ) return(SO_CONTINUE); // info action
+    if( GetNumberOfProgArgs() == 1 ) return(SO_CONTINUE); // info action
 
-    if( (GetNumberOfArgs() == 2) &&
+    if( (GetNumberOfProgArgs() == 2) &&
         (GetProgArg(1) != "info") &&
         (GetProgArg(1) != "open") &&
         (GetProgArg(1) != "create") &&
@@ -95,7 +95,7 @@ int CCollectionOptions::CheckArguments(void)
         return(SO_OPTS_ERROR);
     }
 
-    if( (GetNumberOfArgs() == 3) &&
+    if( (GetNumberOfProgArgs() == 3) &&
         (GetProgArg(1) != "rmjob") ){
         if( IsVerbose() ) {
             if( IsError == false ) fprintf(stderr,"\n");
@@ -106,7 +106,7 @@ int CCollectionOptions::CheckArguments(void)
         return(SO_OPTS_ERROR);
     }
 
-    if( (GetNumberOfArgs() < 4) &&
+    if( (GetNumberOfProgArgs() < 4) &&
         (GetProgArg(1) != "prepare") ){
         if( IsVerbose() ) {
             if( IsError == false ) fprintf(stderr,"\n");
