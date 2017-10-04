@@ -60,7 +60,7 @@ CRVAppMem::CRVAppMem(void)
 
 //------------------------------------------------------------------------------
 
-void CRVAppMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVAppMem::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     string svalue(Value);
 
@@ -82,24 +82,35 @@ void CRVAppMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
     } else {
         if( TestSizeValue(sout,rstatus) == false ) return;
         long long size = GetSize();
-        if( size <= 0 ) {
+        if( size <= 1 ) {
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        Application memory size must be larger than zero but " << GetSizeString() << " is specified!</red></b>" << endl;
+            sout <<         "        Application memory size must be larger than 1kb but " << GetSizeString() << " is specified!</red></b>" << endl;
             rstatus = false;
             return;
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CRVAppMem::PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+{
+    string svalue(Value);
+
+    bool fraction = true;
+    string legall_characters_size = "01234567890.";
+    if( svalue.find_first_not_of(legall_characters_size) != string::npos ){
+        fraction = false;
+    }
+    if( ! fraction ){
+        long long size = GetSize();
+
         // get requested memory from batch system and test if provided appmem is smaller
         long long mem = 0;
         const CResourceValuePtr p_rv = p_rl->FindResource("mem");
         if( p_rv != NULL ){
             mem = p_rv->GetSize();
-        } else {
-            const CResourceValuePtr p_rv1 = p_rl->FindResource("mempercpu");
-            const CResourceValuePtr p_rv2 = p_rl->FindResource("ncpus");
-            if( (p_rv1 != NULL) && (p_rv2 != NULL) ){
-                mem = p_rv1->GetSize()  * p_rv2->GetNumber();
-            }
         }
         if( (mem > 0) && (size > mem) ){
             if( rstatus == true ) sout << endl;
@@ -108,7 +119,6 @@ void CRVAppMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
             rstatus = false;
             return;
         }
-
     }
 }
 

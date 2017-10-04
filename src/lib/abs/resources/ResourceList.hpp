@@ -74,18 +74,18 @@ public:
     /// remove resource
     void RemoveResource(const CSmallString& name);
 
-    /// sort by name
-    void SortByName(void);
-
 // expected order of execution ....
     /// resolve conflicts
     void ResolveConflicts(const CSmallString& short_server_name);
 
     /// test all resources
-    void TestResourceValues(std::ostream& sout,bool& rstatus);
+    void PreTestResourceValues(std::ostream& sout,bool& rstatus);
+
+    /// test all resources
+    void PostTestResourceValues(std::ostream& sout,bool& rstatus);
 
     /// resolve dynamic resources
-    void ResolveDynamicResources(void);
+    void ResolveDynamicResources(std::ostream& sout,bool& rstatus);
 
 // information methods ---------------------------------------------------------
     /// get resource value
@@ -120,10 +120,11 @@ public:
 
 // section of private data -----------------------------------------------------
 private:
-    CJob*       Job;
+    CJob*                           Job;
+    std::list<CResourceValuePtr>    Dependencies;
 
-    /// helper method
-    static bool SortCompName(const CResourceValuePtr& p_left,const CResourceValuePtr& p_right);
+    // helper methods
+    void ResolveDependencies(CResourceValuePtr& p_rv,std::ostream& sout,bool& rstatus);
 
     friend class CJob;
 };

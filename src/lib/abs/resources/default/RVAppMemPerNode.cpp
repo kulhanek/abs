@@ -56,11 +56,13 @@ using namespace std;
 CRVAppMemPerNode::CRVAppMemPerNode(void)
     : CResourceValue(&RVAppMemPerNodeObject)
 {
+    Requires.push_back("nnodes");
+    Provides.push_back("appmem");
 }
 
 //------------------------------------------------------------------------------
 
-void CRVAppMemPerNode::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVAppMemPerNode::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestSizeValue(sout,rstatus) == false ) return;
     long long size = GetSize(); // in kb

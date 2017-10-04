@@ -555,14 +555,24 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     }
 
 // test resources
-    ResourceList.TestResourceValues(sout,result);
+    ResourceList.PreTestResourceValues(sout,result);
     if( result == false ){
         ES_TRACE_ERROR("some resource value is invalid");
         return(false);
     }
 
 // calculate dynamic resources
-    ResourceList.ResolveDynamicResources();
+    ResourceList.ResolveDynamicResources(sout,result);
+    if( result == false ){
+        ES_TRACE_ERROR("some resource value is invalid");
+        return(false);
+    }
+
+    ResourceList.PostTestResourceValues(sout,result);
+    if( result == false ){
+        ES_TRACE_ERROR("some resource value is invalid");
+        return(false);
+    }
 
 // determine batch resources
     CBatchServerPtr srv_ptr = BatchServers.FindBatchServer(BatchServerName,true);

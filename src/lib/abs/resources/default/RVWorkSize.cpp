@@ -60,7 +60,7 @@ CRVWorkSize::CRVWorkSize(void)
 
 //------------------------------------------------------------------------------
 
-void CRVWorkSize::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVWorkSize::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestSizeValue(sout,rstatus) == false ) return;
     long long size = GetSize();

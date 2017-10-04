@@ -63,7 +63,7 @@ CRVProps::CRVProps(void)
 
 //------------------------------------------------------------------------------
 
-void CRVProps::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVProps::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     vector<string> slist;
     string         svalue(Value);

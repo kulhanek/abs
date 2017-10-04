@@ -375,32 +375,62 @@ void CResourceList::ResolveConflicts(const CSmallString& short_server_name)
 
 //------------------------------------------------------------------------------
 
-void CResourceList::TestResourceValues(std::ostream& sout,bool& rstatus)
+void CResourceList::PreTestResourceValues(std::ostream& sout,bool& rstatus)
 {
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
-        p_rv->TestValue(this,sout,rstatus);
+        p_rv->PreTestValue(this,sout,rstatus);
         it++;
     }
 }
 
 //------------------------------------------------------------------------------
 
-void CResourceList::ResolveDynamicResources(void)
+void CResourceList::PostTestResourceValues(std::ostream& sout,bool& rstatus)
 {
     std::list<CResourceValuePtr>::iterator     it = begin();
     std::list<CResourceValuePtr>::iterator     ie = end();
 
+    while( it != ie ){
+        CResourceValuePtr p_rv = *it;
+        p_rv->PostTestValue(this,sout,rstatus);
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CResourceList::ResolveDynamicResources(std::ostream& sout,bool& rstatus)
+{
+    std::list<CResourceValuePtr>::iterator     it;
+    std::list<CResourceValuePtr>::iterator     ie;
+
+    // setup dependencies
+    it = begin();
+    ie = end();
+    while( it != ie ){
+        CResourceValuePtr p_rv = *it;
+        if( find(Dependencies.begin(),Dependencies.end(),p_rv) != Dependencies.end() ){
+            // is not in the list yet
+            ResolveDependencies(p_rv,sout,rstatus);
+        }
+        it++;
+    }
+
     // resolve dynamic resources
+    it = Dependencies.begin();
+    ie = Dependencies.end();
+
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
         bool delete_me = false;
         p_rv->ResolveDynamicResource(this,delete_me);
         if( delete_me ){
-            it = erase(it);
+            RemoveResource(p_rv->Name);
+            it = Dependencies.erase(it);
         } else {
             it++;
         }
@@ -408,6 +438,8 @@ void CResourceList::ResolveDynamicResources(void)
 
     // do variable substitution
     it = begin();
+    ie = end();
+
     while( it != ie ){
         CResourceValuePtr p_rv = *it;
         if( p_rv->Value.GetLength() >= 2 ){
@@ -420,6 +452,57 @@ void CResourceList::ResolveDynamicResources(void)
             }
         }
         it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CResourceList::ResolveDependencies(CResourceValuePtr& p_rv,std::ostream& sout,bool& rstatus)
+{
+    // resolve requires
+    std::vector<CSmallString>::iterator rit = p_rv->Requires.begin();
+    std::vector<CSmallString>::iterator rie = p_rv->Requires.end();
+
+    while( rit != rie ){
+        CSmallString reqname = *rit;
+
+        bool found = false;
+
+        std::list<CResourceValuePtr>::iterator     ait = begin();
+        std::list<CResourceValuePtr>::iterator     aie = end();
+
+        while( ait != aie ){
+            CResourceValuePtr p_arv = *ait;
+            CResourceValuePtr p_reqrv;
+            if( p_arv->Name == reqname ){
+                p_reqrv = p_arv;
+            }
+            if( p_arv->DoesItProvide(reqname) ){
+                p_reqrv = p_arv;
+            }
+            if( p_reqrv ){
+                found = true;
+                if( find(Dependencies.begin(),Dependencies.end(),p_reqrv) != Dependencies.end() ){
+                    Dependencies.push_back(p_reqrv);
+                }
+            }
+            ait++;
+        }
+
+        if( ! found ){
+            if( rstatus == true ) sout << endl;
+            sout << "<b><red> ERROR: Illegal '" << p_rv->Name << "' resource specification!" << endl;
+            sout <<         "        This resources requires '" << reqname << ", which is not specifed or provided by other existing reources'!</red></b>" << endl;
+            rstatus = false;
+            return;
+        }
+
+        rit++;
+    }
+
+    // insert this resource
+    if( find(Dependencies.begin(),Dependencies.end(),p_rv) != Dependencies.end() ){
+        Dependencies.push_back(p_rv);
     }
 }
 
@@ -528,20 +611,6 @@ const CSmallString CResourceList::GetVariables(void) const
     }
 
     return(vars);
-}
-
-//------------------------------------------------------------------------------
-
-bool CResourceList::SortCompName(const CResourceValuePtr& p_left,const CResourceValuePtr& p_right)
-{
-    return( strcmp(p_left->Name,p_right->Name) < 0 );
-}
-
-//------------------------------------------------------------------------------
-
-void CResourceList::SortByName(void)
-{
-    sort(SortCompName);
 }
 
 //==============================================================================

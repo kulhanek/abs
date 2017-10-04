@@ -59,7 +59,7 @@ CRVEmail::CRVEmail(void)
 
 //------------------------------------------------------------------------------
 
-void CRVEmail::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVEmail::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( Value.FindSubString("@") == -1 ){
         if( rstatus == true ) sout << endl;

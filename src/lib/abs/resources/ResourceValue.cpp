@@ -47,7 +47,14 @@ CResourceValue::CResourceValue(CPluginObject* p_objectinfo)
 
 //------------------------------------------------------------------------------
 
-void CResourceValue::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CResourceValue::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+{
+    // nothing to be here
+}
+
+//------------------------------------------------------------------------------
+
+void CResourceValue::PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     // nothing to be here
 }
@@ -316,6 +323,13 @@ bool CResourceValue::TestKeyValue(std::ostream& sout,bool& rstatus,const CSmallS
     sout <<         "        Allowed values '" << keys << "' but '" << Value << "' is specified!</red></b>" << endl;
     rstatus = false;
     return(false);
+}
+
+//------------------------------------------------------------------------------
+
+bool CResourceValue::DoesItProvide(const CSmallString& name)
+{
+    return(find(Provides.begin(),Provides.end(),name) != Provides.end());
 }
 
 //==============================================================================

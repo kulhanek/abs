@@ -57,11 +57,13 @@ using namespace std;
 CRVNCPUsPerNode::CRVNCPUsPerNode(void)
     : CResourceValue(&RVNCPUsPerNodeObject)
 {
+    Requires.push_back("ncpus");
+    Provides.push_back("nnodes");
 }
 
 //------------------------------------------------------------------------------
 
-void CRVNCPUsPerNode::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVNCPUsPerNode::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestNumberValue(sout,rstatus) == false ) return;
     long long value = GetNumber();

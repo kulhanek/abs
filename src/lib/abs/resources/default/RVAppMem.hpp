@@ -36,7 +36,10 @@ public:
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
-    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+    virtual void PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+
+    /// test value if it is in expected range - final test after all resources are completed
+    virtual void PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
     /// resolve conflicts
     virtual void ResolveConflicts(CResourceList* p_rl);

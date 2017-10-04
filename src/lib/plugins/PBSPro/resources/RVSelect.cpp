@@ -61,7 +61,7 @@ CRVSelect::CRVSelect(void)
 
 //------------------------------------------------------------------------------
 
-void CRVSelect::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVSelect::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     CResourceValuePtr res_ptr;
     res_ptr = p_rl->FindResource("ncpus");

@@ -64,7 +64,7 @@ CRVWalltime::CRVWalltime(void)
 
 //------------------------------------------------------------------------------
 
-void CRVWalltime::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVWalltime::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     string svalue(Value);
 

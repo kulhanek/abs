@@ -28,6 +28,7 @@
 #include <ComObject.hpp>
 #include <map>
 #include <string>
+#include <vector>
 
 // -----------------------------------------------------------------------------
 
@@ -43,8 +44,11 @@ public:
         CResourceValue(CPluginObject* p_objectinfo);
 
 // information methods ---------------------------------------------------------
-    /// test value if it is in expected range
-    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+    /// test value if it is in expected range - initial test
+    virtual void PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+
+    /// test value if it is in expected range - final test after all resources are completed
+    virtual void PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
     /// resolve conflicts
     virtual void ResolveConflicts(CResourceList* p_rl);
@@ -82,11 +86,17 @@ public:
     /// get value
     const CSmallString& GetValue(void);
 
+    /// does it provide specified resource?
+    bool DoesItProvide(const CSmallString& name);
+
 // section of private data -----------------------------------------------------
 protected:
-    CSmallString    Server;         // batch server - short server name
-    CSmallString    Name;           // derived from plusula object configuration
-    CSmallString    Value;
+    CSmallString                Server;         // batch server - short server name
+    CSmallString                Name;           // derived from plusula object configuration
+    CSmallString                Value;
+    // dependencies for ResolveDynamicResource
+    std::vector<CSmallString>   Requires;
+    std::vector<CSmallString>   Provides;
 
     /// test value if it is in expected range (number[b][kb][mb][gb][tb])
     bool TestSizeValue(std::ostream& sout,bool& rstatus);

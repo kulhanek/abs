@@ -57,12 +57,13 @@ using namespace std;
 CRVWorkSizePerCPU::CRVWorkSizePerCPU(void)
     : CResourceValue(&RVWorkSizePerCPUObject)
 {
-
+    Requires.push_back("ncpus");
+    Provides.push_back("worksize");
 }
 
 //------------------------------------------------------------------------------
 
-void CRVWorkSizePerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVWorkSizePerCPU::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestSizeValue(sout,rstatus) == false ) return;
     long long size = GetSize();

@@ -62,7 +62,7 @@ CRVWorkDir::CRVWorkDir(void)
 
 //------------------------------------------------------------------------------
 
-void CRVWorkDir::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVWorkDir::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     CXMLElement* p_ele = ABSConfig.GetWorkDirConfig();
     if( p_ele == NULL ){

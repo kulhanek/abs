@@ -60,7 +60,7 @@ CRVMPISlotsPerNode::CRVMPISlotsPerNode(void)
 
 //------------------------------------------------------------------------------
 
-void CRVMPISlotsPerNode::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVMPISlotsPerNode::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestNumberValue(sout,rstatus) == false ) return;
     long long value = GetNumber();
@@ -71,19 +71,20 @@ void CRVMPISlotsPerNode::TestValue(CResourceList* p_rl,std::ostream& sout,bool& 
         rstatus = false;
         return;
     }
+}
+
+//------------------------------------------------------------------------------
+
+void CRVMPISlotsPerNode::PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+{
     int ncpuspernode = 0;
-    if( p_rl->FindResource("nnodes") != NULL ){
-        int ncpus = p_rl->GetNumOfCPUs();
-        int nnodes = p_rl->GetNumOfNodes();
-        if( nnodes > 0 ){
-            // nnodes <= 0 is illegal and tested elsewhere
-            ncpuspernode = ncpus / nnodes;
-        }
-    } else {
-        if( p_rl->FindResource("ncpuspernode") != NULL ){
-            ncpuspernode = p_rl->FindResource("ncpuspernode")->GetNumber();
-        }
+    int ncpus = p_rl->GetNumOfCPUs();
+    int nnodes = p_rl->GetNumOfNodes();
+    if( nnodes > 0 ){
+        // nnodes <= 0 is illegal and tested elsewhere
+        ncpuspernode = ncpus / nnodes;
     }
+
     if( ncpuspernode <= 0 ){
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
@@ -91,6 +92,7 @@ void CRVMPISlotsPerNode::TestValue(CResourceList* p_rl,std::ostream& sout,bool& 
         rstatus = false;
         return;
     }
+    long long value = GetNumber();
     if( value > ncpuspernode ){
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;

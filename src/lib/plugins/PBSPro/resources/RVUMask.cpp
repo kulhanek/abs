@@ -61,7 +61,7 @@ CRVUMask::CRVUMask(void)
 
 //------------------------------------------------------------------------------
 
-void CRVUMask::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVUMask::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     // FIXME
 //    if( Value == "current" ){

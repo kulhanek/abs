@@ -57,11 +57,13 @@ using namespace std;
 CRVMemPerCPU::CRVMemPerCPU(void)
     : CResourceValue(&RVMemPerCPUObject)
 {
+    Requires.push_back("ncpus");
+    Provides.push_back("mem");
 }
 
 //------------------------------------------------------------------------------
 
-void CRVMemPerCPU::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVMemPerCPU::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestSizeValue(sout,rstatus) == false ) return;
     long long size = GetSize();

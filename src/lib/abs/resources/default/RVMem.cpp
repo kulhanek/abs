@@ -60,7 +60,7 @@ CRVMem::CRVMem(void)
 
 //------------------------------------------------------------------------------
 
-void CRVMem::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVMem::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestSizeValue(sout,rstatus) == false ) return;
     long long size = GetSize(); // in kb

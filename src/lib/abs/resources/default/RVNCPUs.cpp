@@ -60,7 +60,7 @@ CRVNCPUs::CRVNCPUs(void)
 
 //------------------------------------------------------------------------------
 
-void CRVNCPUs::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVNCPUs::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestNumberValue(sout,rstatus) == false ) return;
     long long size = GetNumber();
@@ -71,8 +71,14 @@ void CRVNCPUs::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
         rstatus = false;
         return;
     }
+}
+
+//------------------------------------------------------------------------------
+
+void CRVNCPUs::PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+{
+    long long size = GetNumber();
     int nnodes = p_rl->GetNumOfNodes();
-    // nnodes <= 0 is illegal and tested elsewhere
     if( nnodes > 0 ){
         if( size % nnodes != 0 ){
             if( rstatus == true ) sout << endl;

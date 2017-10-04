@@ -36,7 +36,7 @@ public:
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
-    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+    virtual void PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
     /// get batch attribute
     virtual void GetAttribute(CSmallString& name, CSmallString& resource, CSmallString& value);

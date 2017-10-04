@@ -60,7 +60,7 @@ CRVDataIn::CRVDataIn(void)
 
 //------------------------------------------------------------------------------
 
-void CRVDataIn::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVDataIn::PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestKeyValue(sout,rstatus,"keep,copy-master,copy-shared") == false ) return;
 

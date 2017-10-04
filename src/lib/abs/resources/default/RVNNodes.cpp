@@ -60,7 +60,7 @@ CRVNNodes::CRVNNodes(void)
 
 //------------------------------------------------------------------------------
 
-void CRVNNodes::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVNNodes::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestNumberValue(sout,rstatus) == false ) return;
     long long size = GetNumber();

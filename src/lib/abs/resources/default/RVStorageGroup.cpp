@@ -68,7 +68,7 @@ CRVStorageGroup::CRVStorageGroup(void)
 
 //------------------------------------------------------------------------------
 
-void CRVStorageGroup::TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     CJob* p_job = p_rl->GetJob();
 

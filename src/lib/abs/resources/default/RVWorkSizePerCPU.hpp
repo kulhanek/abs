@@ -35,7 +35,7 @@ public:
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
-    virtual void TestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
+    virtual void PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus);
 
     /// resolve dynamic resource
     virtual void ResolveDynamicResource(CResourceList* p_rl,bool& delete_me);
