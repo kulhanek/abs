@@ -1572,6 +1572,7 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
                 } else {
                     sout << "<red>FE</red>";
                 }
+                break;
             case EJS_KILLED:
                 sout << "<red>KI</red>";
                 break;
