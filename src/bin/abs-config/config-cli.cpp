@@ -742,8 +742,7 @@ void CreateOrModifyAlias(void)
     GetTextValue(" Type destination : ",queue);
     GetTextValue(" Type resources   : ",res);
 
-    bool result = true;
-    if( AliasList.AddAlias(tout,result,name,queue,res) == true ){
+    if( AliasList.AddAlias(tout,name,queue,res,false) == true ){
         printf("\n");
         printf(" The alias was successfully created!\n");
         AliasSetupChanged = true;
