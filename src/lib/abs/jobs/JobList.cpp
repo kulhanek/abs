@@ -1312,6 +1312,27 @@ void CJobList::AddJob(const CJobPtr& p_job)
 
 //------------------------------------------------------------------------------
 
+bool CJobList::RemoveCollectionJob(int cid)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    int icid = 1;
+    while( it != ie ){
+        if( icid == cid ){
+            // it is part of collection - remove it
+            it = erase(it);
+            return(true);
+        } else {
+            it++;
+        }
+        icid++;
+    }
+    return(false);
+}
+
+//------------------------------------------------------------------------------
+
 void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool includecomment)
 {
     sout << endl;

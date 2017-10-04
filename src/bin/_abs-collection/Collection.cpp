@@ -358,6 +358,37 @@ bool CCollection::Run(void)
 
         return(true);
 // -------------------------------------------------------------------
+// create
+// -------------------------------------------------------------------
+    } else if( Options.GetProgArg(1) == "rmjob" ){
+
+        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
+            return(false);
+        }
+
+        // update status of live jobs
+        Jobs.UpdateJobStatuses();
+
+        // print info
+        Jobs.PrintCollectionInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
+
+        // remove job
+        if( Jobs.RemoveCollectionJob(Options.GetProgArg(2).ToInt()) == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to remove collection job '" << Options.GetProgArg(2).ToInt() << "'!</red></b>" << endl;
+            return(false);
+        }
+
+        // save collection
+        if( Jobs.SaveCollection() == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to save collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
+            return(false);
+        }
+        return(true);
+// -------------------------------------------------------------------
 // unrecognized
 // -------------------------------------------------------------------
     } else {

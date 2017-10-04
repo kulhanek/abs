@@ -77,6 +77,9 @@ public:
     /// add job into collection
     void AddJob(const CJobPtr& p_job);
 
+    /// remove job from collection
+    bool RemoveCollectionJob(int cid);
+
     /// print info about collection jobs
     void PrintCollectionInfo(std::ostream& sout,bool includepath,bool includecomment);
 

@@ -2448,7 +2448,11 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
             sout << "R ";
             break;
         case EJS_FINISHED:
-            sout << "F ";
+            if( GetJobExitCode() == 0 ){
+                sout << "F ";
+            } else {
+                sout << "FE";
+            }
             break;
         case EJS_KILLED:
             sout << "K ";
@@ -3570,7 +3574,11 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
             sout << "<green>R</green> ";
             break;
         case EJS_FINISHED:
-            sout << "F ";
+            if( GetJobExitCode() == 0 ){
+                sout << "F ";
+            } else {
+                sout << "FE";
+            }
             break;
         case EJS_KILLED:
             sout << "<red>KI</red>";
