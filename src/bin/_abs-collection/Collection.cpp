@@ -264,7 +264,20 @@ bool CCollection::Run(void)
         ShellProcessor.SetVariable("INF_COLLECTION_PATH",Jobs.GetCollectionPath());
         ShellProcessor.SetVariable("INF_COLLECTION_ID",Jobs.GetCollectionID());
 
-        vout << "<blue> Searching for jobs with the script name or input file: " << Options.GetProgArg(3) << "</blue>" << endl;
+        vout << endl;
+        vout << "# Searching for jobs with the script name or input file: " << Options.GetProgArg(3) << endl;
+
+        // setup command
+        CSmallString cmd;
+        cmd << "psubmit " << Options.GetProgArg(2) << " " << Options.GetProgArg(3);
+        for(int i=4; i < Options.GetNumberOfProgArgs(); i++ ){
+            cmd << " " << Options.GetProgArg(i);
+        }
+        vout << "# " << cmd << endl;
+
+        vout << endl;
+        vout << "#                  Job Input Path                 " << endl;
+        vout << "# ------------------------------------------------" << endl;
 
         // find all jobs
         CFileName cwd;
@@ -277,17 +290,9 @@ bool CCollection::Run(void)
 
         if( jobs.size() != 0 ){
 
-            // setup command
-            CSmallString cmd;
-            cmd << "psubmit " << Options.GetProgArg(2) << " " << Options.GetProgArg(3);
-            for(int i=4; i < Options.GetNumberOfProgArgs(); i++ ){
-                cmd << " " << Options.GetProgArg(i);
-            }
-
             // prepare environment
             std::vector<CFileName>::iterator it = jobs.begin();
             std::vector<CFileName>::iterator ie = jobs.end();
-            int i = 0;
             ShellProcessor.BeginSubshell();
             ShellProcessor.CapturePWD();
             while( it != ie ){
@@ -299,16 +304,12 @@ bool CCollection::Run(void)
                 ShellProcessor.ExitIfError();
                 ShellProcessor.RestorePWD();
                 it++;
-                i++;
             }
             ShellProcessor.EndSubshell();
-
-            vout << endl;
-            vout << "<blue> INFO: " << i  << " jobs were found ...</blue>" << endl;
-        } else {
-            vout << endl;
-            vout << "<blue> INFO: No jobs were found ...</blue>" << endl;
         }
+
+        vout << "# ------------------------------------------------" << endl;
+        vout << "# Number of found jobs: " << jobs.size() << endl;
 
         vout << endl;
         vout << "<blue> INFO: Collection was closed.</blue>" << endl;
@@ -583,7 +584,12 @@ void CCollection::FindJobs(std::vector<CFileName>& jobs,const CFileName& cwd,con
     CFileName file;
     while( dir.FindFile(file) ){
         if( (file == "..") || (file == ".") ) continue;
-        CFileName fdir = root / file;
+        CFileName fdir;
+        if( root ){
+            fdir = root / file;
+        } else {
+            fdir = file;
+        }
         if( CFileSystem::IsDirectory(cwd / fdir) ){
             if( CFileSystem::IsFile(cwd / fdir / job) ){
                 jobs.push_back(fdir);
