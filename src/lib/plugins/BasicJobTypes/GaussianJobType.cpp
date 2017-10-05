@@ -173,7 +173,7 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     }
 
     // include module version into job_type
-    job_type << ":" << gmodver;
+    job_type  << " [" << gmodule << ":" << gmodver << "]";
 
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
     job.SetItem("basic/jobinput","INF_JOB_TYPE",job_type);

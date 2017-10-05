@@ -33,6 +33,7 @@
 #include <fstream>
 #include <string>
 #include <iomanip>
+#include <Cache.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -106,12 +107,23 @@ ERetStatus CNWChemJobType::DetectJobType(CJob& job,bool& detected,std::ostream& 
         return(ERS_FAILED);
     }
 
-    // is nwchem module loaded?
-    if( AMSGlobalConfig.IsModuleActive(nmodule) == false ){
-        sout << endl;
-        sout << "<b><red> ERROR: The nwchem job was detected but none nwchem module is active!</red></b>" << endl;
-        sout << "<b><red>        Type 'module add nwchem' and resubmit the job.</red></b>" << endl;
-        return(ERS_FAILED);
+    CSmallString nmodver;
+
+    // is orca module loaded?
+    if( AMSGlobalConfig.IsModuleActive(nmodule) == true ){
+        // get active module version
+        AMSGlobalConfig.GetActiveModuleVersion(nmodule,nmodver);
+    } else {
+        // get default version of module
+        if( Cache.LoadCache(false) == false) {
+            ES_ERROR("unable to load AMS cache");
+            return(ERS_FAILED);
+        }
+        CSmallString drch, dmode;
+        CXMLElement* p_ele = Cache.GetModule(nmodule);
+        if( p_ele ){
+            Cache.GetModuleDefaults(p_ele,nmodver,drch,dmode);
+        }
     }
 
     CFileName job_file = arg_job.GetFileNameWithoutExt();
@@ -127,10 +139,10 @@ ERetStatus CNWChemJobType::DetectJobType(CJob& job,bool& detected,std::ostream& 
         }
 
         ofs << "#!/usr/bin/env infinity-env" << endl;
-        ofs << "# ----------------------------------------------------------" << endl;
+        ofs << "# ------------------------------------------------" << endl;
         ofs << endl;
         ofs << "# activate nwchem module -------------------------" << endl;
-        ofs << "module add " << nmodule << endl;
+        ofs << "module add " << nmodule << ":" << nmodver << endl;
         ofs << endl;
         ofs << "# start job --------------------------------------" << endl;
         ofs << "nwchem " << arg_job << endl;
@@ -146,6 +158,9 @@ ERetStatus CNWChemJobType::DetectJobType(CJob& job,bool& detected,std::ostream& 
             return(ERS_FAILED);
         }
     }
+
+    // include module version into job_type
+    job_type << " [" << nmodule << ":" << nmodver << "]";
 
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
     job.SetItem("basic/jobinput","INF_JOB_TYPE",job_type);

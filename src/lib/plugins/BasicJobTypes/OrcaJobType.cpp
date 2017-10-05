@@ -111,7 +111,7 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
 
     CSmallString omodver;
 
-    // is gaussian module loaded?
+    // is orca module loaded?
     if( AMSGlobalConfig.IsModuleActive(omodule) == true ){
         // get active module version
         AMSGlobalConfig.GetActiveModuleVersion(omodule,omodver);
@@ -159,7 +159,7 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
     }
 
     // include module version into job_type
-    job_type << ":" << omodver;
+    job_type  << " [" << omodule << ":" << omodver << "]";
 
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
     job.SetItem("basic/jobinput","INF_JOB_TYPE",job_type);
