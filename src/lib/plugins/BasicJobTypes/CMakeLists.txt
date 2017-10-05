@@ -11,7 +11,6 @@ SET(BASICJOBTYPES_SRC
         PRecycleJobType.cpp
         PEquiJobType.cpp
         NWChemJobType.cpp
-        PRecycleCPMDJobType.cpp
         ICollectionJobType.cpp
         ICollectionJobTypeOptions.cpp
         STMServerJobType.cpp

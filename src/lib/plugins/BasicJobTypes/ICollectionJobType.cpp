@@ -241,7 +241,7 @@ bool CICollectionJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     if( rgpus > 0 ){
         sout << endl;
-        sout << "<b><red> ERROR: You cannot request GPUs in the icollection job type (not implemented yet)!</red></b>" << endl;
+        sout << "<b><red> ERROR: You cannot request GPUs in the icollection job type!</red></b>" << endl;
         return(false);
     }
 
