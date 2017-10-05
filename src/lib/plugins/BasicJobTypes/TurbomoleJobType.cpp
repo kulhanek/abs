@@ -26,10 +26,14 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
+#include <ABSConfig.hpp>
+#include <XMLElement.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 //------------------------------------------------------------------------------
 
 using namespace std;
+using namespace boost;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -115,6 +119,40 @@ bool CTurbomoleJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     if( nnodes <= 1 ) return(true);
 
+    // get workdir that support copy-shared and keep
+    CXMLElement* p_ele = ABSConfig.GetWorkDirConfig();
+    if( p_ele == NULL ){
+        sout << endl;
+        sout << "<b><red> ERROR: No workdir types configured (ask for support)!</red></b>" << endl;
+        return(false);
+    }
+
+    // assembly list of types
+    std::vector<std::string> workdirs;
+
+    CXMLElement* p_wele = p_ele->GetFirstChildElement("workdir");
+    while( p_wele != NULL ){
+        std::string name;
+        p_wele->GetAttribute("name",name);
+
+        bool resok = false;
+        CXMLElement* p_rele = p_wele->GetFirstChildElement("resource");
+        while( p_rele != NULL ){
+            CSmallString rname,rvalue;
+            p_rele->GetAttribute("name",rname);
+            p_rele->GetAttribute("value",rvalue);
+            if( (rname == "datain") && ( (rvalue == "copy-shared") || (rvalue == "keep") ) ){
+                resok = true;
+            }
+            p_rele = p_rele->GetNextSiblingElement("resource");
+        }
+        if( resok ){
+            workdirs.push_back(name);
+        }
+
+        p_wele = p_wele->GetNextSiblingElement("workdir");
+    }
+
     CSmallString datain = job.GetItem("specific/resources","INF_DATAIN");
 
     if( (datain != "copy-shared") && (datain != "keep") ){
@@ -124,6 +162,7 @@ bool CTurbomoleJobType::CheckInputFile(CJob& job,std::ostream& sout)
         sout << endl;
         sout << "<b><red>        The number of requested computational nodes : " << nnodes << "</red></b>" << endl;
         sout << "<b><red>        Currently requested datain mode             : " << datain << "</red></b>" << endl;
+        sout << "<b><red>        workdir types providing correct datain      : " << join(workdirs,",") << "</red></b>" << endl;
         return(false);
     }
 

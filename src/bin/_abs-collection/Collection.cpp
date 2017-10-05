@@ -437,7 +437,8 @@ bool CCollection::Run(void)
         Jobs.KeepOnlyLiveJobs();
 
         if( Jobs.GetNumberOfJobs() == 0 ){
-            vout << "No queued or running jobs to be killed!" << endl;
+            vout << endl;
+            vout << "No queued or running jobs were found to be killed!" << endl;
             return(false);
         }
 

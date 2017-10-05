@@ -20,28 +20,29 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVMem.hpp>
+#include <RVMemPerNode.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 #include <ResourceList.hpp>
+#include <sstream>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVMemCB(void* p_data);
+CComObject* RVMemPerNodeCB(void* p_data);
 
-CExtUUID        RVMemID(
-                    "{MEM:45b8522a-e690-47ef-93b6-725bc2cb74f0}",
-                    "mem");
+CExtUUID        RVMemPerNodeID(
+                    "{RV_MEM_PER_NODE:7e8fbe6a-00d2-47b2-a35b-bde0efdb3790}",
+                    "mempernode");
 
-CPluginObject   RVMemObject(&ABSPlugin,
-                    RVMemID,RESOURCES_CAT,
-                    RVMemCB);
+CPluginObject   RVMemPerNodeObject(&ABSPlugin,
+                    RVMemPerNodeID,RESOURCES_CAT,
+                    RVMemPerNodeCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVMemCB(void* p_data)
+CComObject* RVMemPerNodeCB(void* p_data)
 {
-    CComObject* p_object = new CRVMem();
+    CComObject* p_object = new CRVMemPerNode();
     return(p_object);
 }
 
@@ -53,14 +54,16 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVMem::CRVMem(void)
-    : CResourceValue(&RVMemObject)
+CRVMemPerNode::CRVMemPerNode(void)
+    : CResourceValue(&RVMemPerNodeObject)
 {
+    Requires.push_back("nnodes");
+    Provides.push_back("mem");
 }
 
 //------------------------------------------------------------------------------
 
-void CRVMem::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVMemPerNode::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestSizeValue(sout,rstatus) == false ) return;
     long long size = GetSize(); // in kb
@@ -75,10 +78,18 @@ void CRVMem::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 
 //------------------------------------------------------------------------------
 
-void CRVMem::ResolveConflicts(CResourceList* p_rl)
+void CRVMemPerNode::ResolveDynamicResource(CResourceList* p_rl,bool& delete_me)
 {
-    p_rl->RemoveResource("mempercpu");
-    p_rl->RemoveResource("mempernode");
+    CResourceValuePtr res = p_rl->FindResource("nnodes");
+    int nnodes = 1;
+    if( res != NULL ){
+        nnodes = res->GetNumber();
+    }
+    long long mem = GetSize() * nnodes;
+    stringstream    str;
+    str << mem;
+
+    p_rl->AddRawResource("mem",str.str().c_str());
 }
 
 //==============================================================================
