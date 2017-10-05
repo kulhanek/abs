@@ -1393,6 +1393,8 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
                 resubmit++;
                 break;
             case EJS_SUBMITTED:
+                waiting++;
+                break;
             case EJS_RUNNING:
                 processing++;
                 break;
@@ -1428,13 +1430,13 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
 
     sout << "# Total:" << right << setw(4) << total;
 
-    int pper = 0;
-    if( total > 0 ) pper = 100*processing / total;
-    sout << " | Precessing:" << setw(4) << processing << " (" << setw(3) << pper << "%)";
-
     int wper = 0;
     if( total > 0 ) wper = 100*waiting / total;
     sout << " | Waiting:" << setw(4) << waiting << " (" << setw(3) << wper << "%)";
+
+    int pper = 0;
+    if( total > 0 ) pper = 100*processing / total;
+    sout << " | Processing:" << setw(4) << processing << " (" << setw(3) << pper << "%)";
 
     int fper = 0;
     if( total > 0 ) fper = 100*finished / total;

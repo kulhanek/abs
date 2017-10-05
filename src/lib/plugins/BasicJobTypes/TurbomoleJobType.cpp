@@ -162,7 +162,7 @@ bool CTurbomoleJobType::CheckInputFile(CJob& job,std::ostream& sout)
         sout << endl;
         sout << "<b><red>        The number of requested computational nodes : " << nnodes << "</red></b>" << endl;
         sout << "<b><red>        Currently requested datain mode             : " << datain << "</red></b>" << endl;
-        sout << "<b><red>        workdir types providing correct datain      : " << join(workdirs,",") << "</red></b>" << endl;
+        sout << "<b><red>        workdir types providing correct datain      : " << join(workdirs,", ") << "</red></b>" << endl;
         return(false);
     }
 
