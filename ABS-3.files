@@ -167,7 +167,6 @@ src/lib/plugins/BasicJobTypes/OrcaJobType.cpp
 src/lib/plugins/BasicJobTypes/OrcaJobType.hpp
 src/lib/plugins/BasicJobTypes/PEquiJobType.cpp
 src/lib/plugins/BasicJobTypes/PEquiJobType.hpp
-src/lib/plugins/BasicJobTypes/PRecycleCPMDJobType.cpp
 src/lib/plugins/BasicJobTypes/PRecycleCPMDJobType.hpp
 src/lib/plugins/BasicJobTypes/PRecycleJobType.cpp
 src/lib/plugins/BasicJobTypes/PRecycleJobType.hpp

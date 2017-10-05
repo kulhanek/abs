@@ -33,6 +33,7 @@
 #include <fstream>
 #include <string>
 #include <iomanip>
+#include <Cache.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -111,21 +112,30 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         return(ERS_FAILED);
     }
 
+    CSmallString gmodver;
+
     // is gaussian module loaded?
-    if( AMSGlobalConfig.IsModuleActive(gmodule) == false ){
-        sout << endl;
-        sout << "<b><red> ERROR: The gaussian job was detected but none gaussian module is active!</red></b>" << endl;
-        sout << "<b><red>        Type 'module add gaussian' and resubmit the job.</red></b>" << endl;
-        return(ERS_FAILED);
+    if( AMSGlobalConfig.IsModuleActive(gmodule) == true ){
+        // get active module version
+        AMSGlobalConfig.GetActiveModuleVersion(gmodule,gmodver);
+    } else {
+        // get default version of module
+        if( Cache.LoadCache(false) == false) {
+            ES_ERROR("unable to load AMS cache");
+            return(ERS_FAILED);
+        }
+        CSmallString drch, dmode;
+        CXMLElement* p_ele = Cache.GetModule(gmodule);
+        if( p_ele ){
+            Cache.GetModuleDefaults(p_ele,gmodver,drch,dmode);
+        }
     }
 
-    CSmallString gmodver;
-    AMSGlobalConfig.GetActiveModuleVersion(gmodule,gmodver);
     CSmallString gexec;
     if( PluginDatabase.FindObjectConfigValue(GaussianJobTypeID,gmodver,gexec) == false ){
-        CSmallString error;
-        error << "unable to find key '" << gmodver << "'";
-        ES_ERROR(error);
+        sout << endl;
+        sout << "<b><red> ERROR: The detected version of gaussian (" << gmodule << ":" << gmodver <<  ") is not supported!</red></b>" << endl;
+        sout << "<b><red>        Application name was not found in the configuration database (contact support).</red></b>" << endl;
         return(ERS_FAILED);
     }
 
@@ -161,6 +171,9 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
             return(ERS_FAILED);
         }
     }
+
+    // include module version into job_type
+    job_type << ":" << gmodver;
 
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
     job.SetItem("basic/jobinput","INF_JOB_TYPE",job_type);
