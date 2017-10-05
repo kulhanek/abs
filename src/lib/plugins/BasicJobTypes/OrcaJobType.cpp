@@ -101,6 +101,32 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
         return(ERS_FAILED);
     }
 
+    // get module name
+    CSmallString omodule;
+    if( PluginDatabase.FindObjectConfigValue(OrcaJobTypeID,"_module",omodule) == false ){
+        ES_ERROR("_module key is not provide");
+        return(ERS_FAILED);
+    }
+
+    CSmallString omodver;
+
+    // is gaussian module loaded?
+    if( AMSGlobalConfig.IsModuleActive(omodule) == true ){
+        // get active module version
+        AMSGlobalConfig.GetActiveModuleVersion(omodule,omodver);
+    } else {
+        // get default version of module
+        if( Cache.LoadCache(false) == false) {
+            ES_ERROR("unable to load AMS cache");
+            return(ERS_FAILED);
+        }
+        CSmallString drch, dmode;
+        CXMLElement* p_ele = Cache.GetModule(omodule);
+        if( p_ele ){
+            Cache.GetModuleDefaults(p_ele,omodver,drch,dmode);
+        }
+    }
+
     CFileName job_file = arg_job.GetFileNameWithoutExt();
 
     // do not write the file if psanitize is used
@@ -114,9 +140,12 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
         }
 
         ofs << "#!/usr/bin/env infinity-env" << endl;
+        ofs << "# ------------------------------------------------" << endl;
         ofs << endl;
-        ofs << "module add orca" << endl;
+        ofs << "# activate orca module ---------------------------" << endl;
+        ofs << "module add " << omodule << ":" << omodver  << endl;
         ofs << endl;
+        ofs << "# start job --------------------------------------" << endl;
         ofs << "orca " << arg_job << endl;
         ofs << endl;
 
@@ -127,6 +156,9 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
             return(ERS_FAILED);
         }
     }
+
+    // include module version into job_type
+    job_type << ":" << gmodver;
 
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
     job.SetItem("basic/jobinput","INF_JOB_TYPE",job_type);

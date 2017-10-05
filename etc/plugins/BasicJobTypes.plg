@@ -17,6 +17,7 @@
     <OBJECT uuid="{ORCA_JOB_TYPE:37b32314-0500-417b-a5b8-0dedf32a1fde}">
         <CONFIG key="_mode"   value="implicit"/>
         <CONFIG key="_type"   value="orca"/>
+        <CONFIG key="_module" value="orca"/>
     </OBJECT>
     <OBJECT uuid="{NWCHEM_JOB_TYPE:481e8667-8de2-498e-a6e1-ad9f427f537a}">
         <CONFIG key="_mode"   value="implicit"/>

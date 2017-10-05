@@ -152,7 +152,7 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         }
 
         ofs << "#!/usr/bin/env infinity-env" << endl;
-        ofs << "# ----------------------------------------------------------" << endl;
+        ofs << "# ------------------------------------------------" << endl;
         ofs << endl;
         ofs << "# activate gaussian module -----------------------" << endl;
         ofs << "module add " << gmodule << ":" << gmodver << endl;
