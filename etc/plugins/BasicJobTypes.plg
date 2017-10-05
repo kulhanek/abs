@@ -35,10 +35,6 @@
         <CONFIG key="_mode"   value="explicit"/>
         <CONFIG key="_type"   value="pequi"/>
     </OBJECT>
-    <OBJECT uuid="{PRECYCLE_CPMD_JOB_TYPE:0d0f2ef4-c8de-42fb-b52b-58b6b1e41f4a}">
-        <CONFIG key="_mode"   value="explicit"/>
-        <CONFIG key="_type"   value="precycleCPMD"/>
-    </OBJECT>
     <OBJECT uuid="{ICOLLECTION_JOB_TYPE:a8aa8420-1b82-46f9-a5eb-26b4f8fa27b9}">
         <CONFIG key="_mode"   value="explicit"/>
         <CONFIG key="_type"   value="icollection"/>
