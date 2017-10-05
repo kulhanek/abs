@@ -33,6 +33,7 @@
 #include <fstream>
 #include <string>
 #include <iomanip>
+#include <Cache.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -158,7 +159,7 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
     }
 
     // include module version into job_type
-    job_type << ":" << gmodver;
+    job_type << ":" << omodver;
 
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
     job.SetItem("basic/jobinput","INF_JOB_TYPE",job_type);
