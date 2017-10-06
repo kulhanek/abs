@@ -986,6 +986,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
             return(false);
         }
         if( ! siblings ){
+            sout << endl;
             sout << "Job was sucessfully added into the collection '" << coll_name << "'!" << endl;
         } else {
             CSmallString tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX");
