@@ -386,7 +386,7 @@ bool CCollection::Run(void)
         vout << "Listed jobs will be resubmitted to the batch server!" << endl;
 
         // resubmit jobs
-        Jobs.CollectionResubmitJobs(vout);
+        Jobs.CollectionResubmitJobs(vout,Options.GetOptVerbose());
 
         return(true);
 // -------------------------------------------------------------------

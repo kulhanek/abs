@@ -93,7 +93,7 @@ public:
     void PrintCollectionResubmitJobs(std::ostream& sout);
 
     /// resubmit jobs
-    bool CollectionResubmitJobs(std::ostream& sout);
+    bool CollectionResubmitJobs(std::ostream& sout,bool verbose);
 
     /// print batch jobs
     void PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment);

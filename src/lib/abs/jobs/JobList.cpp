@@ -1641,7 +1641,7 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CJobList::CollectionResubmitJobs(std::ostream& sout)
+bool CJobList::CollectionResubmitJobs(std::ostream& sout,bool verbose)
 {
     sout << endl;
     sout << "# CID    Job ID        Job Name     Comment" << endl;
@@ -1656,7 +1656,7 @@ bool CJobList::CollectionResubmitJobs(std::ostream& sout)
     while( it != ie ){
         CJobPtr p_job = *it;
 
-        result &= p_job->ResubmitJob(true);
+        result &= p_job->ResubmitJob(verbose);
         sout << right << setw(6) << i;
 
         if( p_job->GetItem("submit/job","INF_JOB_ID",true) != NULL ){
