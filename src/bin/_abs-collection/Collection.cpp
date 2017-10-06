@@ -27,6 +27,7 @@
 #include <ShellProcessor.hpp>
 #include <DirectoryEnum.hpp>
 #include <FileSystem.hpp>
+#include <Host.hpp>
 
 using namespace std;
 
@@ -100,6 +101,14 @@ bool CCollection::Run(void)
     // check if user has valid ticket
     if( ABSConfig.IsUserTicketValid(vout) == false ){
         ES_TRACE_ERROR("user does not have valid ticket");
+        return(false);
+    }
+
+    Host.InitGlobalSetup();
+    Host.InitHostFile();
+
+    if( AliasList.LoadConfig() == false ){
+        ES_TRACE_ERROR("unable to load aliases");
         return(false);
     }
 

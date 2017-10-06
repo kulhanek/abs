@@ -1212,8 +1212,10 @@ bool CJob::ResubmitJob(bool verbose)
     CFileSystem::SetCurrentDir(GetInputDir());
 
     // re-decode resources
-    std::ofstream tout;
-    DecodeResources(cout,true);
+    if( DecodeResources(cerr,true) == false ){
+        ES_TRACE_ERROR("unable to decode resources");
+        return(false);
+    }
 
     // submit job to torque
     if( BatchServers.SubmitJob(*this,verbose) == false ){
