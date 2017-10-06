@@ -1656,7 +1656,7 @@ bool CJobList::CollectionResubmitJobs(std::ostream& sout)
     while( it != ie ){
         CJobPtr p_job = *it;
 
-        result &= p_job->ResubmitJob(false);
+        result &= p_job->ResubmitJob(true);
         sout << right << setw(6) << i;
 
         if( p_job->GetItem("submit/job","INF_JOB_ID",true) != NULL ){

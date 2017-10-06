@@ -1213,7 +1213,7 @@ bool CJob::ResubmitJob(bool verbose)
 
     // re-decode resources
     std::ofstream tout;
-    DecodeResources(tout,true);
+    DecodeResources(cout,true);
 
     // submit job to torque
     if( BatchServers.SubmitJob(*this,verbose) == false ){
