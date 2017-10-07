@@ -232,7 +232,7 @@ bool CCollection::Run(void)
         return(true);
 
 // -------------------------------------------------------------------
-// perpare
+// prepare
 // -------------------------------------------------------------------
     } else if( action == "prepare" ) {
         bool created = false;

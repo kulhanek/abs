@@ -47,6 +47,7 @@ class CCollectionOptions : public CSimpleOptions {
     CSO_PROG_ARGS_LONG_DESC_BEGIN
         "<b>Actions:</b>\n"
         "   <b><cyan>info</cyan></b>        list jobs in collection (default action)\n"
+        "   <b><cyan>stat</cyan></b>        print all collection job statistics\n"
         "   <b><cyan>create</cyan></b>      create new collection <u>collname</u>\n"
         "   <b><cyan>open</cyan></b>        open existing collection <u>collname</u> if collection does not exist it is created\n"
         "   <b><cyan>close</cyan></b>       close <u>collname</u> collection\n"

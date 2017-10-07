@@ -1482,7 +1482,7 @@ void CJobList::PrintCollectionStat(std::ostream& sout,bool compact,bool includep
     list<CJobPtr>::iterator ie = end();
 
     while( it != ie ){
-        jobs.InitByInfoFiles((*it)->GetInputDir());
+        jobs.InitByInfoFiles((*it)->GetInputDir(),true);
         it++;
     }
 

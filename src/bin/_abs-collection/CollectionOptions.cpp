@@ -81,6 +81,7 @@ int CCollectionOptions::CheckArguments(void)
 
     if( (GetNumberOfProgArgs() != 2) && (
         (GetProgArg(1) == "info") ||
+        (GetProgArg(2) == "stat") ||
         (GetProgArg(1) == "open") ||
         (GetProgArg(1) == "create") ||
         (GetProgArg(1) == "close") ||
