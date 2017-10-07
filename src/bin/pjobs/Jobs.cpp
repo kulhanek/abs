@@ -92,15 +92,6 @@ bool CJobs::Run(void)
         return(false);
     }
 
-    vout << "#" << endl;
-    BatchServers.PrintServerOverview(vout);
-    if( Options.IsOptSearchSet() ){
-        std::string str = string(Options.GetOptSearch());
-        boost::replace_all(str,"<","<<");
-    vout << "# Search expr.  : " << str << endl;
-    }
-    vout << "#" << endl;
-
     // user must be initializaed before ABSConfig.IsUserTicketValid()
     User.InitUser();
 
@@ -110,6 +101,15 @@ bool CJobs::Run(void)
         ExtraEndLine = false;
         return(false);
     }
+
+    vout << "#" << endl;
+    BatchServers.PrintServerOverview(vout);
+    if( Options.IsOptSearchSet() ){
+        std::string str = string(Options.GetOptSearch());
+        boost::replace_all(str,"<","<<");
+    vout << "# Search expr.  : " << str << endl;
+    }
+    vout << "#" << endl;
 
     CSmallString user = User.GetName();
 

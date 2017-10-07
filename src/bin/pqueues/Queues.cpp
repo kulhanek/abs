@@ -92,10 +92,6 @@ bool CQueues::Run(void)
         return(false);
     }
 
-    vout << "#" << endl;
-    BatchServers.PrintServerOverview(vout);
-    vout << "#" << endl;
-
     // user must be initializaed before ABSConfig.IsUserTicketValid()
     User.InitUser();
 
@@ -105,6 +101,10 @@ bool CQueues::Run(void)
         ExtraEndLine = false;
         return(false);
     }
+
+    vout << "#" << endl;
+    BatchServers.PrintServerOverview(vout);
+    vout << "#" << endl;
 
     if( Options.GetOptTechnical() ){
         vout << endl;

@@ -90,6 +90,15 @@ bool CKillAll::Run(void)
         return(false);
     }
 
+    // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUser();
+
+    // check if user has valid ticket
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
+        ES_TRACE_ERROR("user does not have valid ticket");
+        return(false);
+    }
+
     vout << "#" << endl;
     BatchServers.PrintServerOverview(vout);
     if( Options.IsOptSearchSet() ){
@@ -99,15 +108,6 @@ bool CKillAll::Run(void)
     }
     vout << "#" << endl;
     vout << endl;
-
-    // user must be initializaed before ABSConfig.IsUserTicketValid()
-    User.InitUser();
-
-    // check if user has valid ticket
-    if( ABSConfig.IsUserTicketValid(vout) == false ){
-        ES_TRACE_ERROR("user does not have valid ticket");
-        return(false);
-    }
 
     vout << high;
     User.PrintUserInfo(vout);

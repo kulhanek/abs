@@ -93,6 +93,16 @@ bool CNodes::Run(void)
         return(false);
     }
 
+    // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUser();
+
+    // check if user has valid ticket
+    if( ABSConfig.IsUserTicketValid(vout) == false ){
+        ES_TRACE_ERROR("user does not have valid ticket");
+        ExtraEndLine = false;
+        return(false);
+    }
+
     if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) ){
         vout << "#" << endl;
         BatchServers.PrintServerOverview(vout);
@@ -102,16 +112,6 @@ bool CNodes::Run(void)
         vout << "# Search expr.  : " << str << endl;
         }
         vout << "#" << endl;
-    }
-
-    // user must be initializaed before ABSConfig.IsUserTicketValid()
-    User.InitUser();
-
-    // check if user has valid ticket
-    if( ABSConfig.IsUserTicketValid(vout) == false ){
-        ES_TRACE_ERROR("user does not have valid ticket");
-        ExtraEndLine = false;
-        return(false);
     }
 
     if( Options.GetOptTechnical() ){
