@@ -51,11 +51,13 @@ class CCollectionOptions : public CSimpleOptions {
         "   <b><cyan>open</cyan></b>        open existing collection <u>collname</u> if collection does not exist it is created\n"
         "   <b><cyan>close</cyan></b>       close <u>collname</u> collection\n"
         "   <b><cyan>prepare</cyan></b> destination job [resources]\n"
-        "               add all <u>job</u> to <u>collname</u> collection\n"
-        "   <b><cyan>submit</cyan></b>      submit all jobs in the collection <u>collname</u>\n"
-        "   <b><cyan>kill</cyan></b>        kill all jobs in the collection <u>collname</u>\n"
+        "               perapre all <u>job</u> and add them to <u>collname</u> collection\n"
+        "   <b><cyan>addjob</cyan></b> path\n"
+        "               add job with <u>path</u> to <u>collname</u> collection\n"
         "   <b><cyan>rmjob</cyan></b> jobcid\n"
         "               remove job with <u>jobcid</u> from <u>collname</u>\n"
+        "   <b><cyan>submit</cyan></b>      submit all jobs in the collection <u>collname</u>\n"
+        "   <b><cyan>kill</cyan></b>        kill all jobs in the collection <u>collname</u>\n"
     CSO_PROG_ARGS_LONG_DESC_END
 
     CSO_PROG_VERS_BEGIN

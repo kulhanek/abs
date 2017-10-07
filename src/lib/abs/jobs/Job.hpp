@@ -106,6 +106,9 @@ public:
     /// 1.3) check for runtime files
     bool CheckRuntimeFiles(std::ostream& sout,bool ignore);
 
+    /// detect runtime files
+    static bool AreRuntimeFiles(const CFileName& dir);
+
     /// 1.4) job input
     ERetStatus JobInput(std::ostream& sout);
 

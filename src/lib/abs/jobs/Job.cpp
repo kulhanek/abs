@@ -297,23 +297,7 @@ bool CJob::SetOutputNumber(std::ostream& sout,int number)
 
 bool CJob::CheckRuntimeFiles(std::ostream& sout,bool ignore)
 {
-    bool            runtime_files = false;
-    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill";
-    char*           p_filter;
-    char*           p_buffer = NULL;
-
-    p_filter = strtok_r(filters.GetBuffer(),";",&p_buffer);
-    while( p_filter ){
-        // detect run-time file
-        CDirectoryEnum direnum;
-        CFileName      file;
-        direnum.SetDirName(".");
-        direnum.StartFindFile(p_filter);
-        runtime_files = direnum.FindFile(file);
-        if( runtime_files ) break;
-        p_filter = strtok_r(NULL,";",&p_buffer);
-    }
-
+    bool runtime_files = AreRuntimeFiles(".");
     if( runtime_files == false ) return(true);
 
     CSmallString var;
@@ -329,6 +313,30 @@ bool CJob::CheckRuntimeFiles(std::ostream& sout,bool ignore)
     }
 
     return(false);
+}
+
+//------------------------------------------------------------------------------
+
+bool CJob::AreRuntimeFiles(const CFileName& dir)
+{
+    bool            runtime_files = false;
+    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill";
+    char*           p_filter;
+    char*           p_buffer = NULL;
+
+    p_filter = strtok_r(filters.GetBuffer(),";",&p_buffer);
+    while( p_filter ){
+        // detect run-time file
+        CDirectoryEnum direnum;
+        CFileName      file;
+        direnum.SetDirName(dir);
+        direnum.StartFindFile(p_filter);
+        runtime_files = direnum.FindFile(file);
+        if( runtime_files ) break;
+        p_filter = strtok_r(NULL,";",&p_buffer);
+    }
+
+    return(runtime_files);
 }
 
 //------------------------------------------------------------------------------

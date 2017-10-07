@@ -74,8 +74,11 @@ public:
     /// save collection
     bool SaveCollection(void);
 
-    /// add job into collection
+    /// add job
     void AddJob(const CJobPtr& p_job);
+
+    /// add job from path
+    bool AddJobByPath(const CFileName& path);
 
     /// remove job from collection
     bool RemoveCollectionJob(int cid);

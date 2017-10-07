@@ -28,6 +28,7 @@
 #include <DirectoryEnum.hpp>
 #include <FileSystem.hpp>
 #include <Host.hpp>
+#include <iomanip>
 
 using namespace std;
 
@@ -231,7 +232,7 @@ bool CCollection::Run(void)
         return(true);
 
 // -------------------------------------------------------------------
-// open
+// perpare
 // -------------------------------------------------------------------
     } else if( action == "prepare" ) {
         bool created = false;
@@ -285,8 +286,8 @@ bool CCollection::Run(void)
         vout << "# " << cmd << endl;
 
         vout << endl;
-        vout << "#                  Job Input Path                 " << endl;
-        vout << "# ------------------------------------------------" << endl;
+        vout << "#        Job Input Path                  Comment            " << endl;
+        vout << "# ---------------------------- -----------------------------" << endl;
 
         // find all jobs
         CFileName cwd;
@@ -306,12 +307,17 @@ bool CCollection::Run(void)
             ShellProcessor.CapturePWD();
             while( it != ie ){
                 CFileName path = *it;
-                vout << "  " << path << endl;
-                ShellProcessor.ChangeCurrentDir(path);
-                ShellProcessor.ExitIfError();
-                ShellProcessor.ExecuteCMD(cmd);
-                ShellProcessor.ExitIfError();
-                ShellProcessor.RestorePWD();
+                bool runtime_files = CJob::AreRuntimeFiles(path);
+                if( ! runtime_files ){
+                    vout << "  " << path << endl;
+                    ShellProcessor.ChangeCurrentDir(path);
+                    ShellProcessor.ExitIfError();
+                    ShellProcessor.ExecuteCMD(cmd);
+                    ShellProcessor.ExitIfError();
+                    ShellProcessor.RestorePWD();
+                } else {
+                    vout << "  " << setw(3) << path << " ignored - it contains runtime files" << endl;
+                }
                 it++;
             }
             ShellProcessor.EndSubshell();
@@ -319,6 +325,29 @@ bool CCollection::Run(void)
 
         vout << "# ------------------------------------------------" << endl;
         vout << "# Number of found jobs: " << jobs.size() << endl;
+
+        // ask for prepare?
+        if( ! Options.GetOptAssumeYes() ){
+            vout << endl;
+            vout << "Do you want to prepare listed jobs for submission to the batch server (YES/NO)?" << endl;
+            vout << "> ";
+
+            string answer;
+            cin >> answer;
+
+            CSmallString sanswer(answer.c_str());
+            sanswer.ToUpperCase();
+
+            if( sanswer != "YES" ){
+                vout << "No jobs were prepared!" << endl;
+                ShellProcessor.RollBack();
+                return(true);
+            }
+        } else {
+            vout << endl;
+        }
+
+        vout << "Listed jobs will be prepared for submission to the batch server!" << endl;
 
         vout << endl;
         vout << "<blue> INFO: Collection was closed.</blue>" << endl;
@@ -482,6 +511,41 @@ bool CCollection::Run(void)
         vout << "Done." << endl;
 
         return(true);
+// -------------------------------------------------------------------
+// addjob
+// -------------------------------------------------------------------
+    } else if( action == "addjob" ){
+
+        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
+            return(false);
+        }
+
+        // update status of live jobs
+        Jobs.UpdateJobStatuses();
+
+        // print info
+        Jobs.PrintCollectionInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
+
+        // add job
+        if( Jobs.AddJobByPath(Options.GetProgArg(2)) == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to add job '" << Options.GetProgArg(2) << "' to collection!</red></b>" << endl;
+            return(false);
+        }
+
+        vout << endl;
+        vout << "Job " << Options.GetProgArg(2) << " was added to collection." << endl;
+
+        // save collection
+        if( Jobs.SaveCollection() == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to save collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
+            return(false);
+        }
+        return(true);
+
 // -------------------------------------------------------------------
 // rmjob
 // -------------------------------------------------------------------

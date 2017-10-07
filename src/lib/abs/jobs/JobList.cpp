@@ -1299,6 +1299,19 @@ void CJobList::SaveCollectionJobs(CXMLElement* p_ele)
     }
 }
 
+
+//------------------------------------------------------------------------------
+
+bool CJobList::AddJobByPath(const CFileName& path)
+{
+    CJobList list;
+    list.InitByInfoFiles(path,false);
+    list.SortByPrepareDateAndTime();
+    if( list.GetNumberOfJobs() == 0 ) return(false);
+    AddJob(list.back());
+    return(true);
+}
+
 //------------------------------------------------------------------------------
 
 void CJobList::AddJob(const CJobPtr& p_job)
