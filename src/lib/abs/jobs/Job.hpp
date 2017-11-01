@@ -110,7 +110,7 @@ public:
     static bool AreRuntimeFiles(const CFileName& dir);
 
     /// 1.4) job input
-    ERetStatus JobInput(std::ostream& sout);
+    ERetStatus JobInput(std::ostream& sout,bool allowallpaths);
 
     /// 2.0) decode resources
     /// decode resources
@@ -429,7 +429,7 @@ protected:
     bool CheckJobName(std::ostream& sout);
 
     /// check job path
-    const CSmallString JobPathCheck(const CSmallString& inpath,std::ostream& sout);
+    const CSmallString JobPathCheck(const CSmallString& inpath,std::ostream& sout,bool allowallpaths);
 
     /// detect job project
     void DetectJobProject(void);

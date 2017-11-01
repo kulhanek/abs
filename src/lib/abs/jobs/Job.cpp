@@ -341,7 +341,7 @@ bool CJob::AreRuntimeFiles(const CFileName& dir)
 
 //------------------------------------------------------------------------------
 
-ERetStatus CJob::JobInput(std::ostream& sout)
+ERetStatus CJob::JobInput(std::ostream& sout,bool allowallpaths)
 {
     // test arg job name
     if( CheckJobName(sout) == false ){
@@ -357,7 +357,7 @@ ERetStatus CJob::JobInput(std::ostream& sout)
 //    CFileSystem::GetCurrentDir(tmp);
     tmp = GetJobInputPath();
 
-    tmp = JobPathCheck(tmp,sout);
+    tmp = JobPathCheck(tmp,sout,allowallpaths);
     if( tmp == NULL ){
         ES_TRACE_ERROR("illegal job dir");
         return(ERS_FAILED);
@@ -1529,7 +1529,7 @@ bool CJob::CheckJobName(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& sout)
+const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& sout,bool allowallpaths)
 {
     CSmallString outpath = inpath;
 
@@ -1564,12 +1564,14 @@ const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& s
         CFileSystem::RemoveFile(test_file);
     }
 
-    // check if job input directory path is allowed
-    if( ABSConfig.IsInputJobPathAllowed(inpath) == false ){
-        sout << endl;
-        sout << "<b><red> ERROR: The job input directory '" << outpath << "' is not allowed!</red></b>" << endl;
-        ABSConfig.PrintAllowedJobInputPaths(sout);
-        return("");
+    if( ! allowallpaths ){
+        // check if job input directory path is allowed
+        if( ABSConfig.IsInputJobPathAllowed(inpath) == false ){
+            sout << endl;
+            sout << "<b><red> ERROR: The job input directory '" << outpath << "' is not allowed!</red></b>" << endl;
+            ABSConfig.PrintAllowedJobInputPaths(sout);
+            return("");
+        }
     }
 
     // FIXME

@@ -67,6 +67,7 @@ class CSubmitOptions : public CSimpleOptions {
         CSO_OPT(bool,Silent)
         CSO_OPT(bool,ExpertMode)
         CSO_OPT(bool,ResubmitMode)
+        CSO_OPT(bool,AllowAllPaths)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -127,6 +128,15 @@ class CSubmitOptions : public CSimpleOptions {
                 "repeat",                      /* long option name */
                 NULL,                           /* parametr name */
                 "repeat job submission in the case of the batch server error")   /* option description */
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                AllowAllPaths,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'a',                           /* short option name */
+                "allowallpaths",                      /* long option name */
+                NULL,                           /* parametr name */
+                "allow all input job paths")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                 Verbose,                        /* option name */
