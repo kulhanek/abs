@@ -2043,7 +2043,13 @@ CSmallString CJob::GetInfoFileVersion(void)
 
 const CSmallString CJob::GetServerName(void)
 {
-    return(GetItem("specific/resources","INF_SERVER"));
+    CSmallString tmp;
+    tmp = GetItem("specific/resources","INF_SERVER",true);
+    // RT#222440
+    if( tmp == NULL ){
+        tmp = "unknown";
+    }
+    return(tmp);
 }
 
 //------------------------------------------------------------------------------
