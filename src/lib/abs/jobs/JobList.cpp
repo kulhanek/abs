@@ -1323,8 +1323,9 @@ void CJobList::AddJob(const CJobPtr& p_job)
     while( it != ie ){
         CJobPtr p_cjob = *it;
         if( p_cjob->GetInputDir() == p_job->GetInputDir() ){
-            // it is part of collection - remove it
-            it = erase(it);
+            // it is part of collection - replace the old object with new one
+            (*it) = p_job;
+            return;
         } else {
             it++;
         }
