@@ -50,7 +50,7 @@ if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
                 cd \"$INF_INPUT_DIR\"; \
                 export INF_EXTERNAL_START_AFTER=$INF_JOB_ID;
                 export INF_EXTERNAL_NAME_SUFFIX=\"$INF_EXTERNAL_NAME_SUFFIX\";
-                psubmit -y -i -e -r \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" $INF_ARG_RESOURCES; "
+                psubmit -a -y -i -e -r \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" $INF_ARG_RESOURCES; "
 
     if [ $? -ne 0 ]; then
         echo "" >&2
@@ -81,7 +81,7 @@ else
                             cd \"$INF_INPUT_DIR\"; \
                             export INF_EXTERNAL_START_AFTER=$INF_JOB_ID;
                             export INF_EXTERNAL_NAME_SUFFIX=\"$INF_EXTERNAL_NAME_SUFFIX\";
-                            psubmit -y -i -e -r \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" $INF_ARG_RESOURCES; "
+                            psubmit -a -y -i -e -r \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" $INF_ARG_RESOURCES; "
 
                 if [ $? -ne 0 ]; then
                     echo "" >&2
