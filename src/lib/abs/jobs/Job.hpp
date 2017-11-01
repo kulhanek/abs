@@ -116,7 +116,7 @@ public:
     /// decode resources
     bool DecodeResources(std::ostream& sout,bool expertmode);
 
-    /// last job check before it is submitted to Torque server
+    /// last job check before it is submitted to batch server
     bool LastJobCheck(std::ostream& sout);
 
     /// 3.0 should submit the job

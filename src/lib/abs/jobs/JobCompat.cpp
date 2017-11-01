@@ -535,12 +535,7 @@ void CJob::PrintBasicV2(std::ostream& sout)
     if( tmp == NULL ) tmp = "-none-";
     sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
 
-    CSmallString srvname;
-    CXMLElement* p_rele = GetElementByPath("infinity",false);
-    if( p_rele != NULL ){
-        p_rele->GetAttribute("server",srvname);
-    }
-
+    CSmallString srvname = GetServerNameV2();
     sout << "Site name        : " << GetSiteName() << " (Torque server: " << srvname << ")" << endl;
     sout << "Job key          : " << GetItem("basic/jobinput","INF_JOB_KEY") << endl;
 
