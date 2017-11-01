@@ -1212,6 +1212,11 @@ bool CJob::ResubmitJob(bool verbose)
     DestroySection("stop");
     DestroySection("kill");
 
+// FIXME
+    // it would be safer if the status of INF_EXTERNAL_START_AFTER would be checked before this job is submited
+    // here we assume that the job was already terminated
+    SetItem("basic/external","INF_EXTERNAL_START_AFTER","");
+
     CSmallString curr_dir;
 //  this does not follow symlinks
 //  CFileSystem::GetCurrentDir(curr_dir);
