@@ -2047,6 +2047,10 @@ const CSmallString CJob::GetServerName(void)
     tmp = GetItem("specific/resources","INF_SERVER",true);
     // RT#222440
     if( tmp == NULL ){
+        // try the old location
+        tmp = GetServerNameV2();
+    }
+    if( tmp == NULL ){
         tmp = "unknown";
     }
     return(tmp);
