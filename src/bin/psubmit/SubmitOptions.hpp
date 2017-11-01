@@ -51,7 +51,7 @@ class CSubmitOptions : public CSimpleOptions {
         "   <b><cyan>job</cyan></b>\n"
         "          job script or job input file\n\n"
         "   <b><cyan>resources</cyan></b>\n"
-        "          number of CPUs or explicit resources, comma or space separated items\n\n"
+        "          number of CPUs or explicit resources, comma or space separated items\n"
     CSO_PROG_ARGS_LONG_DESC_END
 
     CSO_PROG_VERS_BEGIN
