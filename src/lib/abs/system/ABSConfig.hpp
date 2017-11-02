@@ -142,6 +142,9 @@ private:
     CXMLDocument    UserConfig;
     CXMLDocument    DocuConfig;
 
+    bool            TicketChecked;
+    bool            ValidTicket;
+
     bool GetSystemConfigItem(CXMLElement* p_root, const CSmallString& item_name,
                              CSmallString& item_value);
 };

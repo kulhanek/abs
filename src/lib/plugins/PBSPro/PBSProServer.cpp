@@ -130,6 +130,11 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
         it++;
     }
 
+    // record found path to libpbs.so for debugging
+    CSmallString w;
+    w << "libpbs.so: " << PBSProLibName;
+    ES_WARNING(w);
+
     if( InitSymbols() == false ){
         ES_ERROR("unable to init symbols");
         return(false);

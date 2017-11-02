@@ -56,6 +56,9 @@ CABSConfig::CABSConfig(void)
     // must be here
     ABSRoot         = CShell::GetSystemVariable("ABS_ROOT");
     HostName        = CShell::GetSystemVariable("HOSTNAME");
+
+    TicketChecked = false;
+    ValidTicket = false;
 }
 
 //------------------------------------------------------------------------------
@@ -468,10 +471,17 @@ bool CABSConfig::IsABSAvailable(std::ostream& sout)
 
 bool CABSConfig::IsUserTicketValid(std::ostream& sout)
 {
+    // is result chached?
+    if( TicketChecked ){
+        return(ValidTicket);
+    }
+
     CSmallString ticket_validator;
 
     if( GetSystemConfigItem("INF_CHECK_TICKET",ticket_validator) == false ){
         // no ticket validator is requested
+        TicketChecked = true;
+        ValidTicket = true;
         return(true);
     }
 
@@ -479,6 +489,8 @@ bool CABSConfig::IsUserTicketValid(std::ostream& sout)
     CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(ticket_validator));
     if( p_obj == NULL ){
         ES_ERROR("unable to create checker object");
+        TicketChecked = true;
+        ValidTicket = false;
         return(false);
     }
 
@@ -486,6 +498,8 @@ bool CABSConfig::IsUserTicketValid(std::ostream& sout)
     if( p_chk == NULL ){
         delete p_obj;
         ES_ERROR("object is not of correct type");
+        TicketChecked = true;
+        ValidTicket = false;
         return(false);
     }
 
@@ -494,6 +508,9 @@ bool CABSConfig::IsUserTicketValid(std::ostream& sout)
 
     // destroy object
     delete p_chk;
+
+    TicketChecked = true;
+    ValidTicket = result;
 
     return(result);
 }
