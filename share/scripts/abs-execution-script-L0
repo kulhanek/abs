@@ -71,12 +71,12 @@ if [ -f "$INF_BOOT_SCRIPT" ]; then
 fi
 
 # do not use the host chache as it can be outdated
-echo "# ams-host --nocache"
+echo "# ams-host --nocache --verbose"
 
 AMS_HOST_CACHE="/tmp/ams_cache.${USER}.${PBS_JOBID}"
 export AMS_HOST_CACHE
 
-ams-host --nocache
+ams-host --nocache --verbose
 
 echo "# site -v activate $INF_SITE_ID"
 

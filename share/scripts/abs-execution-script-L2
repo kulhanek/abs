@@ -403,8 +403,8 @@ if [ $? -eq 0 ]; then
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
         echo ">>> $NODE_NAME ---"
-        # unset CUDA_VISIBLE_DEVICES to get all data
-        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "CUDA_VISIBLE_DEVICES= nvidia-smi"
+        # CUDA_VISIBLE_DEVICES is ignored by nvidia-smi but unset it for sure
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "unset CUDA_VISIBLE_DEVICES; nvidia-smi"
     done
 else
     echo ">>> INFO: the nvidia-smi command is not available ... skipping"
@@ -548,6 +548,38 @@ echo "INF_OPENMPI1_SPEC      = $INF_OPENMPI1_SPEC"
 echo "INF_OPENMPI2_SPEC      = $INF_OPENMPI2_SPEC"
 
 
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.10: Check HW resources oversubscription ..."
+echo "# ------------------------------------------------------------------------------"
 
+INF_TOTAL_NCPUS=0
+INF_TOTAL_NGPUS=0
 
+for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "ams-host --nodeinfo --nocache" > /tmp/$$.nodeinfo
+    INF_NODE_NCPUS="`grep ncpus /tmp/$$.nodeinfo | awk '{ print $2; }'`"
+    (( INF_TOTAL_NCPUS = INF_TOTAL_NCPUS + INF_NODE_NCPUS ))
+    INF_NODE_NGPUS="`grep ngpus /tmp/$$.nodeinfo | awk '{ print $2; }'`"
+    (( INF_TOTAL_NGPUS = INF_TOTAL_NGPUS + INF_NODE_NGPUS ))
+done
+
+printf "# Requested CPUs: %3d / All availbale CPUs: %3d" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
+printf "# Requested GPUs: %3d / All availbale GPUs: %3d" "$INF_NGPUS" "$INF_TOTAL_NGPUS"
+
+if [[ $INF_NCPUS -gt $INF_TOTAL_NCPUS ]]; then
+    echo "" >&2
+    echo " >>> ERROR: Aborting job due to CPU request oversubscription (this should not happen)!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
+fi
+
+if [[ $INF_NGPUS -gt $INF_TOTAL_NGPUS ]]; then
+    echo "" >&2
+    echo " >>> ERROR: Aborting job due to GPU request oversubscription (this should not happen)!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
+fi
 
