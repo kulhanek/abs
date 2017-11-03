@@ -564,22 +564,33 @@ for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
     (( INF_TOTAL_NGPUS = INF_TOTAL_NGPUS + INF_NODE_NGPUS ))
 done
 
-printf "# Requested CPUs: %3d / All availbale CPUs: %3d" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
-printf "# Requested GPUs: %3d / All availbale GPUs: %3d" "$INF_NGPUS" "$INF_TOTAL_NGPUS"
-
 if [[ $INF_NCPUS -gt $INF_TOTAL_NCPUS ]]; then
-    echo "" >&2
-    echo " >>> ERROR: Aborting job due to CPU request oversubscription (this should not happen)!" >&2
-    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
-    echo "" >&2
+    printf "# Requested CPUs: %3d > All available CPUs: %3d\n" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
+      echo "" >&2
+      echo " >>> ERROR: Aborting job due to CPU request oversubscription (this should not happen)!" >&2
+      echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+      echo "" >&2
     exit 1
+else
+    printf "# Requested CPUs: %3d <= All available CPUs: %3d\n" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
 fi
 
 if [[ $INF_NGPUS -gt $INF_TOTAL_NGPUS ]]; then
-    echo "" >&2
-    echo " >>> ERROR: Aborting job due to GPU request oversubscription (this should not happen)!" >&2
-    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
-    echo "" >&2
+    printf "# Requested GPUs: %3d > All available GPUs: %3d\n" "$INF_NGPUS" "$INF_TOTAL_NGPUS"
+      echo "" >&2
+      echo " >>> ERROR: Aborting job due to GPU request oversubscription (this should not happen)!" >&2
+      echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+      echo "" >&2
     exit 1
+else
+    printf "# Requested GPUs: %3d <= All available GPUs: %3d\n" "$INF_NGPUS" "$INF_TOTAL_NGPUS"
 fi
+
+unset INF_TOTAL_NCPUS
+unset INF_TOTAL_NGPUS
+unset INF_NODE_NCPUS
+unset INF_NODE_NGPUS
+rm -rf /tmp/$$.nodeinfo
+
+
 
