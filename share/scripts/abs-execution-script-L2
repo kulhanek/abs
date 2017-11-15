@@ -431,7 +431,20 @@ echo "# L2.7: Machine software info ..."
 echo "# ------------------------------------------------------------------------------"
 
 echo
-echo "# ulimits"
+echo "# ulimit (main process via pbs_mom)"
+echo "# ============================================================================="
+type ulimit &> /dev/null
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo ">>> `hostname -f` ---"
+    ulimit -a
+else
+    echo ">>> INFO: the ulimit command not available ... skipping"
+fi
+
+echo
+echo "# ulimit (computational nodes via pam_limits)"
 echo "# ============================================================================="
 type ulimit &> /dev/null
 
@@ -439,7 +452,7 @@ if [ $? -eq 0 ]; then
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
         echo ">>> $NODE_NAME ---"
-        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ulimit -a
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ulimit -S -a
     done
 else
     echo ">>> INFO: the ulimit command not available ... skipping"
