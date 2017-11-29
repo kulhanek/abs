@@ -193,12 +193,12 @@ void CQueue::PrintLineInfo(std::ostream& sout)
     sout << " " << setw(5) << TotalJobs - (RunningJobs+QueuedJobs);
     sout << " " << setw(13) << MaxWallTime.GetSTimeAndDay();
 
-    sout << " ";
-    PrintQueueComment(sout);
-
     if( ! OnlyRoutable ){
         sout << "</green></b>";
     }
+
+    sout << " ";    
+    PrintQueueComment(sout);
 }
 
 //------------------------------------------------------------------------------
