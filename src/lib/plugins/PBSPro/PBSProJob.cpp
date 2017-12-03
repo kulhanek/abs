@@ -224,14 +224,18 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_ctime,NULL,tmp);
     SetItem("batch/job","INF_CREATE_TIME",tmp);
-    tmp = NULL;
-    if( status == "H" ){
-        get_attribute(p_job->attribs,ATTR_qtime,NULL,tmp);
-        SetItem("batch/job","INF_SUBMIT_TIME",tmp);
-    } else {
-        get_attribute(p_job->attribs,ATTR_etime,NULL,tmp);
-        SetItem("batch/job","INF_SUBMIT_TIME",tmp);
-    }
+
+    // this does not work for jobs kept in routing queues, see RT#228456
+    // so we will simply use ctime
+    SetItem("batch/job","INF_SUBMIT_TIME",tmp);
+//    tmp = NULL;
+//    if( status == "H" ){
+//        get_attribute(p_job->attribs,ATTR_qtime,NULL,tmp);
+//        SetItem("batch/job","INF_SUBMIT_TIME",tmp);
+//    } else {
+//        get_attribute(p_job->attribs,ATTR_etime,NULL,tmp);
+//        SetItem("batch/job","INF_SUBMIT_TIME",tmp);
+//    }
 
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_stime,NULL,tmp);
