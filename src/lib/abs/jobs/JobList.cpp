@@ -37,12 +37,14 @@
 #include <Shell.hpp>
 #include <AMSGlobalConfig.hpp>
 #include <ABSConfig.hpp>
+#include <boost/filesystem.hpp>
 
 //------------------------------------------------------------------------------
 
 using namespace std;
 using namespace boost;
 using namespace boost::algorithm;
+namespace fs = boost::filesystem;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -1216,22 +1218,27 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
 
         CSmallString name;
         CSmallString machine;
-        CSmallString path;
+        CSmallString spath;
 
         p_jele->GetAttribute("name",name);
         p_jele->GetAttribute("machine",machine);
-        p_jele->GetAttribute("path",path);
+        p_jele->GetAttribute("path",spath);
+
+        fs::path job_path(spath);
 
         // ignore all invalid jobs
-        if( (name != NULL) && (machine != NULL) && (path != NULL) ){
+        if( (name != NULL) && (machine != NULL) && (spath != NULL) ){
+            // resolve job path
+            fs::path job_full_path = fs::system_complete(job_path);
+
             // this is fallback job
             CJobPtr p_job(new CJob);
-            p_job->SetSimpleJobIdentification(name,machine,path);
+            p_job->SetSimpleJobIdentification(name,machine,job_full_path.string());
 
             // try to locate last valid job info in the job directory
             CJobList jobs;
-            if( CFileSystem::IsDirectory(path) ){
-                jobs.InitByInfoFiles(path);
+            if( CFileSystem::IsDirectory(job_full_path.string()) ){
+                jobs.InitByInfoFiles(job_full_path.string().c_str());
                 jobs.SortByPrepareDateAndTime();
             }
             if( jobs.size() >= 1 ){
@@ -1275,6 +1282,8 @@ void CJobList::SaveCollectionJobs(CXMLElement* p_ele)
         INVALID_ARGUMENT("p_ele == NULL");
     }
 
+    fs::path parentPath(CollectionPath);
+
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
 
@@ -1291,9 +1300,13 @@ void CJobList::SaveCollectionJobs(CXMLElement* p_ele)
         // keep only jobs with full data
         if( (name != NULL) && (mach != NULL) && (path != NULL) ){
             CXMLElement* p_jele = p_ele->CreateChildElement("job");
+
+            fs::path childPath(path);
+            fs::path relativePath = fs::relative(childPath, parentPath);
+
             p_jele->SetAttribute("name",name);
             p_jele->SetAttribute("machine",mach);
-            p_jele->SetAttribute("path",path);
+            p_jele->SetAttribute("path",relativePath.string());
         }
         it++;
     }
