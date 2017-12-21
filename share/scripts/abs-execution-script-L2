@@ -569,13 +569,19 @@ echo "# ------------------------------------------------------------------------
 INF_TOTAL_NCPUS=0
 INF_TOTAL_NGPUS=0
 
+# see RT#229993 for possible problems with temporary file name
+INF_NODE_TMP="/tmp/${USER}.$$.nodeinfo"
+
 for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "ams-host --nodeinfo --nocache" > /tmp/$$.nodeinfo
-    INF_NODE_NCPUS="`grep ncpus /tmp/$$.nodeinfo | awk '{ print $2; }'`"
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "ams-host --nodeinfo --nocache" > $INF_NODE_TMP
+    INF_NODE_NCPUS="`grep ncpus $INF_NODE_TMP | awk '{ print $2; }'`"
     (( INF_TOTAL_NCPUS = INF_TOTAL_NCPUS + INF_NODE_NCPUS ))
-    INF_NODE_NGPUS="`grep ngpus /tmp/$$.nodeinfo | awk '{ print $2; }'`"
+    INF_NODE_NGPUS="`grep ngpus $INF_NODE_TMP | awk '{ print $2; }'`"
     (( INF_TOTAL_NGPUS = INF_TOTAL_NGPUS + INF_NODE_NGPUS ))
 done
+
+rm -f "$INF_NODE_TMP"
+unset INF_NODE_TMP
 
 if [[ $INF_NCPUS -gt $INF_TOTAL_NCPUS ]]; then
     printf "# Requested CPUs: %3d > All available CPUs: %3d\n" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
@@ -603,7 +609,7 @@ unset INF_TOTAL_NCPUS
 unset INF_TOTAL_NGPUS
 unset INF_NODE_NCPUS
 unset INF_NODE_NGPUS
-rm -rf /tmp/$$.nodeinfo
+
 
 
 
