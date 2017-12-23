@@ -1066,7 +1066,7 @@ bool CJobList::LoadCollection(const CSmallString& name)
     // get collection path
     CollectionPath = cname.GetFileDirectory();
     if( CollectionPath == NULL ){
-        CFileSystem::GetCurrentDir(CollectionPath);
+        CollectionPath = CJob::GetJobInputPath();
     }
 
     xml_parser.SetOutputXMLNode(&xml_doc);
@@ -1313,10 +1313,10 @@ void CJobList::SaveCollectionJobs(CXMLElement* p_ele)
             CXMLElement* p_jele = p_ele->CreateChildElement("job");
 
             fs::path childPath(path);
-            cout << childPath.string() << " " << parentPath.string() << endl;
+            // cout << childPath.string() << " " << parentPath.string() << endl;
 
             fs::path relativePath = fs::relative(childPath, parentPath);
-            cout << "r:" << relativePath.string() << endl;
+            // cout << "r:" << relativePath.string() << endl;
 
             p_jele->SetAttribute("name",name);
             p_jele->SetAttribute("machine",mach);
