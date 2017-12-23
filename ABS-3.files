@@ -117,6 +117,12 @@ src/lib/abs/jobs/ResourceList.cpp
 src/lib/abs/jobs/ResourceList.hpp
 src/lib/abs/jobs/ResourceValue.cpp
 src/lib/abs/jobs/ResourceValue.hpp
+src/lib/abs/mboost/LICENSE_1_0.txt
+src/lib/abs/mboost/error_code.cpp
+src/lib/abs/mboost/operations.cpp
+src/lib/abs/mboost/operations.cpp
+src/lib/abs/mboost/path.cpp
+src/lib/abs/mboost/path.cpp
 src/lib/abs/old/Collection.cpp
 src/lib/abs/old/Collection.hpp
 src/lib/abs/old/InfoFile.cpp

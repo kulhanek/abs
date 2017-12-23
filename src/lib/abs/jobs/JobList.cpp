@@ -1063,6 +1063,9 @@ bool CJobList::LoadCollection(const CSmallString& name)
         return(false);
     }
 
+    // get collection path
+    CollectionPath = cname.GetFileDirectory();
+
     xml_parser.SetOutputXMLNode(&xml_doc);
     if( xml_parser.Parse(cname) == false ){
         ES_TRACE_ERROR("unable to load collection file");
@@ -1113,12 +1116,13 @@ bool CJobList::LoadCollection(const CSmallString& path,const CSmallString& name,
         return(false);
     }
 
-    if( CollectionSiteName != sitename ){
-        CSmallString error;
-        error << "loaded collection has different site name (" << CollectionSiteName << ") than requested one (" << sitename << ")";
-        ES_TRACE_ERROR(error);
-        return(false);
-    }
+    // allow to check jobs status under different site
+//    if( CollectionSiteName != sitename ){
+//        CSmallString error;
+//        error << "loaded collection has different site name (" << CollectionSiteName << ") than requested one (" << sitename << ")";
+//        ES_TRACE_ERROR(error);
+//        return(false);
+//    }
 
     return(true);
 }
@@ -1198,7 +1202,8 @@ bool CJobList::LoadCollectionHeader(CXMLElement* p_ele)
     result &= p_ele->GetAttribute("time",CollectionLastChange);
     result &= p_ele->GetAttribute("name",CollectionName);
     result &= p_ele->GetAttribute("host",CollectionHost);
-    result &= p_ele->GetAttribute("path",CollectionPath);
+    // path is set in LoadCollection
+    //result &= p_ele->GetAttribute("path",CollectionPath);
     result &= p_ele->GetAttribute("id",CollectionID);
     result &= p_ele->GetAttribute("site",CollectionSiteName);
     result &= p_ele->GetAttribute("siteid",CollectionSiteID);
@@ -1213,6 +1218,9 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
     if( p_ele == NULL ){
         INVALID_ARGUMENT("p_ele == NULL");
     }
+
+    fs::path coll_path(CollectionPath);
+
     CXMLElement* p_jele = p_ele->GetFirstChildElement("job");
     while( p_jele != NULL ){
 
@@ -1229,7 +1237,7 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
         // ignore all invalid jobs
         if( (name != NULL) && (machine != NULL) && (spath != NULL) ){
             // resolve job path
-            fs::path job_full_path = fs::system_complete(job_path);
+            fs::path job_full_path = fs::absolute(job_path,coll_path);
 
             // this is fallback job
             CJobPtr p_job(new CJob);
