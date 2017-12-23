@@ -1310,7 +1310,10 @@ void CJobList::SaveCollectionJobs(CXMLElement* p_ele)
             CXMLElement* p_jele = p_ele->CreateChildElement("job");
 
             fs::path childPath(path);
+            cout << childPath.string() << " " << parentPath.string() << endl;
+
             fs::path relativePath = fs::relative(childPath, parentPath);
+            cout << "r:" << relativePath.string() << endl;
 
             p_jele->SetAttribute("name",name);
             p_jele->SetAttribute("machine",mach);
