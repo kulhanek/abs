@@ -1065,6 +1065,9 @@ bool CJobList::LoadCollection(const CSmallString& name)
 
     // get collection path
     CollectionPath = cname.GetFileDirectory();
+    if( CollectionPath == NULL ){
+        CFileSystem::GetCurrentDir(CollectionPath);
+    }
 
     xml_parser.SetOutputXMLNode(&xml_doc);
     if( xml_parser.Parse(cname) == false ){
