@@ -123,15 +123,6 @@ bool CSubmit::Run(void)
         return(false);
     }
 
-    // execute presubmit hook
-    if( ExecPresubmitHook() == false ){
-        vout << endl;
-        vout << " <b><red>ERROR: Unable to execute the presubmit-hook (or .presubmit-hook) script!</red></b>" << endl;
-        vout << " <b><red>       Aborting the job submission ...</red></b>" << endl;
-        ES_TRACE_ERROR("presubmit hook failed");
-        return(false);
-    }
-
     if( (Options.GetOptNumOfCopies() > 0) && (Options.GetOptResubmitMode() == true) ){
         ES_TRACE_ERROR("unsupported: numofcopies > 0 and repeat == true");
         return(false);
@@ -225,6 +216,15 @@ bool CSubmit::SubmitJobFull(void)
             }
         }
         ES_TRACE_ERROR("runtime files detected");
+        return(false);
+    }
+
+    // execute presubmit hook
+    if( ExecPresubmitHook() == false ){
+        vout << endl;
+        vout << " <b><red>ERROR: Unable to execute the presubmit-hook (or .presubmit-hook) script!</red></b>" << endl;
+        vout << " <b><red>       Aborting the job submission ...</red></b>" << endl;
+        ES_TRACE_ERROR("presubmit hook failed");
         return(false);
     }
 
@@ -336,6 +336,15 @@ bool CSubmit::SubmitJobHeader(void)
         vout << "        <b>premovertf</b>" << endl;
 
         ES_TRACE_ERROR("runtime files detected");
+        return(false);
+    }
+
+    // execute presubmit hook
+    if( ExecPresubmitHook() == false ){
+        vout << endl;
+        vout << " <b><red>ERROR: Unable to execute the presubmit-hook (or .presubmit-hook) script!</red></b>" << endl;
+        vout << " <b><red>       Aborting the job submission ...</red></b>" << endl;
+        ES_TRACE_ERROR("presubmit hook failed");
         return(false);
     }
 
