@@ -298,6 +298,9 @@ bool CCollection::Run(void)
 
         FindJobs(jobs,cwd,root,job);
 
+        // sort jobs
+        sort(jobs.begin(),jobs.end());
+
         if( jobs.size() != 0 ){
 
             // prepare environment
