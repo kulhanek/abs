@@ -979,7 +979,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
         CSmallString coll_id = GetItem("basic/collection","INF_COLLECTION_ID");
         CSmallString site_name = GetSiteName();
 
-        if( collection.LoadCollection(coll_path,coll_name,coll_id,site_name) == false ){
+        if( collection.LoadCollection(coll_path,coll_name,coll_id,site_name,true) == false ){
             ES_ERROR("unable to load collection");
             return(false);
         }

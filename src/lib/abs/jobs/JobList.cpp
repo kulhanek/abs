@@ -1044,7 +1044,7 @@ bool CJobList::CreateCollection(const CSmallString& name,std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CJobList::LoadCollection(const CSmallString& name)
+bool CJobList::LoadCollection(const CSmallString& name,bool fallback_jobs)
 {
     CXMLDocument xml_doc;
     CXMLParser   xml_parser;
@@ -1088,7 +1088,7 @@ bool CJobList::LoadCollection(const CSmallString& name)
 
     CXMLElement* p_jele = xml_doc.GetChildElementByPath("collection/jobs");
     if( p_jele != NULL ){
-        if( LoadCollectionJobs(p_jele) == false ){
+        if( LoadCollectionJobs(p_jele,fallback_jobs) == false ){
             ES_TRACE_ERROR("unable to load collection jobs");
             return(false);
         }
@@ -1103,10 +1103,10 @@ bool CJobList::LoadCollection(const CSmallString& name)
 //------------------------------------------------------------------------------
 
 bool CJobList::LoadCollection(const CSmallString& path,const CSmallString& name,
-                              const CSmallString& id,const CSmallString& sitename)
+                              const CSmallString& id,const CSmallString& sitename,bool fallback_jobs)
 {
     CFileName full_name = CFileName(path) / name + ".cofi";
-    if( LoadCollection(full_name) == false ){
+    if( LoadCollection(full_name,fallback_jobs) == false ){
         ES_TRACE_ERROR("unable to load collection");
         return(false);
     }
@@ -1216,7 +1216,7 @@ bool CJobList::LoadCollectionHeader(CXMLElement* p_ele)
 
 //------------------------------------------------------------------------------
 
-bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
+bool CJobList::LoadCollectionJobs(CXMLElement* p_ele,bool fallback_jobs)
 {
     if( p_ele == NULL ){
         INVALID_ARGUMENT("p_ele == NULL");
@@ -1247,13 +1247,17 @@ bool CJobList::LoadCollectionJobs(CXMLElement* p_ele)
             p_job->SetSimpleJobIdentification(name,machine,job_full_path.string());
 
             // try to locate last valid job info in the job directory
-            CJobList jobs;
-            if( CFileSystem::IsDirectory(job_full_path.string()) ){
-                jobs.InitByInfoFiles(job_full_path.string().c_str());
-                jobs.SortByPrepareDateAndTime();
-            }
-            if( jobs.size() >= 1 ){
-                AddJob(jobs.back());
+            if( ! fallback_jobs ){
+                CJobList jobs;
+                if( CFileSystem::IsDirectory(job_full_path.string()) ){
+                    jobs.InitByInfoFiles(job_full_path.string().c_str());
+                    jobs.SortByPrepareDateAndTime();
+                }
+                if( jobs.size() >= 1 ){
+                    AddJob(jobs.back());
+                } else {
+                    AddJob(p_job);
+                }
             } else {
                 AddJob(p_job);
             }

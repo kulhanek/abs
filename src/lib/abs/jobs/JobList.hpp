@@ -53,11 +53,11 @@ public:
     bool CreateCollection(const CSmallString& name,std::ostream& sout);
 
     /// load collection
-    bool LoadCollection(const CSmallString& name);
+    bool LoadCollection(const CSmallString& name,bool fallback_jobs);
 
     /// load collection
     bool LoadCollection(const CSmallString& path,const CSmallString& name,
-                        const CSmallString& id,const CSmallString& sitename);
+                        const CSmallString& id,const CSmallString& sitename,bool fallback_jobs);
 
     /// get collection name
     const CSmallString& GetCollectionName(void) const;
@@ -219,7 +219,7 @@ private:
     bool LoadCollectionHeader(CXMLElement* p_ele);
 
     /// load collection jobs
-    bool LoadCollectionJobs(CXMLElement* p_ele);
+    bool LoadCollectionJobs(CXMLElement* p_ele,bool fallback_jobs);
 
     /// save collection header
     void SaveCollectionHeader(CXMLElement* p_ele);

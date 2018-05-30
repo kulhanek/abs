@@ -121,7 +121,7 @@ bool CCollection::Run(void)
             vout << "<b><red> ERROR: No or more than one collection is present in the current directory!</red></b>" << endl;
             return(false);
         }
-        if( Jobs.LoadCollection(collname) == false ){
+        if( Jobs.LoadCollection(collname,false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << collname << "'!</red></b>" << endl;
             return(false);
@@ -163,7 +163,7 @@ bool CCollection::Run(void)
 // -------------------------------------------------------------------
     } else if( action == "open" ) {
         bool created = false;
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<blue> INFO: The collection does not exist, creating new one ...</blue>" << endl;
             if( Jobs.CreateCollection(Options.GetProgArg(0),vout) == false ){
@@ -205,7 +205,7 @@ bool CCollection::Run(void)
 // close
 // -------------------------------------------------------------------
     } else if( action == "close" ) {
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
             return(false);
@@ -236,7 +236,7 @@ bool CCollection::Run(void)
 // -------------------------------------------------------------------
     } else if( action == "prepare" ) {
         bool created = false;
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<blue> INFO: The collection does not exist, creating new one ...</blue>" << endl;
             if( Jobs.CreateCollection(Options.GetProgArg(0),vout) == false ){
@@ -361,7 +361,7 @@ bool CCollection::Run(void)
 // submit
 // -------------------------------------------------------------------
     } else if( action == "submit" ) {
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
             return(false);
@@ -422,7 +422,7 @@ bool CCollection::Run(void)
 // info
 // -------------------------------------------------------------------
     } else if( action == "info" ) {
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
             return(false);
@@ -439,7 +439,7 @@ bool CCollection::Run(void)
 // stat
 // -------------------------------------------------------------------
     } else if( action == "stat" ) {
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
             return(false);
@@ -459,7 +459,7 @@ bool CCollection::Run(void)
 // kill
 // -------------------------------------------------------------------
     } else if( action == "kill" ) {
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
             return(false);
@@ -516,7 +516,7 @@ bool CCollection::Run(void)
 // -------------------------------------------------------------------
     } else if( action == "addjob" ){
 
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
             return(false);
@@ -551,7 +551,7 @@ bool CCollection::Run(void)
 // -------------------------------------------------------------------
     } else if( action == "rmjob" ){
 
-        if( Jobs.LoadCollection(Options.GetProgArg(0)) == false ){
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
             return(false);
