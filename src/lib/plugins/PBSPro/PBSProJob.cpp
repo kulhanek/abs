@@ -99,6 +99,8 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
         BatchJobStatus = EJS_FINISHED;
     } else if( status == "E" ) {
         BatchJobStatus = EJS_FINISHED;
+    } else if( status == "M" ) {
+        BatchJobStatus = EJS_MOVED;
     }
 
 // -----------------
