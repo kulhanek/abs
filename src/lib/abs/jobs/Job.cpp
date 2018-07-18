@@ -3902,7 +3902,13 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
         }
     }
     if( includeorigin ){
-        sout << "                  <cyan>" << id << "." << srv << "@" << srv << " -> " << id << "." << srv << "@" << BatchServerName << "</cyan>" << endl;
+        if( srv == BatchServerName ){
+            // normal job
+            sout << "                  <cyan>" << id << "." << srv << "@" << srv << "</cyan>" << endl;
+        } else {
+            // moved job - get short server name
+            sout << "                  <cyan>" << id << "." << srv << "@" << srv << " -> " << id << "." << srv << "@" << BatchServerName << "</cyan>" << endl;
+        }
     }
 
 }
