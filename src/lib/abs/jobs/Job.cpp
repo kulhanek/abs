@@ -3745,15 +3745,16 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
 
     CSmallString id = GetItem("batch/job","INF_JOB_ID");
     CSmallString srv = GetItem("batch/job","INF_SERVER_NAME");
+    CSmallString pid = id;
 
     if( srv == BatchServerName ){
         // normal job
-        id << ShortServerName;
+        pid << ShortServerName;
         sout << "  " << right;
     } else {
         // moved job - get short server name
         CSmallString sn = BatchServers.GetShortServerName(srv);
-        id << sn;
+        pid << sn;
         sout << "> " << right;
     }
 
@@ -3782,7 +3783,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             break;
     }
 
-    sout << right << setw(12) << id << " ";
+    sout << right << setw(12) << pid << " ";
 
     CSmallString user = GetItem("batch/job","INF_JOB_OWNER");
     if( user.GetLength() > 12 ){
