@@ -3755,7 +3755,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
         // moved job - get short server name
         CSmallString sn = BatchServers.GetShortServerName(srv);
         pid << sn;
-        sout << "> " << right;
+        sout << "<cyan>></cyan> " << right;
     }
 
     switch( BatchJobStatus ){
