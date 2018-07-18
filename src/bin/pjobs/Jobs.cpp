@@ -122,15 +122,18 @@ bool CJobs::Run(void)
     vout << "# PBSPro user: " << user << endl;
     vout << low;
 
-    if( BatchServers.GetUserJobs(user,Options.GetOptKeepCompleted() | Options.GetOptFinished()) == false ){
+    if( BatchServers.GetUserJobs(user,Options.GetOptKeepHistory() | Options.GetOptFinished() || Options.GetOptMoved()) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
     }
 
     if( Options.GetOptFinished() ) {
         // show only finished jobs
-        JobList.KeepOnlyCompletedJobs();
+        JobList.KeepOnlyFinishedJobs();
         JobList.SortByFinishDateAndTime();
+    } else if( Options.GetOptMoved() ) {
+        JobList.KeepOnlyMovedJobs();
+        JobList.SortByBatchSubmitDateAndTime();
     } else {
         // this is important in the multibatch environment
         JobList.SortByBatchSubmitDateAndTime();

@@ -117,8 +117,11 @@ public:
     /// keep only jobs of given user
     void KeepUserJobs(const CSmallString& name);
 
-    /// keep only completed jobs
-    void KeepOnlyCompletedJobs(void);
+    /// keep only finished jobs
+    void KeepOnlyFinishedJobs(void);
+
+    /// keep only moved jobs
+    void KeepOnlyMovedJobs(void);
 
     /// keep jobs by mask
     void KeepJobsByMask(struct SExpression* p_mask);

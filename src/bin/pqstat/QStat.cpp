@@ -131,12 +131,12 @@ bool CQStat::Run(void)
         BatchServers.DecodeQueueName(Options.GetOptQueue(),full_srv,short_srv,queue_name);
         CSmallString full_q;
         full_q << queue_name << "@" << short_srv;
-        if( BatchServers.GetQueueJobs(full_q,Options.GetOptKeepCompleted() || Options.GetOptFinished()) == false ){
+        if( BatchServers.GetQueueJobs(full_q,Options.GetOptKeepHistory() || Options.GetOptFinished() || Options.GetOptMoved()) == false ){
             ES_ERROR("unable to get queue jobs");
             return(false);
         }
     } else {
-        if( BatchServers.GetAllJobs(Options.GetOptKeepCompleted() || Options.GetOptFinished()) == false ){
+        if( BatchServers.GetAllJobs(Options.GetOptKeepHistory() || Options.GetOptFinished() || Options.GetOptMoved()) == false ){
             ES_ERROR("unable to get all jobs");
             return(false);
         }
@@ -155,8 +155,17 @@ bool CQStat::Run(void)
         free_mask_tree();
     }
 
-    // this is important in the multibatch environment
-    JobList.SortByBatchSubmitDateAndTime();
+    if( Options.GetOptFinished() ) {
+        // show only finished jobs
+        JobList.KeepOnlyFinishedJobs();
+        JobList.SortByFinishDateAndTime();
+    } else if( Options.GetOptMoved() ) {
+        JobList.KeepOnlyMovedJobs();
+        JobList.SortByBatchSubmitDateAndTime();
+    } else {
+        // this is important in the multibatch environment
+        JobList.SortByBatchSubmitDateAndTime();
+    }
 
     // print info about jobs
     JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());

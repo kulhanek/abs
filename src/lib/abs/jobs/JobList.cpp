@@ -190,7 +190,7 @@ void CJobList::KeepUserJobs(const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-void CJobList::KeepOnlyCompletedJobs(void)
+void CJobList::KeepOnlyFinishedJobs(void)
 {
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
@@ -199,6 +199,28 @@ void CJobList::KeepOnlyCompletedJobs(void)
         CJobPtr p_job = *it;
         switch( p_job->GetJobBatchStatus() ){
             case EJS_FINISHED:
+                // keep
+                it++;
+                continue;
+            default:
+                // delete
+                it = erase(it);
+                continue;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CJobList::KeepOnlyMovedJobs(void)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    while( it != ie ){
+        CJobPtr p_job = *it;
+        switch( p_job->GetJobBatchStatus() ){
+            case EJS_MOVED:
                 // keep
                 it++;
                 continue;
@@ -577,6 +599,12 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool 
                 sout << endl;
                 it = erase(it);
                 break;
+            case EJS_MOVED:
+                sout << "<b><blue> WARNING: The job was moved into the other destination.</blue></b>" << endl;
+                sout << "<b><blue>          The pgo command cannot be used.</blue></b>" << endl;
+                sout << endl;
+                it = erase(it);
+                break;
             case EJS_SUBMITTED:
                 sout << "<b><blue> WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
                 sout << "<b><blue>          Wait until the job is started.</blue></b>" << endl;
@@ -766,6 +794,12 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
         sout << std::endl;
 
         switch( p_job->GetJobStatus() ){
+            case EJS_MOVED:
+                sout << "<b><blue> WARNING: The job was moved into the other destination.</blue></b>" << endl;
+                sout << "<b><blue>          The psync command cannot be used.</blue></b>" << endl;
+                sout << endl;
+                it = erase(it);
+                break;
             case EJS_NONE:
             case EJS_PREPARED:
             case EJS_SUBMITTED:
@@ -1461,6 +1495,7 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
                 resubmit++;
                 break;
             case EJS_INCONSISTENT:
+            case EJS_MOVED:         // this should not technically happen
                 inconsistent++;
                 break;
         }
@@ -1626,6 +1661,9 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
             case EJS_ERROR:
                 sout << "<red>ER</red>";
                 break;
+            case EJS_MOVED:
+                sout << "<cyan>M</cyan>";
+                break;
             case EJS_INCONSISTENT:
                 sout << "<red>IN</red>";
                 break;
@@ -1674,7 +1712,7 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
             case EJS_SUBMITTED:
             case EJS_RUNNING:
             case EJS_INCONSISTENT:
-            default:
+            case EJS_MOVED:
                 break;
         }
         sout << endl;

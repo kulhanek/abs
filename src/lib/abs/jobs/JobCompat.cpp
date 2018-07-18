@@ -93,6 +93,9 @@ void CJob::PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includ
         case EJS_ERROR:
             sout << "<red>ER</red>";
             break;
+        case EJS_MOVED:
+            sout << "<cyan>M</cyan>";
+            break;
         case EJS_INCONSISTENT:
             sout << "<red>IN</red>";
             break;
@@ -136,6 +139,7 @@ void CJob::PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includ
         case EJS_NONE:
         case EJS_INCONSISTENT:
         case EJS_ERROR:
+        case EJS_MOVED:
             break;
         case EJS_PREPARED:
         case EJS_SUBMITTED:
@@ -173,6 +177,7 @@ void CJob::PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includ
                 sout << "     <red>" << GetJobBatchComment() << "</red>" << endl;
                 break;
             case EJS_SUBMITTED:
+            case EJS_MOVED:
                 sout << "     <purple>" << GetJobBatchComment() << "</purple>" << endl;
                 break;
             case EJS_RUNNING:
@@ -224,6 +229,9 @@ void CJob::PrintJobInfoCompactV1(std::ostream& sout,bool includepath)
         case EJS_ERROR:
             sout << "ER";
             break;
+        case EJS_MOVED:
+            sout << "M";
+            break;
         case EJS_INCONSISTENT:
             sout << "IN";
             break;
@@ -261,6 +269,7 @@ void CJob::PrintJobInfoCompactV1(std::ostream& sout,bool includepath)
         case EJS_NONE:
         case EJS_INCONSISTENT:
         case EJS_ERROR:
+        case EJS_MOVED:
             break;
         case EJS_PREPARED:
         case EJS_SUBMITTED:

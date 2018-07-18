@@ -1452,7 +1452,7 @@ bool CJob::KillJob(bool force)
     // normal termination
     if( ABSConfig.IsServerConfigured(GetServerName()) == false ){
         // job was run under different server
-        ES_TRACE_ERROR("job batch server is not availbale under the current site");
+        ES_TRACE_ERROR("job batch server is not available under the current site");
         return(false);
     }
 
@@ -1474,12 +1474,6 @@ bool CJob::KillJob(bool force)
 
 bool CJob::UpdateJobStatus(void)
 {
-    if( ABSConfig.IsServerConfigured(GetServerName()) == false ){
-        // job was run under different server
-        ES_TRACE_ERROR("job batch server is not availbale under the current site");
-        return(true);
-    }
-
     switch( GetJobInfoStatus() ){
         case EJS_SUBMITTED:
         case EJS_RUNNING:
@@ -1490,8 +1484,13 @@ bool CJob::UpdateJobStatus(void)
             return(true);
     }
 
-    // get job status and reason
+    if( ABSConfig.IsServerConfigured(GetServerName()) == false ){
+        // job was run under different server
+        ES_TRACE_ERROR("job batch server is not available under the current site");
+        return(true);
+    }
 
+    // get job status and reason
     if( BatchServers.GetJobStatus(*this) == false ){
         ES_ERROR("unable to update job status");
         return(false);
@@ -2122,6 +2121,7 @@ const CSmallTimeAndDate CJob::GetTimeOfLastChange(void)
     switch( GetJobStatus() ){
         case EJS_NONE:
         case EJS_INCONSISTENT:
+        case EJS_MOVED:
         case EJS_ERROR:
             // nothing to be here
             break;
@@ -2492,6 +2492,9 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
         case EJS_ERROR:
             sout << "<red>ER</red>";
             break;
+        case EJS_MOVED:
+            sout << "<cyan>M</cyan>";
+            break;
         case EJS_INCONSISTENT:
             sout << "<red>IN</red>";
             break;
@@ -2530,6 +2533,7 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
             case EJS_NONE:
             case EJS_INCONSISTENT:
             case EJS_ERROR:
+            case EJS_MOVED:
                 per = cur - 1;
                 sout << "                    ";
                 break;
@@ -2572,7 +2576,10 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
 
             case EJS_ERROR:
             case EJS_INCONSISTENT:
+                sout << "       <red>" << BatchJobComment << "</red>" << endl;
+                break;
             case EJS_SUBMITTED:
+            case EJS_MOVED:
                 sout << "       <green>" << BatchJobComment << "</green>" << endl;
                 break;
             case EJS_RUNNING:
@@ -3454,10 +3461,10 @@ EJobStatus CJob::GetJobStatus(void)
     if( ABSConfig.IsServerConfigured(GetServerName()) == false ){
         switch( GetJobInfoStatus() ){
             case EJS_SUBMITTED:
-                BatchJobComment = "the job batch server is not availbale under the current site";
+                BatchJobComment = "the job batch server is not available under the current site";
                 return(EJS_INCONSISTENT);
             case EJS_RUNNING:
-                BatchJobComment = "the job batch server is not availbale under the current site";
+                BatchJobComment = "the job batch server is not available under the current site";
                 return(EJS_INCONSISTENT);
             default:
                 return( GetJobInfoStatus() );
@@ -3622,6 +3629,9 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
         case EJS_ERROR:
             sout << "<red>ER</red>";
             break;
+        case EJS_MOVED:
+            sout << "<cyan>M</cyan>";
+            break;
         case EJS_INCONSISTENT:
             sout << "<red>IN</red>";
             break;
@@ -3674,6 +3684,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
         case EJS_NONE:
         case EJS_INCONSISTENT:
         case EJS_ERROR:
+        case EJS_MOVED:
             break;
         case EJS_PREPARED:
         case EJS_SUBMITTED:
@@ -3711,9 +3722,10 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
                 sout << "                  <red>" << GetJobBatchComment() << "</red>" << endl;
                 break;
             case EJS_SUBMITTED:
+            case EJS_MOVED:
                 sout << "                  <purple>" << GetJobBatchComment() << "</purple>" << endl;
                 break;
-            case EJS_RUNNING:
+            case EJS_RUNNING:         
                 sout << "                  <green>" << GetItem("start/workdir","INF_MAIN_NODE");
                 if( GetItem("specific/resources","INF_NNODES").ToInt() > 1 ){
                     sout << ",+";
@@ -3751,6 +3763,9 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
                 break;
             case EJS_RUNNING:
                 sout << "<green>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</green> ";
+                break;
+            case EJS_MOVED:
+                sout << "<cyan>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</cyan> ";
                 break;
         }
 
@@ -3827,6 +3842,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             }
             break;
         case EJS_ERROR:
+        case EJS_MOVED:
         case EJS_INCONSISTENT:
             // nothing to be here
             break;
@@ -3861,6 +3877,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
                 sout << "                  <red>" << GetJobBatchComment() << "</red>" << endl;
                 break;
             case EJS_SUBMITTED:
+            case EJS_MOVED:
                 sout << "                  <purple>" << GetJobBatchComment() << "</purple>" << endl;
                 break;
             case EJS_RUNNING:

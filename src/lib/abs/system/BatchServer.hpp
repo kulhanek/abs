@@ -50,7 +50,7 @@ public:
         CBatchServer(CPluginObject* p_objectinfo);
         ~CBatchServer(void);
 
-// init batch system subsystem -------------------------------------------------------
+// init batch system subsystem -------------------------------------------------
     //! load symbols and connect to server
     virtual bool Init(const CSmallString& server_name,const CSmallString& short_name);
 
@@ -59,6 +59,11 @@ public:
 
     /// get short server name
     const CSmallString GetShortName(void);
+
+// helper methods --------------------------------------------------------------
+
+    /// get full job ID - if jobid does not contain server, ServerName is appended, otherwise jobid is returned
+    const CSmallString GetFullJobID(const CSmallString& jobid);
 
 // enumeration -----------------------------------------------------------------
     // IMPORTANT NOTE:
@@ -71,13 +76,13 @@ public:
     virtual bool GetNodes(CNodeList& nodes);
 
     //! init all job list
-    virtual bool GetAllJobs(CJobList& jobs,bool finished);
+    virtual bool GetAllJobs(CJobList& jobs,bool include_history);
 
     //! get queue jobs
-    virtual bool GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished);
+    virtual bool GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool include_history);
 
     //! init job list of given user
-    virtual bool GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished);
+    virtual bool GetUserJobs(CJobList& jobs,const CSmallString& user,bool include_history);
 
     //! get job by job id
     virtual const CJobPtr GetJob(const CSmallString& jobid);
@@ -94,7 +99,7 @@ public:
     //! print technical info about jobs
     virtual bool PrintJobs(std::ostream& sout);
 
-    //! print technical info about single job
+    //! print technical info about a single job
     virtual bool PrintJob(std::ostream& sout,const CSmallString& name);
 
 // execution -------------------------------------------------------------------

@@ -63,6 +63,16 @@ const CSmallString CBatchServer::GetShortName(void)
     return(ShortName);
 }
 
+//------------------------------------------------------------------------------
+
+const CSmallString CBatchServer::GetFullJobID(const CSmallString& jobid)
+{
+    if( jobid.FindSubString(".") != -1 ) return(jobid);
+    CSmallString full_job_id;
+    full_job_id << jobid << "." << ServerName;
+    return(full_job_id);
+}
+
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
@@ -81,21 +91,21 @@ bool CBatchServer::GetNodes(CNodeList& nodes)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::GetAllJobs(CJobList& jobs,bool finished)
+bool CBatchServer::GetAllJobs(CJobList& jobs,bool include_history)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished)
+bool CBatchServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool include_history)
 {
     return(false);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished)
+bool CBatchServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool include_history)
 {
     return(false);
 }

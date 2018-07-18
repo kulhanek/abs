@@ -72,13 +72,13 @@ public:
     bool GetNodes(CNodeList& nodes);
 
     //! init all job list
-    bool GetAllJobs(CJobList& jobs,bool finished);
+    bool GetAllJobs(CJobList& jobs,bool include_history);
 
     //! get queue jobs
-    bool GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished);
+    bool GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool include_history);
 
     //! init job list of given user
-    bool GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished);
+    bool GetUserJobs(CJobList& jobs,const CSmallString& user,bool include_history);
 
     //! init job list by job id
     bool GetJob(CJobList& jobs,const CSmallString& jobid);

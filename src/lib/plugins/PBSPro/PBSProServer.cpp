@@ -358,10 +358,10 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
+bool CPBSProServer::GetAllJobs(CJobList& jobs,bool include_history)
 {
     CSmallString extend;
-    if( finished ){
+    if( include_history ){
         extend << "x";
     }
 
@@ -389,10 +389,10 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool finished)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool finished)
+bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool include_history)
 {
     CSmallString extend;
-    if( finished ){
+    if( include_history ){
         extend << "x";
     }
 
@@ -420,10 +420,10 @@ bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,b
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool finished)
+bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool include_history)
 {
     CSmallString extend;
-    if( finished ){
+    if( include_history ){
         extend << "x";
     }
 
@@ -473,7 +473,7 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
     extend << "x";
 
     CSmallString full_job_id;
-    full_job_id << jobid << "." << ServerName;
+    full_job_id = GetFullJobID(jobid);
 
     struct batch_status* p_jobs;
     p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,extend.GetBuffer());
@@ -560,7 +560,7 @@ bool CPBSProServer::PrintJobs(std::ostream& sout)
 bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid)
 {
     CSmallString full_job_id;
-    full_job_id << jobid << "." << ServerName;
+    full_job_id = GetFullJobID(jobid);
 
     struct batch_status* p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,NULL);
     if( p_jobs != NULL ) {
@@ -849,6 +849,8 @@ bool CPBSProServer::GetJobStatus(CJob& job)
                 job.BatchJobStatus = EJS_FINISHED;
             } else if( status == "E" ) {
                 job.BatchJobStatus = EJS_ERROR;
+            } else if( status == "M" ) {
+                job.BatchJobStatus = EJS_MOVED;
             }
         }
 

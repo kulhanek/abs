@@ -48,6 +48,7 @@ enum EJobStatus {
     EJS_FINISHED,
     EJS_KILLED,
     EJS_ERROR,
+    EJS_MOVED,
     EJS_INCONSISTENT
 };
 
@@ -236,7 +237,7 @@ public:
     /// get job status from info file
     EJobStatus GetJobInfoStatus(void);
 
-    /// get job status fIsInteractiveJobrom batch system
+    /// get job status from batch system
     EJobStatus GetJobBatchStatus(void);
 
     /// get job status from batch system

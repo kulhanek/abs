@@ -83,13 +83,13 @@ public:
     bool GetNodes(void);
 
     //! init all job list
-    bool GetAllJobs(bool finished);
+    bool GetAllJobs(bool include_history);
 
     //! get queue jobs
-    bool GetQueueJobs(const CSmallString& queue_name,bool finished);
+    bool GetQueueJobs(const CSmallString& queue_name,bool include_history);
 
     //! init job list of given user
-    bool GetUserJobs(const CSmallString& user,bool finished);
+    bool GetUserJobs(const CSmallString& user,bool include_history);
 
     //! init job list by job id
     bool GetJob(CJobList& jobs,const CSmallString& jobid);
@@ -144,8 +144,13 @@ private:
     /// number.server           1234.wagap-pro.cerit-sc.cz
     /// numberSERVER_SHORT_NAME 1234C
     /// number                  for default server
-    /// the server name is stripped from the jobid
+    /// it resolves moved jobs - see RT#258670
+    /// the server name is added to the jobid if not present
     const CBatchServerPtr FindBatchServerByJobID(CSmallString& jobid);
+
+    /// find batch server by jobid
+    /// same as above
+    const CBatchServerPtr FindBatchServerByJobID(CJob& job);
 
     // global setup
     CTerminalStr    Console;
