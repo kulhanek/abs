@@ -64,6 +64,7 @@ class CQStatOptions : public CSimpleOptions {
         CSO_OPT(CSmallString,Search)
         CSO_OPT(bool,IncludePath)
         CSO_OPT(bool,IncludeComment)
+        CSO_OPT(bool,IncludeOrigin)
         CSO_OPT(bool,KeepHistory)
         CSO_OPT(bool,Finished)
         CSO_OPT(bool,Moved)
@@ -112,33 +113,6 @@ class CQStatOptions : public CSimpleOptions {
                 "print job path if possible")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                KeepHistory,                        /* option name */
-                false,                          /* default value */
-                false,                          /* is option mandatory */
-                'c',                           /* short option name */
-                "completed",                      /* long option name */
-                NULL,                           /* parametr name */
-                "keep all jobs")   /* option description */
-//----------------------------------------------------------------------
-    CSO_MAP_OPT(bool,                           /* option type */
-                Finished,                        /* option name */
-                false,                          /* default value */
-                false,                          /* is option mandatory */
-                'f',                           /* short option name */
-                "finished",                      /* long option name */
-                NULL,                           /* parametr name */
-                "show only finished jobs sorted by their termination time")   /* option description */
-//----------------------------------------------------------------------
-    CSO_MAP_OPT(bool,                           /* option type */
-                Moved,                        /* option name */
-                false,                          /* default value */
-                false,                          /* is option mandatory */
-                'm',                           /* short option name */
-                "moved",                      /* long option name */
-                NULL,                           /* parametr name */
-                "show only moved jobs")   /* option description */
-    //----------------------------------------------------------------------
-        CSO_MAP_OPT(bool,                           /* option type */
                 IncludeComment,                        /* option name */
                 false,                          /* default value */
                 false,                          /* is option mandatory */
@@ -146,6 +120,42 @@ class CQStatOptions : public CSimpleOptions {
                 "comment",                      /* long option name */
                 NULL,                           /* parametr name */
                 "print job comment if possible")   /* option description */
+//----------------------------------------------------------------------
+    CSO_MAP_OPT(bool,                           /* option type */
+                IncludeOrigin,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'o',                           /* short option name */
+                "origin",                      /* long option name */
+                NULL,                           /* parametr name */
+                "print job origin if the job was moved between servers")   /* option description */
+    //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                KeepHistory,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'c',                           /* short option name */
+                "completed",                      /* long option name */
+                NULL,                           /* parametr name */
+                "keep all jobs")   /* option description */
+    //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                Finished,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'f',                           /* short option name */
+                "finished",                      /* long option name */
+                NULL,                           /* parametr name */
+                "show only finished jobs sorted by their termination time")   /* option description */
+    //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                Moved,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'm',                           /* short option name */
+                "moved",                      /* long option name */
+                NULL,                           /* parametr name */
+                "show only moved jobs")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                 Technical,                        /* option name */

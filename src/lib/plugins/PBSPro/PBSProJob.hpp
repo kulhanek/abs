@@ -35,7 +35,7 @@ public:
 
 // methods ---------------------------------------------------------------------
     //! init queue with batch system information
-    bool Init(const CSmallString& short_srv_name,struct batch_status* p_job);
+    bool Init(const CSmallString& srv_name,const CSmallString& short_srv_name,struct batch_status* p_job);
 
     //! decode job comment
     static void DecodeBatchJobComment(struct attrl* p_item,CSmallString& comment);

@@ -63,6 +63,7 @@ class CJobsOptions : public CSimpleOptions {
         CSO_OPT(CSmallString,Search)
         CSO_OPT(bool,IncludePath)
         CSO_OPT(bool,IncludeComment)
+        CSO_OPT(bool,IncludeOrigin)
         CSO_OPT(bool,KeepHistory)
         CSO_OPT(bool,Moved)
         CSO_OPT(bool,Finished)
@@ -108,6 +109,15 @@ class CJobsOptions : public CSimpleOptions {
                     "comment",                      /* long option name */
                     NULL,                           /* parametr name */
                     "print job comment if possible")   /* option description */
+    //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                    IncludeOrigin,                        /* option name */
+                    false,                          /* default value */
+                    false,                          /* is option mandatory */
+                    'o',                           /* short option name */
+                    "origin",                      /* long option name */
+                    NULL,                           /* parametr name */
+                    "print job origin if the job was moved between servers")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     KeepHistory,                        /* option name */

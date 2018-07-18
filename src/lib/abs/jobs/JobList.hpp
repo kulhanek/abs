@@ -99,7 +99,7 @@ public:
     bool CollectionResubmitJobs(std::ostream& sout,bool verbose);
 
     /// print batch jobs
-    void PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment);
+    void PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin);
 
     /// print batch jobs
     void PrintBatchInfoStat(std::ostream& sout);

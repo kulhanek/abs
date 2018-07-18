@@ -406,7 +406,7 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool include_history)
     bool result = true;
     while( p_jobs != NULL ){
         CPBSProJob* p_job = new CPBSProJob;
-        if( p_job->Init(ShortName,p_jobs) == false ){
+        if( p_job->Init(ServerName,ShortName,p_jobs) == false ){
             ES_ERROR("unable to init job");
             result = false;
             delete p_job;
@@ -441,7 +441,7 @@ bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,b
     bool result = true;
     while( p_jobs != NULL ){
         CPBSProJob* p_job = new CPBSProJob;
-        if( p_job->Init(ShortName,p_jobs) == false ){
+        if( p_job->Init(ServerName,ShortName,p_jobs) == false ){
             ES_ERROR("unable to init job");
             result = false;
             delete p_job;
@@ -479,7 +479,7 @@ bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool inc
     bool result = true;
     while( p_jobs != NULL ){
         CPBSProJob* p_job = new CPBSProJob;
-        if( p_job->Init(ShortName,p_jobs) == false ){
+        if( p_job->Init(ServerName,ShortName,p_jobs) == false ){
             ES_ERROR("unable to init job");
             result = false;
             delete p_job;
@@ -534,7 +534,7 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 
     if( p_jobs != NULL ){
         CPBSProJob* p_job = new CPBSProJob;
-        if( p_job->Init(ShortName,p_jobs) == false ){
+        if( p_job->Init(ServerName,ShortName,p_jobs) == false ){
             delete p_job;
             ES_ERROR("unable to init job");
         } else {

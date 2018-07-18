@@ -48,13 +48,14 @@ CPBSProJob::CPBSProJob(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_job)
+bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv_name,struct batch_status* p_job)
 {
     if( p_job == NULL ){
         ES_ERROR("p_job is NULL");
         return(false);
     }
 
+    BatchServerName = srv_name;
     ShortServerName = short_srv_name;
 
     // create used sections
@@ -70,6 +71,11 @@ bool CPBSProJob::Init(const CSmallString& short_srv_name,struct batch_status* p_
     } else {
         SetItem("batch/job","INF_JOB_ID","");
     }
+
+    // job server
+    items.erase(items.begin());
+    stmp = join(items,".");
+    SetItem("batch/job","INF_SERVER_NAME",stmp);
 
     // get attributes
     CSmallString tmp;

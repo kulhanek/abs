@@ -2042,7 +2042,7 @@ void CJobList::GetNumberOfResFromBatchSys(EJobStatus status,int& ncpus,int& ngpu
 
 //------------------------------------------------------------------------------
 
-void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment)
+void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin)
 {
     sout << endl;
     sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times           " << endl;
@@ -2053,7 +2053,7 @@ void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includeco
 
     while( it != ie ){
         CJobPtr p_job = *it;
-        p_job->PrintJobQStatInfo(sout,includepath,includecomment);
+        p_job->PrintJobQStatInfo(sout,includepath,includecomment,includeorigin);
         it++;
     }
 }

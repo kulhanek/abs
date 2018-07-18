@@ -136,7 +136,7 @@ bool CKillAll::Run(void)
     }
 
     // print info about jobs
-    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
+    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment(),false);
 
     // print batch stat
     vout << endl;

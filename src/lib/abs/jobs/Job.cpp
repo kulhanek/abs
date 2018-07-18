@@ -3738,7 +3738,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecomment)
+void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin)
 {
 //    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
 //    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- --------------------" << endl;
@@ -3770,8 +3770,19 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
         }
 
     CSmallString id = GetItem("batch/job","INF_JOB_ID");
-    id << ShortServerName;
+    CSmallString srv = GetItem("batch/job","INF_SERVER_NAME");
+
+    if( srv == BatchServerName ){
+        // normal job
+        id << ShortServerName;
+    } else {
+        // moved job - get short server name
+        CSmallString sn = BatchServers.GetShortServerName(srv);
+        id << sn;
+    }
+
     sout << right << setw(12) << id << " ";
+
 
     CSmallString user = GetItem("batch/job","INF_JOB_OWNER");
     if( user.GetLength() > 12 ){

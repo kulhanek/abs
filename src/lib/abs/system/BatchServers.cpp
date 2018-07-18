@@ -429,6 +429,26 @@ void CBatchServers::PrintWarningIfUnavailable(std::ostream& vout)
 
 //------------------------------------------------------------------------------
 
+const CSmallString CBatchServers::GetShortServerName(const CSmallString& srv_name)
+{
+    CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
+    if( p_ele ){
+        p_ele = p_ele->GetFirstChildElement("server");
+    }
+
+    while( p_ele != NULL ){
+        CSmallString name, short_name;
+        p_ele->GetAttribute("name",name);
+        p_ele->GetAttribute("short",short_name);
+        if( name == srv_name ) return(short_name);
+        p_ele = p_ele->GetNextSiblingElement();
+    }
+
+    return("-"); // not found
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServers::DecodeQueueName(const CSmallString& input,CSmallString& srv_name,CSmallString& srv_short,CSmallString& queue)
 {
     // queue            default server name

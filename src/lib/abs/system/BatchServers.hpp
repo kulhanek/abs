@@ -78,6 +78,9 @@ public:
     /// decode queue name
     bool DecodeQueueName(const CSmallString& input,CSmallString& srv_name,CSmallString& srv_short,CSmallString& queue);
 
+    /// get short server name
+    const CSmallString GetShortServerName(const CSmallString& srv_name);
+
 // -----------------------------------------------------------------------------
     /// list queues
     bool GetQueues(void);
