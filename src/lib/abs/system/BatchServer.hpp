@@ -118,10 +118,22 @@ public:
     //! kill job by ID
     virtual bool KillJobByID(const CSmallString& jobid);
 
+// timing ----------------------------------------------------------------------
+    /// start timer
+    void StartTimer(void);
+
+    /// end timer
+    void EndTimer(void);
+
+    /// get exec time in seconds
+    double GetExecTime(void);
+
 // -----------------------------------------------------------------------------
 protected:
     CSmallString    ServerName;
     CSmallString    ShortName;
+    size_t          ExecTime;       // execution time in clock ticks
+    size_t          TimerStart;     // timer start time in clock ticks
 };
 
 // -----------------------------------------------------------------------------

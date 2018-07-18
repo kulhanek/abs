@@ -66,6 +66,9 @@ public:
     /// print batch systems
     void PrintServerOverview(std::ostream& vout);
 
+    /// print batch systems exec times
+    void PrintServerExecTimes(std::ostream& vout,double treshold=2.0);
+
     /// print warning if any server is inaccessible
     void PrintWarningIfUnavailable(std::ostream& vout);
 

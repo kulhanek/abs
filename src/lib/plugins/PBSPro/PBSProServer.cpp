@@ -114,6 +114,8 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
         return(false);
     }
 
+    StartTimer();
+
     // find suitable library
     vector<string> libs;
     string         slibs_tok(libs_tok);
@@ -137,6 +139,7 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
 
     if( InitSymbols() == false ){
         ES_ERROR("unable to init symbols");
+        EndTimer();
         return(false);
     }
 
@@ -145,9 +148,11 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
 
     if( ConnectToServer() == false ){
         ES_TRACE_ERROR("unable to connect to server");
+        EndTimer();
         return(false);
     }
 
+    EndTimer();
     return(true);
 }
 
@@ -310,6 +315,8 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 
 bool CPBSProServer::GetQueues(CQueueList& queues)
 {
+    StartTimer();
+
     struct batch_status* p_queue_attrs = pbspro_statque(ServerID,NULL,NULL,NULL);
 
     bool result = true;
@@ -328,6 +335,8 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
 
     if( p_queue_attrs ) pbspro_statfree(p_queue_attrs);
 
+    EndTimer();
+
     return(result);
 }
 
@@ -335,6 +344,8 @@ bool CPBSProServer::GetQueues(CQueueList& queues)
 
 bool CPBSProServer::GetNodes(CNodeList& nodes)
 {
+    StartTimer();
+
     struct batch_status* p_node_attrs = pbspro_stathost(ServerID,NULL,NULL,NULL);
 
     bool result = true;
@@ -353,6 +364,8 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
 
     if( p_node_attrs ) pbspro_statfree(p_node_attrs);
 
+    EndTimer();
+
     return(result);
 }
 
@@ -360,6 +373,8 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
 
 bool CPBSProServer::GetAllJobs(CJobList& jobs,bool include_history)
 {
+    StartTimer();
+
     CSmallString extend;
     if( include_history ){
         extend << "x";
@@ -384,6 +399,8 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool include_history)
 
     if( p_jobs ) pbspro_statfree(p_jobs);
 
+    EndTimer();
+
     return(result);
 }
 
@@ -391,6 +408,8 @@ bool CPBSProServer::GetAllJobs(CJobList& jobs,bool include_history)
 
 bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,bool include_history)
 {
+    StartTimer();
+
     CSmallString extend;
     if( include_history ){
         extend << "x";
@@ -415,6 +434,8 @@ bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,b
 
     if( p_jobs ) pbspro_statfree(p_jobs);
 
+    EndTimer();
+
     return(result);
 }
 
@@ -422,6 +443,8 @@ bool CPBSProServer::GetQueueJobs(CJobList& jobs,const CSmallString& queue_name,b
 
 bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool include_history)
 {
+    StartTimer();
+
     CSmallString extend;
     if( include_history ){
         extend << "x";
@@ -449,6 +472,8 @@ bool CPBSProServer::GetUserJobs(CJobList& jobs,const CSmallString& user,bool inc
 
     if( p_jobs ) pbspro_statfree(p_jobs);
 
+    EndTimer();
+
     return(result);
 }
 
@@ -468,6 +493,8 @@ bool CPBSProServer::GetJob(CJobList& jobs,const CSmallString& jobid)
 
 const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 {
+    StartTimer();
+
     // always use extend attribute
     CSmallString extend;
     extend << "x";
@@ -497,6 +524,8 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 
     if( p_jobs ) pbspro_statfree(p_jobs);
 
+    EndTimer();
+
     return(result);
 }
 
@@ -504,11 +533,16 @@ const CJobPtr CPBSProServer::GetJob(const CSmallString& jobid)
 
 bool CPBSProServer::PrintQueues(std::ostream& sout)
 {
+    StartTimer();
+
     struct batch_status* p_queues = pbspro_statque(ServerID,NULL,NULL,NULL);
     if( p_queues != NULL ) {
         PrintBatchStatus(sout,p_queues);
         pbspro_statfree(p_queues);
     }
+
+    EndTimer();
+
     return(p_queues != NULL);
 }
 
@@ -516,11 +550,16 @@ bool CPBSProServer::PrintQueues(std::ostream& sout)
 
 bool CPBSProServer::PrintNodes(std::ostream& sout)
 {
+    StartTimer();
+
     struct batch_status* p_nodes = pbspro_stathost(ServerID,NULL,NULL,NULL);
     if( p_nodes != NULL ) {
         PrintBatchStatus(sout,p_nodes);
         pbspro_statfree(p_nodes);
     }
+
+    EndTimer();
+
     return(p_nodes != NULL);
 }
 
@@ -528,6 +567,8 @@ bool CPBSProServer::PrintNodes(std::ostream& sout)
 
 bool CPBSProServer::PrintNode(std::ostream& sout,const CSmallString& name)
 {
+    StartTimer();
+
     struct batch_status* p_nodes = pbspro_stathost(ServerID,(char*)name.GetBuffer(),NULL,NULL);
     if( p_nodes != NULL ) {
         PrintBatchStatus(sout,p_nodes);
@@ -540,6 +581,9 @@ bool CPBSProServer::PrintNode(std::ostream& sout,const CSmallString& name)
             pbspro_statfree(p_nodes);
         }
     }
+
+    EndTimer();
+
     return(p_nodes != NULL);
 }
 
@@ -547,11 +591,16 @@ bool CPBSProServer::PrintNode(std::ostream& sout,const CSmallString& name)
 
 bool CPBSProServer::PrintJobs(std::ostream& sout)
 {
+    StartTimer();
+
     struct batch_status* p_jobs = pbspro_statjob(ServerID,NULL,NULL,NULL);
     if( p_jobs != NULL ) {
         PrintBatchStatus(sout,p_jobs);
         pbspro_statfree(p_jobs);
     }
+
+    EndTimer();
+
     return(p_jobs != NULL);
 }
 
@@ -559,6 +608,8 @@ bool CPBSProServer::PrintJobs(std::ostream& sout)
 
 bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid)
 {
+    StartTimer();
+
     CSmallString full_job_id;
     full_job_id = GetFullJobID(jobid);
 
@@ -567,6 +618,9 @@ bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid)
         PrintBatchStatus(sout,p_jobs);
         pbspro_statfree(p_jobs);
     }
+
+    EndTimer();
+
     return(p_jobs != NULL);
 }
 
@@ -671,6 +725,8 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
 
 bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
 {
+    StartTimer();
+
     CFileName script    = job.GetMainScriptName();
     CFileName infout    = job.GetInfoutName();
     CFileName queue     = job.GetQueue();
@@ -789,6 +845,9 @@ bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
     job.WriteSubmitSection(p_jobid);
 
     free(p_jobid);
+
+    EndTimer();
+
     return(true);
 }
 
@@ -819,6 +878,8 @@ void CPBSProServer::CreateJobAttributes(struct attropl* &p_prev,CResourceList* p
 
 bool CPBSProServer::GetJobStatus(CJob& job)
 {
+    StartTimer();
+
     CSmallString jobid = job.GetJobID();
 
     batch_status* p_status = pbspro_statjob(ServerID,jobid.GetBuffer(),NULL,NULL);
@@ -859,6 +920,8 @@ bool CPBSProServer::GetJobStatus(CJob& job)
 
     pbspro_statfree(p_status);
 
+    EndTimer();
+
     return(true);
 }
 
@@ -866,8 +929,13 @@ bool CPBSProServer::GetJobStatus(CJob& job)
 
 bool CPBSProServer::KillJob(CJob& job)
 {
+    StartTimer();
+
     CSmallString jobid = job.GetJobID();
     int retval = pbspro_deljob(ServerID,jobid.GetBuffer(),NULL);
+
+    EndTimer();
+
     return( retval == 0 );
 }
 
@@ -875,8 +943,13 @@ bool CPBSProServer::KillJob(CJob& job)
 
 bool CPBSProServer::KillJobByID(const CSmallString& jobid)
 {
+    StartTimer();
+
     CSmallString lid(jobid);
     int retval = pbspro_deljob(ServerID,lid.GetBuffer(),NULL);
+
+    EndTimer();
+
     return( retval == 0 );
 }
 
@@ -884,7 +957,11 @@ bool CPBSProServer::KillJobByID(const CSmallString& jobid)
 
 const CSmallString CPBSProServer::GetLastErrorMsg(void)
 {
-    return(pbspro_geterrmsg(ServerID));
+    StartTimer();
+    CSmallString errmsg(pbspro_geterrmsg(ServerID));
+    EndTimer();
+
+    return(errmsg);
 }
 
 //==============================================================================

@@ -31,6 +31,8 @@
 CBatchServer::CBatchServer(CPluginObject* p_objectinfo)
     : CComObject(p_objectinfo)
 {
+    ExecTime = 0;
+    TimerStart = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -187,6 +189,27 @@ bool CBatchServer::KillJob(CJob& job)
 bool CBatchServer::KillJobByID(const CSmallString& jobid)
 {
     return(false);
+}
+
+//------------------------------------------------------------------------------
+
+void CBatchServer::StartTimer(void)
+{
+    TimerStart =  clock();
+}
+
+//------------------------------------------------------------------------------
+
+void CBatchServer::EndTimer(void)
+{
+    ExecTime += clock() - TimerStart;
+}
+
+//------------------------------------------------------------------------------
+
+double CBatchServer::GetExecTime(void)
+{
+    return( (double)ExecTime / (double)CLOCKS_PER_SEC );
 }
 
 //==============================================================================

@@ -372,6 +372,41 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
 
 //------------------------------------------------------------------------------
 
+void CBatchServers::PrintServerExecTimes(std::ostream& vout,double treshold)
+{
+    double exectime = 0.0;
+
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+        exectime += srv_ptr->GetExecTime();
+        it++;
+    }
+
+    if( exectime < treshold ) return;
+
+    it = begin();
+
+    vout << endl;
+    vout << "# Batch servers execute times ..." << endl;
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+        CSmallString name, short_name;
+        name = srv_ptr->GetServerName();
+        short_name = srv_ptr->GetShortName();
+
+        vout << "# ->   " << setw(1) << short_name << " " << left << setw(40) << name << " ";
+
+        exectime = srv_ptr->GetExecTime();
+        vout << right << fixed << setw(8) << setprecision(3) << exectime << endl;
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
 void CBatchServers::PrintWarningIfUnavailable(std::ostream& vout)
 {
 // determine number of server configurations
