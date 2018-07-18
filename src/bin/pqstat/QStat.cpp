@@ -174,6 +174,9 @@ bool CQStat::Run(void)
     vout << endl;
     JobList.PrintBatchInfoStat(vout);
 
+    // print diagnosis
+    BatchServers.PrintServerExecTimes(vout);
+
     return(true);
 }
 
