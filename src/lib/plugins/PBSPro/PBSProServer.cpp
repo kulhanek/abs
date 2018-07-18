@@ -91,6 +91,7 @@ CPBSProServer::CPBSProServer(void)
     pbspro_deljob = NULL;
     pbspro_geterrmsg = NULL;
     pbspro_strerror = NULL;
+    pbspro_locjob = NULL;
     pbspro_errno = NULL;
 }
 
@@ -229,6 +230,11 @@ bool CPBSProServer::InitSymbols(void)
         ES_ERROR("unable to bind to pbs_geterrmsg");
         status = false;
     }
+    pbspro_locjob  = (PBS_LOCJOB)PBSProLib.GetProcAddress("pbs_locjob");
+    if( pbspro_locjob == NULL ){
+        ES_ERROR("unable to bind to pbspro_locjob");
+        status = false;
+    }
     pbspro_errno  = (PBS_ERRNO)PBSProLib.GetProcAddress("__pbs_errno_location");
     if( pbspro_errno == NULL ){
         ES_ERROR("unable to bind to __pbs_errno_location");
@@ -312,6 +318,20 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
+
+const CSmallString CPBSProServer::LocateJob(const CSmallString& jobid)
+{
+    CSmallString full_job_id;
+    full_job_id = GetFullJobID(jobid);
+
+    char* p_srv_name = pbspro_locjob(ServerID,(char*)full_job_id.GetBuffer(),NULL);
+    if( p_srv_name == NULL ) return("");
+    CSmallString srv_name(p_srv_name);
+    free(p_srv_name);
+    return(srv_name);
+}
+
+//------------------------------------------------------------------------------
 
 bool CPBSProServer::GetQueues(CQueueList& queues)
 {

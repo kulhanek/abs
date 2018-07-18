@@ -390,7 +390,7 @@ void CBatchServers::PrintServerExecTimes(std::ostream& vout,double treshold)
     it = begin();
 
     vout << endl;
-    vout << "# Batch servers execute times ..." << endl;
+    vout << "# Batch servers execute times [s] ..." << endl;
     while( it != ie ){
         CBatchServerPtr srv_ptr = *it;
         CSmallString name, short_name;
@@ -881,7 +881,12 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
     }
 
     // resolve moved jobs - RT#258670
+    CSmallString job_srv = srv_ptr->LocateJob(jobid);
+    if( job_srv == NULL ) return(srv_ptr);  // unable to locate job - stay with the current server
+    if( job_srv == srv_ptr->GetServerName() ) return(srv_ptr); // the same server
 
+    // other server
+    srv_ptr = FindBatchServer(job_srv,true);
     return(srv_ptr);
 }
 

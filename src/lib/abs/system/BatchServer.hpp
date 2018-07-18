@@ -102,6 +102,9 @@ public:
     //! print technical info about a single job
     virtual bool PrintJob(std::ostream& sout,const CSmallString& name);
 
+    //! locate job - return server name for the job
+    virtual const CSmallString LocateJob(const CSmallString& jobid);
+
 // execution -------------------------------------------------------------------
     //! init specific resources for batch server
     virtual bool InitBatchResources(CResourceList* p_rl);

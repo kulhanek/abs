@@ -48,6 +48,7 @@ typedef struct batch_status* (*PBS_SELSTATJOB)(int,struct attropl*,char*,char*);
 typedef void (*PBS_STATFREE)(struct batch_status *);
 typedef char* (*PBS_SUBMIT)(int,struct attropl*,const char*,const char*,char*);
 typedef char* (*PBS_GETERRMSG)(int connect);
+typedef char* (*PBS_LOCJOB)(int,char*,char*);
 typedef int (*PBS_DELJOB)(int,char*,char*);
 typedef char* (*PBS_STRERROR)(int);
 typedef int (*PBS_ERRNO)(void);
@@ -100,6 +101,9 @@ public:
 
     //! print technical info about single job
     bool PrintJob(std::ostream& sout,const CSmallString& jobid);
+
+    //! locate job - return server name for the job
+    const CSmallString LocateJob(const CSmallString& jobid);
 
 // execution -------------------------------------------------------------------
     //! init specific resources for batch server
@@ -161,6 +165,7 @@ private:
     PBS_DELJOB      pbspro_deljob;
     PBS_GETERRMSG   pbspro_geterrmsg;
     PBS_STRERROR    pbspro_strerror;
+    PBS_LOCJOB      pbspro_locjob;
     PBS_ERRNO       pbspro_errno;
 };
 
