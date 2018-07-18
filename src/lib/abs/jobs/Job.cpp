@@ -3848,13 +3848,13 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             }
             break;
         case EJS_FINISHED:
+        case EJS_MOVED:
         case EJS_KILLED:{
             CSmallTimeAndDate ptime(GetItem("batch/job","INF_FINISH_TIME").ToLInt());
             sout << ptime.GetSDateAndTime();
             }
             break;
         case EJS_ERROR:
-        case EJS_MOVED:
         case EJS_INCONSISTENT:
             // nothing to be here
             break;
