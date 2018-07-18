@@ -3743,46 +3743,46 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
 //    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
 //    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- --------------------" << endl;
 
-    sout << "  " << right;
-        switch( BatchJobStatus ){
-            case EJS_PREPARED:
-                sout << "<yellow>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</yellow> ";
-                break;
-            case EJS_NONE:
-            case EJS_FINISHED:
-                sout << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << " ";
-                break;
-            case EJS_ERROR:
-            case EJS_INCONSISTENT:
-            case EJS_KILLED:
-                sout << "<red>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</red> ";
-                break;
-
-            case EJS_SUBMITTED:
-                sout << "<purple>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</purple> ";
-                break;
-            case EJS_RUNNING:
-                sout << "<green>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</green> ";
-                break;
-            case EJS_MOVED:
-                sout << "<cyan>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</cyan> ";
-                break;
-        }
-
     CSmallString id = GetItem("batch/job","INF_JOB_ID");
     CSmallString srv = GetItem("batch/job","INF_SERVER_NAME");
 
     if( srv == BatchServerName ){
         // normal job
         id << ShortServerName;
+        sout << "  " << right;
     } else {
         // moved job - get short server name
         CSmallString sn = BatchServers.GetShortServerName(srv);
         id << sn;
+        sout << "> " << right;
+    }
+
+    switch( BatchJobStatus ){
+        case EJS_PREPARED:
+            sout << "<yellow>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</yellow> ";
+            break;
+        case EJS_NONE:
+        case EJS_FINISHED:
+            sout << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << " ";
+            break;
+        case EJS_ERROR:
+        case EJS_INCONSISTENT:
+        case EJS_KILLED:
+            sout << "<red>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</red> ";
+            break;
+
+        case EJS_SUBMITTED:
+            sout << "<purple>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</purple> ";
+            break;
+        case EJS_RUNNING:
+            sout << "<green>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</green> ";
+            break;
+        case EJS_MOVED:
+            sout << "<cyan>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</cyan> ";
+            break;
     }
 
     sout << right << setw(12) << id << " ";
-
 
     CSmallString user = GetItem("batch/job","INF_JOB_OWNER");
     if( user.GetLength() > 12 ){
@@ -3899,6 +3899,9 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
                 sout << "</green>" << endl;
                 break;
         }
+    }
+    if( includeorigin ){
+        sout << "                  <cyan>" << id << "." << srv << "@" << srv << " -> " << id << "." << srv << "@" << BatchServerName << "</cyan>" << endl;
     }
 
 }
