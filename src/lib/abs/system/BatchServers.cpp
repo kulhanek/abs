@@ -918,7 +918,7 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
     }
 
     srv_ptr = FindBatchServer(srv_name,true);
-    if( srv_name == NULL ) return(srv_ptr); // not found
+    if( srv_ptr == NULL ) return(srv_ptr); // not found
 
     // append the server name to jobid if not provided
     at = jobid.FindSubString(".");
