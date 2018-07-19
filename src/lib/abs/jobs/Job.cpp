@@ -1296,6 +1296,11 @@ bool CJob::WriteStart(void)
 // create section -------------------------------
     CreateSection("start");
 
+    // update job status from batch system, set following items
+    //    job.SetItem("specific/resources","INF_REAL_QUEUE",tmp);
+    //    job.SetItem("specific/resources","INF_REAL_SERVER",tmp);
+    UpdateJobStatus();
+
 // workdir --------------------------------------
     if( WriteInfo("start/workdir","INF_MAIN_NODE",true) == false ){
         ES_ERROR("unable to get INF_MAIN_NODE");
@@ -1376,11 +1381,6 @@ bool CJob::WriteStart(void)
     }
 
     snodefile.close();
-
-// update job status from batch system, set following items
-//    job.SetItem("specific/resources","INF_REAL_QUEUE",tmp);
-//    job.SetItem("specific/resources","INF_REAL_SERVER",tmp);
-    UpdateJobStatus();
 
     return(true);
 }
