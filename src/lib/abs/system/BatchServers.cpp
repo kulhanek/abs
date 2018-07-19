@@ -237,7 +237,9 @@ bool CBatchServers::Init(const CSmallString& srv)
         sleep(rt);
     }
 
-    ES_ERROR("unable to init batch server");
+    CSmallString error;
+    error << "unable to init batch server '" << srv << "'";
+    ES_ERROR(error);
     return(false);
 }
 
