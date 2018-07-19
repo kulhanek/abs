@@ -594,7 +594,7 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool 
         switch( p_job->GetJobStatus() ){
             case EJS_NONE:
             case EJS_PREPARED:
-                sout << "<b><blue> WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
+                sout << "<b><blue> WARNING: The job was not started therefore it does not have the working directory.</blue></b>" << endl;
                 sout << "<b><blue>          The pgo command cannot be used.</blue></b>" << endl;
                 sout << endl;
                 it = erase(it);
@@ -606,7 +606,7 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool 
                 it = erase(it);
                 break;
             case EJS_SUBMITTED:
-                sout << "<b><blue> WARNING: The job was not started therefore it does not have working directory.</blue></b>" << endl;
+                sout << "<b><blue> WARNING: The job was not started therefore it does not have the working directory.</blue></b>" << endl;
                 sout << "<b><blue>          Wait until the job is started.</blue></b>" << endl;
                 sout << endl;
                 it++;

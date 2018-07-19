@@ -2852,7 +2852,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     PrintResourceTokens(sout,"All resources    : ",tmp,", ");
 
     tmp = GetItem("specific/resources","INF_QUEUE");
-    sout << "Queue            : " << tmp << endl;
+    sout << "Requested queue  : " << tmp << endl;
 
     sout << "-----------------------------------------------" << endl;
     sout << "NCPUs NGPUs NNodes Memory WorkSize     WallTime" << endl;
