@@ -260,7 +260,7 @@ void CNodes::Finalize(void)
     if( ErrorSystem.IsError() || Options.GetOptVerbose() ){
         ErrorSystem.PrintErrors(vout);
     }
-    if( Options.GetOptPrintNames() == false ){
+    if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
         if( ExtraEndLine ) vout << endl;
     }
 }
