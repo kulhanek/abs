@@ -102,14 +102,21 @@ bool CQStat::Run(void)
         return(false);
     }
 
-    vout << "#" << endl;
-    BatchServers.PrintServerOverview(vout);
+    bool term = false;
+    if( Options.IsOptJobSet() == false ){
+        vout << "#" << endl;
+        // the job is related to only one server, thus it is not necessary to enumerate all servers
+        BatchServers.PrintServerOverview(vout);
+        term = true;
+    }
     if( Options.IsOptSearchSet() ){
+        if( ! term ) vout << "#" << endl;
         std::string str = string(Options.GetOptSearch());
         boost::replace_all(str,"<","<<");
-    vout << "# Search expr.  : " << str << endl;
+        vout << "# Search expr.  : " << str << endl;
+        term = true;
     }
-    vout << "#" << endl;
+    if( term ) vout << "#" << endl;
 
     if( Options.GetOptTechnical() ){
         BatchServers.PrintJobs(vout);

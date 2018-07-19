@@ -103,18 +103,21 @@ bool CNodes::Run(void)
         return(false);
     }
 
+    bool term = false;
     if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
-        vout << "#" << endl;
         if( Options.IsOptJobSet() == false ){
-            // the job is related to only one server, it is not necessary to enumerate all servers
+            vout << "#" << endl;
+            // the job is related to only one server, thus it is not necessary to enumerate all servers
             BatchServers.PrintServerOverview(vout);
+            term = true;
         }
         if( Options.IsOptSearchSet() ){
+            if( ! term ) vout << "#" << endl;
             std::string str = string(Options.GetOptSearch());
             boost::replace_all(str,"<","<<");
-        vout << "# Search expr.  : " << str << endl;
+            vout << "# Search expr.  : " << str << endl;
         }
-        vout << "#" << endl;
+        if( term ) vout << "#" << endl;
     }
 
     if( Options.GetOptTechnical() ){
