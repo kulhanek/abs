@@ -81,6 +81,7 @@ void CJob::PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includ
         case EJS_SUBMITTED:
             sout << "<purple>Q</purple> ";
             break;
+        case EJS_BOOTING:
         case EJS_RUNNING:
             sout << "<green>R</green> ";
             break;
@@ -143,6 +144,7 @@ void CJob::PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includ
             break;
         case EJS_PREPARED:
         case EJS_SUBMITTED:
+        case EJS_BOOTING:
         case EJS_RUNNING:
             from_last_change = curr_time - last_change;
             sout << right << setw(20) << from_last_change.GetSTimeAndDay();
@@ -177,6 +179,7 @@ void CJob::PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includ
                 sout << "     <red>" << GetJobBatchComment() << "</red>" << endl;
                 break;
             case EJS_SUBMITTED:
+            case EJS_BOOTING:
             case EJS_MOVED:
                 sout << "     <purple>" << GetJobBatchComment() << "</purple>" << endl;
                 break;
@@ -216,6 +219,9 @@ void CJob::PrintJobInfoCompactV1(std::ostream& sout,bool includepath)
             break;
         case EJS_SUBMITTED:
             sout << "Q ";
+            break;
+        case EJS_BOOTING:
+            sout << "B ";
             break;
         case EJS_RUNNING:
             sout << "R ";
@@ -273,6 +279,7 @@ void CJob::PrintJobInfoCompactV1(std::ostream& sout,bool includepath)
             break;
         case EJS_PREPARED:
         case EJS_SUBMITTED:
+        case EJS_BOOTING:
         case EJS_RUNNING:
             from_last_change = curr_time - last_change;
             sout << from_last_change.GetSTimeAndDay();

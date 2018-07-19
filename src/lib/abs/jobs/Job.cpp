@@ -2122,7 +2122,6 @@ const CSmallTimeAndDate CJob::GetTimeOfLastChange(void)
     switch( GetJobStatus() ){
         case EJS_NONE:
         case EJS_INCONSISTENT:
-        case EJS_MOVED:
         case EJS_ERROR:
             // nothing to be here
             break;
@@ -2130,6 +2129,12 @@ const CSmallTimeAndDate CJob::GetTimeOfLastChange(void)
             HasSection("basic",btad);
             break;
         case EJS_SUBMITTED:
+            HasSection("submit",btad);
+            break;
+        case EJS_BOOTING:
+            HasSection("submit",btad);
+            break;
+        case EJS_MOVED:
             HasSection("submit",btad);
             break;
         case EJS_RUNNING:
@@ -2497,6 +2502,9 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
         case EJS_SUBMITTED:
             sout << "<purple>Q</purple> ";
             break;
+        case EJS_BOOTING:
+            sout << "<green>B</green> ";
+            break;
         case EJS_RUNNING:
             sout << "<green>R</green> ";
             break;
@@ -2560,6 +2568,7 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
                 break;
             case EJS_PREPARED:
             case EJS_SUBMITTED:
+            case EJS_BOOTING:
             case EJS_RUNNING:
                 per = cur - 1;
                 from_last_change = curr_time - last_change;
@@ -2591,6 +2600,7 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
             case EJS_NONE:
             case EJS_PREPARED:
             case EJS_FINISHED:
+            case EJS_BOOTING:
             case EJS_KILLED:
                 // nothing to be here
                 break;
@@ -3503,7 +3513,7 @@ EJobStatus CJob::GetJobStatus(void)
             }
             if( BatchJobStatus == EJS_RUNNING ){
                 BatchJobComment = "the job is in the submitted mode but the batch system shows it in the running mode";
-                return(EJS_INCONSISTENT);
+                return(EJS_BOOTING);
             }
             if( BatchJobStatus == EJS_FINISHED ){
                 BatchJobComment = "the job is in the submitted mode but the batch system shows it finished";
@@ -3634,6 +3644,9 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
         case EJS_SUBMITTED:
             sout << "<purple>Q</purple> ";
             break;
+        case EJS_BOOTING:
+            sout << "<green>B</green> ";
+            break;
         case EJS_RUNNING:
             sout << "<green>R</green> ";
             break;
@@ -3709,6 +3722,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
             break;
         case EJS_PREPARED:
         case EJS_SUBMITTED:
+        case EJS_BOOTING:
         case EJS_RUNNING:
             from_last_change = curr_time - last_change;
             sout << right << setw(25) << from_last_change.GetSTimeAndDay();
@@ -3743,6 +3757,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
                 sout << "                  <red>" << GetJobBatchComment() << "</red>" << endl;
                 break;
             case EJS_SUBMITTED:
+            case EJS_BOOTING:
             case EJS_MOVED:
                 sout << "                  <purple>" << GetJobBatchComment() << "</purple>" << endl;
                 break;
@@ -3796,6 +3811,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
         case EJS_SUBMITTED:
             sout << "<purple>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</purple> ";
             break;
+        case EJS_BOOTING:
         case EJS_RUNNING:
             sout << "<green>" << setw(2) << GetItem("batch/job","INF_JOB_STATE",true) << "</green> ";
             break;
@@ -3853,6 +3869,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             sout << tmp1;
             }
             break;
+        case EJS_BOOTING:
         case EJS_RUNNING:{
             CSmallTimeAndDate ptime(GetItem("batch/job","INF_START_TIME").ToLInt());
             CSmallTime diff = current_time - ptime;
@@ -3913,6 +3930,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             case EJS_MOVED:
                 sout << "                  <purple>" << GetJobBatchComment() << "</purple>" << endl;
                 break;
+            case EJS_BOOTING:
             case EJS_RUNNING:
                 sout << "                  <green>" << GetItem("start/workdir","INF_MAIN_NODE");
                 if( GetItem("specific/resources","INF_NNODES").ToInt() > 1 ){

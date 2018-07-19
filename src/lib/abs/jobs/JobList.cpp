@@ -604,10 +604,16 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool 
                 sout << "<b><blue>          The pgo command cannot be used.</blue></b>" << endl;
                 sout << endl;
                 it = erase(it);
-                break;
+                break;               
             case EJS_SUBMITTED:
                 sout << "<b><blue> WARNING: The job was not started therefore it does not have the working directory.</blue></b>" << endl;
                 sout << "<b><blue>          Wait until the job is started.</blue></b>" << endl;
+                sout << endl;
+                it++;
+                break;
+            case EJS_BOOTING:
+                sout << "<b><blue> WARNING: The job is booting.</blue></b>" << endl;
+                sout << "<b><blue>          Wait until the job is fully started.</blue></b>" << endl;
                 sout << endl;
                 it++;
                 break;
@@ -735,6 +741,7 @@ bool CJobList::WaitForRunningJob(std::ostream& sout)
 
     switch( p_job->GetJobStatus() ){
         case EJS_SUBMITTED:
+        case EJS_BOOTING:
         case EJS_RUNNING:
             break;
         default:
@@ -804,6 +811,12 @@ bool CJobList::IsSyncActionPossible(std::ostream& sout)
             case EJS_PREPARED:
             case EJS_SUBMITTED:
                 sout << "<b><blue> WARNING: The job was not started therefore it does not have the working directory.</blue></b>" << endl;
+                sout << "<b><blue>          The psync command cannot be used.</blue></b>" << endl;
+                sout << endl;
+                it = erase(it);
+                break;
+            case EJS_BOOTING:
+                sout << "<b><blue> WARNING: The job is booting.</blue></b>" << endl;
                 sout << "<b><blue>          The psync command cannot be used.</blue></b>" << endl;
                 sout << endl;
                 it = erase(it);
@@ -1475,6 +1488,7 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
                 waiting++;
                 break;
             case EJS_RUNNING:
+            case EJS_BOOTING:
                 processing++;
                 break;
             case EJS_FINISHED:
@@ -1645,6 +1659,9 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
             case EJS_SUBMITTED:
                 sout << "<purple>Q</purple> ";
                 break;
+            case EJS_BOOTING:
+                sout << "<green>B</green> ";
+                break;
             case EJS_RUNNING:
                 sout << "<green>R</green> ";
                 break;
@@ -1710,6 +1727,7 @@ void CJobList::PrintCollectionResubmitJobs(std::ostream& sout)
                 }
                 break;
             case EJS_SUBMITTED:
+            case EJS_BOOTING:
             case EJS_RUNNING:
             case EJS_INCONSISTENT:
             case EJS_MOVED:

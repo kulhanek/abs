@@ -40,16 +40,34 @@ class CXMLElement;
 
 // -----------------------------------------------------------------------------
 
+//    https://pbsworks.com/pdfs/PBSRefGuide18.2.pdf
+//    page RG-371
+//    B = Job arrays only: job array is begun, meaning that at least one subjob has started
+//    E = Job is exiting after having run
+//    F = Job is finished.  Job has completed execution, job failed during execution, or job was deleted.
+//    H = Job is held. A job is put into a held state by the server or by a user or administrator.
+//        A job stays in a held state until it is released by a user or administrator.
+//    M = Job was moved to another server
+//    Q = Job is queued, eligible to run or be routed
+//    R = Job is running
+//    S =  A job is put into the suspended state when a higher priority job needs the resources.
+//    T = Job is in transition (being moved to a new location)
+//    U = Job is suspended due to workstation becoming busy
+//    W = Job is waiting for its requested execution time to be reached or job specified a stagein
+//        request which failed for some reason.
+//    X = Subjobs only; subjob is finished (expired.)
+
 enum EJobStatus {
     EJS_NONE,
-    EJS_PREPARED,
-    EJS_SUBMITTED,
-    EJS_RUNNING,
-    EJS_FINISHED,
-    EJS_KILLED,
-    EJS_ERROR,
-    EJS_MOVED,
-    EJS_INCONSISTENT
+    EJS_PREPARED,       // prepared job
+    EJS_SUBMITTED,      // Q+H+T
+    EJS_BOOTING,        // R but not pinfo
+    EJS_RUNNING,        // R+S+U+B
+    EJS_FINISHED,       // F+E
+    EJS_KILLED,         // killed
+    EJS_ERROR,          // internal error
+    EJS_MOVED,          // M
+    EJS_INCONSISTENT    // inconsistency
 };
 
 // -----------------------------------------------------------------------------

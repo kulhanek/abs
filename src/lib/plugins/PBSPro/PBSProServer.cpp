@@ -936,6 +936,20 @@ void CPBSProServer::CreateJobAttributes(struct attropl* &p_prev,CResourceList* p
 
 //------------------------------------------------------------------------------
 
+//enum EJobStatus {
+//    EJS_NONE,
+//    EJS_PREPARED,       // prepared job
+//    EJS_SUBMITTED,      // Q+H+T
+//    EJS_BOOTING,        // R but not pinfo
+//    EJS_RUNNING,        // R+S+U+B
+//    EJS_FINISHED,       // F+E
+//    EJS_KILLED,         // killed
+//    EJS_ERROR,          // internal error
+//    EJS_MOVED,          // M
+//    EJS_INCONSISTENT    // inconsistency
+//};
+
+
 bool CPBSProServer::GetJobStatus(CJob& job)
 {
     StartTimer();
@@ -964,12 +978,20 @@ bool CPBSProServer::GetJobStatus(CJob& job)
                 job.BatchJobStatus = EJS_SUBMITTED;
             } else if( status == "H" ) {
                 job.BatchJobStatus = EJS_SUBMITTED;
+            } else if( status == "T" ) {
+                job.BatchJobStatus = EJS_SUBMITTED;
             } else if( status == "R" ) {
                 job.BatchJobStatus = EJS_RUNNING;
-            } else if( status == "C" ) {
-                job.BatchJobStatus = EJS_FINISHED;
+            } else if( status == "S" ) {
+                job.BatchJobStatus = EJS_RUNNING;
+            } else if( status == "B" ) {
+                job.BatchJobStatus = EJS_RUNNING;
+            } else if( status == "U" ) {
+                job.BatchJobStatus = EJS_RUNNING;
             } else if( status == "E" ) {
-                job.BatchJobStatus = EJS_ERROR;
+                job.BatchJobStatus = EJS_FINISHED;
+            } else if( status == "F" ) {
+                job.BatchJobStatus = EJS_FINISHED;
             } else if( status == "M" ) {
                 job.BatchJobStatus = EJS_MOVED;
             }
