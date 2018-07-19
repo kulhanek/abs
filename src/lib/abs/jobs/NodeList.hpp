@@ -67,6 +67,9 @@ public:
     /// print overal statistics
     void PrintStatistics(std::ostream& sout);
 
+    /// print overal statistics in technical format
+    void PrintTechStatistics(std::ostream& sout);
+
     /// print node names
     void PrintNames(std::ostream& sout);
 

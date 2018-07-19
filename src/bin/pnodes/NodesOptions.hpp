@@ -71,6 +71,7 @@ class CNodesOptions : public CSimpleOptions {
         CSO_OPT(bool,Technical)
         CSO_OPT(bool,PrintNames)
         CSO_OPT(bool,PrintHosts)
+        CSO_OPT(bool,PrintStat)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -168,6 +169,15 @@ class CNodesOptions : public CSimpleOptions {
                     NULL,                           /* parametr name */
                     "print only host names")   /* option description */
         //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                    PrintStat,                        /* option name */
+                    false,                          /* default value */
+                    false,                          /* is option mandatory */
+                    0,                           /* short option name */
+                    "stat",                      /* long option name */
+                    NULL,                           /* parametr name */
+                    "print summary statistics")   /* option description */
+            //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
                     false,                          /* default value */

@@ -200,6 +200,40 @@ void CNodeList::PrintStatistics(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
+void CNodeList::PrintTechStatistics(std::ostream& sout)
+{
+    if( (NodeGroups.size() == 1) && (AllProps.size() == 0) ){
+        return;
+    }
+
+    int tot_cpus = 0;
+    int free_cpus = 0;
+    int tot_gpus = 0;
+    int free_gpus = 0;
+    int nnodes = 0;
+
+    set<CNodePtr>::iterator it = ReasonableNodes.begin();
+    set<CNodePtr>::iterator et = ReasonableNodes.end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        tot_cpus += p_node->GetNumOfCPUs();
+        free_cpus += p_node->GetNumOfFreeCPUs();
+        tot_gpus += p_node->GetNumOfGPUs();
+        free_gpus += p_node->GetNumOfFreeGPUs();
+        nnodes++;
+        it++;
+    }
+
+    sout << "nnodes    " <<  nnodes << endl;
+    sout << "ntotcpus  " <<  tot_cpus << endl;
+    sout << "ntotgpus  " <<  tot_gpus << endl;
+    sout << "nfreecpus " <<  free_cpus << endl;
+    sout << "nfreegpus " <<  free_gpus << endl;
+}
+
+//------------------------------------------------------------------------------
+
 void CNodeList::PrintNames(std::ostream& sout)
 {
     list<CNodeGroupPtr>::iterator git = NodeGroups.begin();

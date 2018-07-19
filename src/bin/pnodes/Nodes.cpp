@@ -103,7 +103,7 @@ bool CNodes::Run(void)
         return(false);
     }
 
-    if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) ){
+    if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
         vout << "#" << endl;
         BatchServers.PrintServerOverview(vout);
         if( Options.IsOptSearchSet() ){
@@ -212,7 +212,7 @@ bool CNodes::Run(void)
 
     NodeList.FinalizeNodeGroups();
 
-    if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) ){
+    if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
         // list individual nodes
         NodeList.PrintInfos(vout);
 
@@ -228,6 +228,10 @@ bool CNodes::Run(void)
         NodeList.PrintHosts(vout);
         return(true);
     }
+    if( Options.GetOptPrintStat() == true ){
+        NodeList.PrintTechStatistics(vout);
+        return(true);
+    }
 
     return(true);
 }
@@ -238,7 +242,9 @@ void CNodes::Finalize(void)
 {
     // were all server accessbible?
     if( ABSConfig.IsUserTicketValid(vout) == true ){
-        BatchServers.PrintWarningIfUnavailable(vout);
+        if( Options.IsOptJobSet() == false ){
+            BatchServers.PrintWarningIfUnavailable(vout);
+        }
     }
 
     CSmallTimeAndDate dt;
