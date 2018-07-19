@@ -105,7 +105,10 @@ bool CNodes::Run(void)
 
     if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
         vout << "#" << endl;
-        BatchServers.PrintServerOverview(vout);
+        if( Options.IsOptJobSet() == false ){
+            // the job is related to only one server, it is not necessary to enumerate all servers
+            BatchServers.PrintServerOverview(vout);
+        }
         if( Options.IsOptSearchSet() ){
             std::string str = string(Options.GetOptSearch());
             boost::replace_all(str,"<","<<");

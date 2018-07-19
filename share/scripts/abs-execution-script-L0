@@ -16,6 +16,11 @@
 # mark this job as INFINITY job, this is used by module-add-stat
 export _INFINITY_JOB_="_INFINITY_JOB_"
 
+echo
+echo "# ** DEBUG **"
+echo "# PBS_SERVER=$PBS_SERVER"
+echo "# PBS_JOBID=$PBS_JOBID"
+
 # header -----------------------------------------------------------------------
 
 _DATE=`date`
