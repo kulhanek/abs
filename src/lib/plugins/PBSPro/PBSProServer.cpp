@@ -1010,6 +1010,16 @@ bool CPBSProServer::GetJobStatus(CJob& job)
         p_item = p_item->next;
     }
 
+    // to handle moved jobs
+    CSmallString tmp;
+    tmp = NULL;
+    get_attribute(p_status->attribs,ATTR_queue,NULL,tmp);
+    job.SetItem("specific/resources","INF_REAL_QUEUE",tmp);
+
+    tmp = NULL;
+    get_attribute(p_status->attribs,ATTR_server,NULL,tmp);
+    job.SetItem("specific/resources","INF_REAL_SERVER",tmp);
+
     pbspro_statfree(p_status);
 
     EndTimer();

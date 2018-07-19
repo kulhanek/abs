@@ -126,6 +126,16 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
     SetItem("batch/job","INF_JOB_QUEUE",tmp);
     SetItem("specific/resources","INF_QUEUE",tmp);
 
+// -----------------
+    // to handle moved jobs
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_queue,NULL,tmp);
+    SetItem("specific/resources","INF_REAL_QUEUE",tmp);
+
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_server,NULL,tmp);
+    SetItem("specific/resources","INF_REAL_SERVER",tmp);
+
 // job variables
     BatchVariables.clear();
     tmp = NULL;

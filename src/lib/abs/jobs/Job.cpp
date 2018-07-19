@@ -1377,6 +1377,11 @@ bool CJob::WriteStart(void)
 
     snodefile.close();
 
+// update job status from batch system, set following items
+//    job.SetItem("specific/resources","INF_REAL_QUEUE",tmp);
+//    job.SetItem("specific/resources","INF_REAL_SERVER",tmp);
+    UpdateJobStatus();
+
     return(true);
 }
 
@@ -2833,6 +2838,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     tmp = GetItem("specific/resources","INF_SERVER_SHORT");
     sout << "Site spec        : " << GetSiteName() << "/" << GetABSModule() << "/" << GetServerName() << "|" << tmp << endl;
+    CSmallString server = GetServerName();
 
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");    
     if( tmp != NULL ){
@@ -2863,6 +2869,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
 
     tmp = GetItem("specific/resources","INF_QUEUE");
     sout << "Requested queue  : " << tmp << endl;
+    CSmallString queue = tmp;
 
     sout << "-----------------------------------------------" << endl;
     sout << "NCPUs NGPUs NNodes Memory WorkSize     WallTime" << endl;
@@ -2966,6 +2973,27 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     }
     else{
     sout << "Exported modules : " << tmp << endl;
+    }
+
+    // moved jobs - optional section
+    bool result = true;
+    CSmallString    rqueue;
+    CSmallString    rsrv;
+    result &= GetItem("specific/resources","INF_REAL_QUEUE",rqueue,true);
+    result &= GetItem("specific/resources","INF_REAL_SERVER",rsrv,true);
+
+    if( result ){
+        if( ((rqueue != NULL) && (rqueue != queue)) ||
+            ((rsrv != NULL) && (rsrv != server))  ) {
+        sout << "-----------------------------------------------" << endl;
+        }
+
+        if( (rqueue != NULL) && (rqueue != queue) ){
+        sout << "> Real queue     : " << rqueue << endl;
+        }
+        if( (rsrv != NULL) && (rsrv != server) ){
+        sout << "> Real server    : " << rsrv << endl;
+        }
     }
 
     sout << "========================================================" << endl;
