@@ -1300,6 +1300,12 @@ bool CJob::WriteStart(void)
     //    job.SetItem("specific/resources","INF_REAL_QUEUE",tmp);
     //    job.SetItem("specific/resources","INF_REAL_SERVER",tmp);
 
+    // init all subsystems
+    if( ABSConfig.LoadSystemConfig() == false ){
+        ES_ERROR("unable to load ABSConfig config");
+        return(false);
+    }
+
     // get job status and reason
     if( BatchServers.GetJobStatus(*this) == false ){
         ES_ERROR("unable to update job status");
