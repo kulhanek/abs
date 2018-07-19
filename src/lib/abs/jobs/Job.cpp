@@ -2158,7 +2158,6 @@ bool CJob::GetVNodes(void)
         CSmallString name(*it);
         // append the server name
         name << "@" << ShortServerName;
-        cout << name << endl;
         // get node
         result &= BatchServers.GetNode(NodeList,name);
         it++;

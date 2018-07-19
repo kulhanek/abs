@@ -220,10 +220,9 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
     std::vector<std::string>::iterator it = items.begin();
     std::vector<std::string>::iterator ie = items.end();
     while( it != ie ){
+        std::string node = *it;
         std::vector<std::string> subitems;
-        if( items.size() >= 1 ){
-            split(subitems,items[0],is_any_of("/"));
-        }
+        split(subitems,node,is_any_of("/"));
         if( subitems.size() >= 1 ){
             ExecVNodes.insert(subitems[0]);
         }
