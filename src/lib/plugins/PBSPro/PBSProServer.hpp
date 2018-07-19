@@ -72,6 +72,9 @@ public:
     //! init node list
     bool GetNodes(CNodeList& nodes);
 
+    //! get given node
+    const CNodePtr GetNode(const CSmallString& name);
+
     //! init all job list
     bool GetAllJobs(CJobList& jobs,bool include_history);
 

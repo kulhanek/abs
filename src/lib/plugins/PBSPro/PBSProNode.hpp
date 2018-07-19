@@ -35,7 +35,7 @@ public:
 
 // methods ---------------------------------------------------------------------
     /// init node with batch system information
-    bool Init(const CSmallString& short_srv_name,struct batch_status* p_node);
+    bool Init(const CSmallString& srv_name,const CSmallString& short_srv_name,struct batch_status* p_node);
 };
 
 // -----------------------------------------------------------------------------

@@ -93,6 +93,13 @@ bool CBatchServer::GetNodes(CNodeList& nodes)
 
 //------------------------------------------------------------------------------
 
+const CNodePtr CBatchServer::GetNode(const CSmallString& name)
+{
+    return(CNodePtr());
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServer::GetAllJobs(CJobList& jobs,bool include_history)
 {
     return(false);

@@ -62,6 +62,7 @@ class CNodesOptions : public CSimpleOptions {
     CSO_LIST_BEGIN
         // options ------------------------------
         CSO_OPT(CSmallString,Groups)
+        CSO_OPT(CSmallString,Job)
         CSO_OPT(CSmallString,Node)
         CSO_OPT(CSmallString,Search)
         CSO_OPT(bool,DoNotGroup)
@@ -85,6 +86,15 @@ class CNodesOptions : public CSimpleOptions {
                     "groups",                      /* long option name */
                     "LIST",                           /* parametr name */
                     "comma separated node groups")   /* option description */                    
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(CSmallString,                           /* option type */
+                    Job,                        /* option name */
+                    NULL,                          /* default value */
+                    false,                          /* is option mandatory */
+                    'j',                           /* short option name */
+                    "job",                      /* long option name */
+                    "NAME",                           /* parametr name */
+                    "list execution nodes of the job")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(CSmallString,                           /* option type */
                     Node,                        /* option name */

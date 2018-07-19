@@ -88,6 +88,12 @@ public:
     /// list nodes
     bool GetNodes(void);
 
+    //! init node list by node with name
+    bool GetNode(CNodeList& nodes,const CSmallString& name);
+
+    //! get node with name
+    const CNodePtr GetNode(const CSmallString& name);
+
     //! init all job list
     bool GetAllJobs(bool include_history);
 

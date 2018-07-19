@@ -136,9 +136,27 @@ bool CNodes::Run(void)
         return(true);
     }
 
-    if( BatchServers.GetNodes() == false ){
-        ES_ERROR("unable to load nodes");
-        return(false);
+    if( Options.IsOptJobSet() == false ){
+        // all nodes
+        if( BatchServers.GetNodes() == false ){
+            ES_ERROR("unable to load nodes");
+            return(false);
+        }
+    } else {
+        // only nodes from the job
+        CJobPtr job = BatchServers.GetJob(Options.GetOptJob());
+        if( job == NULL ){
+            ES_TRACE_ERROR("job was not found");
+            return(false);
+        }
+        if( job->GetJobBatchStatus() != EJS_RUNNING ) {
+            ES_TRACE_ERROR("job is not running");
+            return(false);
+        }
+        if( job->GetVNodes() == false ){
+            ES_ERROR("unable to load job nodes");
+            return(false);
+        }
     }
 
     if( Options.GetOptKeepAll() == false ) {

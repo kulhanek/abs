@@ -333,6 +333,9 @@ public:
     /// get time of last change
     const CSmallTimeAndDate GetTimeOfLastChange(void);
 
+    /// get VNodes - populate Nodes with exec vnodes of the job
+    bool GetVNodes(void);
+
 // FS related ------------------------------------------------------------------
     /// get job machine
     const CSmallString GetInputMachine(void);
@@ -490,6 +493,7 @@ public:
     CSmallString                        BatchJobComment;
     std::map<std::string,std::string>   BatchVariables;
     CResourceList                       ResourceList;
+    std::set<std::string>               ExecVNodes;         // unique list of vnodes
 };
 
 // -----------------------------------------------------------------------------

@@ -112,6 +112,7 @@ public:
 
 // section of private data -----------------------------------------------------
 protected:
+    CSmallString                BatchServerName;
     CSmallString                ShortServerName;
 
     CSmallString                Name;

@@ -47,7 +47,7 @@ CPBSProNode::CPBSProNode(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CPBSProNode::Init(const CSmallString& short_srv_name,struct batch_status* p_node)
+bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_srv_name,struct batch_status* p_node)
 {
     if( p_node == NULL ){
         ES_ERROR("p_node is NULL");
@@ -55,6 +55,7 @@ bool CPBSProNode::Init(const CSmallString& short_srv_name,struct batch_status* p
     }
 
     Name = p_node->name;
+    BatchServerName = srv_name;
     ShortServerName = short_srv_name;
 
     // all attributes are optional

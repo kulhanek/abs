@@ -72,7 +72,7 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
         SetItem("batch/job","INF_JOB_ID","");
     }
 
-    // job server
+    // job server from job id
     items.erase(items.begin());
     stmp = join(items,".");
     SetItem("batch/job","INF_SERVER_NAME",stmp);
@@ -209,6 +209,25 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
         if( items.size() > 0 ){
             SetItem("start/workdir","INF_MAIN_NODE",items[0]);
         }
+    }
+
+    // this is optional - all exec vnodes for pnodes -j
+    // exec_host = cn204/0*16+cn197/0*16
+    get_attribute(p_job->attribs,ATTR_exechost,NULL,tmp);
+    stmp = tmp;
+    items.clear();
+    split(items,stmp,is_any_of("+"));
+    std::vector<std::string>::iterator it = items.begin();
+    std::vector<std::string>::iterator ie = items.end();
+    while( it != ie ){
+        std::vector<std::string> subitems;
+        if( items.size() >= 1 ){
+            split(subitems,items[0],is_any_of("/"));
+        }
+        if( subitems.size() >= 1 ){
+            ExecVNodes.insert(subitems[0]);
+        }
+        it++;
     }
 
 // ------------------

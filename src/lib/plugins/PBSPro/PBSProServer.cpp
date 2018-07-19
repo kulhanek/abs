@@ -371,7 +371,7 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
     bool result = true;
     while( p_node_attrs != NULL ){
         CPBSProNode* p_node = new CPBSProNode;
-        if( p_node->Init(ShortName,p_node_attrs) == false ){
+        if( p_node->Init(ServerName,ShortName,p_node_attrs) == false ){
             ES_ERROR("unable to init node");
             result = false;
             delete p_node;
@@ -387,6 +387,46 @@ bool CPBSProServer::GetNodes(CNodeList& nodes)
     EndTimer();
 
     return(result);
+}
+
+//------------------------------------------------------------------------------
+
+const CNodePtr CPBSProServer::GetNode(const CSmallString& name)
+{
+    StartTimer();
+
+    CNodePtr node;
+
+    struct batch_status* p_node_attrs = pbspro_stathost(ServerID,(char*)name.GetBuffer(),NULL,NULL);
+    if( p_node_attrs != NULL ) {
+        CPBSProNode* p_node = new CPBSProNode;
+        if( p_node->Init(ServerName,ShortName,p_node_attrs) == false ){
+            ES_ERROR("unable to init node");
+            delete p_node;
+        } else {
+            CNodePtr lnode(p_node);
+            node = lnode;
+        }
+        pbspro_statfree(p_node_attrs);
+    } else {
+        // try vhost
+        p_node_attrs = pbspro_statvnode(ServerID,(char*)name.GetBuffer(),NULL,NULL);
+        if( p_node_attrs != NULL ) {
+            CPBSProNode* p_node = new CPBSProNode;
+            if( p_node->Init(ServerName,ShortName,p_node_attrs) == false ){
+                ES_ERROR("unable to init node");
+                delete p_node;
+            } else {
+                CNodePtr lnode(p_node);
+                node = lnode;
+            }
+            pbspro_statfree(p_node_attrs);
+        }
+    }
+
+    EndTimer();
+
+    return(node);
 }
 
 //------------------------------------------------------------------------------

@@ -26,6 +26,7 @@
 #include <SmallString.hpp>
 #include <ComObject.hpp>
 #include <Job.hpp>
+#include <Node.hpp>
 #include <iostream>
 #include <string>
 
@@ -68,12 +69,16 @@ public:
 // enumeration -----------------------------------------------------------------
     // IMPORTANT NOTE:
     // in this API, jobid, vnode, queue must be without server specification
+    // not true anymore as we have support for moved jobs
 
     //! init queue list
     virtual bool GetQueues(CQueueList& queues);
 
     //! init node list
     virtual bool GetNodes(CNodeList& nodes);
+
+    //! get given node
+    virtual const CNodePtr GetNode(const CSmallString& name);
 
     //! init all job list
     virtual bool GetAllJobs(CJobList& jobs,bool include_history);

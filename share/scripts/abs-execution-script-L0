@@ -15,7 +15,6 @@
 # ------------------------------------------------------------------------------
 # mark this job as INFINITY job, this is used by module-add-stat
 export _INFINITY_JOB_="_INFINITY_JOB_"
-echo "PBS_SERVER=$PBS_SERVER"
 
 # header -----------------------------------------------------------------------
 

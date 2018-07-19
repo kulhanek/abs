@@ -55,6 +55,7 @@
 #include <grp.h>
 #include <sstream>
 #include <Host.hpp>
+#include <NodeList.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -2143,6 +2144,26 @@ const CSmallTimeAndDate CJob::GetTimeOfLastChange(void)
     }
 
     return(btad);
+}
+
+//------------------------------------------------------------------------------
+
+bool CJob::GetVNodes(void)
+{
+    bool result = true;
+
+    std::set<std::string>::iterator it = ExecVNodes.begin();
+    std::set<std::string>::iterator ie = ExecVNodes.end();
+    while( it != ie ){
+        CSmallString name(*it);
+        // append the server name
+        name << "@" << ShortServerName;
+        // get node
+        result &= BatchServers.GetNode(NodeList,name);
+        it++;
+    }
+
+    return(result);
 }
 
 //------------------------------------------------------------------------------

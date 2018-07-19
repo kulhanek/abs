@@ -548,6 +548,32 @@ bool CBatchServers::GetNodes(void)
 
 //------------------------------------------------------------------------------
 
+bool CBatchServers::GetNode(CNodeList& nodes,const CSmallString& name)
+{
+    CNodePtr node_ptr = GetNode(name);
+    if( node_ptr == NULL ) return(false);
+    nodes.push_back(node_ptr);
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+const CNodePtr CBatchServers::GetNode(const CSmallString& name)
+{
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    CSmallString batch_name = name;
+    CBatchServerPtr srv_ptr = FindBatchServerByNode(batch_name);
+
+    if( srv_ptr == NULL ) return(CNodePtr()); // not found
+
+    // get node
+    return(srv_ptr->GetNode(batch_name));
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServers::GetAllJobs(bool include_history)
 {
     // init servers if not done already
