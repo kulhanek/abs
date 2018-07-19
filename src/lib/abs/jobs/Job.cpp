@@ -1299,7 +1299,17 @@ bool CJob::WriteStart(void)
     // update job status from batch system, set following items
     //    job.SetItem("specific/resources","INF_REAL_QUEUE",tmp);
     //    job.SetItem("specific/resources","INF_REAL_SERVER",tmp);
-    UpdateJobStatus();
+    if( ABSConfig.IsServerConfigured(GetServerName()) == false ){
+        // job was run under different server
+        ES_TRACE_ERROR("job batch server is not available under the current site");
+        return(true);
+    }
+
+    // get job status and reason
+    if( BatchServers.GetJobStatus(*this) == false ){
+        ES_ERROR("unable to update job status");
+        return(false);
+    }
 
 // workdir --------------------------------------
     if( WriteInfo("start/workdir","INF_MAIN_NODE",true) == false ){
