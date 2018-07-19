@@ -102,10 +102,10 @@ public:
     virtual bool PrintNode(std::ostream& sout,const CSmallString& name);
 
     //! print technical info about jobs
-    virtual bool PrintJobs(std::ostream& sout);
+    virtual bool PrintJobs(std::ostream& sout,bool include_history);
 
     //! print technical info about a single job
-    virtual bool PrintJob(std::ostream& sout,const CSmallString& name);
+    virtual bool PrintJob(std::ostream& sout,const CSmallString& name,bool include_history);
 
     //! locate job - return server name for the job
     virtual const CSmallString LocateJob(const CSmallString& jobid);

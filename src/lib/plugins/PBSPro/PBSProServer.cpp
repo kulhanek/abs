@@ -649,11 +649,16 @@ bool CPBSProServer::PrintNode(std::ostream& sout,const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::PrintJobs(std::ostream& sout)
+bool CPBSProServer::PrintJobs(std::ostream& sout,bool include_history)
 {
     StartTimer();
 
-    struct batch_status* p_jobs = pbspro_statjob(ServerID,NULL,NULL,NULL);
+    CSmallString extend;
+    if( include_history ){
+        extend << "x";
+    }
+
+    struct batch_status* p_jobs = pbspro_statjob(ServerID,NULL,NULL,extend.GetBuffer());
     if( p_jobs != NULL ) {
         PrintBatchStatus(sout,p_jobs);
         pbspro_statfree(p_jobs);
@@ -666,14 +671,19 @@ bool CPBSProServer::PrintJobs(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid)
+bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid,bool include_history)
 {
     StartTimer();
+
+    CSmallString extend;
+    if( include_history ){
+        extend << "x";
+    }
 
     CSmallString full_job_id;
     full_job_id = GetFullJobID(jobid);
 
-    struct batch_status* p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,NULL);
+    struct batch_status* p_jobs = pbspro_statjob(ServerID,(char*)full_job_id.GetBuffer(),NULL,extend.GetBuffer());
     if( p_jobs != NULL ) {
         PrintBatchStatus(sout,p_jobs);
         pbspro_statfree(p_jobs);

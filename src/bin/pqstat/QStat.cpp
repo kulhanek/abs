@@ -119,13 +119,13 @@ bool CQStat::Run(void)
     if( term ) vout << "#" << endl;
 
     if( Options.GetOptTechnical() ){
-        BatchServers.PrintJobs(vout);
+        BatchServers.PrintJobs(vout,Options.GetOptKeepHistory() || Options.GetOptFinished() || Options.GetOptMoved());
         return(true);
     }
 
     if( Options.IsOptJobSet() ){
         // only single job info
-        BatchServers.PrintJob(vout,Options.GetOptJob());
+        BatchServers.PrintJob(vout,Options.GetOptJob(),Options.GetOptKeepHistory() || Options.GetOptFinished() || Options.GetOptMoved());
         return(true);
     }
 
@@ -193,7 +193,9 @@ void CQStat::Finalize(void)
 {
     // were all server accessbible?
     if( ABSConfig.IsUserTicketValid(vout) == true ){
-        BatchServers.PrintWarningIfUnavailable(vout);
+        if( ! Options.IsOptJobSet() ){
+            BatchServers.PrintWarningIfUnavailable(vout);
+        }
     }
 
     CSmallTimeAndDate dt;

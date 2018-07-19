@@ -793,7 +793,7 @@ bool CBatchServers::PrintNode(std::ostream& sout,const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-void CBatchServers::PrintJobs(std::ostream& sout)
+void CBatchServers::PrintJobs(std::ostream& sout,bool include_history)
 {
     // init servers if not done already
     if( size() == 0 ) InitAll();
@@ -807,14 +807,14 @@ void CBatchServers::PrintJobs(std::ostream& sout)
     sout << endl;
     sout << "# Batch server  : " << srv_ptr->GetServerName() << " (" << srv_ptr->GetShortName() << ")" << endl;
     sout << "# ------------------------------------------------------------------------------" << endl;
-        srv_ptr->PrintJobs(sout);
+        srv_ptr->PrintJobs(sout,include_history);
         it++;
     }
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& jobid)
+bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& jobid,bool include_history)
 {
     // performance optimization - only the job server is loaded by FindBatchServerByJobID()
     // if( size() == 0 ) InitAll();
@@ -830,7 +830,7 @@ bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& jobid)
     sout << endl;
     sout << "# Batch server  : " << srv_ptr->GetServerName() << " (" << srv_ptr->GetShortName() << ")" << endl;
     sout << "# ------------------------------------------------------------------------------" << endl;
-    srv_ptr->PrintJob(sout,batch_jobid);
+    srv_ptr->PrintJob(sout,batch_jobid,include_history);
 
     return(false);
 }

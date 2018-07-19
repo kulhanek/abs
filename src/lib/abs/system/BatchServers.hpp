@@ -133,10 +133,10 @@ public:
     bool PrintNode(std::ostream& sout,const CSmallString& name);
 
     //! print technical info about jobs
-    void PrintJobs(std::ostream& sout);
+    void PrintJobs(std::ostream& sout,bool include_history);
 
     //! print technical info about single job
-    bool PrintJob(std::ostream& sout,const CSmallString& name);
+    bool PrintJob(std::ostream& sout,const CSmallString& name,bool include_history);
 
 // private data ----------------------------------------------------------------
 private:

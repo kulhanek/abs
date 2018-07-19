@@ -100,10 +100,10 @@ public:
     bool PrintNode(std::ostream& sout,const CSmallString& name);
 
     //! print technical info about jobs
-    bool PrintJobs(std::ostream& sout);
+    bool PrintJobs(std::ostream& sout,bool include_history);
 
     //! print technical info about single job
-    bool PrintJob(std::ostream& sout,const CSmallString& jobid);
+    bool PrintJob(std::ostream& sout,const CSmallString& jobid,bool include_history);
 
     //! locate job - return server name for the job
     const CSmallString LocateJob(const CSmallString& jobid);

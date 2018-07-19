@@ -149,14 +149,14 @@ bool CBatchServer::PrintNode(std::ostream& sout,const CSmallString& name)
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::PrintJobs(std::ostream& sout)
+bool CBatchServer::PrintJobs(std::ostream& sout,bool include_history)
 {
     return(true);
 }
 
 //------------------------------------------------------------------------------
 
-bool CBatchServer::PrintJob(std::ostream& sout,const CSmallString& name)
+bool CBatchServer::PrintJob(std::ostream& sout,const CSmallString& name,bool include_history)
 {
     return(true);
 }
