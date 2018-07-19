@@ -124,7 +124,7 @@ bool CQStat::Run(void)
     }
 
     if( Options.IsOptJobSet() ){
-        // only single node info
+        // only single job info
         BatchServers.PrintJob(vout,Options.GetOptJob());
         return(true);
     }

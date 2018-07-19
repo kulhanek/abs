@@ -560,8 +560,8 @@ bool CBatchServers::GetNode(CNodeList& nodes,const CSmallString& name)
 
 const CNodePtr CBatchServers::GetNode(const CSmallString& name)
 {
-    // init servers if not done already
-    if( size() == 0 ) InitAll();
+    // performance optimization - only the node server is loaded by FindBatchServerByNode()
+    // if( size() == 0 ) InitAll();
 
     CSmallString batch_name = name;
     CBatchServerPtr srv_ptr = FindBatchServerByNode(batch_name);
@@ -772,8 +772,8 @@ void CBatchServers::PrintNodes(std::ostream& sout)
 
 bool CBatchServers::PrintNode(std::ostream& sout,const CSmallString& name)
 {
-    // init servers if not done already
-    if( size() == 0 ) InitAll();
+    // performance optimization - only the node server is loaded by FindBatchServerByNode()
+    // if( size() == 0 ) InitAll();
 
     CSmallString batch_name = name;
     CBatchServerPtr srv_ptr = FindBatchServerByNode(batch_name);
@@ -816,8 +816,8 @@ void CBatchServers::PrintJobs(std::ostream& sout)
 
 bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& jobid)
 {
-    // init servers if not done already
-    if( size() == 0 ) InitAll();
+    // performance optimization - only the job server is loaded by FindBatchServerByJobID()
+    // if( size() == 0 ) InitAll();
 
     CSmallString batch_jobid = jobid;
     CBatchServerPtr srv_ptr = FindBatchServerByJobID(batch_jobid);
