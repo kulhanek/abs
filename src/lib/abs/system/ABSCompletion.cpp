@@ -77,6 +77,8 @@ bool CABSCompletion::InitCompletion(void)
 
     tmp = CShell::GetSystemVariable("COMP_WORDBREAKS");
     QueueNamePerPartes = tmp.FindSubString("@") >= 0;
+    if( QueueNamePerPartes )
+    cout << "perpartes" << endl;
 
     tmp = CShell::GetSystemVariable("COMP_POINT");
     CGenPosition = tmp.ToInt();
