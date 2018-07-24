@@ -48,6 +48,8 @@ private:
     unsigned int                CGenPosition;
     std::vector<CSmallString>   Words;              // command line splitted into words
     unsigned int                CWord;              // word to be completed
+    CSmallString                Command;
+    CSmallString                Action;
     std::list<CSmallString>     Suggestions;        // suggestions
 
     // add initial suggestions (for actions)
@@ -62,6 +64,9 @@ private:
     // add queue suggestions
     bool AddQueueSuggestions(void);
 
+    // init queues cache
+    bool InitQueuesCache(const CSmallString& cname);
+
     // add alias suggestions
     bool AddAliasSuggestions(void);
 
@@ -73,9 +78,6 @@ private:
 
     // list collection files
     bool AddCollectionSuggestions(void);
-
-    // does command line contain any option?
-    bool AnyOption(void);
 
     // filter suggestions
     bool FilterSuggestions(void);

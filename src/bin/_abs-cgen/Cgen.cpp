@@ -24,6 +24,7 @@
 #include <ABSCompletion.hpp>
 #include <ABSConfig.hpp>
 #include "Cgen.hpp"
+#include <SimpleOptions.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -48,29 +49,9 @@ CCgen::CCgen(void)
 
 int CCgen::Init(int argc, char* argv[])
 {
-    // encode program options, all check procedures are done inside of CABFIntOpts
-    int result = Options.ParseCmdLine(argc,argv);
-
-    // should we exit or was it error?
-    if( result != SO_CONTINUE ) return(result);
-
     // attach verbose stream to terminal stream and set desired verbosity level
     vout.Attach(Console);
-    if( Options.GetOptVerbose() ) {
-        vout.Verbosity(CVerboseStr::high);
-    } else {
-        vout.Verbosity(CVerboseStr::low);
-    }
-
-    CSmallTimeAndDate dt;
-    dt.GetActualTimeAndDate();
-
-    vout << high;
-    vout << endl;
-    vout << "# ==============================================================================" << endl;
-    vout << "# _abs-cgen (Infinity utility) started at " << dt.GetSDateAndTime() << endl;
-    vout << "# ==============================================================================" << endl;
-
+    vout.Verbosity(CVerboseStr::low);
     vout << low;
 
     return(SO_CONTINUE);
@@ -92,20 +73,10 @@ bool CCgen::Run(void)
 
 void CCgen::Finalize(void)
 {
-    CSmallTimeAndDate dt;
-    dt.GetActualTimeAndDate();
-
-    vout << high;
-    vout << "# ==============================================================================" << endl;
-    vout << "# _abs-cgen (Infinity utility) terminated at " << dt.GetSDateAndTime() << endl;
-    vout << "# ==============================================================================" << endl;
-
-    if( ErrorSystem.IsError() || Options.GetOptVerbose() ){
+    if( ErrorSystem.IsError() ){
         vout << low;
         ErrorSystem.PrintErrors(vout);
     }
-
-    vout << endl;
 }
 
 //==============================================================================

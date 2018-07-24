@@ -5,8 +5,6 @@ share/scripts/CMakeLists.txt
 share/CMakeLists.txt
 src/bin/_abs-cgen/Cgen.cpp
 src/bin/_abs-cgen/Cgen.hpp
-src/bin/_abs-cgen/CgenOptions.cpp
-src/bin/_abs-cgen/CgenOptions.hpp
 src/bin/_abs-cgen/CMakeLists.txt
 src/bin/_abs-collection/CMakeLists.txt
 src/bin/_abs-collection/Collection.cpp

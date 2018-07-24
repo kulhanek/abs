@@ -37,6 +37,10 @@
 #include <BatchServers.hpp>
 #include <PluginDatabase.hpp>
 #include <CategoryUUID.hpp>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 
 //------------------------------------------------------------------------------
 
@@ -77,13 +81,27 @@ bool CABSCompletion::InitCompletion(void)
     CWord = 0; // command cannot be completed by this program
     p_word = strtok_r(p_beg," ",&p_saveptr);
     while(p_word != NULL) {
-        Words.push_back(p_word);
-        unsigned int pos = p_word - p_beg;
-        if( (pos <= CGenPosition) &&
-                ((pos + strlen(p_word)) >= CGenPosition) ) CWord = Words.size() - 1;
-        p_word = strtok_r(NULL," ",&p_saveptr);
+        if( (strlen(p_word) >= 1) && (p_word[0] == '-') ){
+            // option - ignore
+        } else {
+            Words.push_back(p_word);
+            unsigned int pos = p_word - p_beg;
+            if( (pos <= CGenPosition) &&
+                    ((pos + strlen(p_word)) >= CGenPosition) ) CWord = Words.size() - 1;
+            p_word = strtok_r(NULL," ",&p_saveptr);
+        }
     }
     if( CWord == 0 ) CWord = Words.size();
+
+    // get command
+    if( Words.size() >= 1 ){
+        Command = Words[0];
+    }
+
+    // get action
+    if( Words.size() >= 2 ){
+        Action = Words[1];
+    }
 
     return(true);
 }
@@ -94,9 +112,6 @@ bool CABSCompletion::InitCompletion(void)
 
 bool CABSCompletion::GetSuggestions(void)
 {
-    // if any option then do not provide any suggestion
-    if( AnyOption() == true ) return(true);
-
     // get suggestions according to command ---------
     if( GetCommand() == "psubmit" ) {
         if( CWord == 1 ){
@@ -169,22 +184,65 @@ bool CABSCompletion::AddSuggestions(const CSmallString& list)
 
 CSmallString CABSCompletion::GetCommand(void)
 {
-    if( Words.size() >= 1 ) return(Words[0]);
-    return("");
+    return(Command);
 }
 
 //------------------------------------------------------------------------------
 
 CSmallString CABSCompletion::GetAction(void)
 {
-    if( Words.size() >= 2 ) return(Words[1]);
-    return("");
+    return(Action);
 }
 
 //------------------------------------------------------------------------------
 
 bool CABSCompletion::AddQueueSuggestions(void)
 {
+    // is cache valid?
+    CSmallString cname = ABSConfig.GetUserSiteConfigDir() / "queues";
+    struct stat cstat;
+    if( stat(cname,&cstat) != 0 ){
+        InitQueuesCache(cname);
+    } else {
+        time_t ct = time(NULL);
+        double dt = difftime(ct,cstat.st_mtim.tv_sec);
+        if( dt > 86400 ){
+            InitQueuesCache(cname); // expired cache
+        }
+    }
+
+    // open cache
+    ifstream ifs;
+    ifs.open(cname);
+    if( ! ifs ){
+        CSmallString error;
+        error << "unable to open cache file '" << cname << "'";
+        ES_TRACE_ERROR(error);
+        return(false);
+    }
+
+    // load cache by lines
+    std::string line;
+    while( getline(ifs,line) ){
+        Suggestions.push_back(line);
+    }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSCompletion::InitQueuesCache(const CSmallString& cname)
+{
+    ofstream ofs;
+    ofs.open(cname);
+    if( ! ofs ){
+        CSmallString error;
+        error << "unable to open cache file '" << cname << "'";
+        ES_TRACE_ERROR(error);
+        return(false);
+    }
+
     // init all subsystems
     if( ABSConfig.LoadSystemConfig() == false ){
         ES_TRACE_ERROR("unable to load ABSConfig config");
@@ -215,9 +273,9 @@ bool CABSCompletion::AddQueueSuggestions(void)
 
     while( it != ie ){
         if( BatchServers.GetNumberOfServers() > 1 ){
-            Suggestions.push_back((*it)->GetNameIncludingShortServerName());
+            ofs << (*it)->GetNameIncludingShortServerName() << endl;
         } else {
-            Suggestions.push_back((*it)->GetName());
+            ofs << (*it)->GetName() << endl;
         }
         it++;
     }
@@ -314,17 +372,6 @@ bool CABSCompletion::AddCollectionSuggestions(void)
 
 //------------------------------------------------------------------------------
 
-bool CABSCompletion::AnyOption(void)
-{
-    for(unsigned int i=0; i < Words.size(); i++) {
-        // all words are non-empty (due to usage of strtok)
-        if( Words[i][0] == '-' ) return(true);
-    }
-    return(false);
-}
-
-//------------------------------------------------------------------------------
-
 bool CABSCompletion::FilterSuggestions(void)
 {
     // build filter ---------------------------------
@@ -349,15 +396,21 @@ bool CABSCompletion::FilterSuggestions(void)
         }
     }
 
-// FIXME - Words[CWord] is out of the legal range
-//    // self suggestions
-//    if( Suggestions.size() == 1 ){
-//        if( Suggestions.front() == Words[CWord] ) Suggestions.clear();
-//        // FIXME - workaround for autocompetion in mc where "@" is word break?
-//        // still does not work :-(
-//        CSmallString tmp = Suggestions.front() + "@";
-//        if( Words[CWord].FindSubString(tmp) == 0 ) Suggestions.clear();
-//    }
+    it = Suggestions.begin();
+
+    // keep only the last word after "@"
+    while( it != ie ) {
+        CSmallString tmp = *it;
+        char* p_saveptr = NULL;
+        char* p_word;
+
+        p_word = strtok_r(tmp.GetBuffer(),"@",&p_saveptr);
+        while(p_word != NULL) {
+            *it = p_word;
+            p_word = strtok_r(NULL,"@",&p_saveptr);
+        }
+        it++;
+    }
 
     return(true);
 }
@@ -369,7 +422,10 @@ bool CABSCompletion::PrintSuggestions(void)
     std::list<CSmallString>::iterator it = Suggestions.begin();
     std::list<CSmallString>::iterator ie = Suggestions.end();
     while( it != ie ) {
-        if( (Suggestions.size() == 1) && (CWord < 3) ) {
+        if( (Suggestions.size() == 1) && (CWord == 1) ) {
+            // print only suggestion and move to the next argument - queue
+            cout << *it << "@" << endl;
+        } else if( (Suggestions.size() == 1) && (CWord < 3) ) {
             // print only suggestion and move to the next argument
             cout << *it << " " << endl;
         } else if( (Suggestions.size() == 1) && (CWord >= 3) ) {
