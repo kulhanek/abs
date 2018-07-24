@@ -230,18 +230,34 @@ bool CABSCompletion::AddQueueSuggestions(void)
     while( getline(ifs,line) ){
         vector<string> items;
         split(items,line,is_any_of("@"));
+
+        CSmallString suggestion;
+
         if( items.size() == 1 ){
-            Suggestions.push_back(line);
+            suggestion = line;
         } else if ( items.size() == 2 ) {
             MultipleServers = true;
             switch(qp){
                 case 0:
-                    Suggestions.push_back(items[0]);
+                    suggestion = items[0];
                 break;
                 case 1:
-                    Suggestions.push_back(line);
+                    suggestion = line;
                 break;
             }
+        }
+
+        // is already in the list?
+        bool found = false;
+        std::list<CSmallString>::iterator it = Suggestions.begin();
+        std::list<CSmallString>::iterator ie = Suggestions.end();
+        while( it != ie ) {
+            if( *it == suggestion ) found = true;
+            it++;
+        }
+
+        if( suggestion != NULL ){
+            if( found == false ) Suggestions.push_back(suggestion);
         }
     }
 
