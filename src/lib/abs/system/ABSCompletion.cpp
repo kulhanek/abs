@@ -223,29 +223,31 @@ bool CABSCompletion::AddQueueSuggestions(void)
         return(false);
     }
 
-    unsigned int qp = WhatQueuePart();
+//    unsigned int qp = WhatQueuePart();
 
     // load cache by lines
     std::string line;
     while( getline(ifs,line) ){
-        vector<string> items;
-        split(items,line,is_any_of("@"));
+//        vector<string> items;
+//        split(items,line,is_any_of("@"));
 
         CSmallString suggestion;
 
-        if( items.size() == 1 ){
-            suggestion = line;
-        } else if ( items.size() == 2 ) {
-            MultipleServers = true;
-            switch(qp){
-                case 0:
-                    suggestion = items[0];
-                break;
-                case 1:
-                    suggestion = line;
-                break;
-            }
-        }
+//        if( items.size() == 1 ){
+//            suggestion = line;
+//        } else if ( items.size() == 2 ) {
+//            MultipleServers = true;
+//            switch(qp){
+//                case 0:
+//                    suggestion = items[0];
+//                break;
+//                case 1:
+//                    suggestion = line;
+//                break;
+//            }
+//        }
+
+        suggestion = line;
 
         // is already in the list?
         bool found = false;
