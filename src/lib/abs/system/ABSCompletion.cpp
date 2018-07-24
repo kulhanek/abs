@@ -233,6 +233,7 @@ bool CABSCompletion::AddQueueSuggestions(void)
         if( items.size() == 1 ){
             Suggestions.push_back(line);
         } else if ( items.size() == 2 ) {
+            MultipleServers = true;
             switch(qp){
                 case 0:
                     Suggestions.push_back(items[0]);
@@ -315,19 +316,6 @@ unsigned int CABSCompletion::WhatQueuePart(void)
     }
 
     return(numsem);
-}
-
-//------------------------------------------------------------------------------
-
-bool CABSCompletion::HaveQueueServers(void)
-{
-    bool result = false;
-    if( CWord < Words.size() ) {
-        for(unsigned int i=0; i < Words[CWord].GetLength(); i++) {
-            if( Words[CWord][i] == '@' ) result = true;
-        }
-    }
-    return(result);
 }
 
 //------------------------------------------------------------------------------
@@ -443,21 +431,21 @@ bool CABSCompletion::FilterSuggestions(void)
         }
     }
 
-    it = Suggestions.begin();
+//    it = Suggestions.begin();
 
-    // keep only the last word after "@"
-    while( it != ie ) {
-        CSmallString tmp = *it;
-        char* p_saveptr = NULL;
-        char* p_word;
+//    // keep only the last word after "@"
+//    while( it != ie ) {
+//        CSmallString tmp = *it;
+//        char* p_saveptr = NULL;
+//        char* p_word;
 
-        p_word = strtok_r(tmp.GetBuffer(),"@",&p_saveptr);
-        while(p_word != NULL) {
-            *it = p_word;
-            p_word = strtok_r(NULL,"@",&p_saveptr);
-        }
-        it++;
-    }
+//        p_word = strtok_r(tmp.GetBuffer(),"@",&p_saveptr);
+//        while(p_word != NULL) {
+//            *it = p_word;
+//            p_word = strtok_r(NULL,"@",&p_saveptr);
+//        }
+//        it++;
+//    }
 
     return(true);
 }

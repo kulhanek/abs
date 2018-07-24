@@ -51,6 +51,7 @@ private:
     CSmallString                Command;
     CSmallString                Action;
     std::list<CSmallString>     Suggestions;        // suggestions
+    bool                        MultipleServers;
 
     // add initial suggestions (for actions)
     bool AddSuggestions(const CSmallString& list);
@@ -69,9 +70,6 @@ private:
 
     // what part of queue name is requested
     unsigned int WhatQueuePart(void);
-
-    // have multiple servers
-    bool HaveQueueServers(void);
 
     // add alias suggestions
     bool AddAliasSuggestions(void);
