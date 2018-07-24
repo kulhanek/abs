@@ -40,11 +40,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 //------------------------------------------------------------------------------
 
 using namespace std;
+using namespace boost;
 
 //------------------------------------------------------------------------------
 
@@ -221,10 +223,25 @@ bool CABSCompletion::AddQueueSuggestions(void)
         return(false);
     }
 
+    unsigned int qp = WhatQueuePart();
+
     // load cache by lines
     std::string line;
     while( getline(ifs,line) ){
-        Suggestions.push_back(line);
+        vector<string> items;
+        split(items,line,is_any_of("@"));
+        if( items.size() == 1 ){
+            Suggestions.push_back(line);
+        } else if ( items.size() == 2 ) {
+            switch(qp){
+                case 0:
+                    Suggestions.push_back(items[0]);
+                break;
+                case 1:
+                    Suggestions.push_back(line);
+                break;
+            }
+        }
     }
 
     return(true);
@@ -283,6 +300,34 @@ bool CABSCompletion::InitQueuesCache(const CSmallString& cname)
     }
 
     return(true);
+}
+
+//------------------------------------------------------------------------------
+
+unsigned int CABSCompletion::WhatQueuePart(void)
+{
+    unsigned int numsem = 0;
+
+    if( CWord < Words.size() ) {
+        for(unsigned int i=0; i < Words[CWord].GetLength(); i++) {
+            if( Words[CWord][i] == '@' ) numsem++;
+        }
+    }
+
+    return(numsem);
+}
+
+//------------------------------------------------------------------------------
+
+bool CABSCompletion::HaveQueueServers(void)
+{
+    bool result = false;
+    if( CWord < Words.size() ) {
+        for(unsigned int i=0; i < Words[CWord].GetLength(); i++) {
+            if( Words[CWord][i] == '@' ) result = true;
+        }
+    }
+    return(result);
 }
 
 //------------------------------------------------------------------------------
@@ -424,9 +469,18 @@ bool CABSCompletion::PrintSuggestions(void)
     std::list<CSmallString>::iterator it = Suggestions.begin();
     std::list<CSmallString>::iterator ie = Suggestions.end();
     while( it != ie ) {
-        if( (Suggestions.size() == 1) && (CWord == 1) ) {
-            // print only suggestion and move to the next argument - queue
-            cout << *it << "@" << endl;
+        if( CWord == 1 ) {
+            unsigned int qp = WhatQueuePart();
+            bool  hs = HaveQueueServers();
+            if( (Suggestions.size() == 1) && (qp == 0) && hs ){
+                // print only suggestion and move to the next part of queue
+                cout << *it << "@" << endl;
+            } else if (Suggestions.size() == 1) {
+                // print only suggestion and move to the next argument
+                cout << *it << " " << endl;
+            } else {
+                cout << *it << endl;
+            }
         } else if( (Suggestions.size() == 1) && (CWord < 3) ) {
             // print only suggestion and move to the next argument
             cout << *it << " " << endl;

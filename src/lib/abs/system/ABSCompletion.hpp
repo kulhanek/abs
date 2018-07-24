@@ -67,6 +67,12 @@ private:
     // init queues cache
     bool InitQueuesCache(const CSmallString& cname);
 
+    // what part of queue name is requested
+    unsigned int WhatQueuePart(void);
+
+    // have multiple servers
+    bool HaveQueueServers(void);
+
     // add alias suggestions
     bool AddAliasSuggestions(void);
 
