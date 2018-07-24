@@ -52,6 +52,7 @@ private:
     CSmallString                Action;
     std::list<CSmallString>     Suggestions;        // suggestions
     bool                        MultipleServers;
+    bool                        QueueNamePerPartes;
 
     // add initial suggestions (for actions)
     bool AddSuggestions(const CSmallString& list);

@@ -60,6 +60,8 @@ CABSCompletion::CABSCompletion(void)
 {
     CGenPosition = 0;
     CWord = 0;
+    QueueNamePerPartes = false;
+    MultipleServers = false;
 }
 
 //==============================================================================
@@ -70,7 +72,12 @@ bool CABSCompletion::InitCompletion(void)
 {
     // get completion data --------------------------
     CommandLine = CShell::GetSystemVariable("COMP_LINE");
+
     CSmallString tmp;
+
+    tmp = CShell::GetSystemVariable("COMP_WORDBREAKS");
+    QueueNamePerPartes = tmp.FindSubString("@") >= 0;
+
     tmp = CShell::GetSystemVariable("COMP_POINT");
     CGenPosition = tmp.ToInt();
 
@@ -223,31 +230,32 @@ bool CABSCompletion::AddQueueSuggestions(void)
         return(false);
     }
 
-//    unsigned int qp = WhatQueuePart();
-
     // load cache by lines
     std::string line;
     while( getline(ifs,line) ){
-//        vector<string> items;
-//        split(items,line,is_any_of("@"));
 
         CSmallString suggestion;
 
-//        if( items.size() == 1 ){
-//            suggestion = line;
-//        } else if ( items.size() == 2 ) {
-//            MultipleServers = true;
-//            switch(qp){
-//                case 0:
-//                    suggestion = items[0];
-//                break;
-//                case 1:
-//                    suggestion = line;
-//                break;
-//            }
-//        }
-
-        suggestion = line;
+        if( QueueNamePerPartes ){
+            unsigned int qp = WhatQueuePart();
+            vector<string> items;
+            split(items,line,is_any_of("@"));
+            if( items.size() == 1 ){
+                suggestion = line;
+            } else if ( items.size() == 2 ) {
+                MultipleServers = true;
+                switch(qp){
+                    case 0:
+                        suggestion = items[0];
+                    break;
+                    case 1:
+                        suggestion = line;
+                    break;
+                }
+            }
+        } else {
+            suggestion = line;
+        }
 
         // is already in the list?
         bool found = false;
@@ -449,21 +457,23 @@ bool CABSCompletion::FilterSuggestions(void)
         }
     }
 
-//    it = Suggestions.begin();
+    if( QueueNamePerPartes ){
+        it = Suggestions.begin();
 
-//    // keep only the last word after "@"
-//    while( it != ie ) {
-//        CSmallString tmp = *it;
-//        char* p_saveptr = NULL;
-//        char* p_word;
+        // keep only the last word after "@"
+        while( it != ie ) {
+            CSmallString tmp = *it;
+            char* p_saveptr = NULL;
+            char* p_word;
 
-//        p_word = strtok_r(tmp.GetBuffer(),"@",&p_saveptr);
-//        while(p_word != NULL) {
-//            *it = p_word;
-//            p_word = strtok_r(NULL,"@",&p_saveptr);
-//        }
-//        it++;
-//    }
+            p_word = strtok_r(tmp.GetBuffer(),"@",&p_saveptr);
+            while(p_word != NULL) {
+                *it = p_word;
+                p_word = strtok_r(NULL,"@",&p_saveptr);
+            }
+            it++;
+        }
+    }
 
     return(true);
 }
