@@ -462,14 +462,11 @@ bool CABSCompletion::FilterSuggestions(void)
 
         // keep only the last word after "@"
         while( it != ie ) {
-            CSmallString tmp = *it;
-            char* p_saveptr = NULL;
-            char* p_word;
-
-            p_word = strtok_r(tmp.GetBuffer(),"@",&p_saveptr);
-            while(p_word != NULL) {
-                *it = "@" + CSmallString(p_word);
-                p_word = strtok_r(NULL,"@",&p_saveptr);
+            string line = string(*it);
+            vector<string> items;
+            split(items,line,is_any_of("@"));
+            if( items.size() > 1 ){
+                *it = "@" + items[items.size()-1];
             }
             it++;
         }
