@@ -459,8 +459,7 @@ bool CABSCompletion::PrintSuggestions(void)
     while( it != ie ) {
         if( CWord == 1 ) {
             unsigned int qp = WhatQueuePart();
-            bool  hs = HaveQueueServers();
-            if( (Suggestions.size() == 1) && (qp == 0) && hs ){
+            if( (Suggestions.size() == 1) && (qp == 0) && MultipleServers ){
                 // print only suggestion and move to the next part of queue
                 cout << *it << "@" << endl;
             } else if (Suggestions.size() == 1) {
