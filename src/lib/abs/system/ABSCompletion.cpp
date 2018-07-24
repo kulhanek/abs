@@ -234,6 +234,8 @@ bool CABSCompletion::AddQueueSuggestions(void)
 
 bool CABSCompletion::InitQueuesCache(const CSmallString& cname)
 {
+    CFileSystem::CreateDir(ABSConfig.GetUserSiteConfigDir());
+
     ofstream ofs;
     ofs.open(cname);
     if( ! ofs ){
