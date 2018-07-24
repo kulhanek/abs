@@ -468,7 +468,7 @@ bool CABSCompletion::FilterSuggestions(void)
 
             p_word = strtok_r(tmp.GetBuffer(),"@",&p_saveptr);
             while(p_word != NULL) {
-                *it = p_word;
+                *it = "@" + CSmallString(p_word);
                 p_word = strtok_r(NULL,"@",&p_saveptr);
             }
             it++;
