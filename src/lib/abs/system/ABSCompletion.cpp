@@ -70,12 +70,14 @@ CABSCompletion::CABSCompletion(void)
 
 bool CABSCompletion::InitCompletion(void)
 {
+    BashVersion = CShell::GetSystemVariable("AMS_BASHVERSION");
+
     // get completion data --------------------------
     CommandLine = CShell::GetSystemVariable("COMP_LINE");
 
     CSmallString tmp;
 
-    tmp = CShell::GetSystemVariable("COMP_WORDBREAKS");
+    tmp = CShell::GetSystemVariable("AMS_WORDBREAKS");
     QueueNamePerPartes = tmp.FindSubString("@") >= 0;
 
     tmp = CShell::GetSystemVariable("COMP_POINT");
@@ -466,7 +468,12 @@ bool CABSCompletion::FilterSuggestions(void)
             vector<string> items;
             split(items,line,is_any_of("@"));
             if( items.size() > 1 ){
-                *it = "@" + items[items.size()-1];
+                // FIXME?
+                if( BashVersion == "4.3" ){
+                    *it = items[items.size()-1];
+                } else {
+                    *it = "@" + items[items.size()-1];
+                }
             }
             it++;
         }

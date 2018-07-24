@@ -44,6 +44,7 @@ public:
 
     // section of private date ----------------------------------------------------
 private:
+    CSmallString                BashVersion;
     CSmallString                CommandLine;
     unsigned int                CGenPosition;
     std::vector<CSmallString>   Words;              // command line splitted into words
