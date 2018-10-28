@@ -45,7 +45,7 @@
 #include <JobType.hpp>
 #include <iostream>
 #include <vector>
-#include <sys/types.h>
+#include <sys/sysmacros.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <AMSGlobalConfig.hpp>
@@ -678,9 +678,11 @@ bool CJob::InputDirectory(std::ostream& sout)
     bool    found = false;
     while( mountinfo ){
         stringstream smntpoint(mntpoint);
-        string n1,n2,s1;
-        smntpoint >> n1 >> n2 >> s1;
-        if( s1 == sdev.str() ){
+        string n1,n2,s1,n3,p1;
+        smntpoint >> n1 >> n2 >> s1 >> n3 >> p1;
+        // RT#274876
+        // nfs4 mounts from one server have the same sdev, it is necessary to test also the path
+        if( (s1 == sdev.str()) && (input_dir_raw.find(p1) == string::npos) ){
             found = true;
             break;
         }

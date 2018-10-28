@@ -309,6 +309,9 @@ sselector:
 %%
 /* ========================================================================== */
 
+int yynodeparse(void);
+int yynode_scan_string(const char* p_mask);
+
 int parse_node_mask(const char* p_mask)
 {
     yynode_scan_string(p_mask);

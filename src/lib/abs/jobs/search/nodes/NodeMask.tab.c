@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.2.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.0.2"
+#define YYBISON_VERSION "3.0.4"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -145,7 +145,7 @@ extern int yynodedebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE YYSTYPE;
+
 union YYSTYPE
 {
 #line 16 "NodeMask.y" /* yacc.c:355  */
@@ -160,6 +160,8 @@ union YYSTYPE
 
 #line 162 "NodeMask.tab.c" /* yacc.c:355  */
 };
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -173,7 +175,7 @@ int yynodeparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 177 "NodeMask.tab.c" /* yacc.c:358  */
+#line 179 "NodeMask.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1281,7 +1283,7 @@ yyreduce:
         case 2:
 #line 55 "NodeMask.y" /* yacc.c:1646  */
     { TopExpression = (yyvsp[0].exprValue); (yyval.exprValue) = (yyvsp[0].exprValue); }
-#line 1285 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1287 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
@@ -1295,7 +1297,7 @@ yyreduce:
         p_expr->Selection = (yyvsp[0].selValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1299 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1301 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
@@ -1311,7 +1313,7 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1315 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1317 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
@@ -1327,7 +1329,7 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1331 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1333 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
@@ -1343,7 +1345,7 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1347 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1349 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
@@ -1351,7 +1353,7 @@ yyreduce:
     {
         (yyval.exprValue) = (yyvsp[-1].exprValue);
         }
-#line 1355 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1357 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
@@ -1359,7 +1361,7 @@ yyreduce:
     {
             (yyval.selValue) = (yyvsp[0].selValue);
         }
-#line 1363 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1365 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
@@ -1367,7 +1369,7 @@ yyreduce:
     {
             (yyval.selValue) = (yyvsp[0].selValue);
         }
-#line 1371 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1373 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
@@ -1375,7 +1377,7 @@ yyreduce:
     {
             (yyval.selValue) = (yyvsp[0].selValue);
         }
-#line 1379 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1381 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
@@ -1388,7 +1390,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1392 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1394 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
@@ -1401,7 +1403,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1405 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1407 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
@@ -1414,7 +1416,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1418 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1420 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
@@ -1427,7 +1429,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1431 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1433 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
@@ -1440,7 +1442,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1444 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1446 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
@@ -1453,7 +1455,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1457 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1459 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
@@ -1466,7 +1468,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1470 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1472 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
@@ -1479,7 +1481,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1483 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1485 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
@@ -1492,7 +1494,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1496 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1498 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
@@ -1505,7 +1507,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1509 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1511 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
@@ -1518,7 +1520,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1522 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1524 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
@@ -1531,7 +1533,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1535 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1537 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
@@ -1544,7 +1546,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1548 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1550 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
@@ -1557,7 +1559,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1561 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1563 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
@@ -1566,7 +1568,7 @@ yyreduce:
         enum SType selt = T_NCPUS;
         (yyval.tValue) = selt;
         }
-#line 1570 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1572 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
@@ -1575,7 +1577,7 @@ yyreduce:
         enum SType selt = T_NFREECPUS;
         (yyval.tValue) = selt;
         }
-#line 1579 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1581 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
@@ -1584,7 +1586,7 @@ yyreduce:
         enum SType selt = T_NGPUS;
         (yyval.tValue) = selt;
         }
-#line 1588 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1590 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
@@ -1593,7 +1595,7 @@ yyreduce:
         enum SType selt = T_NFREEGPUS;
         (yyval.tValue) = selt;
         }
-#line 1597 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1599 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
@@ -1602,7 +1604,7 @@ yyreduce:
         enum SType selt = T_MEM;
         (yyval.tValue) = selt;
         }
-#line 1606 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1608 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
@@ -1611,7 +1613,7 @@ yyreduce:
         enum SType selt = T_FREEMEM;
         (yyval.tValue) = selt;
         }
-#line 1615 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1617 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
@@ -1620,7 +1622,7 @@ yyreduce:
         enum SType selt = T_NAME;
         (yyval.tValue) = selt;
         }
-#line 1624 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1626 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
@@ -1629,7 +1631,7 @@ yyreduce:
         enum SType selt = T_PROPS;
         (yyval.tValue) = selt;
         }
-#line 1633 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1635 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
@@ -1638,7 +1640,7 @@ yyreduce:
         enum SType selt = T_ST;
         (yyval.tValue) = selt;
         }
-#line 1642 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1644 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
@@ -1647,11 +1649,11 @@ yyreduce:
         enum SType selt = T_BS;
         (yyval.tValue) = selt;
         }
-#line 1651 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1653 "NodeMask.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1655 "NodeMask.tab.c" /* yacc.c:1646  */
+#line 1657 "NodeMask.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1882,6 +1884,9 @@ yyreturn:
 #line 309 "NodeMask.y" /* yacc.c:1906  */
 
 /* ========================================================================== */
+
+int yynodeparse(void);
+int yynode_scan_string(const char* p_mask);
 
 int parse_node_mask(const char* p_mask)
 {

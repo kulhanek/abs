@@ -183,7 +183,7 @@ bool CMultiWfnJobType::WriteJobFile(const CSmallString& file)
         ofs << *it << endl;
         it++;
     }
-    bool result = ofs;
+    bool result = static_cast<bool>(ofs);
     ofs.close();
 
     return( result );

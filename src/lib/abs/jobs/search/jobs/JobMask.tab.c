@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.0.2.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.0.2"
+#define YYBISON_VERSION "3.0.4"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -144,7 +144,7 @@ extern int yyjobdebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE YYSTYPE;
+
 union YYSTYPE
 {
 #line 16 "JobMask.y" /* yacc.c:355  */
@@ -159,6 +159,8 @@ union YYSTYPE
 
 #line 161 "JobMask.tab.c" /* yacc.c:355  */
 };
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -172,7 +174,7 @@ int yyjobparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 176 "JobMask.tab.c" /* yacc.c:358  */
+#line 178 "JobMask.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1269,7 +1271,7 @@ yyreduce:
         case 2:
 #line 52 "JobMask.y" /* yacc.c:1646  */
     { TopExpression = (yyvsp[0].exprValue); (yyval.exprValue) = (yyvsp[0].exprValue); }
-#line 1273 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1275 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
@@ -1283,7 +1285,7 @@ yyreduce:
         p_expr->Selection = (yyvsp[0].selValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1287 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1289 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
@@ -1299,7 +1301,7 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1303 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1305 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
@@ -1315,7 +1317,7 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1319 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1321 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
@@ -1331,7 +1333,7 @@ yyreduce:
         p_expr->RightExpression = (yyvsp[0].exprValue);
         (yyval.exprValue) = p_expr;
         }
-#line 1335 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1337 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
@@ -1339,7 +1341,7 @@ yyreduce:
     {
         (yyval.exprValue) = (yyvsp[-1].exprValue);
         }
-#line 1343 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1345 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
@@ -1347,7 +1349,7 @@ yyreduce:
     {
             (yyval.selValue) = (yyvsp[0].selValue);
         }
-#line 1351 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1353 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
@@ -1355,7 +1357,7 @@ yyreduce:
     {
             (yyval.selValue) = (yyvsp[0].selValue);
         }
-#line 1359 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1361 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
@@ -1368,7 +1370,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1372 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1374 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
@@ -1381,7 +1383,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1385 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1387 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
@@ -1394,7 +1396,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1398 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1400 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
@@ -1407,7 +1409,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1411 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1413 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
@@ -1420,7 +1422,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1424 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1426 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
@@ -1433,7 +1435,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1437 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1439 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
@@ -1446,7 +1448,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1450 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1452 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
@@ -1459,7 +1461,7 @@ yyreduce:
             }
         (yyval.selValue) = p_selection;
         }
-#line 1463 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1465 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
@@ -1468,7 +1470,7 @@ yyreduce:
         enum SType selt = T_ID;
         (yyval.tValue) = selt;
         }
-#line 1472 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1474 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
@@ -1477,7 +1479,7 @@ yyreduce:
         enum SType selt = T_NCPUS;
         (yyval.tValue) = selt;
         }
-#line 1481 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1483 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
@@ -1486,7 +1488,7 @@ yyreduce:
         enum SType selt = T_NGPUS;
         (yyval.tValue) = selt;
         }
-#line 1490 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1492 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
@@ -1495,7 +1497,7 @@ yyreduce:
         enum SType selt = T_NNODES;
         (yyval.tValue) = selt;
         }
-#line 1499 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1501 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
@@ -1504,7 +1506,7 @@ yyreduce:
         enum SType selt = T_TITLE;
         (yyval.tValue) = selt;
         }
-#line 1508 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1510 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
@@ -1513,7 +1515,7 @@ yyreduce:
         enum SType selt = T_QUEUE;
         (yyval.tValue) = selt;
         }
-#line 1517 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1519 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
@@ -1522,7 +1524,7 @@ yyreduce:
         enum SType selt = T_USER;
         (yyval.tValue) = selt;
         }
-#line 1526 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1528 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
@@ -1531,7 +1533,7 @@ yyreduce:
         enum SType selt = T_PATH;
         (yyval.tValue) = selt;
         }
-#line 1535 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1537 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
@@ -1540,7 +1542,7 @@ yyreduce:
         enum SType selt = T_ST;
         (yyval.tValue) = selt;
         }
-#line 1544 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1546 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
@@ -1549,11 +1551,11 @@ yyreduce:
         enum SType selt = T_BS;
         (yyval.tValue) = selt;
         }
-#line 1553 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1555 "JobMask.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1557 "JobMask.tab.c" /* yacc.c:1646  */
+#line 1559 "JobMask.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
