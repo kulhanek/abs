@@ -682,7 +682,7 @@ bool CJob::InputDirectory(std::ostream& sout)
         smntpoint >> n1 >> n2 >> s1 >> n3 >> p1;
         // RT#274876
         // nfs4 mounts from one server have the same sdev, it is necessary to test also the path
-        if( (s1 == sdev.str()) && (input_dir_raw.find(p1) != string::npos) ){
+        if( (s1 == sdev.str()) && (input_dir_raw.find(p1) == 0) ){
             found = true;
             break;
         }
