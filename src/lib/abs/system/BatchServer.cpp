@@ -23,6 +23,13 @@
 #include <BatchServer.hpp>
 #include <Job.hpp>
 #include <JobList.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+
+//------------------------------------------------------------------------------
+
+using namespace std;
+using namespace boost;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -46,7 +53,7 @@ CBatchServer::~CBatchServer(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchServer::Init(const CSmallString& server_name,const CSmallString& short_name)
+bool CBatchServer::Init(const CSmallString& server_name,const CSmallString& short_name,const CSmallString& alt_names)
 {
     return(false);
 }
@@ -63,6 +70,24 @@ const CSmallString CBatchServer::GetServerName(void)
 const CSmallString CBatchServer::GetShortName(void)
 {
     return(ShortName);
+}
+
+//------------------------------------------------------------------------------
+
+bool CBatchServer::DoesItMatchName(const CSmallString& srvname)
+{
+    if( srvname == ServerName ) return(true);
+    if( srvname == ShortName ) return(true);
+
+    std::vector<std::string> alt_names;
+    std::string salts(AltNames);
+    split(alt_names, salts, is_any_of(":"));
+
+    if( std::find(alt_names.begin(), alt_names.end(), string(srvname)) != alt_names.end() ){
+        return(true);
+    }
+
+    return(false);
 }
 
 //------------------------------------------------------------------------------

@@ -106,7 +106,7 @@ CPBSProServer::~CPBSProServer(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& short_name)
+bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& short_name,const CSmallString& alt_names)
 {
     CSmallString libs_tok;
 
@@ -146,6 +146,7 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
 
     ServerName = server_name;
     ShortName = short_name;
+    AltNames = alt_names;
 
     if( ConnectToServer() == false ){
         ES_TRACE_ERROR("unable to connect to server");

@@ -35,10 +35,13 @@
 #include <QueueList.hpp>
 #include <Shell.hpp>
 #include <cctype>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 //------------------------------------------------------------------------------
 
 using namespace std;
+using namespace boost;
 
 //------------------------------------------------------------------------------
 
@@ -95,8 +98,9 @@ bool CBatchServers::InitAll(void)
         CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
         while( p_sele != NULL ){
 
-            CSmallString name, short_name;
+            CSmallString name, alts, short_name;
             p_sele->GetAttribute("name",name);
+            p_sele->GetAttribute("alts",alts);
             p_sele->GetAttribute("short",short_name);
 
             p_sele = p_sele->GetNextSiblingElement();
@@ -115,7 +119,7 @@ bool CBatchServers::InitAll(void)
                 return(false); // this is FATAL error in configuration
             }
 
-            if( plg_obj->Init(name,short_name) == false ){
+            if( plg_obj->Init(name,short_name,alts) == false ){
                 CSmallString error;
                 error << "unable to init server '" << name << "' (" << short_name << ")";
                 ES_TRACE_ERROR(error);
@@ -191,11 +195,17 @@ bool CBatchServers::Init(const CSmallString& srv)
         CXMLElement* p_sele = p_ele->GetFirstChildElement("server");
         while( p_sele != NULL ){
 
-            CSmallString name, short_name;
+            CSmallString name, alts, short_name;
             p_sele->GetAttribute("name",name);
+            p_sele->GetAttribute("alts",alts);        // comma separated list
             p_sele->GetAttribute("short",short_name);
 
-            if( (name == srv) || (short_name == srv) ){
+            std::vector<std::string> alt_names;
+            std::string salts(alts);
+            split(alt_names, salts, is_any_of(":"));
+
+            if( (name == srv) || (short_name == srv) ||
+                (std::find(alt_names.begin(), alt_names.end(), string(srv)) != alt_names.end())  ){
                 // create plugin object
                 CComObject* p_obj = PluginDatabase.CreateObject(CExtUUID(plugin));
                 if( p_obj == NULL ){
@@ -210,7 +220,7 @@ bool CBatchServers::Init(const CSmallString& srv)
                     return(false);
                 }
 
-                if( plg_obj->Init(name,short_name) == false ){
+                if( plg_obj->Init(name,short_name,alts) == false ){
                     CSmallString error;
                     error << "unable to init server '" << name << "' (" << short_name << ")";
                     ES_TRACE_ERROR(error);
@@ -305,7 +315,7 @@ const CBatchServerPtr CBatchServers::FindBatchServer(const CSmallString& srv_nam
 
     while( it != ie ){
         CBatchServerPtr srv_ptr = *it;
-        if( (srv_ptr->GetServerName() == srv_name) || (srv_ptr->GetShortName() == srv_name) ){
+        if( srv_ptr->DoesItMatchName(srv_name) == true ){
             return(srv_ptr);
         }
         it++;
@@ -690,7 +700,9 @@ bool CBatchServers::GetJobStatus(CJob& job)
 {
     CBatchServerPtr srv_ptr = FindBatchServerByJobID(job);
     if( srv_ptr == NULL ){
-        ES_ERROR("no batch server was found for the job");
+        CSmallString error;
+        error << "no batch server was found for the job (" << job.GetJobID() << ")";
+        ES_ERROR(error);
         return(false);
     }
 
@@ -917,10 +929,16 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
     // not provided - use default server
     if( srv_name == NULL ){
         srv_name = GetDefaultSrvName();
+        CSmallString warn;
+        warn << "default batch server (" << srv_name << ")";
+        ES_WARNING(warn);
     }
 
     srv_ptr = FindBatchServer(srv_name,true);
-    if( srv_ptr == NULL ) return(srv_ptr); // not found
+    if( srv_ptr == NULL ){
+        ES_TRACE_ERROR("batch server not found");
+        return(srv_ptr); // not found
+    }
 
     // append the server name to jobid if not provided
     at = jobid.FindSubString(".");
@@ -930,8 +948,17 @@ const CBatchServerPtr CBatchServers::FindBatchServerByJobID(CSmallString& jobid)
 
     // resolve moved jobs - RT#258670
     CSmallString job_srv = srv_ptr->LocateJob(jobid);
-    if( job_srv == NULL ) return(srv_ptr);  // unable to locate job - stay with the current server
+    if( job_srv == NULL ){
+        CSmallString error;
+        error << "unable to locate server for job (" << jobid << ")";
+        ES_TRACE_ERROR(error);
+        return(srv_ptr);  // unable to locate job - stay with the current server
+    }
     if( job_srv == srv_ptr->GetServerName() ) return(srv_ptr); // the same server
+
+    CSmallString warn;
+    warn << "job relocated from (" << srv_ptr->GetServerName() << ") to (" << job_srv << ")";
+    ES_WARNING(warn);
 
     // other server
     srv_ptr = FindBatchServer(job_srv,true);

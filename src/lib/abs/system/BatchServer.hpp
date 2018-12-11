@@ -53,13 +53,16 @@ public:
 
 // init batch system subsystem -------------------------------------------------
     //! load symbols and connect to server
-    virtual bool Init(const CSmallString& server_name,const CSmallString& short_name);
+    virtual bool Init(const CSmallString& server_name,const CSmallString& short_name,const CSmallString& alt_names);
 
     /// get server name
     const CSmallString GetServerName(void);
 
     /// get short server name
     const CSmallString GetShortName(void);
+
+    /// match name?
+    bool DoesItMatchName(const CSmallString& srvname);
 
 // helper methods --------------------------------------------------------------
 
@@ -140,6 +143,7 @@ public:
 protected:
     CSmallString    ServerName;
     CSmallString    ShortName;
+    CSmallString    AltNames;       // alternative names (comma separated list)
     size_t          ExecTime;       // execution time in clock ticks
     size_t          TimerStart;     // timer start time in clock ticks
 };
