@@ -40,6 +40,7 @@ CBatchServer::CBatchServer(CPluginObject* p_objectinfo)
 {
     ExecTime = 0;
     TimerStart = 0;
+    AllowJobTransfer = true;
 }
 
 //------------------------------------------------------------------------------
@@ -53,7 +54,8 @@ CBatchServer::~CBatchServer(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CBatchServer::Init(const CSmallString& server_name,const CSmallString& short_name,const CSmallString& alt_names)
+bool CBatchServer::Init(const CSmallString& server_name,const CSmallString& short_name,
+                        const CSmallString& alt_names,bool job_transfer)
 {
     return(false);
 }

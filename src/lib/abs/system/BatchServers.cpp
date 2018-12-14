@@ -102,6 +102,8 @@ bool CBatchServers::InitAll(void)
             p_sele->GetAttribute("name",name);
             p_sele->GetAttribute("alts",alts);
             p_sele->GetAttribute("short",short_name);
+            bool job_tranfer = true;
+            p_sele->GetAttribute("job_tranfer",job_tranfer);
 
             p_sele = p_sele->GetNextSiblingElement();
 
@@ -119,7 +121,7 @@ bool CBatchServers::InitAll(void)
                 return(false); // this is FATAL error in configuration
             }
 
-            if( plg_obj->Init(name,short_name,alts) == false ){
+            if( plg_obj->Init(name,short_name,alts,job_tranfer) == false ){
                 CSmallString error;
                 error << "unable to init server '" << name << "' (" << short_name << ")";
                 ES_TRACE_ERROR(error);
@@ -199,6 +201,8 @@ bool CBatchServers::Init(const CSmallString& srv)
             p_sele->GetAttribute("name",name);
             p_sele->GetAttribute("alts",alts);        // comma separated list
             p_sele->GetAttribute("short",short_name);
+            bool job_tranfer = true;
+            p_sele->GetAttribute("job_tranfer",job_tranfer);
 
             std::vector<std::string> alt_names;
             std::string salts(alts);
@@ -220,7 +224,7 @@ bool CBatchServers::Init(const CSmallString& srv)
                     return(false);
                 }
 
-                if( plg_obj->Init(name,short_name,alts) == false ){
+                if( plg_obj->Init(name,short_name,alts,job_tranfer) == false ){
                     CSmallString error;
                     error << "unable to init server '" << name << "' (" << short_name << ")";
                     ES_TRACE_ERROR(error);

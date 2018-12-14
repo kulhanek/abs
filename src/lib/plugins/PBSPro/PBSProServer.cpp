@@ -106,7 +106,8 @@ CPBSProServer::~CPBSProServer(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& short_name,const CSmallString& alt_names)
+bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& short_name,
+                         const CSmallString& alt_names,bool job_transfer)
 {
     CSmallString libs_tok;
 
@@ -147,6 +148,7 @@ bool CPBSProServer::Init(const CSmallString& server_name,const CSmallString& sho
     ServerName = server_name;
     ShortName = short_name;
     AltNames = alt_names;
+    AllowJobTransfer = job_transfer;
 
     if( ConnectToServer() == false ){
         ES_TRACE_ERROR("unable to connect to server");
@@ -322,6 +324,10 @@ void CPBSProServer::PrintAttributes(std::ostream& sout,struct attropl* p_as)
 
 const CSmallString CPBSProServer::LocateJob(const CSmallString& jobid)
 {
+    if( AllowJobTransfer == false ){
+        return(ServerName);
+    }
+
     CSmallString full_job_id;
     full_job_id = GetFullJobID(jobid);
 

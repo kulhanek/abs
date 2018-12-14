@@ -53,7 +53,8 @@ public:
 
 // init batch system subsystem -------------------------------------------------
     //! load symbols and connect to server
-    virtual bool Init(const CSmallString& server_name,const CSmallString& short_name,const CSmallString& alt_names);
+    virtual bool Init(const CSmallString& server_name,const CSmallString& short_name,
+                      const CSmallString& alt_names,bool job_transfer);
 
     /// get server name
     const CSmallString GetServerName(void);
@@ -143,9 +144,10 @@ public:
 protected:
     CSmallString    ServerName;
     CSmallString    ShortName;
-    CSmallString    AltNames;       // alternative names (comma separated list)
-    size_t          ExecTime;       // execution time in clock ticks
-    size_t          TimerStart;     // timer start time in clock ticks
+    CSmallString    AltNames;           // alternative names (comma separated list)
+    bool            AllowJobTransfer;   // allow job transfer to another server
+    size_t          ExecTime;           // execution time in clock ticks
+    size_t          TimerStart;         // timer start time in clock ticks
 };
 
 // -----------------------------------------------------------------------------

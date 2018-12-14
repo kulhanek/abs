@@ -63,7 +63,8 @@ public:
 
 // init batch system subsystem -------------------------------------------------------
     //! load symbols and connect to server
-    bool Init(const CSmallString& server_name,const CSmallString& short_name,const CSmallString& alt_names);
+    bool Init(const CSmallString& server_name,const CSmallString& short_name,
+              const CSmallString& alt_names,bool job_transfer);
 
 // enumeration -----------------------------------------------------------------
     //! init queue list
