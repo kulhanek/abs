@@ -14,7 +14,8 @@ function archive_runtime_files() {
     INF_CURRENT=$2
     INF_FORMAT=$3
 
-    if [ "$INF_START" -eq "$INF_CURRENT" ]; then
+    # INF_CURRENT might be smaller than INF_START due to PRECYCLE_ICYCLES in precycle
+    if [ "$INF_START" -ge "$INF_CURRENT" ]; then
         echo "# NOTE: the first run - no runtime files are archived"
         return 0
     fi
