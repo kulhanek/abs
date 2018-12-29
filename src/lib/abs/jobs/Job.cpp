@@ -1477,6 +1477,7 @@ bool CJob::KillJob(bool force)
 
     switch( GetJobStatus() ){
         case EJS_SUBMITTED:
+        case EJS_BOOTING:
         case EJS_RUNNING:{
             // try to kill job
             bool result = BatchServers.KillJob(*this);
@@ -1484,7 +1485,7 @@ bool CJob::KillJob(bool force)
             return(result);
             }
         default:
-            ES_ERROR("unable to kill job that is not running or queued");
+            ES_ERROR("unable to kill job that is not queued/booting/running");
             return(false);
     }
 }
