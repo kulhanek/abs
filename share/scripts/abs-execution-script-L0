@@ -49,6 +49,18 @@ echo "ABS Root             : $ABS_ROOT"
 
 echo ""
 echo "#-------------------------------------------------------------------------------"
+echo "# LM: Sanity checks ..."
+echo "#-------------------------------------------------------------------------------"
+
+if [[ -v CUDA_VISIBLE_DEVICES ]]; then
+    if [[ -z "$CUDA_VISIBLE_DEVICES" ]]; then
+        echo "CUDA_VISIBLE_DEVICES is set but without contents, unsetting the variable ..."
+        unset CUDA_VISIBLE_DEVICES
+    fi
+fi
+
+echo ""
+echo "#-------------------------------------------------------------------------------"
 echo "# L0: Booting the AMS/ABS environments ..."
 echo "#-------------------------------------------------------------------------------"
 echo ""
