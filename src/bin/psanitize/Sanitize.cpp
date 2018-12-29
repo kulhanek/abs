@@ -133,15 +133,34 @@ bool CSanitize::Run(void)
     // print running job info
     Jobs.PrintInfos(vout);
 
-
     CJobPtr p_job = Jobs.front();
 
     // overwrite job input data
     p_job->SetItem("basic/arguments","INF_ARG_JOB",Options.GetArgJobInputName());
     p_job->SetItem("basic/arguments","INF_SANITIZE_JOB","YES");
 
-    // detect job input and potentially update its status
     vout << endl;
+
+    if( Options.IsOptNCPUsSet() ) {
+        vout << "# ------------------------------------------------------------------------------" << endl;
+        vout << "# *** OVERRIDING RESOURCES ***" << endl;
+        vout << "# Original number of CPUs (info file) : " << p_job->GetItem("specific/resources","INF_NCPUS")  << endl;
+        vout << "# New number of CPUs (--ncpus arg)    : " << Options.GetOptNCPUs()  << endl;
+        p_job->SetItem("specific/resources","INF_NCPUS",Options.GetOptNCPUs());
+    } else {
+        CSmallString envcpus = CShell::GetSystemVariable("INF_NCPUS");
+        if( envcpus != NULL ){
+            if( p_job->GetItem("specific/resources","INF_NCPUS") != envcpus ){
+                vout << "# ------------------------------------------------------------------------------" << endl;
+                vout << "# *** OVERRIDING RESOURCES ***" << endl;
+                vout << "# Original number of CPUs (info file) : " << p_job->GetItem("specific/resources","INF_NCPUS")  << endl;
+                vout << "# New number of CPUs (INF_NCPUS env)  : " << envcpus  << endl;
+                p_job->SetItem("specific/resources","INF_NCPUS",envcpus);
+            }
+        }
+    }
+
+    // detect job input and potentially update its status
     vout << "# ------------------------------------------------------------------------------" << endl;
     vout << "# Job input file:  " << Options.GetArgJobInputName() << endl;
     if( p_job->DetectJobType(vout,Options.GetOptJobType()) != ERS_OK ){

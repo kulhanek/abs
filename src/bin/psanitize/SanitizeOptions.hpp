@@ -50,6 +50,7 @@ class CSanitizeOptions : public CSimpleOptions {
         CSO_ARG(CSmallString,JobInputName)
         // options ------------------------------
         CSO_OPT(CSmallString,JobType)
+        CSO_OPT(int,NCPUs)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -73,6 +74,15 @@ class CSanitizeOptions : public CSimpleOptions {
                     "TYPE",                           /* parametr name */
                     "explicitly specify job type")   /* option description */
         //----------------------------------------------------------------------
+            CSO_MAP_OPT(int,                           /* option type */
+                    NCPUs,                        /* option name */
+                    0,                          /* default value */
+                    false,                          /* is option mandatory */
+                    '\0',                           /* short option name */
+                    "ncpus",                      /* long option name */
+                    "NUM",                           /* parametr name */
+                    "override number of cpus, which are taken from info file")   /* option description */
+        //----------------------------------------------------------------------
             CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
                     false,                          /* default value */
@@ -82,7 +92,7 @@ class CSanitizeOptions : public CSimpleOptions {
                     NULL,                           /* parametr name */
                     "increase output verbosity")   /* option description */
         //----------------------------------------------------------------------
-        CSO_MAP_OPT(bool,                           /* option type */
+            CSO_MAP_OPT(bool,                           /* option type */
                     Version,                        /* option name */
                     false,                          /* default value */
                     false,                          /* is option mandatory */
@@ -91,7 +101,7 @@ class CSanitizeOptions : public CSimpleOptions {
                     NULL,                           /* parametr name */
                     "output version information and exit")   /* option description */
         //----------------------------------------------------------------------
-        CSO_MAP_OPT(bool,                           /* option type */
+            CSO_MAP_OPT(bool,                           /* option type */
                     Help,                        /* option name */
                     false,                          /* default value */
                     false,                          /* is option mandatory */
