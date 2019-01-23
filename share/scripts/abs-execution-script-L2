@@ -571,7 +571,10 @@ INF_TOTAL_NGPUS=0
 INF_NODE_TMP="/tmp/${USER}.$$.nodeinfo"
 
 for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    echo ""
+    echo ">>> $NODE_NAME ---"
     ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "$AMS_ROOT/bin/ams-host --nodeinfo --nocache" > $INF_NODE_TMP
+    cat $INF_NODE_TMP
     INF_NODE_NCPUS="`grep ncpus $INF_NODE_TMP | awk '{ print $2; }'`"
     (( INF_TOTAL_NCPUS = INF_TOTAL_NCPUS + INF_NODE_NCPUS ))
     INF_NODE_NGPUS="`grep ngpus $INF_NODE_TMP | awk '{ print $2; }'`"
