@@ -31,6 +31,7 @@ CEnvOptions::CEnvOptions(void)
 {
     SetShowMiniUsage(true);
     SetAllowProgArgs(true);
+    SetUnrecognizedOptsAsArgs(true);
 }
 
 //------------------------------------------------------------------------------
