@@ -221,6 +221,8 @@ bool CABSCompletion::AddQueueSuggestions(void)
         double dt = difftime(ct,cstat.st_mtim.tv_sec);
         if( dt > 86400 ){
             InitQueuesCache(cname); // expired cache
+        } else if( cstat.st_size == 0 ) {
+            InitQueuesCache(cname); // illegal cache - for example, as results of caching without krb5
         }
     }
 
