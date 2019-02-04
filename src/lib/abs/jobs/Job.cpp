@@ -2583,7 +2583,6 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
     sout << " " << setw(15) << name;
 
     if( InfoFileLoaded ){
-        sout << right;
         CSmallString queue = GetItem("specific/resources","INF_QUEUE");
         if( queue.GetLength() > 15 ){
             queue = queue.GetSubStringFromTo(0,14);
