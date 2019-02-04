@@ -913,7 +913,7 @@ bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
         char* p_error = pbspro_geterrmsg(ServerID);
         job.WriteErrorSection(p_error);
         CSmallString error;
-        error << "unable to submit job, error: "  << p_error;
+        error << "unable to submit job, error: "  << p_error << " cmd: " << script;
         ES_TRACE_ERROR(error);
         return(false);
     }
