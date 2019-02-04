@@ -2579,6 +2579,7 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
     if( name.GetLength() > 15 ){
         name = name.GetSubStringFromTo(0,14);
     }
+    sout << left;
     sout << " " << setw(15) << name;
 
     if( InfoFileLoaded ){
@@ -2588,6 +2589,7 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
             queue = queue.GetSubStringFromTo(0,14);
         }
         sout << " " << setw(15) << queue;
+        sout << right;
         sout << " " << setw(5) << GetItem("specific/resources","INF_NCPUS");
         sout << " " << setw(5) << GetItem("specific/resources","INF_NGPUS");
         sout << " " << setw(5) << GetItem("specific/resources","INF_NNODES");
