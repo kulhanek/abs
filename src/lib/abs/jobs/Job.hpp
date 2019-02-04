@@ -145,7 +145,7 @@ public:
     bool SubmitJob(std::ostream& sout,bool siblings,bool verbose);
 
     /// resubmit job
-    bool ResubmitJob(bool verbose);
+    ERetStatus ResubmitJob(bool verbose);
 
     /// write submit section
     void WriteSubmitSection(char* p_jobid);

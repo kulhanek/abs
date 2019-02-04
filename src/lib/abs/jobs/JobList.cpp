@@ -1757,25 +1757,35 @@ bool CJobList::CollectionResubmitJobs(std::ostream& sout,bool verbose)
     while( it != ie ){
         CJobPtr p_job = *it;
 
-        result &= p_job->ResubmitJob(verbose);
+        ERetStatus rstat = p_job->ResubmitJob(verbose);
+        result &= ! (rstat == ERS_FAILED);
         sout << right << setw(6) << i;
 
-        if( p_job->GetItem("submit/job","INF_JOB_ID",true) != NULL ){
-            CSmallString id = p_job->GetItem("submit/job","INF_JOB_ID");
-            CSmallString srv = p_job->GetItem("specific/resources","INF_SERVER_SHORT");
-            string stmp(id);
-            vector<string> items;
-            split(items,stmp,is_any_of("."));
-            if( items.size() >= 1 ){
-                id = items[0];
+        if( rstat == ERS_OK ){
+            if( p_job->GetItem("submit/job","INF_JOB_ID",true) != NULL ){
+                CSmallString id = p_job->GetItem("submit/job","INF_JOB_ID");
+                CSmallString srv = p_job->GetItem("specific/resources","INF_SERVER_SHORT");
+                string stmp(id);
+                vector<string> items;
+                split(items,stmp,is_any_of("."));
+                if( items.size() >= 1 ){
+                    id = items[0];
+                }
+                id << srv;
+                sout << " " << right << setw(12) << id;
+            } else {
+                sout << " -\?\?\?\?\?\?\?\?\?- ";
             }
-            id << srv;
-            sout << " " << right << setw(12) << id;
         } else {
-            sout << "             ";
+            if( rstat == ERS_TERMINATE ){
+                sout << " -nosubjobs- ";
+            }
+            if( rstat == ERS_FAILED ){
+                sout << " -failed-    ";
+            }
         }
 
-        CSmallString name = p_job->GetJobName();
+        CSmallString name = p_job->GetJobTitle(); // use here job title to show recycle stage
         if( name.GetLength() > 15 ){
             name = name.GetSubStringFromTo(0,14);
         }

@@ -1207,7 +1207,7 @@ void CJob::FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,boo
 
 //------------------------------------------------------------------------------
 
-bool CJob::ResubmitJob(bool verbose)
+ERetStatus CJob::ResubmitJob(bool verbose)
 {
     // destroy start/stop/kill sections
     DestroySection("submit");
@@ -1228,29 +1228,45 @@ bool CJob::ResubmitJob(bool verbose)
     // go to job directory
     CFileSystem::SetCurrentDir(GetInputDir());
 
+    // detect job type - important for recycle jobs
+    ERetStatus rstat = DetectJobType(cerr);
+    if( rstat == ERS_FAILED ){
+        ES_TRACE_ERROR("error during job type detection");
+        return(ERS_FAILED);
+    }
+    if( rstat == ERS_TERMINATE ){
+        return(ERS_TERMINATE);
+    }
+
     // re-decode resources
     if( DecodeResources(cerr,true) == false ){
         ES_TRACE_ERROR("unable to decode resources");
-        return(false);
+        return(ERS_FAILED);
     }
 
-    // submit job to torque
+    // last job check
+    if( LastJobCheck(cerr) == false ){
+        ES_TRACE_ERROR("job submission was canceled by last check procedure");
+        return(ERS_FAILED);
+    }
+
+    // submit job to batch system
     if( BatchServers.SubmitJob(*this,verbose) == false ){
         ES_TRACE_ERROR("unable to resubmit job to batch system");
         BatchJobComment = GetLastError();
         CFileSystem::SetCurrentDir(curr_dir);
-        return(false);
+        return(ERS_FAILED);
     }
 
     // save info file
     if( SaveInfoFile() == false ){
         ES_TRACE_ERROR("unable to save job info file");
         CFileSystem::SetCurrentDir(curr_dir);
-        return(false);
+        return(ERS_FAILED);
     }
 
     CFileSystem::SetCurrentDir(curr_dir);
-    return(true);
+    return(ERS_OK);
 }
 
 //------------------------------------------------------------------------------
