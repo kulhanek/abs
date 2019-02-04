@@ -1229,53 +1229,51 @@ ERetStatus CJob::ResubmitJob(bool verbose)
     CFileSystem::SetCurrentDir(GetInputDir());
 
     // four /dev/null output
-    stringstream tmpout1;
+    stringstream tmpout;
 
-    // detect job type - important for recycle jobs
-    ERetStatus rstat = DetectJobType(tmpout1);
-    if( rstat == ERS_FAILED ){
-        ES_TRACE_ERROR(tmpout1.str());
-        ES_TRACE_ERROR("error during job type detection");
+    tmpout.str("");
+    ERetStatus retstat = JobInput(tmpout,false);
+    if( retstat == ERS_FAILED ){
+        ES_TRACE_ERROR(tmpout.str());
+        ES_TRACE_ERROR("unable to set job input");
         return(ERS_FAILED);
     }
-    if( rstat == ERS_TERMINATE ){
+    if( retstat == ERS_TERMINATE ){
         return(ERS_TERMINATE);
     }
 
-    // four /dev/null output
-    stringstream tmpout2;
-
-    // re-decode resources
-    if( DecodeResources(tmpout2,true) == false ){
-        ES_TRACE_ERROR(tmpout2.str());
-        ES_TRACE_ERROR("unable to decode resources");        
+    // resources
+    tmpout.str("");
+    if( DecodeResources(tmpout,true) == false ){
+        ES_TRACE_ERROR(tmpout.str());
+        ES_TRACE_ERROR("unable to decode resources");
         return(ERS_FAILED);
     }
 
-    // four /dev/null output
-    stringstream tmpout3;
-
     // last job check
-    if( LastJobCheck(tmpout3) == false ){
-        ES_TRACE_ERROR(tmpout3.str());
+    tmpout.str("");
+    if( LastJobCheck(tmpout) == false ){
+        ES_TRACE_ERROR(tmpout.str());
         ES_TRACE_ERROR("job submission was canceled by last check procedure");
         return(ERS_FAILED);
     }
 
-    PrintJobInfo(cerr);
-
-    // submit job to batch system
-    if( BatchServers.SubmitJob(*this,verbose) == false ){
-        ES_TRACE_ERROR("unable to resubmit job to batch system");
-        BatchJobComment = GetLastError();
-        CFileSystem::SetCurrentDir(curr_dir);
+    // submit job
+    tmpout.str("");
+    if( SubmitJob(tmpout,false,verbose) == false ){
+        ES_TRACE_ERROR(tmpout.str());
+        ES_TRACE_ERROR("unable to submit job");
         return(ERS_FAILED);
     }
 
-    // save info file
-    if( SaveInfoFile() == false ){
-        ES_TRACE_ERROR("unable to save job info file");
-        CFileSystem::SetCurrentDir(curr_dir);
+    // save job info
+    if( SaveInfoFileWithPerms() == false ){
+        ES_ERROR("unable to save job info file");
+        return(ERS_FAILED);
+    }
+
+    if( SaveJobKey() == false ){
+        ES_ERROR("unable to save job key file");
         return(ERS_FAILED);
     }
 

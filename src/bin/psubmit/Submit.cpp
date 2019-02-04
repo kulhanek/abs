@@ -270,6 +270,7 @@ bool CSubmit::SubmitJobFull(void)
         return(false);
     }
 
+    // fix me - race condition? - should it be before submit job?
     if( Job->SaveJobKey() == false ){
         ES_ERROR("unable to save job key file");
         return(false);
