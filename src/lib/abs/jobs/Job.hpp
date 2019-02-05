@@ -142,7 +142,7 @@ public:
     bool ShouldSubmitJob(std::ostream& sout,bool assume_yes);
 
     /// submit job
-    bool SubmitJob(std::ostream& sout,bool siblings,bool verbose);
+    bool SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollection);
 
     /// resubmit job
     ERetStatus ResubmitJob(bool verbose);

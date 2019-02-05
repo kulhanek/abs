@@ -870,7 +870,7 @@ bool CJob::ShouldSubmitJob(std::ostream& sout,bool assume_yes)
 
 //------------------------------------------------------------------------------
 
-bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
+bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollection)
 {   
     CFileName job_script;
     job_script = GetFullJobName() + ".infex";
@@ -935,7 +935,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose)
 
     }
 
-    if( GetItem("basic/collection","INF_COLLECTION_NAME",true) == NULL ) {
+    if( (GetItem("basic/collection","INF_COLLECTION_NAME",true) == NULL) || (nocollection == true) ) {
         // submit job to batch system
         if( BatchServers.SubmitJob(*this,verbose) == false ){
             if( ! siblings ){
@@ -1239,6 +1239,11 @@ ERetStatus CJob::ResubmitJob(bool verbose)
         return(ERS_FAILED);
     }
     if( retstat == ERS_TERMINATE ){
+        // save job info - update infor file with proper CYCLE
+        if( SaveInfoFileWithPerms() == false ){
+            ES_ERROR("unable to save job info file");
+            return(ERS_FAILED);
+        }
         return(ERS_TERMINATE);
     }
 
@@ -1260,7 +1265,7 @@ ERetStatus CJob::ResubmitJob(bool verbose)
 
     // submit job
     tmpout.str("");
-    if( SubmitJob(tmpout,false,verbose) == false ){
+    if( SubmitJob(tmpout,false,verbose,true) == false ){
         ES_TRACE_ERROR(tmpout.str());
         ES_TRACE_ERROR("unable to submit job");
         return(ERS_FAILED);

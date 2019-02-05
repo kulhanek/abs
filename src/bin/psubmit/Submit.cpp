@@ -259,7 +259,7 @@ bool CSubmit::SubmitJobFull(void)
         return(false);
     }
 
-    if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
+    if( Job->SubmitJob(vout,false,Options.GetOptVerbose(),false) == false ){
         ES_TRACE_ERROR("unable to submit job");
         return(false);
     }
@@ -378,7 +378,7 @@ bool CSubmit::SubmitJobHeader(void)
         ES_TRACE_ERROR("job submission was canceled by an user");
         return(false);
     }
-    if( Job->SubmitJob(vout,false,Options.GetOptVerbose()) == false ){
+    if( Job->SubmitJob(vout,false,Options.GetOptVerbose(),false) == false ){
         ES_TRACE_ERROR("unable to submit job");
         return(false);
     }
@@ -442,7 +442,7 @@ bool CSubmit::SubmitJobCopy(int i)
     }
 
     // submit job
-    if( Job->SubmitJob(vout,true,Options.GetOptVerbose()) == false ){
+    if( Job->SubmitJob(vout,true,Options.GetOptVerbose(),false) == false ){
         ES_TRACE_ERROR("unable to submit job");
         return(false);
     }
