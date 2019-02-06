@@ -573,7 +573,8 @@ INF_NODE_TMP="/tmp/${USER}.$$.nodeinfo"
 for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
     echo ""
     echo ">>> $NODE_NAME ---"
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "$AMS_ROOT/bin/ams-host --nodeinfo --nocache" > $INF_NODE_TMP
+    # start ams-host with AMS_ROOT env, see RT#298740
+    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "AMS_ROOT=$AMS_ROOT $AMS_ROOT/bin/ams-host --nodeinfo --nocache" > $INF_NODE_TMP
     cat $INF_NODE_TMP
     INF_NODE_NCPUS="`grep ncpus $INF_NODE_TMP | awk '{ print $2; }'`"
     (( INF_TOTAL_NCPUS = INF_TOTAL_NCPUS + INF_NODE_NCPUS ))
@@ -588,7 +589,8 @@ if [[ $INF_NCPUS -gt $INF_TOTAL_NCPUS ]]; then
     printf "# Requested CPUs: %3d > All available CPUs: %3d\n" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
       echo "" >&2
       echo " >>> ERROR: Aborting job due to CPU request oversubscription (this should not happen)!" >&2
-      echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+      echo "                           *** REACTIVATE Infinity in this site ***                   " >&2
+      echo "            If the problem persists, send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
       echo "" >&2
     exit 1
 else
@@ -599,7 +601,8 @@ if [[ $INF_NGPUS -gt $INF_TOTAL_NGPUS ]]; then
     printf "# Requested GPUs: %3d > All available GPUs: %3d\n" "$INF_NGPUS" "$INF_TOTAL_NGPUS"
       echo "" >&2
       echo " >>> ERROR: Aborting job due to GPU request oversubscription (this should not happen)!" >&2
-      echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+      echo "                           *** REACTIVATE Infinity in this site ***                   " >&2
+      echo "            If the problem persists, send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
       echo "" >&2
     exit 1
 else
