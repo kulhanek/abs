@@ -342,7 +342,7 @@ bool CJob::AreRuntimeFiles(const CFileName& dir)
 
 //------------------------------------------------------------------------------
 
-ERetStatus CJob::JobInput(std::ostream& sout,bool allowallpaths)
+ERetStatus CJob::JobInput(std::ostream& sout,bool allowallpaths,bool inputfrominfo)
 {
     // test arg job name
     if( CheckJobName(sout) == false ){
@@ -354,16 +354,21 @@ ERetStatus CJob::JobInput(std::ostream& sout,bool allowallpaths)
 
     // get job directory -------------------------
 
-// this does not follow symlinks
-//    CFileSystem::GetCurrentDir(tmp);
-    tmp = GetJobInputPath();
+    if( inputfrominfo ) {
+        // already set in by collection and checked
+        tmp = GetInputDir();
+    } else {
+        // this does not follow symlinks
+        //    CFileSystem::GetCurrentDir(tmp);
+        tmp = GetJobInputPath();
 
-    tmp = JobPathCheck(tmp,sout,allowallpaths);
-    if( tmp == NULL ){
-        ES_TRACE_ERROR("illegal job dir");
-        return(ERS_FAILED);
-    }   
-    SetItem("basic/jobinput","INF_INPUT_DIR",tmp);
+        tmp = JobPathCheck(tmp,sout,allowallpaths);
+        if( tmp == NULL ){
+            ES_TRACE_ERROR("illegal job dir");
+            return(ERS_FAILED);
+        }
+        SetItem("basic/jobinput","INF_INPUT_DIR",tmp);
+    }
 
     tmp = CShell::GetSystemVariable("HOSTNAME");
     SetItem("basic/jobinput","INF_INPUT_MACHINE",tmp);
@@ -1220,10 +1225,6 @@ ERetStatus CJob::ResubmitJob(bool verbose)
     // here we assume that the job was already terminated
     SetItem("basic/external","INF_EXTERNAL_START_AFTER","");
 
-    CSmallString curr_dir;
-//  this does not follow symlinks
-//  CFileSystem::GetCurrentDir(curr_dir);
-    curr_dir = GetJobInputPath();
 
     // go to job directory
     CFileSystem::SetCurrentDir(GetInputDir());
@@ -1232,7 +1233,7 @@ ERetStatus CJob::ResubmitJob(bool verbose)
     stringstream tmpout;
 
     tmpout.str("");
-    ERetStatus retstat = JobInput(tmpout,false);
+    ERetStatus retstat = JobInput(tmpout,false,true);
     if( retstat == ERS_FAILED ){
         ES_TRACE_ERROR(tmpout.str());
         ES_TRACE_ERROR("unable to set job input");
@@ -1282,7 +1283,6 @@ ERetStatus CJob::ResubmitJob(bool verbose)
         return(ERS_FAILED);
     }
 
-    CFileSystem::SetCurrentDir(curr_dir);
     return(ERS_OK);
 }
 
@@ -2281,6 +2281,19 @@ int CJob::GetCurrentRecycleJob(void)
     GetItem("basic/recycle","INF_RECYCLE_CURRENT",current,true);
 
     return( current.ToInt() - start.ToInt() + 1);
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::IncrementRecycleStage(void)
+{
+    CSmallString current;
+    GetItem("basic/recycle","INF_RECYCLE_CURRENT",current,true);
+    if( current != NULL ){
+        int inum = current.ToInt();
+        inum++;
+        SetItem("basic/recycle","INF_RECYCLE_CURRENT",inum);
+    }
 }
 
 //------------------------------------------------------------------------------

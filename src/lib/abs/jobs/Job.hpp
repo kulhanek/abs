@@ -129,7 +129,7 @@ public:
     static bool AreRuntimeFiles(const CFileName& dir);
 
     /// 1.4) job input
-    ERetStatus JobInput(std::ostream& sout,bool allowallpaths);
+    ERetStatus JobInput(std::ostream& sout,bool allowallpaths,bool inputfrominfo);
 
     /// 2.0) decode resources
     /// decode resources
@@ -392,6 +392,9 @@ public:
 
     /// get current recycle job or 1 if general job
     int GetCurrentRecycleJob(void);
+
+    /// increment value INF_RECYCLE_CURRENT
+    void IncrementRecycleStage(void);
 
     /// is info file loaded
     bool IsInfoFileLoaded(void);

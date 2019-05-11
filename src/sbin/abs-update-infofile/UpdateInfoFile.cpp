@@ -79,6 +79,9 @@ bool CUpdateInfoFile::Run(void)
             return(false);
         }
     }
+    else if( Options.GetArgAction() == "incstage" ){
+        Job.IncrementRecycleStage();
+    }
     else{
         ES_ERROR("not implemented");
         return(false);

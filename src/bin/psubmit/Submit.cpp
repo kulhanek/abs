@@ -228,7 +228,7 @@ bool CSubmit::SubmitJobFull(void)
         return(false);
     }
 
-    ERetStatus retstat = Job->JobInput(vout,Options.GetOptAllowAllPaths());
+    ERetStatus retstat = Job->JobInput(vout,Options.GetOptAllowAllPaths(),false);
     if( retstat == ERS_FAILED ){
         ES_TRACE_ERROR("unable to set job input");
         return(false);
@@ -349,7 +349,7 @@ bool CSubmit::SubmitJobHeader(void)
         return(false);
     }
 
-    ERetStatus retstat = Job->JobInput(vout,Options.GetOptAllowAllPaths());
+    ERetStatus retstat = Job->JobInput(vout,Options.GetOptAllowAllPaths(),false);
     if( retstat == ERS_FAILED ){
         ES_TRACE_ERROR("unable to set job input");
         return(false);
@@ -422,7 +422,7 @@ bool CSubmit::SubmitJobCopy(int i)
 
     stringstream stmp;
 
-    ERetStatus retstat = Job->JobInput(stmp,Options.GetOptAllowAllPaths());
+    ERetStatus retstat = Job->JobInput(stmp,Options.GetOptAllowAllPaths(),false);
     if( retstat == ERS_FAILED ){
         ES_TRACE_ERROR("unable to set job input");
         return(false);

@@ -42,6 +42,7 @@ public:
         "      stop         - job was terminated\n"
         "      cliready     - CLI terminal is available\n"
         "      guiready     - GUI terminal is available"
+        "      incstage     - increment INF_RECYCLE_CURRENT"
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN

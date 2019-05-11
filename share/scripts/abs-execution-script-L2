@@ -589,7 +589,7 @@ if [[ $INF_NCPUS -gt $INF_TOTAL_NCPUS ]]; then
     printf "# Requested CPUs: %3d > All available CPUs: %3d\n" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
       echo "" >&2
       echo " >>> ERROR: Aborting job due to CPU request oversubscription (this should not happen)!" >&2
-      echo "                           *** REACTIVATE Infinity in this site ***                   " >&2
+      echo "                           *** REACTIVATE Infinity at this site ***                   " >&2
       echo "            If the problem persists, send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
       echo "" >&2
     exit 1
@@ -601,7 +601,7 @@ if [[ $INF_NGPUS -gt $INF_TOTAL_NGPUS ]]; then
     printf "# Requested GPUs: %3d > All available GPUs: %3d\n" "$INF_NGPUS" "$INF_TOTAL_NGPUS"
       echo "" >&2
       echo " >>> ERROR: Aborting job due to GPU request oversubscription (this should not happen)!" >&2
-      echo "                           *** REACTIVATE Infinity in this site ***                   " >&2
+      echo "                           *** REACTIVATE Infinity at this site ***                   " >&2
       echo "            If the problem persists, send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
       echo "" >&2
     exit 1
