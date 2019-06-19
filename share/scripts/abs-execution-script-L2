@@ -322,7 +322,7 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     echo ""
     export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
     rm -f "$INF_GPUFILE"
-            echo "# This node hostname   : $HOSTNAME"
+            echo    "# This node hostname: $HOSTNAME"
     cat $INF_MPIFILE | while read NODE MPISPEC; do
         (
             # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files of PBS
