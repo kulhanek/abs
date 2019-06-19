@@ -32,6 +32,7 @@ echo "##########################################################################
 echo
 echo "Initial job information (recovered from transmitted environment):"
 echo "--------------------------------------------------------------------------------"
+echo "Job ID               : $PBS_JOBID"
 echo "Job name             : $INF_JOB_NAME"
 echo "Job name suffix      : $INF_JOB_NAME_SUFFIX"
 echo "Job input machine    : $INF_INPUT_MACHINE"
@@ -141,7 +142,7 @@ $ABS_RSYNC --version
 
 # ==============================================================================
 
-# be sure that PBS_SERVER is not set, it is used default server from pbs_mom setup
+# be sure that PBS_SERVER is not set, default server name is taken from pbs_mom setup
 unset PBS_SERVER
 
 # ==============================================================================
@@ -173,6 +174,9 @@ source $ABS_ROOT/share/scripts/abs-execution-script-L6
 if [ -f "$AMS_HOST_CACHE" ]; then
     rm -f "$AMS_HOST_CACHE"
 fi
+
+# current time
+_DATE=`date`
 
 echo
 echo "################################################################################"

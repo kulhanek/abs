@@ -322,15 +322,30 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     echo ""
     export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
     rm -f "$INF_GPUFILE"
+            echo "# This node hostname   : $HOSTNAME"
     cat $INF_MPIFILE | while read NODE MPISPEC; do
         (
-            # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files
-            # and not to the standard and error outputs
-            echo "# Scanning GPU node : $NODE"
+            # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files of PBS
+            # and not to the standard and error streams, RT#196359
+            echo -n "# Scanning GPU node : $NODE"
             pbs_tmrsh $NODE sh -c "echo \$(hostname -f) gpus=\$CUDA_VISIBLE_DEVICES | ssh $HOSTNAME \"cat >> $INF_GPUFILE\""
-            if [ $? -ne 0 ]; then exit 1; fi
+            echo " -> exit code: $?"
          ) < /dev/null
     done 
+    if ! [ -f "$INF_GPUFILE" ]; then
+        # file was not created - try some fallback, RT#475300
+        # we cannot create INF_GPUFILE if more than 2 nodes were allocated
+        if [ $INF_NNODES -gt 1 ]; then
+            echo "" >&2
+            echo " >>> ERROR: INF_GPUFILE was not created due to computational node(s) misconfiguration!" >&2
+            echo "            As you reqested more than one computational node this error cannot be bypassed." >&2
+            echo "" >&2
+            exit 1
+        fi
+        # fallback for single node allocation
+        echo "# WARNING: Employing single node fallback for INF_GPUFILE creation ..."
+        echo "$INF_MAIN_NODE gpus=$CUDA_VISIBLE_DEVICES" >> $INF_GPUFILE
+    fi
     echo "# INF_GPUFILE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "# File: $INF_GPUFILE"
     cat "$INF_GPUFILE"
