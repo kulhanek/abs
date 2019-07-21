@@ -1456,6 +1456,7 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
     list<CJobPtr>::iterator ie = end();
 
     int total = 0;
+    int total_jobs = size();
     int processing = 0;
     int waiting = 0;
     int finished = 0;
@@ -1516,32 +1517,32 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
     }
 
     sout << "# ---------------------------------------------------------------------------------------------" << endl;
-//Total: 980 | Processing:   0 (  0%) | Waiting: 502 ( 51%) | Finished: 478 ( 48%)
+//Waiting: 502 ( 51%) | Processing:   0 (  0%) | Finished: 478 ( 48%) | Total: 980
 //Requires (re)submission:  49 (  5%)
 
-    sout << "# Total:" << right << setw(4) << total;
-
     int wper = 0;
-    if( total > 0 ) wper = 100*waiting / total;
+    if( total > 0 ) wper = 100*waiting / total_jobs;
     sout << " | Waiting:" << setw(4) << waiting << " (" << setw(3) << wper << "%)";
 
     int pper = 0;
-    if( total > 0 ) pper = 100*processing / total;
+    if( total > 0 ) pper = 100*processing / total_jobs;
     sout << " | Processing:" << setw(4) << processing << " (" << setw(3) << pper << "%)";
 
     int fper = 0;
     if( total > 0 ) fper = 100*finished / total;
-    sout << " | Finished:" << setw(4) << finished << " (" << setw(3) << fper << "%)" << endl;
+    sout << " | Finished:" << setw(4) << finished << " (" << setw(3) << fper << "%)";
+
+    sout << " | Total:" << right << setw(4) << total <<  endl;
 
     int rper = 0;
-    if( total > 0 ) rper = 100*resubmit / total;
+    if( total > 0 ) rper = 100*resubmit / total_jobs;
     sout << "# ";
     if( resubmit > 0 ) sout << "<b><red>";
     sout << "Requires (re)submission:" << setw(4) << resubmit << " (" << setw(3) << rper << "%)";
     if( resubmit > 0 ) sout << "</red></b>";
 
     int iper = 0;
-    if( total > 0 ) iper = 100*inconsistent / total;
+    if( total > 0 ) iper = 100*inconsistent / total_jobs;
     sout << " | ";
     if( inconsistent > 0 ) sout << "<b><red>";
     sout << "Inconsistent:" << setw(4) << inconsistent << " (" << setw(3) << iper << "%)";
