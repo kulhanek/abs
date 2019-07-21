@@ -251,6 +251,7 @@ void CJob::SetExternalOptions(void)
     WriteInfo("basic/external","INF_EXTERNAL_NAME_SUFFIX",false);
     WriteInfo("basic/external","INF_EXTERNAL_VARIABLES",false);
     WriteInfo("basic/external","INF_EXTERNAL_START_AFTER",false);
+    WriteInfo("basic/external","INF_EXTERNAL_FLAGS",false);
 }
 
 //------------------------------------------------------------------------------
