@@ -70,6 +70,8 @@ int CUpdateInfoFileOptions::CheckArguments(void)
     if( GetArgAction() == "stop" ) return(SO_CONTINUE);
     if( GetArgAction() == "cliready" ) return(SO_CONTINUE);
     if( GetArgAction() == "guiready" ) return(SO_CONTINUE);
+    if( GetArgAction() == "incstage" ) return(SO_CONTINUE);
+    if( GetArgAction() == "archive" ) return(SO_CONTINUE);
     if( IsVerbose() ){
         if( IsError == false ) fprintf(stderr,"\n");
         fprintf(stderr,"%s: action '%s' is not supported\n",

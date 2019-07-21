@@ -22,6 +22,7 @@
 #include "UpdateInfoFile.hpp"
 #include <ErrorSystem.hpp>
 #include <TerminalStr.hpp>
+#include <JobList.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -50,6 +51,10 @@ int CUpdateInfoFile::Init(int argc,char* argv[])
 
 bool CUpdateInfoFile::Run(void)
 {
+    if( Options.GetArgAction() == "archive" ){
+        return( ArchiveRuntimeFiles() );
+    }
+
     CSmallString info_file_name;
 
     if( Job.GetJobInfoFileName(info_file_name) == false ){
@@ -81,6 +86,7 @@ bool CUpdateInfoFile::Run(void)
     }
     else if( Options.GetArgAction() == "incstage" ){
         Job.IncrementRecycleStage();
+
     }
     else{
         ES_ERROR("not implemented");
@@ -92,6 +98,24 @@ bool CUpdateInfoFile::Run(void)
         ES_ERROR("unable to save info file");
         return(false);
     }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
+{
+    CJobList jobs;
+
+    // get all jobs in job input directory
+    jobs.InitByInfoFiles(".",false);
+
+    // keep finished or terminated jobs
+    jobs.KeepOnlyFinishedJobs();
+
+    // clean
+    jobs.ArchiveRuntimeFiles(Options.GetOptFormat());
 
     return(true);
 }

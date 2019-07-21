@@ -5,52 +5,29 @@ function archive_runtime_files() {
     if [ $# -ne 3 ]; then
         echo "" 1>&2
         echo "ERROR: Three arguments are required for the 'runtime' mode!" 1>&2
-        echo "       parchive runtime <start> <current> <format>" 1>&2
+        echo "       parchive runtime <dummy> <dummy> <format>" 1>&2
         echo "" 1>&2
         return 1
     fi
 
-    INF_START=$1
-    INF_CURRENT=$2
     INF_FORMAT=$3
-
-    # INF_CURRENT might be smaller than INF_START due to PRECYCLE_ICYCLES in precycle
-    if [ "$INF_START" -ge "$INF_CURRENT" ]; then
-        echo "# NOTE: the first run - no runtime files are archived"
-        return 0
-    fi
-    # rename files
-    OLD="$INF_JOB_NAME#"`printf "%03d" "$(($INF_CURRENT-1))"`
-    NEW=`printf "$INF_FORMAT" "$(($INF_CURRENT-1))"`
 
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "Data transfer: local mode ..."
-        echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
-        echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
-        echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
-        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
 
         cd $INF_INPUT_DIR
         if [ $? -ne 0 ]; then exit 1; fi
-        mv "${OLD}.info" "$INF_ARCHIVE_DIR/${NEW}.info"
-        mv "${OLD}.stdout" "$INF_ARCHIVE_DIR/${NEW}.stdout"
-        mv "${OLD}.infout" "$INF_ARCHIVE_DIR/${NEW}.infout"
-        rm -f "${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
+
+        $ABS_ROOT/sbin/abs-update-infofile archive --format "$INF_FORMAT"
+
     else
         echo "Data transfer: remote mode ..."
-        echo "${OLD}.info -> $INF_ARCHIVE_DIR/${NEW}.info"
-        echo "${OLD}.stdout -> $INF_ARCHIVE_DIR/${NEW}.stdout"
-        echo "${OLD}.infout -> $INF_ARCHIVE_DIR/${NEW}.infout"
-        echo "Removed: ${OLD}.infkey" "${OLD}.infex" "${OLD}.gpus" "${OLD}.nodes" "${OLD}.mpinodes"
 
         if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
             ssh $INF_INPUT_MACHINE \
                 "cd $INF_INPUT_DIR; \
                 if [ $? -ne 0 ]; then exit 1; fi; \
-                mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
-                mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
-                mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
-                rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\" \"${OLD}.mpinodes\""
+                $ABS_ROOT/sbin/abs-update-infofile archive --format \"$INF_FORMAT\""
         else
             if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "NO" ]; then
                 if [ -z "$INF_SURROGATE_MACHINES" ]; then
@@ -68,10 +45,7 @@ function archive_runtime_files() {
                         ssh $INF_INPUT_MACHINE \
                             "cd $INF_INPUT_DIR; \
                             if [ $? -ne 0 ]; then exit 1; fi; \
-                            mv \"${OLD}.info\" \"$INF_ARCHIVE_DIR/${NEW}.info\"; \
-                            mv \"${OLD}.stdout\" \"$INF_ARCHIVE_DIR/${NEW}.stdout\"; \
-                            mv \"${OLD}.infout\" \"$INF_ARCHIVE_DIR/${NEW}.infout\"; \
-                            rm -f \"${OLD}.infkey\" \"${OLD}.infex\" \"${OLD}.gpus\" \"${OLD}.nodes\" \"${OLD}.mpinodes\""
+                            $ABS_ROOT/sbin/abs-update-infofile archive --format \"$INF_FORMAT\""
                     else
                         echo "failure"
                     fi
@@ -162,7 +136,7 @@ case $1 in
         echo "" 1>&2
         echo " >>> ERROR: Unsupported action: $1" 1>&2
         echo "            Supported action: runtime | get | write | move" 1>&2
-        echo "                parchive runtime <start> <current> <format>" 1>&2
+        echo "                parchive runtime <dummy> <dummy> <format>" 1>&2
         echo "                parchive get    <file1> [file2] ..." 1>&2
         echo "                parchive tryget <file1> [file2] ..." 1>&2
         echo "                parchive write  <file1> [file2] ..." 1>&2
@@ -205,7 +179,11 @@ case $INF_MODE in
     runtime )
         inf-retry-cmd archive_runtime_files "$@"
         EXIT_CODE=$?
-        ;;     
+        ;;
+    autoruntime )
+        inf-retry-cmd archive_runtime_files_auto "$@"
+        EXIT_CODE=$?
+        ;;
     get )
         get_data_from_archive "$@"
         EXIT_CODE=$?

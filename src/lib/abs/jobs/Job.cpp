@@ -38,6 +38,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/format.hpp>
 #include <JobList.hpp>
 #include <PluginDatabase.hpp>
 #include <PluginObject.hpp>
@@ -4149,6 +4150,70 @@ CFileName CJob::GetJobInputPath(void)
     }
 
     return(cwd);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
+void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
+{
+    // CLEANME
+
+    CSmallString whole_name = GetJobName();
+    if( GetJobNameSuffix() != NULL ){
+        whole_name += GetJobNameSuffix();
+    }
+
+    // delete non-important runtime files
+    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill
+    CSmallString cmd;
+    cmd << "rm -f ";
+    cmd << whole_name << ".infex ";
+    cmd << whole_name << ".nodes ";
+    cmd << whole_name << ".gpus ";
+    cmd << whole_name << ".mpinodes ";
+    cmd << whole_name << ".infkey ";
+    cmd << whole_name << ".vncid ";
+    cmd << whole_name << ".vncpsw ";
+    cmd << whole_name << ".kill ";
+    system(cmd);
+
+    // archive *.info *.stdout *.infout
+    CFileName archive;
+    archive = GetItem("basic/recycle","INF_ARCHIVE_DIR",false);
+    if( archive == NULL ) return;
+
+    CSmallString scurrent_stage;
+    scurrent_stage = GetItem("basic/recycle","INF_RECYCLE_CURRENT",false);
+    if( scurrent_stage == NULL ) return;
+
+    int current_stage = scurrent_stage.ToInt();
+
+    stringstream str;
+    str << format(sformat) % current_stage;
+    CFileName dest_name(str.str());
+
+    archive = archive / dest_name;
+
+    cmd = NULL;
+    cmd << "mv ";
+    cmd << "'" << whole_name << ".info' ";
+    cmd << "'" << archive << ".info'";
+    system(cmd);
+
+    cmd = NULL;
+    cmd << "mv ";
+    cmd << "'" << whole_name << ".stdout' ";
+    cmd << "'" << archive << ".stdout'";
+    system(cmd);
+
+    cmd = NULL;
+    cmd << "mv ";
+    cmd << "'" << whole_name << ".infout' ";
+    cmd << "'" << archive << ".infout'";
+    system(cmd);
+
 }
 
 //==============================================================================

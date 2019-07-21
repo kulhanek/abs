@@ -423,6 +423,9 @@ public:
     /// activate proxy for GUI job
     void ActivateGUIProxy(void);
 
+    /// archive runtime files
+    void ArchiveRuntimeFiles(const CSmallString& sformat);
+
 // section of private data -----------------------------------------------------
 protected:
     bool            InfoFileLoaded;

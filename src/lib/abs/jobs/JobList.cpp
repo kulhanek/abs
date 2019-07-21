@@ -2137,6 +2137,20 @@ const CJobPtr CJobList::CreateNewJob(void)
     return(job_ptr);
 }
 
+//------------------------------------------------------------------------------
+
+void CJobList::ArchiveRuntimeFiles(const CSmallString& format)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    while( it != ie ){
+        CJobPtr p_jobptr = *it;
+        p_jobptr->ArchiveRuntimeFiles(format);
+        it++;
+    }
+}
+
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================

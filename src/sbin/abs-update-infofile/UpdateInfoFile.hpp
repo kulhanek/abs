@@ -45,6 +45,8 @@ public:
     private:
     CUpdateInfoFileOptions  Options;
     CJob                    Job;
+
+    bool ArchiveRuntimeFiles(void);
 };
 
 // -----------------------------------------------------------------------------

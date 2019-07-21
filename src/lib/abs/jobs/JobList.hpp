@@ -174,6 +174,9 @@ public:
     /// find job
     const CJobPtr FindJob(CJob* p_job);
 
+    // archive runtime files
+    void ArchiveRuntimeFiles(const CSmallString& format);
+
 // information methods ---------------------------------------------------------
     /// print info about all jobs
     void PrintInfos(std::ostream& sout);

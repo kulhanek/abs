@@ -43,6 +43,7 @@ public:
         "      cliready     - CLI terminal is available\n"
         "      guiready     - GUI terminal is available"
         "      incstage     - increment INF_RECYCLE_CURRENT"
+        "      archive      - archive runtime files"
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN
@@ -55,6 +56,7 @@ public:
         // options ------------------------------
         CSO_OPT(CSmallString,Agent)
         CSO_OPT(CSmallString,VNCID)
+        CSO_OPT(CSmallString,Format)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -85,6 +87,15 @@ public:
                     "vncid",                      /* long option name */
                     "ID",                           /* parametr name */
                     "vnc terminal id in the form of user@machine:display")   /* option description */
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(CSmallString,                           /* option type */
+                Format,                        /* option name */
+                NULL,                          /* default value */
+                false,                          /* is option mandatory */
+                '\0',                           /* short option name */
+                "format",                      /* long option name */
+                "STRING",                           /* parametr name */
+                "format for runtime file backup")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
