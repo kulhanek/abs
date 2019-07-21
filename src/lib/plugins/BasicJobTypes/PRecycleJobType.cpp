@@ -188,12 +188,14 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         sout << "<b><red> ERROR: The number of internal cycles (PRECYCLE_ICYCLES) is not provided!</red></b>" << endl;
         return(ERS_FAILED);
     }
-    int icycles = sicycles.ToInt();
-    sout << "# Internal cycles     : " << setw(4) << right << icycles << endl;
-    if( icycles <= 0 ){
-        sout << endl;
-        sout << "<b><red> ERROR: The number of internal cycles (PRECYCLE_ICYCLES) must be larger zero!</red></b>" << endl;
-        return(ERS_FAILED);
+    if( sicycles != "auto" ){
+        int icycles = sicycles.ToInt();
+        sout << "# Internal cycles     : " << setw(4) << right << icycles << endl;
+        if( icycles <= 0 ){
+            sout << endl;
+            sout << "<b><red> ERROR: The number of internal cycles (PRECYCLE_ICYCLES) must be larger than zero or \"auto\"!</red></b>" << endl;
+            return(ERS_FAILED);
+        }
     }
 
     //--------------------------------------------------------------------------
