@@ -123,7 +123,7 @@ bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
         return(true);
     }
 
-    vout << "Jobs for archiving ..." << std::endl;
+    vout << "Jobs for archiving (format: " << Options.GetOptFormat() << ")..." << std::endl;
     jobs.PrintInfosCompact(vout,false,false);
 
     // clean
