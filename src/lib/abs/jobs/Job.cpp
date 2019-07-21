@@ -2863,7 +2863,7 @@ void CJob::PrintBasicV3(std::ostream& sout)
     if( HasSection("basic/recycle") == true ){
         sout << " ";
         sout << format("%03d") % GetItem("basic/recycle","INF_RECYCLE_CURRENT",false).ToInt();
-        sout << " / ";
+        sout << "/";
         sout << format("%03d") % GetItem("basic/recycle","INF_RECYCLE_STOP",false).ToInt();
     }
     sout << ")" << endl;

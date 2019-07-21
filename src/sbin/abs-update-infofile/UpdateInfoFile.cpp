@@ -114,6 +114,9 @@ bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
     // keep finished or terminated jobs
     jobs.KeepOnlyFinishedJobs();
 
+    // sort by prepare date
+    jobs.SortByPrepareDateAndTime();
+
     CTerminalStr    console;
     CVerboseStr     vout;
     vout.Attach(console);
