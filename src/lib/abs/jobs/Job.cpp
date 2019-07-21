@@ -2859,7 +2859,14 @@ void CJob::PrintBasicV3(std::ostream& sout)
     sout << "Job ID           : " << GetItem("submit/job","INF_JOB_ID") << endl;
     }
     sout << "Job title        : " << GetItem("basic/jobinput","INF_JOB_TITLE") << " (Job type: ";
-    sout << GetItem("basic/jobinput","INF_JOB_TYPE") << ")" << endl;
+    sout << GetItem("basic/jobinput","INF_JOB_TYPE");
+    if( HasSection("basic/recycle") == true ){
+        sout << " ";
+        sout << format("%03d") % GetItem("basic/recycle","INF_RECYCLE_CURRENT",false).ToInt();
+        sout << " / ";
+        sout << format("%03d") % GetItem("basic/recycle","INF_RECYCLE_STOP",false).ToInt();
+    }
+    sout << ")" << endl;
 
     sout << "Job input dir    : " << GetItem("basic/jobinput","INF_INPUT_MACHINE");
     sout << ":" << GetItem("basic/jobinput","INF_INPUT_DIR") << endl;

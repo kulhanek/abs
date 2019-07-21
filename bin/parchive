@@ -11,6 +11,7 @@ function archive_runtime_files() {
     fi
 
     INF_FORMAT=$3
+    echo
 
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "Data transfer: local mode ..."

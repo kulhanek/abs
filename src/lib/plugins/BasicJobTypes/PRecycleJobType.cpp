@@ -372,7 +372,11 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     detected = true;
 
     stringstream ssufix;
-    ssufix << format("#%03d") % current;
+    if( job.GetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",false) == "+" ){
+        ssufix << format("+%03d") % current;
+    } else {
+        ssufix << format("#%03d") % current;
+    }
 
     job.SetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",ssufix.str().c_str());
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
