@@ -114,6 +114,18 @@ bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
     // keep finished or terminated jobs
     jobs.KeepOnlyFinishedJobs();
 
+    CTerminalStr    console;
+    CVerboseStr     vout;
+    vout.Attach(console);
+
+    if( jobs.GetNumberOfJobs() == 0 ){
+        vout << "No job runtime files to arhive ..." << std::endl;
+        return(true);
+    }
+
+    vout << "Jobs for archiving ..." << std::endl;
+    jobs.PrintInfosCompact(vout,false,false);
+
     // clean
     jobs.ArchiveRuntimeFiles(Options.GetOptFormat());
 
