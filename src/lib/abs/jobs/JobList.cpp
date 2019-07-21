@@ -197,15 +197,12 @@ void CJobList::KeepOnlyFinishedJobs(void)
 
     while( it != ie ){
         CJobPtr p_job = *it;
-        switch( p_job->GetJobBatchStatus() ){
-            case EJS_FINISHED:
-                // keep
-                it++;
-                continue;
-            default:
-                // delete
-                it = erase(it);
-                continue;
+        if( (p_job->GetJobInfoStatus() == EJS_FINISHED) || (p_job->GetJobBatchStatus() == EJS_FINISHED) ){
+            // keep
+            it++;
+        } else {
+            // delete
+            it = erase(it);
         }
     }
 }

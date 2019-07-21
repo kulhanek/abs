@@ -119,7 +119,7 @@ bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
     vout.Attach(console);
 
     if( jobs.GetNumberOfJobs() == 0 ){
-        vout << "No job runtime files to arhive ..." << std::endl;
+        vout << "No job runtime files to archive ..." << std::endl;
         return(true);
     }
 
