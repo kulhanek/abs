@@ -592,6 +592,7 @@ void CJobList::CleanJobs(void)
             CVerboseStr     vout;
             vout.Attach(console);
 
+            vout << endl;
             if( jobs.GetNumberOfJobs() == 0 ){
                 vout << "No job runtime files to clean ..." << std::endl;
                 break;
