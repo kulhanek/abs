@@ -129,7 +129,7 @@ bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
         return(true);
     }
 
-    vout << "Jobs for archiving (format: " << Options.GetOptFormat() << ")..." << std::endl;
+    vout << "Jobs for archiving (format: " << Options.GetOptFormat() << ") ..." << std::endl;
     jobs.PrintInfosCompact(vout,false,false);
 
     // archive
@@ -158,11 +158,11 @@ bool CUpdateInfoFile::CleanRuntimeFiles(void)
     vout.Attach(console);
 
     if( jobs.GetNumberOfJobs() == 0 ){
-        vout << "No job runtime files to archive ..." << std::endl;
+        vout << "No job runtime files to clean ..." << std::endl;
         return(true);
     }
 
-    vout << "Jobs for archiving (format: " << Options.GetOptFormat() << ")..." << std::endl;
+    vout << "Jobs for cleaning ..." << std::endl;
     jobs.PrintInfosCompact(vout,false,false);
 
     // clean
