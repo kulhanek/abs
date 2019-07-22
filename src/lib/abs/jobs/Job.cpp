@@ -1216,17 +1216,11 @@ void CJob::FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,boo
 
 ERetStatus CJob::ResubmitJob(bool verbose)
 {
-    // destroy start/stop/kill sections
-    DestroySection("submit");
-    DestroySection("start");
-    DestroySection("stop");
-    DestroySection("kill");
 
 // FIXME
     // it would be safer if the status of INF_EXTERNAL_START_AFTER would be checked before this job is submited
     // here we assume that the job was already terminated
     SetItem("basic/external","INF_EXTERNAL_START_AFTER","");
-
 
     // go to job directory
     CFileSystem::SetCurrentDir(GetInputDir());
@@ -1249,6 +1243,12 @@ ERetStatus CJob::ResubmitJob(bool verbose)
         }
         return(ERS_TERMINATE);
     }
+
+    // destroy start/stop/kill sections
+    DestroySection("submit");
+    DestroySection("start");
+    DestroySection("stop");
+    DestroySection("kill");
 
     // resources
     tmpout.str("");
@@ -1858,14 +1858,35 @@ void CJob::DetectJobCollection(void)
     CSmallString coll_id   = CShell::GetSystemVariable("INF_COLLECTION_ID");
 
     if( (coll_path == NULL) || (coll_name == NULL) || (coll_id == NULL) ) {
-        // no open collection
-        return;
+        // no open collection, try .collinfo file
+        if( CFileSystem::IsFile(".collinfo") == false ) return;
+
+        // try to read .collinfo file
+        ifstream ifs(".collinfo");
+        if( ! ifs ) return;
+
+        string id,path,name;
+        if( ! getline(ifs,id) ) return;
+        if( ! getline(ifs,path) ) return;
+        if( ! getline(ifs,name) ) return;
+
+        coll_id = id;
+        coll_path = path;
+        coll_name = name;
     }
 
     // setup collection
     SetItem("basic/collection","INF_COLLECTION_PATH",coll_path);
     SetItem("basic/collection","INF_COLLECTION_NAME",coll_name);
     SetItem("basic/collection","INF_COLLECTION_ID",coll_id);
+
+    // save .collinfo file
+    ofstream ofs(".collinfo");
+    if( ofs ){
+        ofs << coll_id << endl;
+        ofs << coll_path << endl;
+        ofs << coll_name << endl;
+    }
 }
 
 //==============================================================================

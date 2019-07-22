@@ -278,6 +278,7 @@ function inf-rsync-from-inputdir()
     echo "${INF_WHOLE_NAME}.stdout" >> $TMPDIR/${_TNAME_}.excluded
     echo "*#???.*"  >> $TMPDIR/${_TNAME_}.excluded
     echo "pjob???" >> $TMPDIR/${_TNAME_}.excluded
+    echo ".collinfo" >> $TMPDIR/${_TNAME_}.excluded
 
     if [ -n "$INF_EXCLUDED_FILES" ]; then
         echo "$INF_EXCLUDED_FILES" | tr ";" "\n" >> $TMPDIR/${_TNAME_}.excluded
