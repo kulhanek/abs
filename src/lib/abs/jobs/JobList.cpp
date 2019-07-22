@@ -2149,6 +2149,20 @@ void CJobList::ArchiveRuntimeFiles(const CSmallString& format)
     }
 }
 
+//------------------------------------------------------------------------------
+
+void CJobList::CleanRuntimeFiles(void)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    while( it != ie ){
+        CJobPtr p_jobptr = *it;
+        p_jobptr->CleanRuntimeFiles();
+        it++;
+    }
+}
+
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================

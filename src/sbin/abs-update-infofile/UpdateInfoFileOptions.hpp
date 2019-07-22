@@ -41,9 +41,10 @@ public:
         "      start        - job was started\n"
         "      stop         - job was terminated\n"
         "      cliready     - CLI terminal is available\n"
-        "      guiready     - GUI terminal is available"
-        "      incstage     - increment INF_RECYCLE_CURRENT"
-        "      archive      - archive runtime files"
+        "      guiready     - GUI terminal is available\n"
+        "      incstage     - increment INF_RECYCLE_CURRENT\n"
+        "      archive      - archive runtime files of finished jobs\n"
+        "      clean        - clean runtime files of finished jobs\n"
     CSO_PROG_DESC_END
 
     CSO_PROG_VERS_BEGIN

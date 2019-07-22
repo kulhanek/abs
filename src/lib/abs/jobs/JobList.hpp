@@ -177,6 +177,9 @@ public:
     // archive runtime files
     void ArchiveRuntimeFiles(const CSmallString& format);
 
+    // clean runtime files
+    void CleanRuntimeFiles(void);
+
 // information methods ---------------------------------------------------------
     /// print info about all jobs
     void PrintInfos(std::ostream& sout);

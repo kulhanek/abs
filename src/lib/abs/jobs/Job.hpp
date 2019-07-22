@@ -426,6 +426,9 @@ public:
     /// archive runtime files
     void ArchiveRuntimeFiles(const CSmallString& sformat);
 
+    /// clean runtime files
+    void CleanRuntimeFiles(void);
+
 // section of private data -----------------------------------------------------
 protected:
     bool            InfoFileLoaded;

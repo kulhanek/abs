@@ -47,6 +47,7 @@ public:
     CJob                    Job;
 
     bool ArchiveRuntimeFiles(void);
+    bool CleanRuntimeFiles(void);
 };
 
 // -----------------------------------------------------------------------------

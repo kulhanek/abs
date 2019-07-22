@@ -4269,6 +4269,36 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     system(cmd);
 }
 
+//------------------------------------------------------------------------------
+
+void CJob::CleanRuntimeFiles(void)
+{
+    // CLEANME
+
+    CSmallString whole_name = GetJobName();
+    if( GetJobNameSuffix() != NULL ){
+        whole_name += GetJobNameSuffix();
+    }
+
+    // delete all runtime files
+    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*info;*stdout;*infout
+    CSmallString cmd;
+    cmd << "rm -f ";
+    cmd << "'" << whole_name << ".infex' ";
+    cmd << "'" << whole_name << ".nodes' ";
+    cmd << "'" << whole_name << ".gpus' ";
+    cmd << "'" << whole_name << ".mpinodes' ";
+    cmd << "'" << whole_name << ".infkey' ";
+    cmd << "'" << whole_name << ".vncid' ";
+    cmd << "'" << whole_name << ".vncpsw' ";
+    cmd << "'" << whole_name << ".kill' ";
+    cmd << "'" << whole_name << ".info' ";
+    cmd << "'" << whole_name << ".stdout' ";
+    cmd << "'" << whole_name << ".infout' ";
+    // FUJ
+    system(cmd);
+}
+
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================

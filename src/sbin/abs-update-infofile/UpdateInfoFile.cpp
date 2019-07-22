@@ -54,6 +54,9 @@ bool CUpdateInfoFile::Run(void)
     if( Options.GetArgAction() == "archive" ){
         return( ArchiveRuntimeFiles() );
     }
+    if( Options.GetArgAction() == "clean" ){
+        return( CleanRuntimeFiles() );
+    }
 
     CSmallString info_file_name;
 
@@ -129,8 +132,41 @@ bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
     vout << "Jobs for archiving (format: " << Options.GetOptFormat() << ")..." << std::endl;
     jobs.PrintInfosCompact(vout,false,false);
 
-    // clean
+    // archive
     jobs.ArchiveRuntimeFiles(Options.GetOptFormat());
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CUpdateInfoFile::CleanRuntimeFiles(void)
+{
+    CJobList jobs;
+
+    // get all jobs in job input directory
+    jobs.InitByInfoFiles(".",false);
+
+    // keep finished or terminated jobs
+    jobs.KeepOnlyFinishedJobs();
+
+    // sort by prepare date
+    jobs.SortByPrepareDateAndTime();
+
+    CTerminalStr    console;
+    CVerboseStr     vout;
+    vout.Attach(console);
+
+    if( jobs.GetNumberOfJobs() == 0 ){
+        vout << "No job runtime files to archive ..." << std::endl;
+        return(true);
+    }
+
+    vout << "Jobs for archiving (format: " << Options.GetOptFormat() << ")..." << std::endl;
+    jobs.PrintInfosCompact(vout,false,false);
+
+    // clean
+    jobs.CleanRuntimeFiles();
 
     return(true);
 }
