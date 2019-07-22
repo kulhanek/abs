@@ -587,6 +587,8 @@ void CJobList::CleanJobs(void)
             jobs.SortByPrepareDateAndTime();
 
             CTerminalStr    console;
+            console.Attach(stderr); // due to _abs-collection
+
             CVerboseStr     vout;
             vout.Attach(console);
 
