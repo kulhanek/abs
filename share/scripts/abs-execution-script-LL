@@ -51,7 +51,6 @@ function inf-copy-from-inputdir()
     # any:workdir
     INF_AW_RSYNCOPTS="--chown=:`id -g -n`"
 
-    echo ""
     echo "# ------------------------------------------------------------------------------"
     echo "= inf-copy-from-inputdir:"
 
@@ -103,7 +102,6 @@ function inf-copy-from-inputdir()
 
 function inf-copy-to-inputdir() 
 {
-    echo ""
     echo "# ------------------------------------------------------------------------------"
     echo "= inf-copy-to-inputdir:"
 
@@ -163,7 +161,6 @@ function inf-copy-from-archive()
         shift
     done
 
-    echo ""
     echo "# ------------------------------------------------------------------------------"
     echo "= inf-copy-from-archive:"
 
@@ -215,7 +212,6 @@ function inf-copy-from-archive()
 
 function inf-copy-to-archive()
 {
-    echo ""
     echo "# ------------------------------------------------------------------------------"
     echo "= inf-copy-to-archive:"
 
@@ -267,7 +263,6 @@ function inf-copy-to-archive()
 
 function inf-rsync-from-inputdir()
 {
-    echo ""
     echo "# ------------------------------------------------------------------------------"
     echo "= inf-rsync-from-inputdir:"
     # create file with excluded files
@@ -343,7 +338,6 @@ function inf-rsync-from-inputdir()
 
 function inf-rsync-to-inputdir()
 {
-    echo ""
     echo "# ------------------------------------------------------------------------------"
     echo "= inf-rsync-to-inputdir:"
 

@@ -11,18 +11,17 @@ function archive_runtime_files() {
     fi
 
     INF_FORMAT=$3
-    echo
 
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
-        echo "Data transfer: local mode ..."
+        echo "# Data transfer       : local mode ..."
 
         cd $INF_INPUT_DIR
         if [ $? -ne 0 ]; then exit 1; fi
 
         $ABS_ROOT/sbin/abs-update-infofile archive --format "$INF_FORMAT"
 
-    else
-        echo "Data transfer: remote mode ..."
+    else   
+        echo "# Data transfer       : remote mode ..."
 
         if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
             ssh $INF_INPUT_MACHINE \
