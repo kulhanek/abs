@@ -823,9 +823,12 @@ bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
     variables << ",INF_STORAGE_DIR=" << job.GetStorageDir();
     variables << ",INF_JOB_KEY=" << job.GetJobKey();
     variables << ",ABS_ROOT=" << CShell::GetSystemVariable("ABS_ROOT");
-    variables << ",INF_COLLECTION_NAME=" << job.GetItem("basic/collection","INF_COLLECTION_NAME",true);
-    variables << ",INF_COLLECTION_PATH=" << job.GetItem("basic/collection","INF_COLLECTION_PATH",true);
-    variables << ",INF_COLLECTION_ID=" << job.GetItem("basic/collection","INF_COLLECTION_ID",true);
+    if( job.GetItem("basic/collection","INF_COLLECTION_ID",true) != NULL ) {
+        // optional info about job collection
+        variables << ",INF_COLLECTION_NAME=" << job.GetItem("basic/collection","INF_COLLECTION_NAME",true);
+        variables << ",INF_COLLECTION_PATH=" << job.GetItem("basic/collection","INF_COLLECTION_PATH",true);
+        variables << ",INF_COLLECTION_ID=" << job.GetItem("basic/collection","INF_COLLECTION_ID",true);
+    }
 
     if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",item) ){
         variables << ",INF_BOOT_SCRIPT=" << item;

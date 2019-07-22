@@ -1873,6 +1873,10 @@ void CJob::DetectJobCollection(void)
         coll_id = id;
         coll_path = path;
         coll_name = name;
+
+        // test if collection file exists
+        CFileName cofi = CFileName(coll_path) / CFileName(coll_name) + ".cofi";
+        if( CFileSystem::IsFile(cofi) == false ) return;
     }
 
     // setup collection
