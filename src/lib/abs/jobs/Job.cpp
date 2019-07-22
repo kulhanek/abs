@@ -4172,19 +4172,25 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     if( GetJobNameSuffix() != NULL ){
         whole_name += GetJobNameSuffix();
     }
+    bool autorecovery = false;
+    if( GetItem("basic/external","INF_EXTERNAL_FLAGS",false) == "+" ){
+        // this indicates autorecovery jobs
+        autorecovery = true;
+    }
 
     // delete non-important runtime files
     // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill
     CSmallString cmd;
     cmd << "rm -f ";
-    cmd << whole_name << ".infex ";
-    cmd << whole_name << ".nodes ";
-    cmd << whole_name << ".gpus ";
-    cmd << whole_name << ".mpinodes ";
-    cmd << whole_name << ".infkey ";
-    cmd << whole_name << ".vncid ";
-    cmd << whole_name << ".vncpsw ";
-    cmd << whole_name << ".kill ";
+    cmd << "'" << whole_name << ".infex' ";
+    cmd << "'" << whole_name << ".nodes' ";
+    cmd << "'" << whole_name << ".gpus' ";
+    cmd << "'" << whole_name << ".mpinodes' ";
+    cmd << "'" << whole_name << ".infkey' ";
+    cmd << "'" << whole_name << ".vncid' ";
+    cmd << "'" << whole_name << ".vncpsw' ";
+    cmd << "'" << whole_name << ".kill' ";
+    // FUJ
     system(cmd);
 
     // archive *.info *.stdout *.infout
@@ -4207,21 +4213,35 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     cmd = NULL;
     cmd << "mv ";
     cmd << "'" << whole_name << ".info' ";
-    cmd << "'" << archive << ".info'";
+    if( autorecovery ){
+        cmd << "'" << archive << ".info+'";
+    } else {
+        cmd << "'" << archive << ".info'";
+    }
+    // FUJ
     system(cmd);
 
     cmd = NULL;
     cmd << "mv ";
     cmd << "'" << whole_name << ".stdout' ";
-    cmd << "'" << archive << ".stdout'";
+    if( autorecovery ){
+        cmd << "'" << archive << ".stdout+'";
+    } else {
+        cmd << "'" << archive << ".stdout'";
+    }
+    // FUJ
     system(cmd);
 
     cmd = NULL;
     cmd << "mv ";
     cmd << "'" << whole_name << ".infout' ";
-    cmd << "'" << archive << ".infout'";
+    if( autorecovery ){
+        cmd << "'" << archive << ".infout+'";
+    } else {
+        cmd << "'" << archive << ".infout'";
+    }
+    // FUJ
     system(cmd);
-
 }
 
 //==============================================================================
