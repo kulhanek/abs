@@ -1893,6 +1893,13 @@ void CJob::DetectJobCollection(void)
     }
 }
 
+//------------------------------------------------------------------------------
+
+bool CJob::IsJobInCollection(void)
+{
+   return( GetItem("basic/collection","INF_COLLECTION_ID",true) != NULL );
+}
+
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
@@ -4193,6 +4200,10 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
 {
     // CLEANME
 
+    CFileName job_dir = GetItem("basic/jobinput","INF_INPUT_DIR",true);
+    if( job_dir == NULL ) return;
+    if( CFileSystem::SetCurrentDir(job_dir) == false ) return;
+
     CSmallString whole_name = GetJobName();
     if( GetJobNameSuffix() != NULL ){
         whole_name += GetJobNameSuffix();
@@ -4274,6 +4285,10 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
 void CJob::CleanRuntimeFiles(void)
 {
     // CLEANME
+
+    CFileName job_dir = GetItem("basic/jobinput","INF_INPUT_DIR",true);
+    if( job_dir == NULL ) return;
+    if( CFileSystem::SetCurrentDir(job_dir) == false ) return;
 
     CSmallString whole_name = GetJobName();
     if( GetJobNameSuffix() != NULL ){

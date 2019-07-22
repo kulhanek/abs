@@ -86,7 +86,8 @@ int CCollectionOptions::CheckArguments(void)
         (GetProgArg(1) == "create") ||
         (GetProgArg(1) == "close") ||
         (GetProgArg(1) == "submit") ||
-        (GetProgArg(1) == "kill") ) ){
+        (GetProgArg(1) == "kill")  ||
+        (GetProgArg(1) == "clean")) ){
         if( IsVerbose() ) {
             if( IsError == false ) fprintf(stderr,"\n");
             fprintf(stderr,"%s: wrong number of arguments, only two arguments for action %s\n",

@@ -120,6 +120,9 @@ public:
     /// keep only finished jobs
     void KeepOnlyFinishedJobs(void);
 
+    /// keep only finished jobs (P, F, K)
+    void KeepForClean(void);
+
     /// keep only moved jobs
     void KeepOnlyMovedJobs(void);
 
@@ -134,6 +137,9 @@ public:
 
     /// kill all jobs with info
     bool KillAllJobsWithInfo(std::ostream& sout,bool force);
+
+    /// clean jobs
+    void CleanJobs(void);
 
     /// load all info files
     bool LoadAllInfoFiles(void);

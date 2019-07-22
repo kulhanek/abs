@@ -38,6 +38,7 @@
 #include <AMSGlobalConfig.hpp>
 #include <ABSConfig.hpp>
 #include <boost/filesystem.hpp>
+#include <TerminalStr.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -197,7 +198,28 @@ void CJobList::KeepOnlyFinishedJobs(void)
 
     while( it != ie ){
         CJobPtr p_job = *it;
-        if( (p_job->GetJobInfoStatus() == EJS_FINISHED) || (p_job->GetJobBatchStatus() == EJS_FINISHED) ){
+        if( p_job->GetJobBatchStatus() == EJS_FINISHED ){
+            // keep
+            it++;
+        } else {
+            // delete
+            it = erase(it);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CJobList::KeepForClean(void)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    while( it != ie ){
+        CJobPtr p_job = *it;
+        if( (p_job->GetJobInfoStatus() == EJS_PREPARED) ||
+            (p_job->GetJobInfoStatus() == EJS_FINISHED) ||
+            (p_job->GetJobInfoStatus() == EJS_KILLED) ){
             // keep
             it++;
         } else {
@@ -537,6 +559,50 @@ bool CJobList::KillAllJobsWithInfo(std::ostream& sout,bool force)
     }
 
     return(true);
+}
+
+//------------------------------------------------------------------------------
+
+void CJobList::CleanJobs(void)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    while( it != ie ){
+        CJobPtr p_job = *it;
+        it++;
+
+        CFileName job_dir = p_job->GetItem("basic/jobinput","INF_INPUT_DIR",true);
+        if( (job_dir != NULL) && CFileSystem::SetCurrentDir(job_dir) ){
+
+            CJobList jobs;
+
+            // get all jobs in job input directory
+            jobs.InitByInfoFiles(".",false);
+
+            // keep finished or terminated jobs
+            jobs.KeepForClean();
+
+            // sort by prepare date
+            jobs.SortByPrepareDateAndTime();
+
+            CTerminalStr    console;
+            CVerboseStr     vout;
+            vout.Attach(console);
+
+            if( jobs.GetNumberOfJobs() == 0 ){
+                vout << "No job runtime files to clean ..." << std::endl;
+                break;
+            }
+
+            vout << "Jobs for cleaning ..." << std::endl;
+            jobs.PrintInfosCompact(vout,false,false);
+
+            // clean
+            jobs.CleanRuntimeFiles();
+        }
+
+    }
 }
 
 //------------------------------------------------------------------------------

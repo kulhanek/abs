@@ -115,7 +115,7 @@ bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
     jobs.InitByInfoFiles(".",false);
 
     // keep finished or terminated jobs
-    jobs.KeepOnlyFinishedJobs();
+    jobs.KeepForClean();
 
     // sort by prepare date
     jobs.SortByPrepareDateAndTime();
@@ -148,7 +148,7 @@ bool CUpdateInfoFile::CleanRuntimeFiles(void)
     jobs.InitByInfoFiles(".",false);
 
     // keep finished or terminated jobs
-    jobs.KeepOnlyFinishedJobs();
+    jobs.KeepForClean();
 
     // sort by prepare date
     jobs.SortByPrepareDateAndTime();

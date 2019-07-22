@@ -259,7 +259,8 @@ bool CSubmit::SubmitJobFull(void)
         return(false);
     }
 
-    if( Job->SubmitJob(vout,false,Options.GetOptVerbose(),false) == false ){
+    // in resubmit mode - ignore collections
+    if( Job->SubmitJob(vout,false,Options.GetOptVerbose(),Options.GetOptResubmitMode()) == false ){
         ES_TRACE_ERROR("unable to submit job");
         return(false);
     }
@@ -370,6 +371,14 @@ bool CSubmit::SubmitJobHeader(void)
     // last job check
     if( Job->LastJobCheck(vout) == false ){
         ES_TRACE_ERROR("job submission was canceled by last check procedure");
+        return(false);
+    }
+
+    if( Job->IsJobInCollection() ){
+        vout << endl;
+        vout << " <b><red>ERROR: It is not possible to submit multiple copies of a job, which is in a collection!</red></b>" << endl;
+        vout << " <b><red>       Aborting the job submission ...</red></b>" << endl;
+        ES_TRACE_ERROR("multiple copies not allowed for job in collection");
         return(false);
     }
 

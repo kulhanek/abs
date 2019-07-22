@@ -515,6 +515,50 @@ bool CCollection::Run(void)
 
         return(true);
 // -------------------------------------------------------------------
+// clean
+// -------------------------------------------------------------------
+    } else if( action == "clean" ) {
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
+            return(false);
+        }
+
+        // update status of live jobs
+        Jobs.UpdateJobStatuses();
+
+        // print info
+        Jobs.PrintCollectionInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
+
+        // ask for kill?
+        if( ! Options.GetOptAssumeYes() ){
+            vout << endl;
+            vout << "Do you want to clean collection jobs (YES/NO)?" << endl;
+            vout << "> ";
+
+            string answer;
+            cin >> answer;
+
+            CSmallString sanswer(answer.c_str());
+            sanswer.ToUpperCase();
+
+            if( sanswer != "YES" ){
+                vout << "No jobs were cleaned!" << endl;
+                return(true);
+            }
+        } else {
+            vout << endl;
+        }
+
+        vout << "Jobs will be cleaned!" << endl;
+
+        Jobs.CleanJobs();
+
+        vout << endl;
+        vout << "Done." << endl;
+
+        return(true);
+// -------------------------------------------------------------------
 // addjob
 // -------------------------------------------------------------------
     } else if( action == "addjob" ){

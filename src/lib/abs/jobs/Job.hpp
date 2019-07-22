@@ -429,6 +429,9 @@ public:
     /// clean runtime files
     void CleanRuntimeFiles(void);
 
+    /// is job in collections?
+    bool IsJobInCollection(void);
+
 // section of private data -----------------------------------------------------
 protected:
     bool            InfoFileLoaded;
