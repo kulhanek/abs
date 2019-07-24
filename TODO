@@ -1,9 +1,11 @@
 completition - final fixes
 
-
 rsync: Disk quota exceeded (122)
 
-
+pcollection
+    addjob
+    rmjob
+        update .colinfo file in the job input directory
 
 
 

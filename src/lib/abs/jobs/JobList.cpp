@@ -1447,12 +1447,61 @@ void CJobList::SaveCollectionJobs(CXMLElement* p_ele)
 //------------------------------------------------------------------------------
 
 bool CJobList::AddJobByPath(const CFileName& path)
-{
+{    
+    // save .collinfo file
+    CFileName coll_info = path / ".collinfo";
+    ofstream ofs(coll_info);
+    if( ofs ){
+        ofs << CollectionID << endl;
+        ofs << CollectionPath << endl;
+        ofs << CollectionName << endl;
+    }
+    if( ! ofs ){
+        CSmallString error;
+        error << "unable to save collection info (" << coll_info << ")";
+        ES_ERROR(error);
+        return(false);
+    }
+
     CJobList list;
     list.InitByInfoFiles(path,false);
     list.SortByPrepareDateAndTime();
     if( list.GetNumberOfJobs() == 0 ) return(false);
     AddJob(list.back());
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CJobList::AddJobDirContainer(const CFileName& path)
+{
+    if( CFileSystem::IsDirectory(path) == false ){
+        CSmallString error;
+        error << "the job directory (" << path << ") does not exist";
+        ES_ERROR(error);
+        return(false);
+    }
+
+    // save .collinfo file
+    CFileName coll_info = path / ".collinfo";
+    ofstream ofs(coll_info);
+    if( ofs ){
+        ofs << CollectionID << endl;
+        ofs << CollectionPath << endl;
+        ofs << CollectionName << endl;
+    }
+    if( ! ofs ){
+        CSmallString error;
+        error << "unable to save collection info (" << coll_info << ")";
+        ES_ERROR(error);
+        return(false);
+    }
+
+    CJobPtr p_job = CJobPtr(new CJob);
+    p_job->SetSimpleJobIdentification("dirjob",ABSConfig.GetHostName(),path);
+    push_back(p_job);
+
     return(true);
 }
 
@@ -1489,6 +1538,14 @@ bool CJobList::RemoveCollectionJob(int cid)
     int icid = 1;
     while( it != ie ){
         if( icid == cid ){
+            CJobPtr p_job = *it;
+            // try to remove collinfo
+            CFileName job_dir = p_job->GetItem("basic/jobinput","INF_INPUT_MACHINE",true);
+            if( CFileSystem::IsDirectory(job_dir) ){
+                CFileName coll_info = job_dir / ".collinfo";
+                CFileSystem::RemoveFile(coll_info,true);
+            }
+
             // it is part of collection - remove it
             it = erase(it);
             return(true);
@@ -1586,12 +1643,12 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
     }
 
     sout << "# ---------------------------------------------------------------------------------------------" << endl;
-//Waiting: 502 ( 51%) | Processing:   0 (  0%) | Finished: 478 ( 48%) | Total: 980
-//Requires (re)submission:  49 (  5%)
+//# Waiting: 502 ( 51%) | Processing:   0 (  0%) | Finished: 478 ( 48%) | Total: 980
+//# Requires (re)submission:  49 (  5%)
 
     int wper = 0;
     if( total > 0 ) wper = 100*waiting / total_jobs;
-    sout << " | Waiting:" << setw(4) << waiting << " (" << setw(3) << wper << "%)";
+    sout << "# Waiting:" << setw(4) << waiting << " (" << setw(3) << wper << "%)";
 
     int pper = 0;
     if( total > 0 ) pper = 100*processing / total_jobs;

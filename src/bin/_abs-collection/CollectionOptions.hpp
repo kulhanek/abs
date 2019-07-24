@@ -55,6 +55,8 @@ class CCollectionOptions : public CSimpleOptions {
         "               perapre all <u>job</u> and add them to <u>collname</u> collection\n"
         "   <b><cyan>addjob</cyan></b> path\n"
         "               add job with <u>path</u> to <u>collname</u> collection\n"
+        "   <b><cyan>adddir</cyan></b> path\n"
+        "               add fake job with <u>path</u> to <u>collname</u> collection\n"
         "   <b><cyan>rmjob</cyan></b> jobcid\n"
         "               remove job with <u>jobcid</u> from <u>collname</u>\n"
         "   <b><cyan>submit</cyan></b>      submit all jobs in the collection <u>collname</u>\n"

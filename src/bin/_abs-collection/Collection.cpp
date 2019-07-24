@@ -592,6 +592,40 @@ bool CCollection::Run(void)
             return(false);
         }
         return(true);
+// -------------------------------------------------------------------
+// adddir
+// -------------------------------------------------------------------
+    } else if( action == "adddir" ){
+
+        if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
+            return(false);
+        }
+
+        // update status of live jobs
+        Jobs.UpdateJobStatuses();
+
+        // print info
+        Jobs.PrintCollectionInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
+
+        // add job dir
+        if( Jobs.AddJobDirContainer(Options.GetProgArg(2)) == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to add job directory '" << Options.GetProgArg(2) << "' to collection!</red></b>" << endl;
+            return(false);
+        }
+
+        vout << endl;
+        vout << "Job directory '" << Options.GetProgArg(2) << "' was added to collection." << endl;
+
+        // save collection
+        if( Jobs.SaveCollection() == false ){
+            vout << endl;
+            vout << "<b><red> ERROR: Unable to save collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
+            return(false);
+        }
+        return(true);
 
 // -------------------------------------------------------------------
 // rmjob

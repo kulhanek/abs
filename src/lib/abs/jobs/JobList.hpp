@@ -80,6 +80,9 @@ public:
     /// add job from path
     bool AddJobByPath(const CFileName& path);
 
+    /// add fake job by path
+    bool AddJobDirContainer(const CFileName& path);
+
     /// remove job from collection
     bool RemoveCollectionJob(int cid);
 
@@ -245,6 +248,8 @@ private:
     // helper methods
     bool IsJobSelected(CJobPtr p_job,struct SExpression* p_expr);
     bool IsJobSelected(CJobPtr p_job,struct SSelection* p_sel);
+
+    friend class CJob;
 };
 
 // -----------------------------------------------------------------------------
