@@ -1540,7 +1540,7 @@ bool CJobList::RemoveCollectionJob(int cid)
         if( icid == cid ){
             CJobPtr p_job = *it;
             // try to remove collinfo
-            CFileName job_dir = p_job->GetItem("basic/jobinput","INF_INPUT_MACHINE",true);
+            CFileName job_dir = p_job->GetItem("basic/jobinput","INF_INPUT_DIR",true);
             if( CFileSystem::IsDirectory(job_dir) ){
                 CFileName coll_info = job_dir / ".collinfo";
                 CFileSystem::RemoveFile(coll_info,true);
