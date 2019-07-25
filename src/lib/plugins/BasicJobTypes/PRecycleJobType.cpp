@@ -374,7 +374,7 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     detected = true;
 
     stringstream ssufix;
-    if( job.GetItem("basic/external","INF_EXTERNAL_FLAGS",false) == "+" ){
+    if( job.GetItem("basic/external","INF_EXTERNAL_FLAGS",true) == "+" ){
         ssufix << format("+%03d") % current;
     } else {
         ssufix << format("#%03d") % current;

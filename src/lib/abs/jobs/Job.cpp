@@ -4217,7 +4217,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
         whole_name += GetJobNameSuffix();
     }
     bool autorecovery = false;
-    if( GetItem("basic/external","INF_EXTERNAL_FLAGS",false) == "+" ){
+    if( GetItem("basic/external","INF_EXTERNAL_FLAGS",true) == "+" ){
         // this indicates autorecovery jobs
         autorecovery = true;
     }
