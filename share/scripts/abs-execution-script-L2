@@ -518,6 +518,14 @@ pnodes -j "$INF_JOB_ID"
 # total number of CPUs on exec nodes
 INF_MAX_NCPUS=`pnodes -j "$INF_JOB_ID" --stat | grep ntotcpus | awk '{ print $2; }'`
 
+if [ -z "$INF_MAX_NCPUS" ]; then
+    echo "" >&2
+    echo " >>> ERROR: INF_MAX_NCPUS is not set properly!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
+fi
+
 # encode cpusets
 read INF_CPUSET < /proc/self/cpuset
 if [ "$INF_CPUSET" != "/" ]; then

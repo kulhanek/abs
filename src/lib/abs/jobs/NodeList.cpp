@@ -202,10 +202,6 @@ void CNodeList::PrintStatistics(std::ostream& sout)
 
 void CNodeList::PrintTechStatistics(std::ostream& sout)
 {
-    if( (NodeGroups.size() == 1) && (AllProps.size() == 0) ){
-        return;
-    }
-
     int tot_cpus = 0;
     int free_cpus = 0;
     int tot_gpus = 0;
