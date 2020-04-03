@@ -60,6 +60,12 @@ if [[ -v CUDA_VISIBLE_DEVICES ]]; then
     fi
 fi
 
+# RT#659657
+if [[ (-f "$HOME/.k5login") && (`stat --format=%a "$HOME/.k5login"` != 644) ]]; then
+    echo ".k5login exists with incorrect access rights, fixing to 644 ..."
+    chmod 644 "$HOME/.k5login"
+fi
+
 echo ""
 echo "#-------------------------------------------------------------------------------"
 echo "# L0: Booting the AMS/ABS environments ..."
