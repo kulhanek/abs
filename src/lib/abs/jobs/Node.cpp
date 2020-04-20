@@ -250,8 +250,11 @@ void CNode::PrintJobsInfo(std::ostream& sout,const std::string& jobid)
         int    nslots = JobSlots[job].size();
         std::string sslots = join(JobSlots[job],"/");
      // sout << "# ------------ ";
-        if( (jobid == job) || jobid.empty() ){
+        if( jobid.empty() ){
             sout << "  > <b><blue>";
+            sout << job << "(ncpus=" << nslots << ",slots=" << sslots <<")</blue></b>" << std::endl;
+        } else if( jobid == job){
+            sout << "  *** <b><blue>";
             sout << job << "(ncpus=" << nslots << ",slots=" << sslots <<")</blue></b>" << std::endl;
         } else {
             sout << "  > <blue>";
