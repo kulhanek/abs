@@ -513,7 +513,7 @@ echo "# ------------------------------------------------------------------------
 
 echo ""
 echo "# Summary of execution nodes ..."
-pnodes -j "$INF_JOB_ID" --slots
+pnodes -j "$INF_JOB_ID" --jobs
 
 # total number of CPUs on exec nodes
 INF_MAX_NCPUS=`pnodes -j "$INF_JOB_ID" --stat | grep ntotcpus | awk '{ print $2; }'`
