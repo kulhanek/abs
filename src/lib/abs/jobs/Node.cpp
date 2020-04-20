@@ -254,7 +254,7 @@ void CNode::PrintJobsInfo(std::ostream& sout,const std::string& jobid)
             sout << "  > <b><blue>";
             sout << job << "(ncpus=" << nslots << ",slots=" << sslots <<")</blue></b>" << std::endl;
         } else if( jobid == job){
-            sout << "  *** <b><blue>";
+            sout << "++> <b><blue>";
             sout << job << "(ncpus=" << nslots << ",slots=" << sslots <<")</blue></b>" << std::endl;
         } else {
             sout << "  > <blue>";
