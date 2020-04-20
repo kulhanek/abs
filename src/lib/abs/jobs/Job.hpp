@@ -231,6 +231,9 @@ public:
     /// get job id
     const CSmallString GetJobID(void);
 
+    /// get full job id (including server name)
+    const CSmallString GetBatchJobID(void);
+
     /// get job key
     const CSmallString GetJobKey(void);
 

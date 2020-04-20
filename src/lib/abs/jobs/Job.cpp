@@ -3486,6 +3486,15 @@ const CSmallString CJob::GetJobID(void)
 
 //------------------------------------------------------------------------------
 
+const CSmallString CJob::GetBatchJobID(void)
+{
+    CSmallString id = GetItem("batch/job","INF_JOB_ID");
+    CSmallString sv = GetItem("batch/job","INF_SERVER_NAME");
+    return(id + "." + sv);
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallString CJob::GetJobKey(void)
 {
     CSmallString rv = GetItem("basic/jobinput","INF_JOB_KEY");
