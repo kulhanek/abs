@@ -25,6 +25,7 @@
 #include "PBSProAttr.hpp"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/format.hpp>
 
@@ -92,7 +93,9 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
             if( slist.size() == 2 ){
                 string job = slist[0];
                 string sid = slist[1];
-                JobList.insert(slist[0]);
+                trim(job);
+                trim(sid);
+                JobList.insert(job);
                 JobSlots[job].push_back(sid);
             }
             it++;
