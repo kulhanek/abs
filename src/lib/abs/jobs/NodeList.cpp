@@ -54,7 +54,7 @@ CNodeList::CNodeList(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-void CNodeList::PrintInfos(std::ostream& sout,bool include_jobs)
+void CNodeList::PrintInfos(std::ostream& sout,bool include_jobs,const std::string& jobid)
 {
     CTerminal   term;
     int ncolumns = term.GetNumberOfColumns();
@@ -115,7 +115,7 @@ void CNodeList::PrintInfos(std::ostream& sout,bool include_jobs)
             CNodePtr p_node = *it;
             p_node->PrintLineInfo(sout,p_group->CommonProps,ncolumns);
             if( include_jobs ){
-                p_node->PrintJobsInfo(sout);
+                p_node->PrintJobsInfo(sout,jobid);
             }
 
             tot_cpus += p_node->GetNumOfCPUs();

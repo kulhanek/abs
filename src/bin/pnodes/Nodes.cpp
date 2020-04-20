@@ -142,6 +142,7 @@ bool CNodes::Run(void)
         return(true);
     }
 
+    std::string jobid;   // epty if not set
     if( Options.IsOptJobSet() == false ){
         // all nodes
         if( BatchServers.GetNodes() == false ){
@@ -163,6 +164,7 @@ bool CNodes::Run(void)
             ES_ERROR("unable to load job nodes");
             return(false);
         }
+        jobid = job->GetJobID();
     }
 
     if( Options.GetOptKeepAll() == false ) {
@@ -220,7 +222,7 @@ bool CNodes::Run(void)
 
     if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
         // list individual nodes
-        NodeList.PrintInfos(vout,Options.GetOptPrintJobs());
+        NodeList.PrintInfos(vout,Options.GetOptPrintJobs(),jobid);
 
         // print final stats
         NodeList.PrintStatistics(vout);

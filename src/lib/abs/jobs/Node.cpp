@@ -240,7 +240,7 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
 
 //------------------------------------------------------------------------------
 
-void CNode::PrintJobsInfo(std::ostream& sout)
+void CNode::PrintJobsInfo(std::ostream& sout,const std::string& jobid)
 {
     std::set<std::string>::iterator it = JobList.begin();
     std::set<std::string>::iterator ie = JobList.end();
@@ -250,8 +250,14 @@ void CNode::PrintJobsInfo(std::ostream& sout)
         int    nslots = JobSlots[job].size();
         std::string sslots = join(JobSlots[job],"/");
      // sout << "# ------------ ";
-        sout << "  > <b><blue>";
-        sout << job << "(ncpus=" << nslots << ",slots=" << sslots <<")</blue></b>" << std::endl;
+        if( jobid == job ){
+            sout << "  > <b><blue>";
+            sout << job << "(ncpus=" << nslots << ",slots=" << sslots <<")</blue></b>" << std::endl;
+        } else {
+            sout << "  > <blue>";
+            sout << job << "(ncpus=" << nslots << ",slots=" << sslots <<")</blue>" << std::endl;
+        }
+
         it++;
     }
 }

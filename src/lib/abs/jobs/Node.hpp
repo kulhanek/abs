@@ -49,7 +49,7 @@ public:
     void PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops,int ncolumns);
 
     /// print jobs on the node
-    void PrintJobsInfo(std::ostream& sout);
+    void PrintJobsInfo(std::ostream& sout,const std::string& jobid);
 
     /// get node name
     const CSmallString& GetName(void) const;
