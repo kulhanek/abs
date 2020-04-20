@@ -240,6 +240,23 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
 
 //------------------------------------------------------------------------------
 
+void CNode::PrintJobsInfo(std::ostream& sout)
+{
+    std::set<std::string>::iterator it = JobList.begin();
+    std::set<std::string>::iterator ie = JobList.end();
+
+    while( it != ie ){
+        std::string job = *it;
+        int    nslots = JobSlots[job].size();
+     // sout << "# ------------ ";
+        sout << "               <green>";
+        sout << job << " (ncpus=" << nslots << ")</green>" << std::endl;
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallString& CNode::GetName(void) const
 {
     return(Name);

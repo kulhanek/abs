@@ -74,11 +74,33 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
     get_attribute(p_node->attribs,"resources_available","scratch_shared",ScratchShared);
     get_attribute(p_node->attribs,"resources_available","scratch_ssd",ScratchSSD);
 
-    // queue list
-    get_attribute(p_node->attribs,"resources_available","queue_list",Queues);
-
     std::string tmp;
 
+    // parse jobs
+    get_attribute(p_node->attribs,"jobs",NULL,Jobs);
+    if( Jobs != NULL ){
+        tmp = Jobs;
+        std::vector<string> jlist;
+        split(jlist,tmp,is_any_of(","));
+        std::vector<string>::iterator it = jlist.begin();
+        std::vector<string>::iterator ie = jlist.end();
+
+        while( it != ie ){
+            string slot = *it;
+            std::vector<string> slist;
+            split(slist,slot,is_any_of("/"));
+            if( slist.size() == 2 ){
+                string job = slist[0];
+                int    sid  = std::stoi(slist[1]);
+                JobList.insert(slist[0]);
+                JobSlots[job].push_back(sid);
+            }
+            it++;
+        }
+    }
+
+    // queue list
+    get_attribute(p_node->attribs,"resources_available","queue_list",Queues);
     tmp = string(Queues);
     if( ! tmp.empty() ) split(QueueList,tmp,is_any_of(","));
 

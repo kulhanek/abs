@@ -27,6 +27,7 @@
 #include <vector>
 #include <list>
 #include <set>
+#include <map>
 #include <iostream>
 
 // -----------------------------------------------------------------------------
@@ -46,6 +47,9 @@ public:
 // methods ---------------------------------------------------------------------
     /// print line info about the node
     void PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops,int ncolumns);
+
+    /// print jobs on the node
+    void PrintJobsInfo(std::ostream& sout);
 
     /// get node name
     const CSmallString& GetName(void) const;
@@ -136,7 +140,8 @@ protected:
     CSmallString                Type;
 
     CSmallString                Jobs;
-    std::vector<std::string>    JobList;
+    std::set<std::string>       JobList;        // unique list of jobs
+    std::map<std::string, std::vector<int> >  JobSlots;
 
     CSmallString                Properties;
     std::vector<std::string>    PropList;
