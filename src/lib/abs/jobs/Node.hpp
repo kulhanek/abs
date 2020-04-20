@@ -141,7 +141,7 @@ protected:
 
     CSmallString                Jobs;
     std::set<std::string>       JobList;        // unique list of jobs
-    std::map<std::string, std::vector<int> >  JobSlots;
+    std::map<std::string, std::vector<std::string> >  JobSlots;
 
     CSmallString                Properties;
     std::vector<std::string>    PropList;

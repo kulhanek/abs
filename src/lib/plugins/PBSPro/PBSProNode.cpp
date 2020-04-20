@@ -91,7 +91,7 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
             split(slist,slot,is_any_of("/"));
             if( slist.size() == 2 ){
                 string job = slist[0];
-                int    sid  = std::stoi(slist[1]);
+                string sid = slist[1];
                 JobList.insert(slist[0]);
                 JobSlots[job].push_back(sid);
             }

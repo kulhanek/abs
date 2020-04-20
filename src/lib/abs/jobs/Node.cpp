@@ -248,9 +248,10 @@ void CNode::PrintJobsInfo(std::ostream& sout)
     while( it != ie ){
         std::string job = *it;
         int    nslots = JobSlots[job].size();
+        std::string sslots = join(JobSlots[job],"/");
      // sout << "# ------------ ";
-        sout << "               <green>";
-        sout << job << " (ncpus=" << nslots << ")</green>" << std::endl;
+        sout << "  ><bold><blue>";
+        sout << job << "(ncpus=" << nslots << ",slots=" << sslots <<")</blue></bold>" << std::endl;
         it++;
     }
 }
