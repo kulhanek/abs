@@ -164,7 +164,7 @@ bool CNodes::Run(void)
             ES_ERROR("unable to load job nodes");
             return(false);
         }
-        jobid = job->GetJobID();
+        jobid = job->GetJobID() + "." + job->GetServerName();
     }
 
     if( Options.GetOptKeepAll() == false ) {
