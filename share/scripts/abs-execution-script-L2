@@ -545,7 +545,8 @@ if [ "$INF_MPI_NCPUS" == "$INF_NCPUS" ]; then
     case "$INF_EXEC_TYPE" in
         cpuset|exclusive)
             export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
-            export INF_OPENMPI2_SPEC="-report-bindings -bind-to core"
+            export INF_OPENMPI2_SPEC="-display-map -output-proctable -display-allocation -report-bindings -bind-to core"
+            export INF_OPENMPI3_SPEC="-display-map -output-proctable -display-allocation -report-bindings -bind-to core"
             ;;
     esac
 else
@@ -553,7 +554,8 @@ else
     case "$INF_EXEC_TYPE" in
         cpuset|exclusive)
             export INF_OPENMPI1_SPEC="--not-supported-by-infinity"
-            export INF_OPENMPI2_SPEC="-report-bindings -map-by socket -bind-to core"
+            export INF_OPENMPI2_SPEC="-display-map -output-proctable -display-allocation -report-bindings -map-by socket -bind-to core"
+            export INF_OPENMPI3_SPEC="-display-map -output-proctable -display-allocation -report-bindings -map-by socket -bind-to core"
             ;;
         *)
             echo "" >&2
@@ -580,7 +582,7 @@ echo "INF_CPUSET             = $INF_CPUSET"
 echo "INF_EXEC_TYPE          = $INF_EXEC_TYPE"
 echo "INF_OPENMPI1_SPEC      = $INF_OPENMPI1_SPEC"
 echo "INF_OPENMPI2_SPEC      = $INF_OPENMPI2_SPEC"
-
+echo "INF_OPENMPI3_SPEC      = $INF_OPENMPI3_SPEC"
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
