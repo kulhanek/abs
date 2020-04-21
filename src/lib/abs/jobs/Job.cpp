@@ -323,7 +323,7 @@ bool CJob::CheckRuntimeFiles(std::ostream& sout,bool ignore)
 bool CJob::AreRuntimeFiles(const CFileName& dir)
 {
     bool            runtime_files = false;
-    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill";
+    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*.hwtopo";
     char*           p_filter;
     char*           p_buffer = NULL;
 
@@ -4232,7 +4232,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     }
 
     // delete non-important runtime files
-    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill
+    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*.hwtopo
     CSmallString cmd;
     cmd << "rm -f ";
     cmd << "'" << whole_name << ".infex' ";
@@ -4243,6 +4243,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     cmd << "'" << whole_name << ".vncid' ";
     cmd << "'" << whole_name << ".vncpsw' ";
     cmd << "'" << whole_name << ".kill' ";
+    cmd << "'" << whole_name << ".hwtopo' ";
     // FUJ
     system(cmd);
 
@@ -4313,7 +4314,7 @@ void CJob::CleanRuntimeFiles(void)
     }
 
     // delete all runtime files
-    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*info;*stdout;*infout
+    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*info;*stdout;*infout;*.hwtopo
     CSmallString cmd;
     cmd << "rm -f ";
     cmd << "'" << whole_name << ".infex' ";
@@ -4327,6 +4328,7 @@ void CJob::CleanRuntimeFiles(void)
     cmd << "'" << whole_name << ".info' ";
     cmd << "'" << whole_name << ".stdout' ";
     cmd << "'" << whole_name << ".infout' ";
+    cmd << "'" << whole_name << ".hwtopo' ";
     // FUJ
     system(cmd);
 }

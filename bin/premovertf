@@ -23,10 +23,10 @@ done
 echo ""
 echo "# List of job runtime files ..."
 echo "# --------------------------------------------------------------------"
-ls -l *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill  2> /dev/null
+ls -l *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo  2> /dev/null
 
 # do we have runtime files?
-NRTF=`ls -l *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill 2>/dev/null | wc -l`
+NRTF=`ls -l *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo  2>/dev/null | wc -l`
 if [ "$NRTF" -eq 0 ]; then
     echo ""
     echo ">>> INFO: No runtime files detected!"
@@ -47,7 +47,7 @@ if [ "$FORCE" == "NO" ]; then
 fi
 
 # clean runtime file
-rm -f *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill
+rm -f *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo
 
 echo ""
 echo ">>> INFO: Runtime files were deleted!"
