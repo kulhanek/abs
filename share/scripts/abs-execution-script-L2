@@ -495,7 +495,7 @@ echo "# ------------------------------------------------------------------------
 
 amsmodule add hwloc
 
-NUMACTL=`type -P numactl &> /dev/null`
+NUMACTL=`type -P numactl 2> /dev/null`
 
 if [ $? -eq 0 ]; then
     $NUMACTL --show
@@ -503,7 +503,7 @@ else
     echo ">>> INFO: the numactl command not available ... skipping"
 fi
 
-LSTOPO=`type -P lstopo &> /dev/null`
+LSTOPO=`type -P lstopo 2> /dev/null`
 
 if [ $? -eq 0 ]; then
     echo
