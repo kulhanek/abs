@@ -398,13 +398,13 @@ echo "# ------------------------------------------------------------------------
 echo
 echo "# CPU info (All CPUs)"
 echo "# ============================================================================="
-type lscpu &> /dev/null
+LSCPU=`type -P lscpu 2> /dev/null`
 
-if [ $? -eq 0 ]; then
+if [ -n "$LSCPU" ]; then
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
         echo ">>> $NODE_NAME ---"
-        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME lscpu
+        ssh -x "$INF_SSH_OPTIONS" "$NODE_NAME" "$LSCPU"
     done
 else
     echo ">>> INFO: the lscpu command not available ... skipping"
@@ -497,7 +497,7 @@ amsmodule add hwloc
 
 NUMACTL=`type -P numactl 2> /dev/null`
 
-if [ $? -eq 0 ]; then
+if [ -n "$NUMACTL" ]; then
     $NUMACTL --show
 else
     echo ">>> INFO: the numactl command not available ... skipping"
@@ -505,7 +505,7 @@ fi
 
 LSTOPO=`type -P lstopo 2> /dev/null`
 
-if [ $? -eq 0 ]; then
+if [ -n "$LSTOPO" ]; then
     echo
     $LSTOPO
 else
@@ -527,13 +527,28 @@ cat $INF_MPIFILE | while read NODE MPISPEC; do
         # and not to the standard and error streams, RT#196359
         echo -n "# Scanning node : $NODE"
         echo "# == $NODE" >> "$INF_HWTOPO"
+        echo -n "# CPU set: " >> "$INF_HWTOPO"
+            pbs_tmrsh $NODE sh -c "cat /proc/self/cpuset | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+        echo "# CPU Info ..." >> "$INF_HWTOPO"
+        if [ -n "$LSCPU" ]; then
+            pbs_tmrsh $NODE sh -c "$LSCPU | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+        else
+            echo "  > not available ..." >> "$INF_HWTOPO"
+        fi
+        echo "# NUMA topology ..." >> "$INF_HWTOPO"
         if [ -n "$NUMACTL" ]; then
             pbs_tmrsh $NODE sh -c "$NUMACTL --show | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+        else
+            echo "  > not available ..." >> "$INF_HWTOPO"
         fi
+        echo "# HWLOC topology ..." >> "$INF_HWTOPO"
         if [ -n "$LSTOPO" ]; then
             pbs_tmrsh $NODE sh -c "$LSTOPO | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+        else
+            echo "  > not available ..." >> "$INF_HWTOPO"
         fi
         echo " -> exit code: $?"
+        echo "# ------------------------------------------------------------------------------" >> "$INF_HWTOPO"
      ) < /dev/null
 done
 
@@ -542,6 +557,8 @@ echo "# INF_HWTOPO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 echo "# File: $INF_HWTOPO"
 cat "$INF_HWTOPO"
 if [ $? -ne 0 ]; then exit 1; fi
+
+unset LSTOPO LSCPU NUMACTL
 
 # ------------------------------------------------------------------------------
 # MPI setup
