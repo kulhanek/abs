@@ -490,15 +490,58 @@ fi
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
-echo "# L2.8: Current NUMA settings on the master node ..."
+echo "# L2.8a: Current NUMA settings on the master node ..."
 echo "# ------------------------------------------------------------------------------"
-type numactl &> /dev/null
+
+amsmodule add hwloc
+
+NUMACTL=`type -P numactl &> /dev/null`
 
 if [ $? -eq 0 ]; then
-    numactl --show
+    $NUMACTL --show
 else
     echo ">>> INFO: the numactl command not available ... skipping"
 fi
+
+LSTOPO=`type -P lstopo &> /dev/null`
+
+if [ $? -eq 0 ]; then
+    echo
+    $LSTOPO
+else
+    echo ">>> INFO: the lstopo command not available ... skipping"
+fi
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.8b: Current NUMA settings on all nodes ..."
+echo "# ------------------------------------------------------------------------------"
+
+# create hwtopology file
+export INF_HWTOPO="$INF_WORK_DIR/${INF_WHOLE_NAME}.hwtopo"
+rm -f "$INF_HWTOPO"
+
+cat $INF_MPIFILE | while read NODE MPISPEC; do
+    (
+        # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files of PBS
+        # and not to the standard and error streams, RT#196359
+        echo -n "# Scanning node : $NODE"
+        echo "# == $NODE" >> "$INF_HWTOPO"
+        if [ -n "$NUMACTL" ]; then
+            pbs_tmrsh $NODE sh -c "$NUMACTL --show | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+        fi
+        if [ -n "$LSTOPO" ]; then
+            pbs_tmrsh $NODE sh -c "$LSTOPO | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+        fi
+        echo " -> exit code: $?"
+     ) < /dev/null
+done
+
+echo ""
+echo "# INF_HWTOPO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "# File: $INF_HWTOPO"
+cat "$INF_HWTOPO"
+if [ $? -ne 0 ]; then exit 1; fi
 
 # ------------------------------------------------------------------------------
 # MPI setup
@@ -545,18 +588,23 @@ if [ "$INF_MPI_NCPUS" == "$INF_NCPUS" ]; then
     case "$INF_EXEC_TYPE" in
         cpuset|exclusive)
             export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
-            export INF_OPENMPI2_SPEC="-display-map -output-proctable -display-allocation -report-bindings -bind-to core"
-            export INF_OPENMPI3_SPEC="-display-map -output-proctable -display-allocation -report-bindings -bind-to core"
+            export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by core -map-by core -bind-to core"
+            export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by core -map-by core -bind-to core"
+            ;;
+        raw)
+            export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
+            export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by slot -map-by slot -bind-to none"
+            export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by slot -map-by slot -bind-to none"
             ;;
     esac
 else
-    # number of used CPUs is smaller
+    # number of used CPUs is smaller, map by socket to evenly distribute processes
     case "$INF_EXEC_TYPE" in
         cpuset|exclusive)
             export INF_OPENMPI1_SPEC="--not-supported-by-infinity"
-            export INF_OPENMPI2_SPEC="-display-map -output-proctable -display-allocation -report-bindings -map-by socket -bind-to core"
-            export INF_OPENMPI3_SPEC="-display-map -output-proctable -display-allocation -report-bindings -map-by socket -bind-to core"
-            ;;
+            export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by slot -map-by socket -bind-to core"
+            export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by slot -map-by socket -bind-to core"
+            ;;          
         *)
             echo "" >&2
             echo " >>> ERROR: Unsupported OpenMPI mode (INF_MPI_SLOTS_PER_NODE requires cpuset or exclusive allocation)!" >&2
