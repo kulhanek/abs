@@ -588,11 +588,12 @@ fi
 
 # encode cpusets
 read INF_CPUSET < /proc/self/cpuset
-if [ "$INF_CPUSET" != "/" ]; then
-    INF_EXEC_TYPE="cpuset"
+
+if [ "$INF_MAX_NCPUS" -eq "$INF_NCPUS" ]; then
+    INF_EXEC_TYPE="exclusive"
 else
-    if [ "$INF_MAX_NCPUS" -eq "$INF_NCPUS" ]; then
-        INF_EXEC_TYPE="exclusive"
+    if [ "$INF_CPUSET" != "/" ]; then
+        INF_EXEC_TYPE="cpuset"
     else
         INF_EXEC_TYPE="raw"
     fi
