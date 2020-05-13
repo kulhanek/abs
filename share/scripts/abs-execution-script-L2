@@ -575,6 +575,13 @@ echo ""
 echo "# Summary of execution nodes with assigned slots ..."
 pnodes -j "$INF_JOB_ID" --jobs
 
+if [ $? -ne 0 ]; then
+    # RT#687751
+    echo ">>> WARNING: Trying again after 60s ...."
+    sleep 60
+    pnodes -j "$INF_JOB_ID" --jobs --verbose
+fi
+
 # total number of CPUs on exec nodes
 INF_MAX_NCPUS=`pnodes -j "$INF_JOB_ID" --stat | grep ntotcpus | awk '{ print $2; }'`
 
