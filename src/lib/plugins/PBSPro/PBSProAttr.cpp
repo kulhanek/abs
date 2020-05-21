@@ -23,8 +23,12 @@
 #include <ErrorSystem.hpp>
 #include <string.h>
 #include <stdlib.h>
+#include <string>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 using namespace std;
+using namespace boost;
 
 //==============================================================================
 //------------------------------------------------------------------------------
@@ -180,21 +184,37 @@ bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
 //------------------------------------------------------------------------------
 
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
-                   std::vector<CSmallString>& values,const char* p_delim,bool emit_error)
+                   std::vector<std::string>& values,const char* p_delim,bool emit_error)
 {
     CSmallString list;
     if( get_attribute(p_first,p_name,p_res,list,emit_error) == false ){
         return(false);
     }
 
-    char* p_save = NULL;
-    char* p_item = strtok_r(list.GetBuffer(),p_delim,&p_save);
-    while( p_item ){
-        values.push_back(p_item);
-        p_item = strtok_r(NULL,p_delim,&p_save);
-    }
+    string str(list);
+    string del(p_delim);
+    split(values,str,is_any_of(del),boost::token_compress_on);
 
     return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
+                   std::vector<CSmallString>& values,const char* p_delim,bool emit_error)
+{
+    std::vector<CSmallString> svalues;
+    bool rst = get_attribute(p_first,p_name,p_res,svalues,p_delim,emit_error);
+
+    std::vector<CSmallString>::iterator it = svalues.begin();
+    std::vector<CSmallString>::iterator ie = svalues.end();
+
+    while( it != ie ){
+        values.push_back(*it);
+        it++;
+    }
+
+    return(rst);
 }
 
 //==============================================================================

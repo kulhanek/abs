@@ -25,6 +25,7 @@
 #include <SmallString.hpp>
 #include <SmallTime.hpp>
 #include <vector>
+#include <string>
 #include <pbs_ifl.h>
 
 // -----------------------------------------------------------------------------
@@ -39,6 +40,8 @@ bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    CSmallString& value,bool emit_error=false);
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    CSmallTime& value,bool emit_error=false);
+bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
+                   std::vector<std::string>& values,const char* p_delim=",",bool emit_error=false);
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    std::vector<CSmallString>& values,const char* p_delim=",",bool emit_error=false);
 
