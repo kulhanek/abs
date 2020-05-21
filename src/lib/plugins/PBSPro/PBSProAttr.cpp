@@ -203,11 +203,11 @@ bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
 bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
                    std::vector<CSmallString>& values,const char* p_delim,bool emit_error)
 {
-    std::vector<CSmallString> svalues;
+    std::vector<std::string> svalues;
     bool rst = get_attribute(p_first,p_name,p_res,svalues,p_delim,emit_error);
 
-    std::vector<CSmallString>::iterator it = svalues.begin();
-    std::vector<CSmallString>::iterator ie = svalues.end();
+    std::vector<std::string>::iterator it = svalues.begin();
+    std::vector<std::string>::iterator ie = svalues.end();
 
     while( it != ie ){
         values.push_back(*it);
