@@ -582,8 +582,28 @@ if [ $? -ne 0 ]; then
     pnodes -j "$INF_JOB_ID" --jobs --verbose
 fi
 
-# total number of CPUs on exec nodes
-INF_MAX_NCPUS=`pnodes -j "$INF_JOB_ID" --stat | grep ntotcpus | awk '{ print $2; }'`
+echo ""
+echo "# Maximum of available resources  ..."
+
+INF_MAX_NCPUS=0
+INF_MAX_NGPUS=0
+
+# see RT#229993 for possible problems with temporary file name
+INF_NODE_TMP="/tmp/${USER}.$$.nodeinfo"
+
+# node stat
+pnodes -j "$INF_JOB_ID" --stat > $INF_NODE_TMP
+
+if [ $? -ne 0 ]; then
+    # RT#687751
+    echo ">>> WARNING: Trying again after 60s ...."
+    sleep 60
+    pnodes -j "$INF_JOB_ID" --stat --verbose > $INF_NODE_TMP
+fi
+
+cat $INF_NODE_TMP
+
+INF_MAX_NCPUS=`grep ntotcpus $INF_NODE_TMP | awk '{ print $2; }'`
 
 if [ -z "$INF_MAX_NCPUS" ]; then
     echo "" >&2
@@ -592,6 +612,18 @@ if [ -z "$INF_MAX_NCPUS" ]; then
     echo "" >&2
     exit 1
 fi
+
+INF_MAX_NGPUS=`grep ntotgpus $INF_NODE_TMP | awk '{ print $2; }'`
+if [ -z "$INF_MAX_NCPUS" ]; then
+    echo "" >&2
+    echo " >>> ERROR: INF_MAX_NGPUS is not set properly!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
+fi
+
+rm -f "$INF_NODE_TMP"
+unset INF_NODE_TMP
 
 # encode cpusets
 read INF_CPUSET < /proc/self/cpuset
@@ -646,9 +678,11 @@ export INF_MPI_NCPUS
 
 # final reporting --------------------------------------------------------------
 
+echo "INF_NNODES             = $INF_NNODES"
 echo "INF_MAX_NCPUS          = $INF_MAX_NCPUS"
 echo "INF_NCPUS              = $INF_NCPUS"
-echo "INF_NNODES             = $INF_NNODES"
+echo "INF_MAX_NGPUS          = $INF_MAX_NGPUS"
+echo "INF_NGPUS              = $INF_NGPUS"
 echo "INF_MPI_SLOTS_PER_NODE = $INF_MPI_SLOTS_PER_NODE"
 echo "INF_MPI_NCPUS          = $INF_MPI_NCPUS"
 echo "INF_CPUSET             = $INF_CPUSET"
@@ -662,29 +696,8 @@ echo "# ------------------------------------------------------------------------
 echo "# L2.10: Check HW resources oversubscription ..."
 echo "# ------------------------------------------------------------------------------"
 
-INF_TOTAL_NCPUS=0
-INF_TOTAL_NGPUS=0
-
-# see RT#229993 for possible problems with temporary file name
-INF_NODE_TMP="/tmp/${USER}.$$.nodeinfo"
-
-for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
-    echo ""
-    echo ">>> $NODE_NAME ---"
-    # start ams-host with AMS_ROOT env, see RT#298740
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "AMS_ROOT=$AMS_ROOT $AMS_ROOT/bin/ams-host --nodeinfo --nocache" > $INF_NODE_TMP
-    cat $INF_NODE_TMP
-    INF_NODE_NCPUS="`grep ncpus $INF_NODE_TMP | awk '{ print $2; }'`"
-    (( INF_TOTAL_NCPUS = INF_TOTAL_NCPUS + INF_NODE_NCPUS ))
-    INF_NODE_NGPUS="`grep ngpus $INF_NODE_TMP | awk '{ print $2; }'`"
-    (( INF_TOTAL_NGPUS = INF_TOTAL_NGPUS + INF_NODE_NGPUS ))
-done
-
-rm -f "$INF_NODE_TMP"
-unset INF_NODE_TMP
-
-if [[ $INF_NCPUS -gt $INF_TOTAL_NCPUS ]]; then
-    printf "# Requested CPUs: %3d > All available CPUs: %3d\n" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
+if [[ $INF_NCPUS -gt $INF_MAX_NCPUS ]]; then
+    printf "# Requested CPUs: %3d > All available CPUs: %3d\n" "$INF_NCPUS" "$INF_MAX_NCPUS"
       echo "" >&2
       echo " >>> ERROR: Aborting job due to CPU request oversubscription (this should not happen)!" >&2
       echo "                           *** REACTIVATE Infinity at this site ***                   " >&2
@@ -692,11 +705,11 @@ if [[ $INF_NCPUS -gt $INF_TOTAL_NCPUS ]]; then
       echo "" >&2
     exit 1
 else
-    printf "# Requested CPUs: %3d <= All available CPUs: %3d\n" "$INF_NCPUS" "$INF_TOTAL_NCPUS"
+    printf "# Requested CPUs: %3d <= All available CPUs: %3d\n" "$INF_NCPUS" "$INF_MAX_NCPUS"
 fi
 
-if [[ $INF_NGPUS -gt $INF_TOTAL_NGPUS ]]; then
-    printf "# Requested GPUs: %3d > All available GPUs: %3d\n" "$INF_NGPUS" "$INF_TOTAL_NGPUS"
+if [[ $INF_NGPUS -gt $INF_MAX_NGPUS ]]; then
+    printf "# Requested GPUs: %3d > All available GPUs: %3d\n" "$INF_NGPUS" "$INF_MAX_NGPUS"
       echo "" >&2
       echo " >>> ERROR: Aborting job due to GPU request oversubscription (this should not happen)!" >&2
       echo "                           *** REACTIVATE Infinity at this site ***                   " >&2
@@ -704,13 +717,9 @@ if [[ $INF_NGPUS -gt $INF_TOTAL_NGPUS ]]; then
       echo "" >&2
     exit 1
 else
-    printf "# Requested GPUs: %3d <= All available GPUs: %3d\n" "$INF_NGPUS" "$INF_TOTAL_NGPUS"
+    printf "# Requested GPUs: %3d <= All available GPUs: %3d\n" "$INF_NGPUS" "$INF_MAX_NGPUS"
 fi
 
-unset INF_TOTAL_NCPUS
-unset INF_TOTAL_NGPUS
-unset INF_NODE_NCPUS
-unset INF_NODE_NGPUS
 
 
 
