@@ -1916,7 +1916,7 @@ bool CJobList::CollectionResubmitJobs(std::ostream& sout,bool verbose)
         sout << " " << setw(15) << name;
 
         if( rstat == ERS_FAILED ){
-            sout << p_job->GetLastError();
+            sout << " >>> Reason: " << p_job->GetLastError();
         }
         // no comment here
         sout << endl;

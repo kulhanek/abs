@@ -529,6 +529,10 @@ bool CBatchServers::GetQueues(void)
     // init servers if not done already
     if( size() == 0 ) InitAll();
 
+    // is it not already populated?
+    // RT#656762, duplicit records leads to wrong determination of server for the queue
+    if( QueueList.size() > 0 ) return(true);
+
     // list queues
     std::list<CBatchServerPtr>::iterator    it = begin();
     std::list<CBatchServerPtr>::iterator    ie = end();

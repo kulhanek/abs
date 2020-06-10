@@ -1878,13 +1878,13 @@ void CJob::DetectJobCollection(void)
         CFileName cofi = CFileName(coll_path) / CFileName(coll_name) + ".cofi";
         if( CFileSystem::IsFile(cofi) == false ) return;
 
-        // re-read its contents
-        CJobList coll;
-        if( coll.LoadCollection(cofi,true) == false ) return;
-
-        coll_id = coll.CollectionID;
-        coll_path = coll.CollectionPath;
-        coll_name = coll.CollectionName;
+        // This was commented becuase it was a bad idea, it slowed the processeing significantly
+        // so DO NOT re-read the collection contents
+        // CJobList coll;
+        // if( coll.LoadCollection(cofi,true) == false ) return;
+        // coll_id = coll.CollectionID;
+        // coll_path = coll.CollectionPath;
+        // coll_name = coll.CollectionName;
     }
 
     // setup collection

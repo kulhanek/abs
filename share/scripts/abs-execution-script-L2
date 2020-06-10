@@ -573,6 +573,8 @@ echo "# ------------------------------------------------------------------------
 
 echo ""
 echo "# Summary of execution nodes with assigned slots ..."
+echo "# pnodes -j "$INF_JOB_ID" --jobs"
+
 pnodes -j "$INF_JOB_ID" --jobs
 
 if [ $? -ne 0 ]; then
@@ -584,6 +586,7 @@ fi
 
 echo ""
 echo "# Maximum of available resources  ..."
+echo "# pnodes -j "$INF_JOB_ID" --stat"
 
 INF_MAX_NCPUS=0
 INF_MAX_NGPUS=0
@@ -678,6 +681,7 @@ export INF_MPI_NCPUS
 
 # final reporting --------------------------------------------------------------
 
+echo ""
 echo "INF_NNODES             = $INF_NNODES"
 echo "INF_MAX_NCPUS          = $INF_MAX_NCPUS"
 echo "INF_NCPUS              = $INF_NCPUS"
