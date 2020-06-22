@@ -1563,8 +1563,8 @@ bool CJob::CheckJobName(std::ostream& sout)
     string arg_job_name;
     arg_job_name = GetItem("basic/arguments","INF_ARG_JOB");
 
-    string legall_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_+-.#";
-    string legall_char_short = "a-z A-Z 0-9 _+-.#";
+    string legall_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_+-.";
+    string legall_char_short = "a-z A-Z 0-9 _+-.";
 
     if( arg_job_name.find_first_not_of(legall_characters) != string::npos ){
         sout << endl;
@@ -1592,8 +1592,8 @@ const CSmallString CJob::JobPathCheck(const CSmallString& inpath,std::ostream& s
 {
     CSmallString outpath = inpath;
 
-    string legall_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_+-.#/";
-    string legall_char_short = "a-z A-Z 0-9 _+-.#/";
+    string legall_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_+-./";
+    string legall_char_short = "a-z A-Z 0-9 _+-./";
 
     string soutpath(outpath);
     if( soutpath.find_first_not_of(legall_characters) != string::npos ){
@@ -4226,7 +4226,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
         whole_name += GetJobNameSuffix();
     }
     bool autorecovery = false;
-    if( GetItem("basic/external","INF_EXTERNAL_FLAGS",true) == "+" ){
+    if( GetItem("basic/external","INF_EXTERNAL_FLAGS",true) == "-" ){
         // this indicates autorecovery jobs
         autorecovery = true;
     }

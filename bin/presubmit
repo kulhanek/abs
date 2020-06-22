@@ -27,11 +27,11 @@ fi
 
 # determine job suffix
 if [ -z "$INF_EXTERNAL_NAME_SUFFIX" ]; then
-    export INF_EXTERNAL_NAME_SUFFIX="#002"
+    export INF_EXTERNAL_NAME_SUFFIX="+002"
 else
-    NUM=`echo "$INF_EXTERNAL_NAME_SUFFIX" | tr -d "#"`
+    NUM=`echo "$INF_EXTERNAL_NAME_SUFFIX" | tr -d "+" | tr -d "-"`
     NUM=`expr $NUM + 1 2> /dev/null`
-    export INF_EXTERNAL_NAME_SUFFIX="#`printf %03d $NUM 2> /dev/null`"
+    export INF_EXTERNAL_NAME_SUFFIX="+`printf %03d $NUM 2> /dev/null`"
 fi
 
 # add fixperms=none if not present
