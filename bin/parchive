@@ -180,10 +180,6 @@ case $INF_MODE in
         inf-retry-cmd archive_runtime_files "$@"
         EXIT_CODE=$?
         ;;
-    autoruntime )
-        inf-retry-cmd archive_runtime_files_auto "$@"
-        EXIT_CODE=$?
-        ;;
     get )
         get_data_from_archive "$@"
         EXIT_CODE=$?
