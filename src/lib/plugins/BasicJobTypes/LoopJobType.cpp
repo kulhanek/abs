@@ -235,7 +235,7 @@ ERetStatus CLoopJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
     detected = true;
 
     stringstream ssufix;
-    ssufix << format("#%03d") % current;
+    ssufix << format("+%03d") % current;
 
     job.SetItem("basic/external","INF_EXTERNAL_NAME_SUFFIX",ssufix.str().c_str());
     job.SetItem("basic/jobinput","INF_JOB_NAME",job_file);
