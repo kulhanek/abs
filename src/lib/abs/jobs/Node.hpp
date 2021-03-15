@@ -93,11 +93,14 @@ public:
     /// has node any of given properties
     bool HasAnyProperties(const std::vector<std::string>& props);
 
-    /// has node any of given properties
+    /// has node any of given queue
     bool IsInAnyQueueWithServer(const std::vector<std::string>& qlist);
 
-    /// has node any of given properties
+    /// has node any of given queue
     bool IsInQueueWithServer(const std::string& queue);
+
+    /// is it owned by user
+    bool IsInOwnerList(const std::string& user);
 
     /// get extra properties
     const std::set<std::string> GetExtraProperties(const std::set<std::string>& props);
@@ -149,6 +152,9 @@ protected:
 
     CSmallString                Queues;
     std::vector<std::string>    QueueList;
+
+    CSmallString                NodeOwner;
+    std::vector<std::string>    OwnerList;
 
     const std::string GetNiceSize(size_t size);
 };

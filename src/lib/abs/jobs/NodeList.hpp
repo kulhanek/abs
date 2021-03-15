@@ -100,6 +100,9 @@ public:
     /// keep only those nodes that has at least one of properties
     void KeepNodesByQueuesWithServer(const std::vector<std::string>& qlist);
 
+    /// keep only those nodes that has given owner
+    void KeepNodesByOwner(const std::string& user);
+
     /// keep nodes by mask
     void KeepNodesByMask(struct SExpression* p_mask);
 

@@ -107,6 +107,12 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
     tmp = string(Queues);
     if( ! tmp.empty() ) split(QueueList,tmp,is_any_of(","));
 
+    // user list
+    // queue list
+    get_attribute(p_node->attribs,"resources_available","node_owner",NodeOwner);
+    tmp = string(NodeOwner);
+    if( ! tmp.empty() ) split(OwnerList,tmp,is_any_of(","));
+
     // detect properties
     // all "resources_available" which is boolean
     struct attrl* p_list = p_node->attribs;

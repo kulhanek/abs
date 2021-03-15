@@ -191,6 +191,7 @@ bool CNodes::Run(void)
 
         // remove unwanted nodes
         NodeList.KeepNodesByQueuesWithServer(qlist);
+        NodeList.KeepNodesByOwner(string(User.GetName()));
         NodeList.RemoveDownNodes();
     }
 

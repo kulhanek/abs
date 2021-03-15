@@ -506,6 +506,23 @@ void CNodeList::KeepNodesByQueuesWithServer(const std::vector<std::string>& qlis
 
 //------------------------------------------------------------------------------
 
+void CNodeList::KeepNodesByOwner(const std::string& user)
+{
+    list<CNodePtr>::iterator it = begin();
+    list<CNodePtr>::iterator et = end();
+
+    while( it != et ){
+        CNodePtr p_node = *it;
+        if( p_node->IsInOwnerList(user) == false ){
+            it = erase(it);
+        } else {
+            it++;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
 void CNodeList::KeepNodesByMask(struct SExpression* p_mask)
 {
     list<CNodePtr>::iterator it = begin();

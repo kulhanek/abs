@@ -415,6 +415,25 @@ bool CNode::IsInQueueWithServer(const std::string& queue)
 
 //------------------------------------------------------------------------------
 
+bool CNode::IsInOwnerList(const std::string& user)
+{
+    if( NodeOwner == NULL ) return(true); // no owner - keep
+
+    vector<string>::iterator mit = OwnerList.begin();
+    vector<string>::iterator mie = OwnerList.end();
+
+    while( mit != mie ){
+        std::string nuser = *mit;
+        if( nuser == "everybody" ) return(true); // hardcoded "everybody" :-(
+        if( nuser == user ) return(true);
+        mit++;
+    }
+
+    return(false);
+}
+
+//------------------------------------------------------------------------------
+
 const std::set<std::string> CNode::GetExtraProperties(const std::set<std::string>& gprops)
 {
     set<string> extra;
