@@ -196,6 +196,8 @@ src/lib/plugins/BasicTicketCheck/NoTicketChecker.hpp
 src/lib/plugins/BasicTicketCheck/SSHTicketChecker.cpp
 src/lib/plugins/BasicTicketCheck/SSHTicketChecker.hpp
 src/lib/plugins/CMakeLists.txt
+src/lib/plugins/PBSPro/resources/RVVNode.cpp
+src/lib/plugins/PBSPro/resources/RVVNode.hpp
 src/lib/plusula/CMakeLists.txt
 src/lib/plusula/ComObject.cpp
 src/lib/plusula/ComObject.hpp

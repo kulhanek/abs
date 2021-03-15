@@ -794,6 +794,12 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
         }
     }
 
+// ------------
+    rv_ptr = p_rl->FindResource("vnode");
+    if( rv_ptr ){
+        str << ":" << "vnode" << "=" << rv_ptr->GetValue();
+    }
+
     p_rl->AddRawResource("select",CSmallString(str.str().c_str()));
     return(true);
 }

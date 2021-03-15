@@ -6,3 +6,4 @@ src/lib/abs
 src/lib/abs/resources/default
 src/lib/plugins/BasicJobTypes
 src/lib/abs/mboost
+src/lib/plugins/PBSPro/resources
