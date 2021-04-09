@@ -14,6 +14,7 @@
         <CONFIG key="09.E1" value="g09"/>
         <CONFIG key="16.A3" value="g16"/>
         <CONFIG key="16.B1" value="g16"/>
+        <CONFIG key="16.C1" value="g16"/>
     </OBJECT>
     <OBJECT uuid="{ORCA_JOB_TYPE:37b32314-0500-417b-a5b8-0dedf32a1fde}">
         <CONFIG key="_mode"   value="implicit"/>
