@@ -91,7 +91,7 @@ void CRVNCPUs::PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatu
     CResourceValuePtr p_nr = p_rl->FindResource("ncpuspernumanode");
     if( p_nr != NULL ){
         long long numa = p_nr->GetNumber();
-        if( size % nnodes != 0 ){
+        if( size % numa != 0 ){
             if( rstatus == true ) sout << endl;
             sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
             sout <<         "        ncpus=" << size << " must be divisible by ncpuspernumanode=" << numa << "!</red></b>" << endl;
