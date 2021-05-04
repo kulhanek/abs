@@ -24,6 +24,7 @@ SET(PBSPRO_SRC
         resources/RVPlace.cpp
         resources/RVProps.cpp
         resources/RVGPUCap.cpp
+        resources/RVVNode.cpp
         )
 
 # create shared library --------------------------------------------------------

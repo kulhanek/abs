@@ -32,6 +32,7 @@ SET(ABS_SRC
         resources/default/RVMemPerCPU.cpp
         resources/default/RVNCPUs.cpp
         resources/default/RVNCPUsPerNode.cpp
+        resources/default/RVNCPUsPerNUMANode.cpp
         resources/default/RVNGPUs.cpp
         resources/default/RVNNodes.cpp
         resources/default/RVWorkDir.cpp

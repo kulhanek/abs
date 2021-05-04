@@ -20,28 +20,29 @@
 //     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 // =============================================================================
 
-#include <RVNCPUs.hpp>
+#include <RVNCPUsPerNUMANode.hpp>
 #include <CategoryUUID.hpp>
 #include <ABSModule.hpp>
 #include <ResourceList.hpp>
+#include <sstream>
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVNCPUsCB(void* p_data);
+CComObject* RVNCPUsPerNUMANodeCB(void* p_data);
 
-CExtUUID        RVNCPUsID(
-                    "{RV_NCPUSL:87b41b5f-bdb5-4988-9130-5dff66a7a780}",
-                    "ncpus");
+CExtUUID        RVNCPUsPerNUMANodeID(
+                    "{RV_NCPUS_PER_NUMA_NODE:a7121430-5aec-46e8-9bcb-b1362d298dda}",
+                    "ncpuspernumanode");
 
-CPluginObject   RVNCPUsObject(&ABSPlugin,
-                    RVNCPUsID,RESOURCES_CAT,
-                    RVNCPUsCB);
+CPluginObject   RVNCPUsPerNUMANodeObject(&ABSPlugin,
+                    RVNCPUsPerNUMANodeID,RESOURCES_CAT,
+                    RVNCPUsPerNUMANodeCB);
 
 // -----------------------------------------------------------------------------
 
-CComObject* RVNCPUsCB(void* p_data)
+CComObject* RVNCPUsPerNUMANodeCB(void* p_data)
 {
-    CComObject* p_object = new CRVNCPUs();
+    CComObject* p_object = new CRVNCPUsPerNUMANode();
     return(p_object);
 }
 
@@ -53,51 +54,23 @@ using namespace std;
 //------------------------------------------------------------------------------
 //==============================================================================
 
-CRVNCPUs::CRVNCPUs(void)
-    : CResourceValue(&RVNCPUsObject)
+CRVNCPUsPerNUMANode::CRVNCPUsPerNUMANode(void)
+    : CResourceValue(&RVNCPUsPerNUMANodeObject)
 {
 }
 
 //------------------------------------------------------------------------------
 
-void CRVNCPUs::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
+void CRVNCPUsPerNUMANode::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
 {
     if( TestNumberValue(sout,rstatus) == false ) return;
-    long long size = GetNumber();
-    if( size <= 0 ) {
+    long long value = GetNumber();
+    if( value <= 0 ) {
         if( rstatus == true ) sout << endl;
         sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-        sout <<         "        At least one CPU must be requested but '" << size << "' is specified!</red></b>" << endl;
+        sout <<         "        At least one CPU must be present in CPU NUMA node but '" << value << "' is specified!</red></b>" << endl;
         rstatus = false;
         return;
-    }
-}
-
-//------------------------------------------------------------------------------
-
-void CRVNCPUs::PostTestValue(CResourceList* p_rl,std::ostream& sout,bool& rstatus)
-{
-    long long size = GetNumber();
-    int nnodes = p_rl->GetNumOfNodes();
-    if( nnodes > 0 ){
-        if( size % nnodes != 0 ){
-            if( rstatus == true ) sout << endl;
-            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        ncpus=" << size << " must be divisible by nnodes=" << nnodes << "!</red></b>" << endl;
-            rstatus = false;
-            return;
-        }
-    }
-    CResourceValuePtr p_nr = p_rl->FindResource("ncpuspernumanode");
-    if( p_nr != NULL ){
-        long long numa = p_nr->GetNumber();
-        if( size % nnodes != 0 ){
-            if( rstatus == true ) sout << endl;
-            sout << "<b><red> ERROR: Illegal '" << Name << "' resource specification!" << endl;
-            sout <<         "        ncpus=" << size << " must be divisible by ncpuspernumanode=" << numa << "!</red></b>" << endl;
-            rstatus = false;
-            return;
-        }
     }
 }
 

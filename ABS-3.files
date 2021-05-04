@@ -135,6 +135,8 @@ src/lib/abs/resources/default/RVMPISlotsPerNode.cpp
 src/lib/abs/resources/default/RVMPISlotsPerNode.hpp
 src/lib/abs/resources/default/RVMemPerNode.cpp
 src/lib/abs/resources/default/RVMemPerNode.hpp
+src/lib/abs/resources/default/RVNCPUsPerNUMANode.cpp
+src/lib/abs/resources/default/RVNCPUsPerNUMANode.hpp
 src/lib/abs/resources/default/RVNCPUsPerNode.cpp
 src/lib/abs/resources/default/RVNCPUsPerNode.hpp
 src/lib/abs/system/CategoryUUID.cpp
