@@ -115,19 +115,17 @@ void CRVBatchGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rs
                 }
             }
         }
+        sout << "'" << storage_group << "'" << endl;
         if( storage_group.empty() ){
             ES_WARNING("unable to determine the jobdir group");
             if( rstatus == true ) sout << endl;
             sout << "<b><blue> WARNING: Unable to determine value of the '" << Name << "' resource!" << endl;
             sout <<          "          Falling back to the user primary group!</blue></b>" << endl;
             rstatus = false;
-            Value = User.GetRGroup();
+            Value = User.GetEGroup();
             return;
         }
 
-        if( storage_group.empty() ){
-            ES_ERROR("unable to determine the jobdir group");
-        }
         // remove realm if present
         Value = storage_group.substr(0,storage_group.find("@"));
 
