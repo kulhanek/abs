@@ -84,6 +84,8 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
     CSmallString storage_machine_groupns = p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS");
     CSmallString batch_server_groupns = p_job->GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS");
 
+    sout << "value: " << Value << endl;
+
     if( Value == "current" ){
         if( input_machine_groupns != storage_machine_groupns ){
             if( rstatus == true ) sout << endl;
