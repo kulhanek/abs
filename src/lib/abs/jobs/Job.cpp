@@ -773,6 +773,14 @@ bool CJob::InputDirectory(std::ostream& sout)
         gname = string(p_grp->gr_name);
     }
 
+    if( gname.empty() ){
+        ES_WARNING("unable to determine the jobdir group");
+        sout << "<b><blue> WARNING: Unable to determine group name of the job input directory!" << endl;
+        sout <<          "          Disabling various file system checks, which can lead" << endl;
+        sout <<          "          to data ownership inconsistency!</blue></b>" << endl;
+        gname = "-disabled-";
+    }
+
     if( gname.find("@") != string::npos ){
         SetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE",Host.GetRealm(storage_machine));
         string realm = gname.substr(gname.find("@")+1,string::npos);

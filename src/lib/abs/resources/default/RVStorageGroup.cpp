@@ -103,12 +103,9 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
                 struct group* p_gr = getgrgid(info.st_gid);
                 if( p_gr ){
                     storage_group = p_gr->gr_name;
-                    sout << "here" << endl;
                 }
             }
         }
-
-        sout << "here 2: '" << storage_group << "'" << endl;
 
         if( storage_group.empty() ){
             ES_WARNING("unable to determine the jobdir group");
@@ -116,7 +113,6 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
             if( rstatus == true ) sout << endl;
             sout << "<b><blue> WARNING: Unable to determine value of the '" << Name << "' resource!" << endl;
             sout <<          "          This can lead to data ownership inconsistency!</blue></b>" << endl;
-            rstatus = false;
             return;
         }
         // remove realm if present
@@ -134,8 +130,6 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
             }
         }
     }
-
-    sout << "here 3: '" << Value << "'" << endl;
 
     if( p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") == NULL ){
         // we can check if the value is correct
