@@ -132,6 +132,13 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
         }
     }
 
+    if( Value == "nogroup" ) {
+        sout << "<b><blue> WARNING: Unable to determine value of the '" << Name << "' resource" << endl;
+        sout <<          "          because the group name is 'nogroup'!" << endl;
+        sout <<          "          To continue, various file system checks will be disabled, which can lead" << endl;
+        sout <<          "          to data ownership inconsistency!</blue></b>" << endl;
+        Value = "-disabled-";
+    }
     if( Value == "-disabled-" ) return;
 
     if( p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") == NULL ){
