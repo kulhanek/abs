@@ -135,6 +135,8 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
         }
     }
 
+    sout << "here 3: '" << Value << "'" << endl;
+
     if( p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") == NULL ){
         // we can check if the value is correct
         if( User.IsInPosixGroup(Value) == false ){
