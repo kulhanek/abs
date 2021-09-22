@@ -103,9 +103,13 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
                 struct group* p_gr = getgrgid(info.st_gid);
                 if( p_gr ){
                     storage_group = p_gr->gr_name;
+                    sout << "here" << endl;
                 }
             }
         }
+
+        sout << "'" << storage_group << "'" << endl;
+
         if( storage_group.empty() ){
             ES_WARNING("unable to determine the jobdir group");
             Value = "-disabled-";

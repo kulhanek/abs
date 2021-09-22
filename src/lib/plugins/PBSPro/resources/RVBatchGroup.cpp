@@ -115,7 +115,6 @@ void CRVBatchGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& rs
                 }
             }
         }
-        sout << "'" << storage_group << "'" << endl;
         if( storage_group.empty() ){
             ES_WARNING("unable to determine the jobdir group");
             if( rstatus == true ) sout << endl;
