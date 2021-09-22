@@ -108,7 +108,7 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
             }
         }
 
-        sout << "'" << storage_group << "'" << endl;
+        sout << "here 2: '" << storage_group << "'" << endl;
 
         if( storage_group.empty() ){
             ES_WARNING("unable to determine the jobdir group");
