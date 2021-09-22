@@ -161,7 +161,7 @@ bool CJob::SaveInfoFileWithPerms(void)
     chmod(name,fmode);
 
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-    if( sgroup != NULL ){
+    if( (sgroup != NULL) && (sgroup != "-disabled-") ){
         if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
             sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }
@@ -890,15 +890,6 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollec
         ES_ERROR("unable to copy startup script to the job directory");
         return(false);
     }
-
-// determine FS user group
-    // if the FS uses composed group add a storage machine realm to the group
-    CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-    if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
-        sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
-    }
-    gid_t sgrid = CUser::GetGroupID(sgroup,false);
-
 // ------------------------
     CFileName user_script   = GetItem("basic/jobinput","INF_JOB_NAME",true);
 
@@ -922,24 +913,36 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollec
             ES_WARNING(warning);
         }
 
-        ret = chown(job_script,-1,sgrid);
-        if( ret != 0 ){
-            CSmallString warning;
-            warning << "unable to set group for file '" << job_script << "' (" << ret << ")";
-            ES_WARNING(warning);
-        }
-
-        // user script
         if( IsInteractiveJob() == false ){
             chmod(user_script,fmode);
-            ret = chown(user_script,-1,sgrid);
-            if( ret != 0 ){
-                CSmallString warning;
-                warning << "unable to set group for file '" << user_script << "' (" << ret << ")";
-                ES_WARNING(warning);
-            }
         }
 
+        // determine FS user group
+        // if the FS uses composed group add a storage machine realm to the group
+        CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
+        if( (sgroup != NULL) && (sgroup != "-disabled-") ){
+            if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
+                sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
+            }
+            gid_t sgrid = CUser::GetGroupID(sgroup,false);
+
+            ret = chown(job_script,-1,sgrid);
+            if( ret != 0 ){
+                CSmallString warning;
+                warning << "unable to set group for file '" << job_script << "' (" << ret << ")";
+                ES_WARNING(warning);
+            }
+
+            // user script
+            if( IsInteractiveJob() == false ){
+                ret = chown(user_script,-1,sgrid);
+                if( ret != 0 ){
+                    CSmallString warning;
+                    warning << "unable to set group for file '" << user_script << "' (" << ret << ")";
+                    ES_WARNING(warning);
+                }
+            }
+        }
     }
 
     if( (GetItem("basic/collection","INF_COLLECTION_NAME",true) == NULL) || (nocollection == true) ) {
@@ -1023,11 +1026,15 @@ void CJob::FixJobPerms(void)
 
     if( (fixperms == NULL) || (fixperms == "none") ) return;
 
+    gid_t groupid = -1;
+
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-    if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
-        sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
+    if( (sgroup != NULL) && (sgroup != "-disabled-") ) {
+        if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
+            sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
+        }
+        groupid = CUser::GetGroupID(sgroup,false);
     }
-    gid_t groupid = CUser::GetGroupID(sgroup,false);
 
     CSmallString sumask = GetItem("specific/resources","INF_UMASK");
     mode_t umask = CUser::GetUMaskMode(sumask);
@@ -2472,10 +2479,13 @@ bool CJob::PrepareSyncWorkingDirEnv(void)
     ShellProcessor.SetVariable("INF_SYNC_INPUT_DIR",tmp);
 
     CSmallString INF_WI_RSYNCOPTS;
-    if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
-        INF_WI_RSYNCOPTS << "--chown=:" << GetItem("specific/resources","INF_USTORAGEGROUP") << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
-    } else {
-        INF_WI_RSYNCOPTS << "--chown=:" << GetItem("specific/resources","INF_USTORAGEGROUP");
+    CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
+    if( sgroup != "-disabled-" ){
+        if( GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") != GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS") ){
+            INF_WI_RSYNCOPTS << "--chown=:" << sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+        } else {
+            INF_WI_RSYNCOPTS << "--chown=:" << sgroup;
+        }
     }
     ShellProcessor.SetVariable("INF_SYNC_WI_RSYNCOPTS",INF_WI_RSYNCOPTS);
 
@@ -3755,7 +3765,7 @@ bool CJob::SaveJobKey(void)
     chmod(keyname,fmode);
 
     CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
-    if( sgroup != NULL ){
+    if( (sgroup != NULL) && (sgroup != "-disabled-") ){
         if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
             sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }

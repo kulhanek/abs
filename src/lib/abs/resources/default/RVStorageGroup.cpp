@@ -107,7 +107,13 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
             }
         }
         if( storage_group.empty() ){
-            ES_ERROR("unable to determine the jobdir group");
+            ES_WARNING("unable to determine the jobdir group");
+            Value = "-disabled-";
+            if( rstatus == true ) sout << endl;
+            sout << "<b><blue> WARNING: Unable to determine value of the '" << Name << "' resource!" << endl;
+            sout <<          "          This can lead to data ownership inconsistency!</blue></b>" << endl;
+            rstatus = false;
+            return;
         }
         // remove realm if present
         Value = storage_group.substr(0,storage_group.find("@"));

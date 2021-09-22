@@ -430,7 +430,7 @@ bool CPRecycleJobType::CheckInputFile(CJob& job,std::ostream& sout)
     chmod(storage,fmode);
 
     CSmallString sgroup = job.GetItem("specific/resources","INF_USTORAGEGROUP");
-    if( sgroup != NULL ){
+    if( (sgroup != NULL) && (sgroup != "-disabled-") ){
         if( job.GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
             sgroup << "@" << job.GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }
