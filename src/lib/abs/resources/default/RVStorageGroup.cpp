@@ -84,8 +84,6 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
     CSmallString storage_machine_groupns = p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS");
     CSmallString batch_server_groupns = p_job->GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS");
 
-    sout << "value: " << Value << endl;
-
     if( Value == "current" ){
         if( input_machine_groupns != storage_machine_groupns ){
             if( rstatus == true ) sout << endl;
@@ -112,9 +110,10 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
         if( storage_group.empty() ){
             ES_WARNING("unable to determine the jobdir group");
             Value = "-disabled-";
-            if( rstatus == true ) sout << endl;
-            sout << "<b><blue> WARNING: Unable to determine value of the '" << Name << "' resource!" << endl;
-            sout <<          "          This can lead to data ownership inconsistency!</blue></b>" << endl;
+            sout << "<b><blue> WARNING: Unable to determine value of the '" << Name << "' resource" << endl;
+            sout <<          "          from the group name of the job input directory!" << endl;
+            sout <<          "          To continue, various file system checks will be disabled, which can lead" << endl;
+            sout <<          "          to data ownership inconsistency!</blue></b>" << endl;
             return;
         }
         // remove realm if present
@@ -132,6 +131,8 @@ void CRVStorageGroup::PreTestValue(CResourceList* p_rl,std::ostream& sout,bool& 
             }
         }
     }
+
+    if( Value == "-disabled-" ) return;
 
     if( p_job->GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") == NULL ){
         // we can check if the value is correct
