@@ -152,6 +152,8 @@ src/lib/abs/system/TicketChecker.hpp
 src/lib/abs/ABSMainHeader.cpp
 src/lib/abs/ABSMainHeader.hpp
 src/lib/abs/CMakeLists.txt
+src/lib/plugins/BasicJobTypes/AlphafoldJobType.cpp
+src/lib/plugins/BasicJobTypes/AlphafoldJobType.hpp
 src/lib/plugins/BasicJobTypes/BasicJobTypesMainHeader.cpp
 src/lib/plugins/BasicJobTypes/BasicJobTypesMainHeader.hpp
 src/lib/plugins/BasicJobTypes/BasicJobTypesModule.cpp

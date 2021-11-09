@@ -142,7 +142,7 @@ ERetStatus CNWChemJobType::DetectJobType(CJob& job,bool& detected,std::ostream& 
         ofs << "# ------------------------------------------------" << endl;
         ofs << endl;
         ofs << "# activate nwchem module -------------------------" << endl;
-        ofs << "module add " << nmodule << ":" << nmodver << endl;
+        ofs << "amsmodule add " << nmodule << ":" << nmodver << endl;
         ofs << endl;
         ofs << "# start job --------------------------------------" << endl;
         ofs << "nwchem " << arg_job << endl;

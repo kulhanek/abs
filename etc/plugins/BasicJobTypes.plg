@@ -58,4 +58,9 @@
         <CONFIG key="_mode"   value="explicit"/>
         <CONFIG key="_type"   value="multiwfn"/>
     </OBJECT>
+    <OBJECT uuid="{ALPHAFOLD:abfeb6d3-5e39-468f-99a0-d1812262b5c6}">
+        <CONFIG key="_mode"   value="implicit"/>
+        <CONFIG key="_type"   value="alphafold"/>
+        <CONFIG key="_module" value="alphafold"/>
+    </OBJECT>
 </PLUGIN> 

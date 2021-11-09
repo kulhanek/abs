@@ -20,6 +20,7 @@ SET(BASICJOBTYPES_SRC
         LoopJobType.cpp
         MultiWfnJobType.cpp
         OrcaJobType.cpp
+        AlphafoldJobType.cpp
         )
 
 # create shared library --------------------------------------------------------

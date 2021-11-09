@@ -144,7 +144,7 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
         ofs << "# ------------------------------------------------" << endl;
         ofs << endl;
         ofs << "# activate orca module ---------------------------" << endl;
-        ofs << "module add " << omodule << ":" << omodver  << endl;
+        ofs << "amsmodule add " << omodule << ":" << omodver  << endl;
         ofs << endl;
         ofs << "# start job --------------------------------------" << endl;
         ofs << "orca " << arg_job << endl;

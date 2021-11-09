@@ -155,7 +155,7 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         ofs << "# ------------------------------------------------" << endl;
         ofs << endl;
         ofs << "# activate gaussian module -----------------------" << endl;
-        ofs << "module add " << gmodule << ":" << gmodver << endl;
+        ofs << "amsmodule add " << gmodule << ":" << gmodver << endl;
         ofs << endl;
         ofs << "# start job --------------------------------------" << endl;
         ofs << gexec << " " << job_file << endl;
