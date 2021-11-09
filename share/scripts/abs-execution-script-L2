@@ -220,6 +220,67 @@ if [ $? -ne 0 ]; then
 fi
 
 # ------------------------------------------------------------------------------
+# get tmp directory
+
+INF_TMP_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type tmp $INF_WORK_DIR_TYPE`"
+if [ $? -ne -0 ]; then
+    return 1
+fi
+echo ""
+echo "# Tmp directory      : $INF_TMP_DIR"
+INF_TMP_DIR="`eval echo "$INF_TMP_DIR"`"
+echo "# Tmp directory      : $INF_TMP_DIR"
+export INF_TMP_DIR
+
+# ------------------------------------------------------------------------------
+# create tmp directories if necessary
+
+echo ""
+case $INF_DATAIN in
+    keep)
+        echo "# In the datain keep mode, we use standard TMP directory ..."
+    ;;
+    copy-shared)
+        echo "# Creating the TMP directory on the main working node ..."
+        echo "  >>> $INF_MAIN_NODE:$INF_TMP_DIR ---"
+        (
+            umask $INF_UMASK
+            if ! [ -d "$INF_TMP_DIR" ]; then
+                mkdir -p "$INF_TMP_DIR"
+            fi
+            # the ownership should be INF_BATCHGROUP as the directory is created by the main job process
+        )
+        if [ $? -ne 0 ]; then
+            echo "" >&2
+            echo " >>> ERROR: Unable to create the TMP directory on the main node!" >&2
+            echo "" >&2
+            exit 1
+        fi
+        export TMP=$INF_TMP_DIR
+        export TMPDIR=$INF_TMP_DIR
+        export TEMP=$INF_TMP_DIR
+    ;;
+    copy-master)
+            echo "# Creating TMP directories on the working nodes ..."
+        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+            echo "  >>> $NODE_NAME:$INF_TMP_DIR ---"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "umask $INF_UMASK; if ! [ -d \"$INF_TMP_DIR\" ]; then mkdir -p \"$INF_TMP_DIR\"; fi; EXIT_CODE=\$?; if [ -n \"$INF_UBATCHGROUP\" ]; then chgrp \"$INF_BATCHGROUP\" \"$INF_TMP_DIR\"; fi; exit \$EXIT_CODE;"
+
+            if [ $? -ne 0 ]; then
+                echo "" >&2
+                echo " >>> ERROR: Unable to create the TMP directory on the specified node!" >&2
+                echo "" >&2
+                exit 1
+            fi
+        done
+        # FIXME - we should instruct processes on other nodes to honor these variables (via mpurun?)
+        export TMP=$INF_TMP_DIR
+        export TMPDIR=$INF_TMP_DIR
+        export TEMP=$INF_TMP_DIR
+    ;;
+esac
+
+# ------------------------------------------------------------------------------
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
@@ -744,6 +805,37 @@ if [[ $INF_NGPUS -gt $INF_MAX_NGPUS ]]; then
 else
     printf "# Requested GPUs: %3d <= All available GPUs: %3d\n" "$INF_NGPUS" "$INF_MAX_NGPUS"
 fi
+
+# ------------------------------------------------------------------------------
+# list environment
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L2.11: Job environment summary ..."
+echo "# ------------------------------------------------------------------------------"
+
+echo "# Variable                     Value                                            "
+echo "# ---------------------------- -------------------------------------------------"
+set | grep ^INF_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^AMS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^PBS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep ^TORQUE_ | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+set | grep CUDA     | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
+
+# ------------------------------------------------------------------------------
+
+# FIXME - compatibility mode - set them here so they are not visible in the above lists
+export AMS_NCPU=$AMS_NCPUS
+export AMS_NGPU=$AMS_NGPUS
+export AMS_NNODE=$AMS_NNODES
+
+export INF_NCPU=$AMS_NCPUS
+export INF_NGPU=$AMS_NGPUS
+export INF_NNODE=$AMS_NNODES
+
+export INF_JOB_PATH=$INF_INPUT_DIR
+export INF_JOB_MACHINE=$INF_INPUT_MACHINE
+
 
 
 

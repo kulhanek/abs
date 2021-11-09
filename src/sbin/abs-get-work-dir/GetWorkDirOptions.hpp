@@ -73,6 +73,7 @@ public:
                     "workdir mode, supported: main, ijobs, clean, preinit")   /* option description */
 //    /*
 //     * main - path to main work dir
+//     * tmp  - path to tmp directory
 //     * jobs - path to ijobs master dir
 //     * clean - path to entire work dir for cleaning
 //     * preinit - script that is executed after the work dir is initialized but before the job

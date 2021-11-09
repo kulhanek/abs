@@ -123,30 +123,6 @@ else
     echo ""
 fi
 
-# ------------------------------------------------------------------------------
-# list environment
-
-echo "# Variable                     Value                                            "
-echo "# ---------------------------- -------------------------------------------------"
-set | grep ^INF_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
-set | grep ^AMS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
-set | grep ^PBS_    | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
-set | grep ^TORQUE_ | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
-set | grep CUDA     | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF;i++) printf(" %s",$i); printf("\n"); }'
-
-# ------------------------------------------------------------------------------
-
-# FIXME - compatibility mode - set them here so they are not visible in the above lists
-export AMS_NCPU=$AMS_NCPUS
-export AMS_NGPU=$AMS_NGPUS
-export AMS_NNODE=$AMS_NNODES
-
-export INF_NCPU=$AMS_NCPUS
-export INF_NGPU=$AMS_NGPUS
-export INF_NNODE=$AMS_NNODES
-
-export INF_JOB_PATH=$INF_INPUT_DIR
-export INF_JOB_MACHINE=$INF_INPUT_MACHINE
 
 
 

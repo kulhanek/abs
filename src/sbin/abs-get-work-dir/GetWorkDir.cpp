@@ -1,6 +1,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2021      Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2012      Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -82,6 +83,8 @@ bool CGetWorkDir::Run(void)
     if( p_mele != NULL ){
         if( Options.GetOptMode() == "main" ){
             p_mele->GetAttribute("path",value);
+        } else if ( Options.GetOptMode() == "tmp" ){
+            p_mele->GetAttribute("path",value);
         } else if ( Options.GetOptMode() == "ijob" ){
             p_mele->GetAttribute("path",value);
         } else if ( Options.GetOptMode() == "clean" ){
@@ -95,6 +98,8 @@ bool CGetWorkDir::Run(void)
         // fallback defaults
         if( Options.GetOptMode() == "main" ){
             value = "/scratch/$USER/$INF_JOB_ID/main";
+        } else if ( Options.GetOptMode() == "tmp" ){
+            value = "/scratch/$USER/$INF_JOB_ID/tmp";
         } else if ( Options.GetOptMode() == "ijob" ){
             value = "/scratch/$USER/$INF_JOB_ID/$INF_IJOB_ID";
         } else if ( Options.GetOptMode() == "clean" ){
