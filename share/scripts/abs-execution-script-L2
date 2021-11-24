@@ -326,7 +326,7 @@ fi
 # ------------------------------------------------------------------------------
 # move info file to working directory
 
-mv "$TMPDIR/${_TNAME_}.info" "$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
+mv "$TMP_INFO_FILE" "$INF_WORK_DIR/${INF_WHOLE_NAME}.info"
 if [ $? -ne 0 ]; then
     echo "" >&2
     echo " >>> ERROR: Unable to move the job info file into the working directory!" >&2
