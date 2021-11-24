@@ -48,6 +48,11 @@ echo "# Data OUT copy mode : $INF_DATAOUT"
 # switch to HOME directory because next commands can remove the current directory
 cd
 
+# unset these varibales since directories will be destroyed in the next step
+unset TMP
+unset TMPDIR
+unset TEMP
+
 CLEAN_DIR="`$ABS_ROOT/sbin/abs-get-work-dir --type clean $INF_WORK_DIR_TYPE`"
 if [ $? -ne -0 ]; then
     echo ""
