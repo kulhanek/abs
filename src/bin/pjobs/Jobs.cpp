@@ -153,10 +153,12 @@ bool CJobs::Run(void)
     }
 
     // print info about jobs
+    bool collate = ! Options.GetOptNoCollate();
+    if( Options.GetOptFinished() ) collate = ! collate;
     JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),
                                 Options.GetOptIncludeComment(),
                                 Options.GetOptIncludeOrigin(),
-                                ! Options.GetOptNoCollate());
+                                collate);
 
     // print batch stat
     vout << endl;

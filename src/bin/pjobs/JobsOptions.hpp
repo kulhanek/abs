@@ -145,7 +145,7 @@ class CJobsOptions : public CSimpleOptions {
                     'f',                           /* short option name */
                     "finished",                      /* long option name */
                     NULL,                           /* parametr name */
-                    "show only finished jobs sorted by their termination time")   /* option description */
+                    "show only finished jobs sorted by their termination time. This option negates the --nocollate option.")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Moved,                        /* option name */
