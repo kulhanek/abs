@@ -61,7 +61,7 @@ class CJobsOptions : public CSimpleOptions {
         // options ------------------------------
         CSO_OPT(CSmallString,User)
         CSO_OPT(CSmallString,Search)
-        CSO_OPT(bool,NoCollate)
+        CSO_OPT(bool,Collate)
         CSO_OPT(bool,IncludePath)
         CSO_OPT(bool,IncludeComment)
         CSO_OPT(bool,IncludeOrigin)
@@ -94,13 +94,13 @@ class CJobsOptions : public CSimpleOptions {
                     "search for jobs satisfying logical expression")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    NoCollate,                        /* option name */
+                    Collate,                        /* option name */
                     false,                          /* default value */
                     false,                          /* is option mandatory */
-                    'n',                           /* short option name */
-                    "nocollate",                      /* long option name */
+                    'g',                           /* short option name */
+                    "collate",                      /* long option name */
                     NULL,                           /* parametr name */
-                    "do not collate jobs into collections")   /* option description */
+                    "collate jobs into collections")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     IncludePath,                        /* option name */
@@ -145,7 +145,7 @@ class CJobsOptions : public CSimpleOptions {
                     'f',                           /* short option name */
                     "finished",                      /* long option name */
                     NULL,                           /* parametr name */
-                    "show only finished jobs sorted by their termination time. This option negates the --nocollate option.")   /* option description */
+                    "show only finished jobs sorted by their termination time")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Moved,                        /* option name */
