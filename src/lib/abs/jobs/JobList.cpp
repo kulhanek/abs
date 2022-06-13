@@ -39,6 +39,7 @@
 #include <ABSConfig.hpp>
 #include <boost/filesystem.hpp>
 #include <TerminalStr.hpp>
+#include <boost/format.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -2227,7 +2228,7 @@ void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includeco
         while( cit != cie ){
             CBSCollectionListPtr col = *cit;
             // print collection header
-            sout << "<purple>***] " << col->Path << "</purple>" << endl;
+            sout << "<purple>" << format("[% 3d] ")%col->size() << col->Path << "</purple>" << endl;
             // print jobs in a collection
             it = col->begin();
             ie = col->end();
