@@ -603,36 +603,63 @@ echo "# ------------------------------------------------------------------------
 export INF_HWTOPO="$INF_WORK_DIR/${INF_WHOLE_NAME}.hwtopo"
 rm -f "$INF_HWTOPO"
 
-cat $INF_MPIFILE | while read NODE MPISPEC; do
-    (
-        # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files of PBS
-        # and not to the standard and error streams, RT#196359
-        echo -n "# Scanning node : $NODE"
-        echo "# == $NODE" >> "$INF_HWTOPO"
-        echo -n ">>>> CPU set: " >> "$INF_HWTOPO"
-            pbs_tmrsh $NODE sh -c "cat /proc/self/cpuset | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
-        echo ">>>> CPU Info ..." >> "$INF_HWTOPO"
-        if [ -n "$LSCPU" ]; then
-            pbs_tmrsh $NODE sh -c "$LSCPU | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
-        else
-            echo "  > not available ..." >> "$INF_HWTOPO"
-        fi
-        echo ">>>> NUMA topology ..." >> "$INF_HWTOPO"
-        if [ -n "$NUMACTL" ]; then
-            pbs_tmrsh $NODE sh -c "$NUMACTL --show | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
-        else
-            echo "  > not available ..." >> "$INF_HWTOPO"
-        fi
-        echo ">>>> HWLOC topology ..." >> "$INF_HWTOPO"
-        if [ -n "$LSTOPO" ]; then
-            pbs_tmrsh $NODE sh -c "$LSTOPO | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
-        else
-            echo "  > not available ..." >> "$INF_HWTOPO"
-        fi
-        echo " -> exit code: $?"
-        echo "# ------------------------------------------------------------------------------" >> "$INF_HWTOPO"
-     ) < /dev/null
-done
+if [ $INF_NNODE -ne 1 ]; then
+    cat $INF_MPIFILE | while read NODE MPISPEC; do
+        (
+            # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files of PBS
+            # and not to the standard and error streams, RT#196359
+            echo -n "# Scanning node : $NODE"
+            echo "# == $NODE" >> "$INF_HWTOPO"
+            echo -n ">>>> CPU set: " >> "$INF_HWTOPO"
+                pbs_tmrsh $NODE sh -c "cat /proc/self/cpuset | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+            echo ">>>> CPU Info ..." >> "$INF_HWTOPO"
+            if [ -n "$LSCPU" ]; then
+                pbs_tmrsh $NODE sh -c "$LSCPU | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+            else
+                echo "  > not available ..." >> "$INF_HWTOPO"
+            fi
+            echo ">>>> NUMA topology ..." >> "$INF_HWTOPO"
+            if [ -n "$NUMACTL" ]; then
+                pbs_tmrsh $NODE sh -c "$NUMACTL --show | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+            else
+                echo "  > not available ..." >> "$INF_HWTOPO"
+            fi
+            echo ">>>> HWLOC topology ..." >> "$INF_HWTOPO"
+            if [ -n "$LSTOPO" ]; then
+                pbs_tmrsh $NODE sh -c "$LSTOPO | ssh $HOSTNAME \"cat >> $INF_HWTOPO\""
+            else
+                echo "  > not available ..." >> "$INF_HWTOPO"
+            fi
+            echo " -> exit code: $?"
+            echo "# ------------------------------------------------------------------------------" >> "$INF_HWTOPO"
+         ) < /dev/null
+    done
+else
+    NODE=$INF_MAIN_NODE
+    echo -n "# Scanning node : $NODE"
+    echo "# == $NODE" >> "$INF_HWTOPO"
+    echo -n ">>>> CPU set: " >> "$INF_HWTOPO"
+    cat /proc/self/cpuset >> "$INF_HWTOPO"
+    echo ">>>> CPU Info ..." >> "$INF_HWTOPO"
+    if [ -n "$LSCPU" ]; then
+        $LSCPU >> "$INF_HWTOPO"
+    else
+        echo "  > not available ..." >> "$INF_HWTOPO"
+    fi
+    echo ">>>> NUMA topology ..." >> "$INF_HWTOPO"
+    if [ -n "$NUMACTL" ]; then
+        $NUMACTL --show "$INF_HWTOPO"
+    else
+        echo "  > not available ..." >> "$INF_HWTOPO"
+    fi
+    echo ">>>> HWLOC topology ..." >> "$INF_HWTOPO"
+    if [ -n "$LSTOPO" ]; then
+        $LSTOPO "$INF_HWTOPO"
+    else
+        echo "  > not available ..." >> "$INF_HWTOPO"
+    fi
+    echo "# ------------------------------------------------------------------------------" >> "$INF_HWTOPO"
+fi
 
 echo ""
 echo "# INF_HWTOPO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
