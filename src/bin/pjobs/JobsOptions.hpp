@@ -61,6 +61,7 @@ class CJobsOptions : public CSimpleOptions {
         // options ------------------------------
         CSO_OPT(CSmallString,User)
         CSO_OPT(CSmallString,Search)
+        CSO_OPT(bool,NoCollate)
         CSO_OPT(bool,IncludePath)
         CSO_OPT(bool,IncludeComment)
         CSO_OPT(bool,IncludeOrigin)
@@ -91,6 +92,15 @@ class CJobsOptions : public CSimpleOptions {
                     "search",                      /* long option name */
                     "EXPRESSION",                           /* parametr name */
                     "search for jobs satisfying logical expression")   /* option description */
+    //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                    NoCollate,                        /* option name */
+                    false,                          /* default value */
+                    false,                          /* is option mandatory */
+                    'n',                           /* short option name */
+                    "nocollate",                      /* long option name */
+                    NULL,                           /* parametr name */
+                    "do not collate jobs into collections")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     IncludePath,                        /* option name */

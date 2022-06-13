@@ -383,6 +383,19 @@ public:
     bool IsJobDirLocal(bool no_deep=false);
 
 // -----------------------------------------------------------------------------
+    /// is job in a collection registered in batch system?
+    bool IsJobInCollectionFromBS(void);
+
+    /// return collection ID
+    const std::string GetCollectionIDFromBS(void);
+
+    /// return collection name
+    const std::string GetCollectionNameFromBS(void);
+
+    /// return collection path
+    const std::string GetCollectionPathFromBS(void);
+
+// -----------------------------------------------------------------------------
 
 // collections and special job types
 

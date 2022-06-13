@@ -211,7 +211,7 @@ bool CInfoGo::GoByJobID(void)
     }
 
     // print info about jobs
-    JobList.PrintBatchInfo(vout,true,true,false);
+    JobList.PrintBatchInfo(vout,true,true,false,false);
 
     // prepare environment for pgo command
     return(JobList.PrepareGoInputDirEnv(vout));

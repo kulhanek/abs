@@ -2197,8 +2197,12 @@ void CJobList::GetNumberOfResFromBatchSys(EJobStatus status,int& ncpus,int& ngpu
 
 //------------------------------------------------------------------------------
 
-void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin)
+void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin,bool collate)
 {
+    if( collate ){
+        CollateBSCollections();
+    }
+
     sout << endl;
     sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times           " << endl;
     sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------------" << endl;
@@ -2208,8 +2212,33 @@ void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includeco
 
     while( it != ie ){
         CJobPtr p_job = *it;
-        p_job->PrintJobQStatInfo(sout,includepath,includecomment,includeorigin);
+        if( (collate == false) || (p_job->IsJobInCollectionFromBS() == false) ){
+            // print non-collection jobs or all jobs if not collate
+            p_job->PrintJobQStatInfo(sout,includepath,includecomment,includeorigin);
+        }
         it++;
+    }
+
+    // print collections
+    if( collate ){
+        std::list<CBSCollectionListPtr>::iterator cit = BSCollections.begin();
+        std::list<CBSCollectionListPtr>::iterator cie = BSCollections.end();
+
+        while( cit != cie ){
+            CBSCollectionListPtr col = *cit;
+            // print collection header
+
+            // print jobs in a collection
+            it = col->begin();
+            ie = col->end();
+
+            while( it != ie ){
+                CJobPtr p_job = *it;
+                p_job->PrintJobQStatInfo(sout,includepath,includecomment,includeorigin);
+                it++;
+            }
+            cit++;
+        }
     }
 }
 
@@ -2227,6 +2256,36 @@ void CJobList::PrintBatchInfoStat(std::ostream& sout)
     sout << "# Total(QR): " << setw(6) << GetNumberOfJobsFromBatchSys(EJS_SUBMITTED) + GetNumberOfJobsFromBatchSys(EJS_RUNNING);
     sout << "        Finished: " << setw(6) << GetNumberOfJobsFromBatchSys(EJS_FINISHED);
     sout << " Others: " << setw(6) << GetNumberOfOtherJobsFromBatchSys() << endl;
+}
+
+//------------------------------------------------------------------------------
+
+void CJobList::CollateBSCollections(void)
+{
+    list<CJobPtr>::iterator it = begin();
+    list<CJobPtr>::iterator ie = end();
+
+    while( it != ie ){
+        CJobPtr p_job = *it;
+        if( p_job->IsJobInCollectionFromBS() == true ){
+            CBSCollectionListPtr bscol;
+            if( BSCollectionMap.count(p_job->GetCollectionIDFromBS()) == 1 ){
+                // already registered
+                bscol = BSCollectionMap[p_job->GetCollectionIDFromBS()];
+            } else {
+                // create new collection
+                bscol = CBSCollectionListPtr(new CBSCollectionList);
+                BSCollectionMap[p_job->GetCollectionIDFromBS()] = bscol;
+                BSCollections.push_back(bscol);
+                bscol->ID = p_job->GetCollectionIDFromBS();
+                bscol->Name = p_job->GetCollectionNameFromBS();
+                bscol->Path = p_job->GetCollectionPathFromBS();
+            }
+            // register job into collection
+            bscol->push_back(p_job);
+        }
+        it++;
+    }
 }
 
 //------------------------------------------------------------------------------

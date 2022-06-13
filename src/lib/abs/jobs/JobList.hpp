@@ -28,6 +28,18 @@
 
 // -----------------------------------------------------------------------------
 
+class ABS_PACKAGE CBSCollectionList : public std::list<CJobPtr> {
+// public data ----------------------------------------------------------------
+public:
+    std::string     ID;
+    std::string     Name;
+    std::string     Path;
+};
+
+typedef boost::shared_ptr<CBSCollectionList>  CBSCollectionListPtr;
+
+// -----------------------------------------------------------------------------
+
 /// list of jobs
 
 class ABS_PACKAGE CJobList : public std::list<CJobPtr> {
@@ -102,7 +114,7 @@ public:
     bool CollectionResubmitJobs(std::ostream& sout,bool verbose);
 
     /// print batch jobs
-    void PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin);
+    void PrintBatchInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin,bool collate);
 
     /// print batch jobs
     void PrintBatchInfoStat(std::ostream& sout);
@@ -227,6 +239,10 @@ private:
     CSmallString        CollectionID;
     CSmallTimeAndDate   CollectionLastChange;
 
+    // batch system collections
+    std::list<CBSCollectionListPtr>             BSCollections;
+    std::map<std::string,CBSCollectionListPtr>  BSCollectionMap;
+
     static bool SortByPrepareDateAndTimeA(const CJobPtr& p_left,const CJobPtr& p_right);
 
     static bool SortByFinishDateAndTimeA(const CJobPtr& p_left,const CJobPtr& p_right);
@@ -248,6 +264,9 @@ private:
     // helper methods
     bool IsJobSelected(CJobPtr p_job,struct SExpression* p_expr);
     bool IsJobSelected(CJobPtr p_job,struct SSelection* p_sel);
+
+    // collect batch collections
+    void CollateBSCollections(void);
 
     friend class CJob;
 };

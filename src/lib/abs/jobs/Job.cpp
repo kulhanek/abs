@@ -4355,5 +4355,35 @@ void CJob::CleanRuntimeFiles(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
+bool CJob::IsJobInCollectionFromBS(void)
+{
+    return(BatchVariables.count("INF_COLLECTION_ID") == 1);
+}
+
+//------------------------------------------------------------------------------
+
+const std::string CJob::GetCollectionIDFromBS(void)
+{
+    return(BatchVariables["INF_COLLECTION_ID"]);
+}
+
+//------------------------------------------------------------------------------
+
+const std::string CJob::GetCollectionNameFromBS(void)
+{
+    return(BatchVariables["INF_COLLECTION_NAME"]);
+}
+
+//------------------------------------------------------------------------------
+
+const std::string CJob::GetCollectionPathFromBS(void)
+{
+    return(BatchVariables["INF_COLLECTION_PATH"]);
+}
+
+//==============================================================================
+//------------------------------------------------------------------------------
+//==============================================================================
+
 
 

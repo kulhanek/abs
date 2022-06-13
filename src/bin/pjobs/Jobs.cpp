@@ -153,7 +153,10 @@ bool CJobs::Run(void)
     }
 
     // print info about jobs
-    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment(),Options.GetOptIncludeOrigin());
+    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),
+                                Options.GetOptIncludeComment(),
+                                Options.GetOptIncludeOrigin(),
+                                Options.GetOptNoCollate());
 
     // print batch stat
     vout << endl;

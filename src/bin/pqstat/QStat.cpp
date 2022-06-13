@@ -175,7 +175,9 @@ bool CQStat::Run(void)
     }
 
     // print info about jobs
-    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment(),Options.GetOptIncludeOrigin());
+    JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),
+                                Options.GetOptIncludeComment(),
+                                Options.GetOptIncludeOrigin(),false);
 
     // print batch stat
     vout << endl;
