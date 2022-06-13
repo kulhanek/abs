@@ -156,7 +156,7 @@ bool CJobs::Run(void)
     JobList.PrintBatchInfo(vout,Options.GetOptIncludePath(),
                                 Options.GetOptIncludeComment(),
                                 Options.GetOptIncludeOrigin(),
-                                Options.GetOptNoCollate());
+                                ! Options.GetOptNoCollate());
 
     // print batch stat
     vout << endl;
