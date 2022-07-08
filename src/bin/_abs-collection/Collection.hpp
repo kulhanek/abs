@@ -53,6 +53,9 @@ private:
     CJobList                Jobs;
 
     void FindJobs(std::vector<CFileName>& jobs,const CFileName& cwd,const CFileName& root,const CFileName& job);
+
+    // get current path using PWD or GetCurrentDir
+    static CFileName GetCurrentPath(void);
 };
 
 // -----------------------------------------------------------------------------

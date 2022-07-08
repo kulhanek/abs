@@ -30,6 +30,8 @@
 #include <Shell.hpp>
 #include <Host.hpp>
 #include <iomanip>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -283,8 +285,7 @@ bool CCollection::Run(void)
         vout << "# ---------------------------- -----------------------------" << endl;
 
         // find all jobs
-        CFileName cwd;
-        CFileSystem::GetCurrentDir(cwd);
+        CFileName cwd = GetCurrentPath();
         CFileName root;
         CFileName job = Options.GetProgArg(3);
         std::vector<CFileName> jobs;
@@ -351,7 +352,7 @@ bool CCollection::Run(void)
             while( it != ie ){
                 vout << endl;
                 CFileName path = *it;
-                if( CFileSystem::SetCurrentDir(path) == true ){
+                if( CFileSystem::SetCurrentDir(cwd / path) == true ){
 
                 CJob::SubmitJobFull(vout,args,
                                            false,
@@ -776,6 +777,32 @@ void CCollection::FindJobs(std::vector<CFileName>& jobs,const CFileName& cwd,con
         }
     }
     dir.EndFindFile();
+}
+
+//------------------------------------------------------------------------------
+
+CFileName CCollection::GetCurrentPath(void)
+{
+    CFileName pwd = CShell::GetSystemVariable("PWD");
+    CFileName cwd;
+    CFileSystem::GetCurrentDir(cwd);
+
+    if( pwd == NULL ){
+        return(cwd);
+    }
+
+    struct stat pwd_stat;
+    if( stat(pwd,&pwd_stat) != 0 ) return(cwd);
+
+    struct stat cwd_stat;
+    stat(cwd,&cwd_stat);
+
+    if( (pwd_stat.st_dev == cwd_stat.st_dev) &&
+        (pwd_stat.st_ino == cwd_stat.st_ino) ) {
+        return(pwd);
+    }
+
+    return(cwd);
 }
 
 //==============================================================================
