@@ -1118,11 +1118,10 @@ bool CJobList::TryToFindCollection(CSmallString& collname)
 
 //------------------------------------------------------------------------------
 
-bool CJobList::CreateCollection(const CSmallString& name,std::ostream& sout)
+bool CJobList::CreateCollection(const CSmallString& path,const CSmallString& name,std::ostream& sout)
 {
     CFileName cinput = name;
-    CFileName cpath = cinput.GetFileDirectory();
-    cpath.AbsolutizePath();
+    CFileName cpath  = path;
     CFileName cname = cinput.GetFileNameWithoutExt();
 
     CFileName full_name;

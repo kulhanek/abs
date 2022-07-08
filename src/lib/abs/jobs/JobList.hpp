@@ -62,7 +62,7 @@ public:
     static bool TryToFindCollection(CSmallString& collname);
 
     /// create collection
-    bool CreateCollection(const CSmallString& name,std::ostream& sout);
+    bool CreateCollection(const CSmallString& path,const CSmallString& name,std::ostream& sout);
 
     /// load collection
     bool LoadCollection(const CSmallString& name,bool fallback_jobs);

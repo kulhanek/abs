@@ -146,7 +146,8 @@ bool CCollection::Run(void)
 // create
 // -------------------------------------------------------------------
     if( action == "create" ){
-        if( Jobs.CreateCollection(Options.GetProgArg(0),vout) == false ){
+        CFileName pwd = GetCurrentPath();
+        if( Jobs.CreateCollection(pwd,Options.GetProgArg(0),vout) == false ){
             ES_TRACE_ERROR("unable to create collection");
             return(false);
         }
@@ -169,7 +170,8 @@ bool CCollection::Run(void)
         if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<blue> INFO: The collection does not exist, creating new one ...</blue>" << endl;
-            if( Jobs.CreateCollection(Options.GetProgArg(0),vout) == false ){
+            CFileName pwd = GetCurrentPath();
+            if( Jobs.CreateCollection(pwd,Options.GetProgArg(0),vout) == false ){
                 ES_TRACE_ERROR("unable to create collection");
                 return(false);
             }
@@ -242,7 +244,8 @@ bool CCollection::Run(void)
         if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<blue> INFO: The collection does not exist, creating new one ...</blue>" << endl;
-            if( Jobs.CreateCollection(Options.GetProgArg(0),vout) == false ){
+             CFileName pwd = GetCurrentPath();
+            if( Jobs.CreateCollection(pwd,Options.GetProgArg(0),vout) == false ){
                 ES_TRACE_ERROR("unable to create collection");
                 return(false);
             }
