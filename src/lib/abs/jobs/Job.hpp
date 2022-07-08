@@ -30,6 +30,7 @@
 #include <boost/shared_ptr.hpp>
 #include <map>
 #include <set>
+#include <vector>
 #include <JobType.hpp>
 #include <FileName.hpp>
 #include <ResourceList.hpp>
@@ -447,6 +448,13 @@ public:
 
     /// is job in collections?
     bool IsJobInCollection(void);
+
+// ------------------------------------------------------------------------------
+// functionality moved from psubmit
+    static bool SubmitJobFull(std::ostream& vout,std::vector<std::string>& args,
+                             bool ignorertmf,bool allowallpath,bool expermode,
+                             bool assumeyes, bool resubmitmode, bool verbose);
+    static bool ExecPresubmitHook(void);
 
 // section of private data -----------------------------------------------------
 protected:

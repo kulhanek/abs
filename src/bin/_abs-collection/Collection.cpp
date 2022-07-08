@@ -27,6 +27,7 @@
 #include <ShellProcessor.hpp>
 #include <DirectoryEnum.hpp>
 #include <FileSystem.hpp>
+#include <Shell.hpp>
 #include <Host.hpp>
 #include <iomanip>
 
@@ -270,20 +271,12 @@ bool CCollection::Run(void)
         vout << endl;
         vout << "<blue> INFO: Collection was opened.</blue>" << endl;
 
-        ShellProcessor.SetVariable("INF_COLLECTION_NAME",Jobs.GetCollectionName());
-        ShellProcessor.SetVariable("INF_COLLECTION_PATH",Jobs.GetCollectionPath());
-        ShellProcessor.SetVariable("INF_COLLECTION_ID",Jobs.GetCollectionID());
+        CShell::SetSystemVariable("INF_COLLECTION_NAME",Jobs.GetCollectionName());
+        CShell::SetSystemVariable("INF_COLLECTION_PATH",Jobs.GetCollectionPath());
+        CShell::SetSystemVariable("INF_COLLECTION_ID",Jobs.GetCollectionID());
 
         vout << endl;
         vout << "# Searching for jobs with the script name or input file: " << Options.GetProgArg(3) << endl;
-
-        // setup command
-        CSmallString cmd;
-        cmd << "psubmit " << Options.GetProgArg(2) << " " << Options.GetProgArg(3);
-        for(int i=4; i < Options.GetNumberOfProgArgs(); i++ ){
-            cmd << " " << Options.GetProgArg(i);
-        }
-        vout << "# " << cmd << endl;
 
         vout << endl;
         vout << "#        Job Input Path                  Comment            " << endl;
@@ -301,29 +294,21 @@ bool CCollection::Run(void)
         // sort jobs
         sort(jobs.begin(),jobs.end());
 
-        if( jobs.size() != 0 ){
-
-            // prepare environment
+        if( jobs.size() != 0 ) {
+            // list jobs
             std::vector<CFileName>::iterator it = jobs.begin();
             std::vector<CFileName>::iterator ie = jobs.end();
-            ShellProcessor.BeginSubshell();
-            ShellProcessor.CapturePWD();
             while( it != ie ){
                 CFileName path = *it;
                 bool runtime_files = CJob::AreRuntimeFiles(path);
                 if( ! runtime_files ){
                     vout << "  " << path << endl;
-                    ShellProcessor.ChangeCurrentDir(path);
-                    ShellProcessor.ExitIfError();
-                    ShellProcessor.ExecuteCMD(cmd);
-                    ShellProcessor.ExitIfError();
-                    ShellProcessor.RestorePWD();
+                    it++;
                 } else {
                     vout << "  " << setw(3) << path << " ignored - it contains runtime files" << endl;
+                    it = jobs.erase(it);
                 }
-                it++;
             }
-            ShellProcessor.EndSubshell();
         }
 
         vout << "# ------------------------------------------------" << endl;
@@ -352,8 +337,39 @@ bool CCollection::Run(void)
 
         vout << "Listed jobs will be prepared for submission to the batch server!" << endl;
 
+        // setup psubmit command
+        std::vector<std::string> args;
+        for(int i=2; i < Options.GetNumberOfProgArgs(); i++){
+            string arg(Options.GetProgArg(i));
+            args.push_back(arg);
+        }
+
+        if( jobs.size() != 0 ) {
+            // list jobs
+            std::vector<CFileName>::iterator it = jobs.begin();
+            std::vector<CFileName>::iterator ie = jobs.end();
+            while( it != ie ){
+                vout << endl;
+                CFileName path = *it;
+                if( CFileSystem::SetCurrentDir(path) == true ){
+
+                CJob::SubmitJobFull(vout,args,
+                                           false,
+                                           false,
+                                           false,
+                                           true,
+                                           false,
+                                           Options.GetOptVerbose() );
+                } else {
+                    vout << "<red> >>> ERROR: Unable to change working directory to '" << path << "'!" << endl;
+                }
+                it++;
+            }
+        }
+
         vout << endl;
         vout << "<blue> INFO: Collection was closed.</blue>" << endl;
+
         ShellProcessor.UnsetVariable("INF_COLLECTION_NAME");
         ShellProcessor.UnsetVariable("INF_COLLECTION_PATH");
         ShellProcessor.UnsetVariable("INF_COLLECTION_ID");

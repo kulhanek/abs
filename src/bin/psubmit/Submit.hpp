@@ -54,7 +54,6 @@ private:
     bool SubmitJobFull(void);
     bool SubmitJobHeader(void);
     bool SubmitJobCopy(int i);
-    bool ExecPresubmitHook(void);
 };
 
 // -----------------------------------------------------------------------------

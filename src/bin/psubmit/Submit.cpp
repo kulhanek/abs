@@ -153,131 +153,20 @@ bool CSubmit::Run(void)
 
 bool CSubmit::SubmitJobFull(void)
 {
-    CJobPtr Job = JobList.CreateNewJob();
-
-    // start job preparation
-    Job->CreateHeader();
-
-    // basic section
-    Job->CreateBasicSection();
-    Job->SetExternalOptions();
-
-    CSmallString qa,jn,rs;
-    qa = Options.GetProgArg(0);
-    jn = Options.GetProgArg(1);
-
-    // generate list of resources
-    vector<string> argres;
-    vector<string> allres;
-    for(int i=2; i < Options.GetNumberOfProgArgs(); i++){
-        string stm(Options.GetProgArg(i));
-        split(argres,stm,is_any_of(","),boost::token_compress_on);
-        allres.insert(allres.end(),argres.begin(),argres.end());
-    }
-    rs = join(allres,",");
-
-    if( Job->SetArguments(qa,jn,rs) == false ) return(false);
-    if( Job->CheckRuntimeFiles(vout,Options.GetOptIgnoreRuntimeFiles()) == false ){
-        CJobList jobs;
-        jobs.InitByInfoFiles(".",false);
-        if( jobs.GetNumberOfJobs() > 0 ){
-            jobs.SortByPrepareDateAndTime();
-            jobs.UpdateJobStatuses();
-            vout << endl;
-            vout << ">>> List of jobs from info files ..." << endl;
-            jobs.PrintInfosCompact(vout,false,true);
-        }
-
-        vout << endl;
-        vout << " <b><red>ERROR: Infinity runtime files were detected in the job input directory!</red></b>" << endl;
-        vout << "" << endl;
-        vout << "<b><red>        The presence of the runtime files indicates that another job</red></b>" << endl;
-        vout << "<b><red>        has been started in this directory. Multiple job submission </red></b>" << endl;
-        vout << "<b><red>        within the same directory is not permitted by the Infinity system.</red></b>" << endl;
-
-        if( (jobs.GetNumberOfJobsFromBatchSys(EJS_SUBMITTED) > 0) || (jobs.GetNumberOfJobsFromBatchSys(EJS_RUNNING) > 0) ){
-            vout << "" << endl;
-            vout << "<blue>        At least one job is waiting or running in the batch system (state: Q, R),</blue>" << endl;
-            vout << "<blue>        please use the pkill command to remove this job from the batch system first!</blue>" << endl;
-        } else {
-            if( (jobs.GetNumberOfJobs(EJS_INCONSISTENT) > 0) || (jobs.GetNumberOfJobs(EJS_ERROR) > 0) ){
-                vout << "" << endl;
-                vout << "<blue>        At least one job is in inconsistent or error state (state: IN, ER),</blue>" << endl;
-                vout << "<blue>        thus it is potentially dangerous to blindly remove the runtime files via:</blue>" << endl;
-                vout << "<blue>        premovertf</blue>" << endl;
-            } else {
-                vout << "" << endl;
-                vout << "        If you really want to submit the job, you have to remove runtime" << endl;
-                vout << "        files from the previous run. Please, be very sure that the previous job has " << endl;
-                vout << "        been already terminated otherwise undefined behaviour can occur!" << endl;
-                vout << "" << endl;
-                vout << "        Type following to remove runtime files:" << endl;
-                vout << "        <b>premovertf</b>" << endl;
-            }
-        }
-        ES_TRACE_ERROR("runtime files detected");
-        return(false);
+    std::vector<std::string> args;
+    for(int i=0; i < Options.GetNumberOfProgArgs(); i++){
+        string arg(Options.GetProgArg(i));
+        args.push_back(arg);
     }
 
-    // execute presubmit hook
-    if( ExecPresubmitHook() == false ){
-        vout << endl;
-        vout << " <b><red>ERROR: Unable to execute the presubmit-hook (or .presubmit-hook) script!</red></b>" << endl;
-        vout << " <b><red>       Aborting the job submission ...</red></b>" << endl;
-        ES_TRACE_ERROR("presubmit hook failed");
-        return(false);
-    }
-
-    ERetStatus retstat = Job->JobInput(vout,Options.GetOptAllowAllPaths(),false);
-    if( retstat == ERS_FAILED ){
-        ES_TRACE_ERROR("unable to set job input");
-        return(false);
-    }
-    if( retstat == ERS_TERMINATE ){
-        return(true);
-    }
-
-    vout << endl;
-    Job->PrintBasicV3(vout);
-
-    // resources
-    if( Job->DecodeResources(vout,Options.GetOptExpertMode()) == false ){
-        ES_TRACE_ERROR("unable to decode resources");
-        return(false);
-    }
-    Job->PrintResourcesV3(vout);
-
-    // last job check
-    if( Job->LastJobCheck(vout) == false ){
-        ES_TRACE_ERROR("job submission was canceled by last check procedure");
-        return(false);
-    }
-
-    // submit job
-    if( Job->ShouldSubmitJob(vout,Options.GetOptAssumeYes()) == false ){
-        ES_TRACE_ERROR("job submission was canceled by an user");
-        return(false);
-    }
-
-    // in resubmit mode - ignore collections
-    if( Job->SubmitJob(vout,false,Options.GetOptVerbose(),Options.GetOptResubmitMode()) == false ){
-        ES_TRACE_ERROR("unable to submit job");
-        return(false);
-    }
-
-    // save job info
-    if( Job->SaveInfoFileWithPerms() == false ){
-        ES_ERROR("unable to save job info file");
-        return(false);
-    }
-
-    // fix me - race condition? - should it be before submit job?
-    if( Job->SaveJobKey() == false ){
-        ES_ERROR("unable to save job key file");
-        return(false);
-    }
-
-    return(true);
+    bool rst = CJob::SubmitJobFull(vout,args,
+                                   Options.GetOptIgnoreRuntimeFiles(),
+                                   Options.GetOptAllowAllPaths(),
+                                   Options.GetOptExpertMode(),
+                                   Options.GetOptAssumeYes(),
+                                   Options.GetOptResubmitMode(),
+                                   Options.GetOptVerbose() );
+    return(rst);
 }
 
 //------------------------------------------------------------------------------
@@ -342,7 +231,7 @@ bool CSubmit::SubmitJobHeader(void)
     }
 
     // execute presubmit hook
-    if( ExecPresubmitHook() == false ){
+    if( CJob::ExecPresubmitHook() == false ){
         vout << endl;
         vout << " <b><red>ERROR: Unable to execute the presubmit-hook (or .presubmit-hook) script!</red></b>" << endl;
         vout << " <b><red>       Aborting the job submission ...</red></b>" << endl;
@@ -468,38 +357,6 @@ bool CSubmit::SubmitJobCopy(int i)
     }
 
     return(true);
-}
-
-//------------------------------------------------------------------------------
-
-bool CSubmit::ExecPresubmitHook(void)
-{
-    CFileName presubmit_hook;
-
-    if( CFileSystem::IsFile("presubmit-hook") ){
-        presubmit_hook = "presubmit-hook";
-    } else if( CFileSystem::IsFile(".presubmit-hook") ) {
-        presubmit_hook = ".presubmit-hook";
-    }
-
-    if( presubmit_hook == NULL ) return(true);  // nothing to do
-
-    // make the script executable
-    mode_t mode = CFileSystem::GetPosixMode(presubmit_hook);
-    mode_t fmode = (mode | 0100 ) & 0777;
-    chmod(presubmit_hook,fmode);
-
-    CFileName pwd = CJob::GetJobInputPath();
-    presubmit_hook =  pwd / presubmit_hook;
-
-    // execute script
-    bool result = system(presubmit_hook) == 0;
-
-    // dissable execution flag for the executable
-    fmode = (mode & ~0111 ) & 0777;
-    chmod(presubmit_hook,fmode);
-
-    return(result);
 }
 
 //------------------------------------------------------------------------------
