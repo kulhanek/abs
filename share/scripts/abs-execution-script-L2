@@ -192,17 +192,34 @@ case $INF_DATAIN in
     ;;
     copy-master)
             echo "# Creating working directories on the working nodes ..."
-        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-            echo "  >>> $NODE_NAME:$INF_WORK_DIR ---"
-            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "umask $INF_UMASK; if ! [ -d \"$INF_WORK_DIR\" ]; then mkdir -p \"$INF_WORK_DIR\"; fi; EXIT_CODE=\$?; if [ -n \"$INF_UBATCHGROUP\" ]; then chgrp \"$INF_BATCHGROUP\" \"$INF_WORK_DIR\"; fi; exit \$EXIT_CODE;"
+            if [[ $INF_NNODES -eq 1 ]]; then
+                echo "  >>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
+                umask "$INF_UMASK"
+                if ! [ -d "$INF_WORK_DIR" ]; then
+                    mkdir -p "$INF_WORK_DIR"
+                fi
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " >>> ERROR: Unable to create the working directory on the specified node!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+                if [ -n "$INF_UBATCHGROUP" ]; then
+                    chgrp "$INF_BATCHGROUP" "$INF_WORK_DIR"
+                fi
+            else
+                for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+                    echo "  >>> $NODE_NAME:$INF_WORK_DIR ---"
+                    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "umask $INF_UMASK; if ! [ -d \"$INF_WORK_DIR\" ]; then mkdir -p \"$INF_WORK_DIR\"; fi; EXIT_CODE=\$?; if [ -n \"$INF_UBATCHGROUP\" ]; then chgrp \"$INF_BATCHGROUP\" \"$INF_WORK_DIR\"; fi; exit \$EXIT_CODE;"
 
-            if [ $? -ne 0 ]; then
-                echo "" >&2
-                echo " >>> ERROR: Unable to create the working directory on the specified node!" >&2
-                echo "" >&2
-                exit 1
+                    if [ $? -ne 0 ]; then
+                        echo "" >&2
+                        echo " >>> ERROR: Unable to create the working directory on the specified node!" >&2
+                        echo "" >&2
+                        exit 1
+                    fi
+                done
             fi
-        done
     ;;
 esac
 
@@ -262,18 +279,35 @@ case $INF_DATAIN in
     ;;
     copy-master)
             echo "# Creating TMP directories on the working nodes ..."
-        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
-            echo "  >>> $NODE_NAME:$INF_TMP_DIR ---"
-            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "umask $INF_UMASK; if ! [ -d \"$INF_TMP_DIR\" ]; then mkdir -p \"$INF_TMP_DIR\"; fi; EXIT_CODE=\$?; if [ -n \"$INF_UBATCHGROUP\" ]; then chgrp \"$INF_BATCHGROUP\" \"$INF_TMP_DIR\"; fi; exit \$EXIT_CODE;"
+            if [[ $INF_NNODES -eq 1 ]]; then
+                echo "  >>> $INF_MAIN_NODE:$INF_TMP_DIR ---"
+                umask "$INF_UMASK"
+                if ! [ -d "$INF_TMP_DIR" ]; then
+                    mkdir -p "$INF_TMP_DIR"
+                fi
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " >>> ERROR: Unable to create the TMP directory on the specified node!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+                if [ -n "$INF_UBATCHGROUP" ]; then
+                    chgrp "$INF_BATCHGROUP" "$INF_TMP_DIR"
+                fi
+            else
+                for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+                    echo "  >>> $NODE_NAME:$INF_TMP_DIR ---"
+                    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "umask $INF_UMASK; if ! [ -d \"$INF_TMP_DIR\" ]; then mkdir -p \"$INF_TMP_DIR\"; fi; EXIT_CODE=\$?; if [ -n \"$INF_UBATCHGROUP\" ]; then chgrp \"$INF_BATCHGROUP\" \"$INF_TMP_DIR\"; fi; exit \$EXIT_CODE;"
 
-            if [ $? -ne 0 ]; then
-                echo "" >&2
-                echo " >>> ERROR: Unable to create the TMP directory on the specified node!" >&2
-                echo "" >&2
-                exit 1
+                    if [ $? -ne 0 ]; then
+                        echo "" >&2
+                        echo " >>> ERROR: Unable to create the TMP directory on the specified node!" >&2
+                        echo "" >&2
+                        exit 1
+                    fi
+                done
             fi
-        done
-        # FIXME - we should instruct processes on other nodes to honor these variables (via mpurun?)
+        # FIXME - we should instruct processes on other nodes to honor these variables (via mpirun?)
         export TMP=$INF_TMP_DIR
         export TMPDIR=$INF_TMP_DIR
         export TEMP=$INF_TMP_DIR
@@ -306,17 +340,26 @@ case $INF_DATAIN in
         fi
     ;;
     copy-master)
-        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+        if [[ $INF_NNODES -eq 1 ]]; then
             echo ""
-            echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
-            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "export INF_WORK_DIR=$INF_WORK_DIR; eval \"$INF_WORK_PREINIT\""
-            if [ $? -ne 0 ]; then
-                echo "" >&2
-                echo " >>> ERROR: Unable to pre-init the working directory on the specified node!" >&2
-                echo "" >&2
-                exit 1
-            fi
-        done
+            echo ">>> $INF_MAIN_NODE:$INF_WORK_DIR ---"
+            (
+                eval "$INF_WORK_PREINIT"
+            )
+        else
+            for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+                echo ""
+                echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
+                ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "export INF_WORK_DIR=$INF_WORK_DIR; eval \"$INF_WORK_PREINIT\""
+                if [ $? -ne 0 ]; then
+                    echo "" >&2
+                    echo " >>> ERROR: Unable to pre-init the working directory on the specified node!" >&2
+                    echo "" >&2
+                    exit 1
+                fi
+            done
+        fi
+
     ;;
 esac
 else
@@ -342,11 +385,20 @@ echo "# ------------------------------------------------------------------------
 echo "# L2.3: Filesystem states  ..."
 echo "# ------------------------------------------------------------------------------"
 
-for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+if [[ $INF_NNODES -eq 1 ]]; then
     echo ""
-    echo ">>> $NODE_NAME ---"
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
-done
+    echo ">>> $INF_MAIN_NODE ---"
+    timeout 30 df -h
+    if [ $? -ne 0 ]; then
+        echo ">>> WARNING: the df command was not completed due to an error or timeout."
+    fi
+else
+    for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ---"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
+    done
+fi
 
 # ------------------------------------------------------------------------------
 
@@ -404,16 +456,18 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     echo ""
     export INF_GPUFILE="$INF_WORK_DIR/${INF_WHOLE_NAME}.gpus"
     rm -f "$INF_GPUFILE"
-            echo    "# This node hostname: $HOSTNAME"
-    cat $INF_MPIFILE | while read NODE MPISPEC; do
-        (
-            # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files of PBS
-            # and not to the standard and error streams, RT#196359
-            echo -n "# Scanning GPU node : $NODE"
-            pbs_tmrsh $NODE sh -c "echo \$(hostname -f) gpus=\$CUDA_VISIBLE_DEVICES | ssh $HOSTNAME \"cat >> $INF_GPUFILE\""
-            echo " -> exit code: $?"
-         ) < /dev/null
-    done 
+            echo    "# This node hostname: $INF_MAIN_NODE"
+    if [ $INF_NNODES -ne 1 ]; then
+        cat $INF_MPIFILE | while read NODE MPISPEC; do
+            (
+                # this is quite complicated because both pbsdsh and pbs_tmrsh write output directly to output and error files of PBS
+                # and not to the standard and error streams, RT#196359
+                echo -n "# Scanning GPU node : $NODE"
+                pbs_tmrsh $NODE sh -c "echo \$(hostname -f) gpus=\$CUDA_VISIBLE_DEVICES | ssh $HOSTNAME \"cat >> $INF_GPUFILE\""
+                echo " -> exit code: $?"
+             ) < /dev/null
+        done
+    fi
     if ! [ -f "$INF_GPUFILE" ]; then
         # file was not created - try some fallback, RT#475300
         # we cannot create INF_GPUFILE if more than 2 nodes were allocated
@@ -466,11 +520,17 @@ echo "# ------------------------------------------------------------------------
 echo "# L2.5: Current node utilizations ..."
 echo "# ------------------------------------------------------------------------------"
 
-for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+if [[ $INF_NNODES -eq 1 ]]; then
     echo ""
-    echo ">>> $NODE_NAME ----------------------------------"
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /PID USER/ { start = 1; }'"
-done
+    echo ">>> $INF_MAIN_NODE ----------------------------------"
+    top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /PID USER/ { start = 1; }'
+else
+    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ----------------------------------"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /PID USER/ { start = 1; }'"
+    done
+fi
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
@@ -483,11 +543,17 @@ echo "# ========================================================================
 LSCPU=`type -P lscpu 2> /dev/null`
 
 if [ -n "$LSCPU" ]; then
-    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    if [[ $INF_NNODES -eq 1 ]]; then
         echo ""
-        echo ">>> $NODE_NAME ---"
-        ssh -x "$INF_SSH_OPTIONS" "$NODE_NAME" "$LSCPU"
-    done
+        echo ">>> $INF_MAIN_NODE ---"
+        "$LSCPU"
+    else
+        for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME ---"
+            ssh -x "$INF_SSH_OPTIONS" "$NODE_NAME" "$LSCPU"
+        done
+    fi
 else
     echo ">>> INFO: the lscpu command not available ... skipping"
 fi
@@ -497,12 +563,21 @@ echo "# GPU info (ALL GPUs)"
 echo "# ============================================================================="
 type nvidia-smi &> /dev/null
 if [ $? -eq 0 ]; then
-    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    if [[ $INF_NNODES -eq 1 ]]; then
         echo ""
-        echo ">>> $NODE_NAME ---"
-        # CUDA_VISIBLE_DEVICES is ignored by nvidia-smi but unset it for sure
-        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "unset CUDA_VISIBLE_DEVICES; nvidia-smi"
-    done
+        echo ">>> $INF_MAIN_NODE ---"
+        (
+            unset CUDA_VISIBLE_DEVICES
+            nvidia-smi
+        )
+    else
+        for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME ---"
+            # CUDA_VISIBLE_DEVICES is ignored by nvidia-smi but unset it for sure
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "unset CUDA_VISIBLE_DEVICES; nvidia-smi"
+        done
+    fi
 else
     echo ">>> INFO: the nvidia-smi command is not available ... skipping"
 fi
@@ -513,11 +588,17 @@ echo "# ========================================================================
 type ibv_devinfo &> /dev/null
 
 if [ $? -eq 0 ]; then
-    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    if [[ $INF_NNODES -eq 1 ]]; then
         echo ""
-        echo ">>> $NODE_NAME ---"
-        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ibv_devinfo
-    done
+        echo ">>> $INF_MAIN_NODE ---"
+        ibv_devinfo
+    else
+        for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME ---"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ibv_devinfo
+        done
+    fi
 else
     echo ">>> INFO: the ibv_devinfo command is not available ... skipping"
 fi
@@ -546,11 +627,17 @@ echo "# ========================================================================
 type ulimit &> /dev/null
 
 if [ $? -eq 0 ]; then
-    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    if [[ $INF_NNODES -eq 1 ]]; then
         echo ""
-        echo ">>> $NODE_NAME ---"
-        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ulimit -S -a
-    done
+        echo ">>> $INF_MAIN_NODE ---"
+        ulimit -S -a
+    else
+        for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME ---"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ulimit -S -a
+        done
+    fi
 else
     echo ">>> INFO: the ulimit command not available ... skipping"
 fi
@@ -561,11 +648,17 @@ echo "# ========================================================================
 type ipcs &> /dev/null
 
 if [ $? -eq 0 ]; then
-    for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+    if [[ $INF_NNODES -eq 1 ]]; then
         echo ""
-        echo ">>> $NODE_NAME ---"
-        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ipcs
-    done
+        echo ">>> $INF_MAIN_NODE ---"
+        ipcs
+    else
+        for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
+            echo ""
+            echo ">>> $NODE_NAME ---"
+            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME ipcs
+        done
+    fi
 else
     echo ">>> INFO: the ipcs command not available ... skipping"
 fi

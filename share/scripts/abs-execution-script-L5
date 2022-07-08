@@ -18,11 +18,21 @@ echo "# ------------------------------------------------------------------------
 
 case $INF_DATAOUT in
     copy-master)
-        for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+        if [[ $INF_NNODES -eq 1 ]]; then
             echo ""
-            echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
-            ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "cd $INF_WORK_DIR; ls -la; echo \"Total size: `du -sh`\""
-        done
+            echo ">>> $INF_MAIN_NODE ---"
+            (
+                cd $INF_WORK_DIR
+                ls -la
+                echo "Total size: `du -sh`"
+            )
+        else
+            for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+                echo ""
+                echo ">>> $NODE_NAME:$INF_WORK_DIR ---"
+                ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "cd $INF_WORK_DIR; ls -la; echo \"Total size: `du -sh`\""
+            done
+        fi
         ;;
     keep|copy-shared)
         echo ""
@@ -37,11 +47,20 @@ echo "# ------------------------------------------------------------------------
 echo "# L5.2: Filesystem states  ..."
 echo "# ------------------------------------------------------------------------------"
 
-for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+if [[ $INF_NNODES -eq 1 ]]; then
     echo ""
-    echo ">>> $NODE_NAME ---"
-    ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
-done
+    echo ">>> $INF_MAIN_NODE ---"
+    timeout 30 df -h
+    if [ $? -ne 0 ]; then
+        echo ">>> WARNING: the df command was not completed due to an error or timeout."
+    fi
+else
+    for NODE_NAME in `cat $PBS_NODEFILE | sort -u`; do
+        echo ""
+        echo ">>> $NODE_NAME ---"
+        ssh -x "$INF_SSH_OPTIONS" $NODE_NAME "timeout 30 df -h; if [ \$? -ne 0 ]; then echo \">>> WARNING: the df command was not completed due to an error or timeout.\"; fi;"
+    done
+fi
 
 echo ""
 echo "# ------------------------------------------------------------------------------"
