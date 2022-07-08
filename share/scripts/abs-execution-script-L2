@@ -523,7 +523,7 @@ echo "# ------------------------------------------------------------------------
 if [[ $INF_NNODES -eq 1 ]]; then
     echo ""
     echo ">>> $INF_MAIN_NODE ----------------------------------"
-    top -b -n 1 | awk '{ if( start == 0 ) print \$0; else if( (\$9 > 1) || (\$10 > 1) ) print \$0; } /PID USER/ { start = 1; }'
+    top -b -n 1 | awk '{ if( start == 0 ) print $0; else if( ($9 > 1) || ($10 > 1) ) print $0; } /PID USER/ { start = 1; }'
 else
     for NODE_NAME in `cat $INF_NODEFILE | sort -u`; do
         echo ""
