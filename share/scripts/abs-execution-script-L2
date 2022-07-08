@@ -518,7 +518,7 @@ if [[ (-n "$INF_RANDOMIZE") && (INF_RANDOMIZE -gt 0) ]]; then
     echo "#"
     echo "# Randomizing job startup in $INF_RANDOMIZE seconds window!"
     ((_TR = RANDOM % INF_RANDOMIZE))
-    echo "# Random start offset is $_TR seconds, sleeping now ..." tee "$INF_WORK_DIR/__RANDOMIZING_JOB_START__"
+    echo "# Random start offset is $_TR seconds, sleeping now ..." | tee "$INF_WORK_DIR/__RANDOMIZING_JOB_START__"
     sleep $_TR
     unset _TR
     rm -f "$INF_WORK_DIR/__RANDOMIZING_JOB_START__"
