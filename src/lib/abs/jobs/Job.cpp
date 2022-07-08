@@ -3895,7 +3895,6 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
         case EJS_FINISHED:
         case EJS_KILLED:
             sout << right << setw(25) << last_change.GetSDateAndTime();
-            sout << " " << right << setw(4) << GetItem("batch/job","INF_EXIT_STATUS");
             break;
     }
 
@@ -3942,8 +3941,8 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
 
 void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin)
 {
-//    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
-//    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- --------------------" << endl;
+//    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change          Exit" << endl;
+//    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------- ----" << endl;
 
     CSmallString id = GetItem("batch/job","INF_JOB_ID");
     CSmallString srv = GetItem("batch/job","INF_SERVER_NAME");
@@ -4057,6 +4056,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             CSmallTimeAndDate ptime(GetItem("batch/job","INF_FINISH_TIME").ToLInt());
             sout << ptime.GetSDateAndTime();
             }
+            sout << " " << right << setw(4) << GetItem("batch/job","INF_EXIT_STATUS");
             break;
         case EJS_ERROR:
         case EJS_INCONSISTENT:

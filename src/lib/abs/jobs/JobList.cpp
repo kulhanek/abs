@@ -1951,8 +1951,8 @@ void CJobList::PrintInfos(std::ostream& sout)
 void CJobList::PrintInfosCompact(std::ostream& sout,bool includepath,bool includecomment)
 {
     sout << endl;
-    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times            Exit" << endl;
-    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- ------------------------- ----" << endl;
+    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times           " << endl;
+    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------------" << endl;
 
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
@@ -2205,8 +2205,8 @@ void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includeco
     }
 
     sout << endl;
-    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times           " << endl;
-    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------------" << endl;
+    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times            Exit" << endl;
+    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- ------------------------- ----" << endl;
 
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
