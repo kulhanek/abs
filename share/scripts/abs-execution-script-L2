@@ -513,7 +513,23 @@ case $INF_DATAIN in
 esac
 
 # ------------------------------------------------------------------------------
+# randomize job start, RT#1094208
+if [[ (-n "$INF_RANDOMIZE") && (INF_RANDOMIZE -gt 0) ]]; then
+    echo "#"
+    echo "# Randomizing job startup in $INF_RANDOMIZE seconds window!"
+    ((_TR = RANDOM % INF_RANDOMIZE))
+    echo "# Random start offset is $_TR seconds, sleeping now ..." tee "$INF_WORK_DIR/__RANDOMIZING_JOB_START__"
+    sleep $_TR
+    unset _TR
+    rm -f "$INF_WORK_DIR/__RANDOMIZING_JOB_START__"
+fi
+
+# ------------------------------------------------------------------------------
 # various statistics
+
+# ------------------------------------------------------------------------------
+# determine INF_MAX_WALLTIME from the job stat
+export INF_MAX_WALLTIME=`pqstat -j $INF_JOB_ID | grep Resource_List.walltime | awk '{print $3;}' | tr ":" " " | awk '{ print $1*3600 + $2*60 + $3;}'`
 
 echo ""
 echo "# ------------------------------------------------------------------------------"

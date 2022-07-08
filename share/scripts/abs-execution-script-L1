@@ -96,26 +96,12 @@ if [ $? -ne 0 ] || [ "$AMS_EXIT_CODE" != "0" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# randomize job start, RT#1094208
-if [[ (-n "$INF_RANDOMIZE") && (INF_RANDOMIZE -gt 0) ]]; then
-    echo "# Randomizing job startup by $INF_RANDOMIZE window!"
-    ((_TR = RANDOM % INF_RANDOMIZE))
-    echo "# Random satrt offset is $_TR seconds, sleeping now ..."
-    sleep $_TR
-    uset _TR
-fi
-
-# ------------------------------------------------------------------------------
 # AMS/ABS co-operation
 
 export AMS_NCPUS=$INF_NCPUS
 export AMS_NGPUS=$INF_NGPUS
 export AMS_NNODES=$INF_NNODES
 export AMS_NODEFILE=$PBS_NODEFILE
-
-# ------------------------------------------------------------------------------
-# determine INF_MAX_WALLTIME from the job stat
-export INF_MAX_WALLTIME=`pqstat -j $INF_JOB_ID | grep Resource_List.walltime | awk '{print $3;}' | tr ":" " " | awk '{ print $1*3600 + $2*60 + $3;}'`
 
 # ------------------------------------------------------------------------------
 # restore exported modules
