@@ -135,6 +135,9 @@ public:
     //! print technical info about jobs
     void PrintJobs(std::ostream& sout,bool include_history);
 
+    //! print technical info about jobs
+    void PrintUserJobs(std::ostream& sout,const CSmallString& user,bool include_history);
+
     //! print technical info about single job
     bool PrintJob(std::ostream& sout,const CSmallString& name,bool include_history);
 

@@ -108,6 +108,9 @@ public:
     //! print technical info about jobs
     virtual bool PrintJobs(std::ostream& sout,bool include_history);
 
+    //! print technical info about jobs of given user
+    virtual bool PrintUserJobs(std::ostream& sout,const CSmallString& user,bool include_history);
+
     //! print technical info about a single job
     virtual bool PrintJob(std::ostream& sout,const CSmallString& name,bool include_history);
 

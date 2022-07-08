@@ -3795,8 +3795,8 @@ bool CJob::SaveJobKey(void)
 void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includecomment)
 {
 
-//    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change         " << endl;
-//    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- --------------------" << endl;
+//    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change          Exit" << endl;
+//    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------- ----" << endl;
 
     sout << "  ";
     switch( GetJobStatus() ){
@@ -3895,6 +3895,7 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
         case EJS_FINISHED:
         case EJS_KILLED:
             sout << right << setw(25) << last_change.GetSDateAndTime();
+            sout << " " << right << setw(4) << GetItem("batch/job","INF_EXIT_STATUS");
             break;
     }
 

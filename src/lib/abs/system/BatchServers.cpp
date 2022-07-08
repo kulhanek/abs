@@ -836,6 +836,27 @@ void CBatchServers::PrintJobs(std::ostream& sout,bool include_history)
 
 //------------------------------------------------------------------------------
 
+void CBatchServers::PrintUserJobs(std::ostream& sout,const CSmallString& user,bool include_history)
+{
+    // init servers if not done already
+    if( size() == 0 ) InitAll();
+
+    // list jobs
+    std::list<CBatchServerPtr>::iterator    it = begin();
+    std::list<CBatchServerPtr>::iterator    ie = end();
+
+    while( it != ie ){
+        CBatchServerPtr srv_ptr = *it;
+    sout << endl;
+    sout << "# Batch server  : " << srv_ptr->GetServerName() << " (" << srv_ptr->GetShortName() << ")" << endl;
+    sout << "# ------------------------------------------------------------------------------" << endl;
+        srv_ptr->PrintUserJobs(sout,user,include_history);
+        it++;
+    }
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServers::PrintJob(std::ostream& sout,const CSmallString& jobid,bool include_history)
 {
     // performance optimization - only the job server is loaded by FindBatchServerByJobID()

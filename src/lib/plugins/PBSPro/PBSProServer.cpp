@@ -678,6 +678,33 @@ bool CPBSProServer::PrintJobs(std::ostream& sout,bool include_history)
 
 //------------------------------------------------------------------------------
 
+bool CPBSProServer::PrintUserJobs(std::ostream& sout,const CSmallString& user,bool include_history)
+{
+    StartTimer();
+
+    CSmallString extend;
+    if( include_history ){
+        extend << "x";
+    }
+
+    struct attropl* p_first = NULL;
+    set_attribute(p_first,ATTR_u,NULL,user,EQ);
+
+    struct batch_status* p_jobs;
+    p_jobs = pbspro_selstat(ServerID,p_first,NULL,extend.GetBuffer());
+
+    if( p_jobs != NULL ) {
+        PrintBatchStatus(sout,p_jobs);
+        pbspro_statfree(p_jobs);
+    }
+
+    EndTimer();
+
+    return(p_jobs != NULL);
+}
+
+//------------------------------------------------------------------------------
+
 bool CPBSProServer::PrintJob(std::ostream& sout,const CSmallString& jobid,bool include_history)
 {
     StartTimer();

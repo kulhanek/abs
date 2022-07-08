@@ -183,6 +183,13 @@ bool CBatchServer::PrintJobs(std::ostream& sout,bool include_history)
 
 //------------------------------------------------------------------------------
 
+bool CBatchServer::PrintUserJobs(std::ostream& sout,const CSmallString& user,bool include_history)
+{
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
 bool CBatchServer::PrintJob(std::ostream& sout,const CSmallString& name,bool include_history)
 {
     return(true);

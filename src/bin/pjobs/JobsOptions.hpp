@@ -68,6 +68,7 @@ class CJobsOptions : public CSimpleOptions {
         CSO_OPT(bool,KeepHistory)
         CSO_OPT(bool,Moved)
         CSO_OPT(bool,Finished)
+        CSO_OPT(bool,Technical)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -155,7 +156,16 @@ class CJobsOptions : public CSimpleOptions {
                     "moved",                      /* long option name */
                     NULL,                           /* parametr name */
                     "show only moved jobs")   /* option description */
-        //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                    Technical,                        /* option name */
+                    false,                          /* default value */
+                    false,                          /* is option mandatory */
+                    't',                           /* short option name */
+                    "technical",                      /* long option name */
+                    NULL,                           /* parametr name */
+                    "print all jobs in technical format")   /* option description */
+    //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
                     false,                          /* default value */
@@ -164,7 +174,7 @@ class CJobsOptions : public CSimpleOptions {
                     "verbose",                      /* long option name */
                     NULL,                           /* parametr name */
                     "increase output verbosity")   /* option description */
-        //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Version,                        /* option name */
                     false,                          /* default value */
@@ -173,7 +183,7 @@ class CJobsOptions : public CSimpleOptions {
                     "version",                      /* long option name */
                     NULL,                           /* parametr name */
                     "output version information and exit")   /* option description */
-        //----------------------------------------------------------------------
+    //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Help,                        /* option name */
                     false,                          /* default value */

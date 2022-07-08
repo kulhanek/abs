@@ -291,6 +291,12 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
     get_attribute(p_job->attribs,ATTR_l,"walltime",time);
     SetItem("batch/job","INF_WALL_TIME",time.GetSecondsFromBeginning());
 
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_exit_status,NULL,tmp);
+    if( tmp != NULL ){
+        SetItem("batch/job","INF_EXIT_STATUS",tmp);
+    }
+
     return(true);
 }
 

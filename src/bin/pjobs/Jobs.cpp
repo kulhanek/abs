@@ -122,6 +122,11 @@ bool CJobs::Run(void)
     vout << "# PBSPro user: " << user << endl;
     vout << low;
 
+    if( Options.GetOptTechnical() ){
+        BatchServers.PrintUserJobs(vout,user,Options.GetOptKeepHistory() || Options.GetOptFinished() || Options.GetOptMoved());
+        return(true);
+    }
+
     if( BatchServers.GetUserJobs(user,Options.GetOptKeepHistory() | Options.GetOptFinished() || Options.GetOptMoved()) == false ){
         ES_ERROR("unable to get jobs");
         return(false);
