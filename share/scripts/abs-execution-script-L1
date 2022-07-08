@@ -96,6 +96,16 @@ if [ $? -ne 0 ] || [ "$AMS_EXIT_CODE" != "0" ]; then
 fi
 
 # ------------------------------------------------------------------------------
+# randomize job start, RT#1094208
+if [[ (-n "$INF_RANDOMIZE") && (INF_RANDOMIZE -gt 0) ]]; then
+    echo "# Randomizing job startup by $INF_RANDOMIZE window!"
+    ((_TR = RANDOM % INF_RANDOMIZE))
+    echo "# Random satrt offset is $_TR seconds, sleeping now ..."
+    sleep $_TR
+    uset _TR
+fi
+
+# ------------------------------------------------------------------------------
 # AMS/ABS co-operation
 
 export AMS_NCPUS=$INF_NCPUS

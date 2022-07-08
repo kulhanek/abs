@@ -139,6 +139,8 @@ src/lib/abs/resources/default/RVNCPUsPerNUMANode.cpp
 src/lib/abs/resources/default/RVNCPUsPerNUMANode.hpp
 src/lib/abs/resources/default/RVNCPUsPerNode.cpp
 src/lib/abs/resources/default/RVNCPUsPerNode.hpp
+src/lib/abs/resources/default/RVRandomize.cpp
+src/lib/abs/resources/default/RVRandomize.hpp
 src/lib/abs/system/CategoryUUID.cpp
 src/lib/abs/system/CategoryUUID.hpp
 src/lib/abs/system/ABSCompletion.cpp
