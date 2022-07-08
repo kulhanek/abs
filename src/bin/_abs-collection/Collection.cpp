@@ -357,18 +357,23 @@ bool CCollection::Run(void)
                 CFileName path = *it;
                 if( CFileSystem::SetCurrentDir(cwd / path) == true ){
 
-                CJob::SubmitJobFull(vout,args,
-                                           false,
-                                           false,
-                                           false,
-                                           true,
-                                           false,
-                                           Options.GetOptVerbose() );
+                    CShell::SetSystemVariable("PWD",cwd / path);    // fake PWD
+
+                    CJob::SubmitJobFull(vout,args,
+                                               false,
+                                               false,
+                                               false,
+                                               true,
+                                               false,
+                                               Options.GetOptVerbose() );
                 } else {
                     vout << "<red> >>> ERROR: Unable to change working directory to '" << path << "'!" << endl;
                 }
                 it++;
             }
+            // restore original cwd
+            CFileSystem::SetCurrentDir(cwd);
+            CShell::SetSystemVariable("PWD",cwd);
         }
 
         vout << endl;
