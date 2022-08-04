@@ -302,7 +302,7 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
     get_attribute(p_job->attribs,ATTR_used,"cpupercent",tmp);
 
     CSmallString tmp1;
-    get_attribute(p_job->attribs,ATTR_l,"ATTR_l",tmp1);
+    get_attribute(p_job->attribs,ATTR_l,"ncpus",tmp1);
 
     if( (tmp != NULL) && (tmp1 != NULL) ){
         int cpupercent = tmp.ToInt();
