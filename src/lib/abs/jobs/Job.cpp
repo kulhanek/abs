@@ -4052,6 +4052,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             string tmp2(wtime.GetSTimeAndDay());
             trim(tmp2);
             sout << tmp2;
+            PrintJobQStatUtilization(sout);
             }
             break;
         case EJS_FINISHED:
@@ -4060,6 +4061,7 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
             CSmallTimeAndDate ptime(GetItem("batch/job","INF_FINISH_TIME").ToLInt());
             sout << ptime.GetSDateAndTime();
             }
+            PrintJobQStatUtilization(sout);
             sout << " " << right << setw(4) << GetItem("batch/job","INF_EXIT_STATUS",true);
             break;
         case EJS_ERROR:

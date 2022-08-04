@@ -309,7 +309,7 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
         int ncpus = tmp1.ToInt();
         if( ncpus > 0 ){
             cpupercent = cpupercent / ncpus;
-            SetItem("batch/job","INF_EXIT_STATUS",cpupercent);
+            SetItem("batch/job","INF_UTIL_CPU",cpupercent);
         }
     }
 
