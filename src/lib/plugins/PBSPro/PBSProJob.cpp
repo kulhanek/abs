@@ -300,7 +300,6 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
 // decode resource utilization
     tmp = NULL;
     get_attribute(p_job->attribs,ATTR_used,"cpupercent",tmp);
-
     CSmallString tmp1;
     get_attribute(p_job->attribs,ATTR_l,"ncpus",tmp1);
 
@@ -310,6 +309,20 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
         if( ncpus > 0 ){
             cpupercent = cpupercent / ncpus;
             SetItem("batch/job","INF_UTIL_CPU",cpupercent);
+        }
+    }
+
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_used,"mem",tmp);
+    tmp1 = NULL;
+    get_attribute(p_job->attribs,ATTR_l,"mem",tmp1);
+
+    if( (tmp != NULL) && (tmp1 != NULL) ){
+        long int umem = CResourceValue::GetSize(tmp);
+        long int amem = CResourceValue::GetSize(tmp1);
+        if( amem > 0 ){
+            umem = (umem * 100) / amem;
+            SetItem("batch/job","INF_UTIL_MEM",umem);
         }
     }
 
