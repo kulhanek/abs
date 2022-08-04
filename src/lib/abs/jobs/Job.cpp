@@ -4131,23 +4131,38 @@ void CJob::PrintJobQStatUtilization(std::ostream& sout)
     CSmallString tmp;
     tmp = GetItem("batch/job","INF_UTIL_CPU",true);
 
-    int cutil = 0;
+    int ctil = 0;
     if( tmp != NULL ){
-        cutil = tmp. ToInt();
+        ctil = tmp. ToInt();
     }
-    if( (cutil > 110) && (cutil < 60) ){
+    if( (ctil > 110) || (ctil < 60) ){
         sout << "<red>";
-    } else if( cutil < 80 ) {
+    } else if( ctil < 80 ) {
         sout << "<yellow>";
     }
-    sout << " " << right << setw(3) << GetItem("batch/job","INF_UTIL_CPU",true);
-    if( (cutil > 110) && (cutil < 60) ){
+    sout << " " << right << setw(3) << tmp;
+    if( (ctil > 110) || (ctil < 60) ){
         sout << "</red>";
-    } else if( cutil < 80 ) {
+    } else if( ctil < 80 ) {
         sout << "</yellow>";
     }
 
-    sout << " " << right << setw(3) << GetItem("batch/job","INF_UTIL_MEM",true);
+    tmp = GetItem("batch/job","INF_UTIL_MEM",true);
+    ctil = 0;
+    if( tmp != NULL ){
+        ctil = tmp. ToInt();
+    }
+    if( (ctil > 110) || (ctil < 60) ){
+        sout << "<red>";
+    } else if( ctil < 80 ) {
+        sout << "<yellow>";
+    }
+    sout << " " << right << setw(3) << tmp;
+    if( (ctil > 110) || (ctil < 60) ){
+        sout << "</red>";
+    } else if( ctil < 80 ) {
+        sout << "</yellow>";
+    }
 }
 
 //------------------------------------------------------------------------------
