@@ -486,6 +486,10 @@ if [ "$INF_NGPUS" -gt 0 ]; then
     echo "# File: $INF_GPUFILE"
     cat "$INF_GPUFILE"
     if [ $? -ne 0 ]; then exit 1; fi
+else
+    # disable GPU use
+    CUDA_VISIBLE_DEVICES=""
+    export CUDA_VISIBLE_DEVICES
 fi
 
 # ------------------------------------------------------------------------------
