@@ -4128,8 +4128,26 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
 
 void CJob::PrintJobQStatUtilization(std::ostream& sout)
 {
-    sout << " " << right << setw(4) << GetItem("batch/job","INF_UTIL_CPU",true);
-    sout << " " << right << setw(4) << GetItem("batch/job","INF_UTIL_MEM",true);
+    CSmallString tmp;
+    tmp = GetItem("batch/job","INF_UTIL_CPU",true);
+
+    int cutil = 0;
+    if( tmp != NULL ){
+        cutil = tmp. ToInt();
+    }
+    if( (cutil > 110) && (cutil < 60) ){
+        sout << "<red>";
+    } else if( cutil < 80 ) {
+        sout << "<yellow>";
+    }
+    sout << " " << right << setw(3) << GetItem("batch/job","INF_UTIL_CPU",true);
+    if( (cutil > 110) && (cutil < 60) ){
+        sout << "</red>";
+    } else if( cutil < 80 ) {
+        sout << "</yellow>";
+    }
+
+    sout << " " << right << setw(3) << GetItem("batch/job","INF_UTIL_MEM",true);
 }
 
 //------------------------------------------------------------------------------
