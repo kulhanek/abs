@@ -4147,22 +4147,8 @@ void CJob::PrintJobQStatUtilization(std::ostream& sout)
         sout << "</yellow>";
     }
 
-    tmp = GetItem("batch/job","INF_UTIL_MEM",true);
-    ctil = 0;
-    if( tmp != NULL ){
-        ctil = tmp. ToInt();
-    }
-    if( (ctil > 110) || (ctil < 60) ){
-        sout << "<red>";
-    } else if( ctil < 80 ) {
-        sout << "<yellow>";
-    }
-    sout << " " << right << setw(3) << tmp;
-    if( (ctil > 110) || (ctil < 60) ){
-        sout << "</red>";
-    } else if( ctil < 80 ) {
-        sout << "</yellow>";
-    }
+    // do not color mem utilization
+    sout << " " << right << setw(3) << GetItem("batch/job","INF_UTIL_MEM",true);
 }
 
 //------------------------------------------------------------------------------
