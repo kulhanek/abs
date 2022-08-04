@@ -2204,8 +2204,9 @@ void CJobList::PrintBatchInfo(std::ostream& sout,bool includepath,bool includeco
     }
 
     sout << endl;
-    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times            Exit" << endl;
-    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- ------------------------- ----" << endl;
+    sout << "#                                                                                                          Util[%]     " << endl;
+    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times            CPU Mem Exit" << endl;
+    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- ------------------------- --- --- ----" << endl;
 
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();

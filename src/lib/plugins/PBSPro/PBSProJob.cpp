@@ -297,6 +297,22 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
         SetItem("batch/job","INF_EXIT_STATUS",tmp);
     }
 
+// decode resource utilization
+    tmp = NULL;
+    get_attribute(p_job->attribs,ATTR_used,"cpupercent",tmp);
+
+    CSmallString tmp1;
+    get_attribute(p_job->attribs,ATTR_l,"ATTR_l",tmp1);
+
+    if( (tmp != NULL) && (tmp1 != NULL) ){
+        int cpupercent = tmp.ToInt();
+        int ncpus = tmp1.ToInt();
+        if( ncpus > 0 ){
+            cpupercent = cpupercent / ncpus;
+            SetItem("batch/job","INF_EXIT_STATUS",cpupercent);
+        }
+    }
+
     return(true);
 }
 

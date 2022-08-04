@@ -193,6 +193,9 @@ public:
     /// print information about job
     void PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin);
 
+    /// print information about resource utilization
+    void PrintJobQStatUtilization(std::ostream& sout);
+
     /// print job status using abbreviations: P, Q, R, F, IN
     void PrintJobStatus(std::ostream& sout);
 

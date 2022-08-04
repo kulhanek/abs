@@ -1478,6 +1478,9 @@ bool CJob::WriteStop(void)
         return(false);
     }
 
+// HW utilization
+
+
     return(true);
 }
 
@@ -3941,8 +3944,9 @@ void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includ
 
 void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecomment,bool includeorigin)
 {
-//    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change          Exit" << endl;
-//    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------- ----" << endl;
+//    sout << "#                                                                                                          Util[%]     " << endl;
+//    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods          Times            CPU Mem Exit" << endl;
+//    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- ------------------------- --- --- ----" << endl;
 
     CSmallString id = GetItem("batch/job","INF_JOB_ID");
     CSmallString srv = GetItem("batch/job","INF_SERVER_NAME");
@@ -4116,6 +4120,14 @@ void CJob::PrintJobQStatInfo(std::ostream& sout,bool includepath,bool includecom
         }
     }
 
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::PrintJobQStatUtilization(std::ostream& sout)
+{
+    sout << " " << right << setw(4) << GetItem("batch/job","INF_UTIL_CPU",true);
+    sout << " " << right << setw(4) << GetItem("batch/job","INF_UTIL_MEM",true);
 }
 
 //------------------------------------------------------------------------------
