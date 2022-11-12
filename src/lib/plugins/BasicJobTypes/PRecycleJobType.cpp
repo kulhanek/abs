@@ -405,17 +405,18 @@ bool CPRecycleJobType::CheckInputFile(CJob& job,std::ostream& sout)
     //note: cache is already initialized
 
     // check if GPU resources are required by module
-    if( Cache.DoesItNeedGPU(mname) == false ) return(true);
+    if( Cache.DoesItNeedGPU(mname) == true ){
 
-    // the module needs GPU, did we requested GPUs?
-    CSmallString sngpus = job.GetItem("specific/resources","INF_NGPUS");
-    int ngpus = sngpus.ToInt();
+        // the module needs GPU, did we requested GPUs?
+        CSmallString sngpus = job.GetItem("specific/resources","INF_NGPUS");
+        int ngpus = sngpus.ToInt();
 
-    if( ngpus == 0 ){
-        sout << endl;
-        sout << "<b><red> ERROR: The specified MD engine module (" << mname;
-        sout << ") requires GPU resources but none were requested!</red></b>" << endl;
-        return(false);
+        if( ngpus == 0 ){
+            sout << endl;
+            sout << "<b><red> ERROR: The specified MD engine module (" << mname;
+            sout << ") requires GPU resources but none were requested!</red></b>" << endl;
+            return(false);
+        }
     }
 
     CFileName storage;
