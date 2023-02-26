@@ -44,6 +44,7 @@ SET(ABS_SRC
         resources/default/RVFixPerms.cpp
         resources/default/RVMPISlotsPerNode.cpp
         resources/default/RVRandomize.cpp
+        resources/default/RVInputData.cpp
 
     # jobs ---------------------------------------
         jobs/search/nodes/NodeMask.tab.c

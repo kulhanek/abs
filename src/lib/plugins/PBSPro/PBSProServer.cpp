@@ -855,6 +855,9 @@ bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
     variables << ",INF_STORAGE_MACHINE=" << job.GetStorageMachine();
     variables << ",INF_STORAGE_DIR=" << job.GetStorageDir();
     variables << ",INF_JOB_KEY=" << job.GetJobKey();
+    if( job.GetItem("specific/resources","INF_INPUT_DATA",true) != NULL ){
+        variables << ",INF_INPUT_DATA=" << job.GetItem("specific/resources","INF_INPUT_DATA",true);
+    }
     variables << ",ABS_ROOT=" << CShell::GetSystemVariable("ABS_ROOT");
     if( job.GetItem("basic/collection","INF_COLLECTION_ID",true) != NULL ) {
         // optional info about job collection

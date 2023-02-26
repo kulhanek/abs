@@ -636,6 +636,12 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_MPI_SLOTS_PER_NODE",ResourceList.GetResourceValue("mpislotspernode"));
     SetItem("specific/resources","INF_APPMEM",ResourceList.GetResourceValue("appmem"));
 
+    if( ResourceList.GetResourceValue("inputdata") != NULL ){
+        SetItem("specific/resources","INF_INPUT_DATA",ResourceList.GetResourceValue("inputdata"));
+    } else {
+        SetItem("specific/resources","INF_INPUT_DATA","default");
+    }
+
 // umask and group
     SetItem("specific/resources","INF_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
     SetItem("specific/resources","INF_UBATCHGROUP",ResourceList.GetResourceValue("batchgroup"));

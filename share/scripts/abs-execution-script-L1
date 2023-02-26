@@ -55,8 +55,12 @@ if [ -d "$INF_INPUT_DIR" ]; then
     # compare keys
     grep "$INF_JOB_KEY" "$INF_INPUT_DIR/${INF_WHOLE_NAME}.infkey" &> /dev/null
     if [ $? -eq 0 ]; then
-        INF_LOCAL_INPUT_DATA="YES"
-        echo "  > the input dir is local and the job keys match!"
+        if [ "$INF_INPUT_DATA" == "local" ] || [ "$INF_INPUT_DATA" == "default" ]; then
+            echo "  > the input dir is local and the job keys match!"
+            INF_LOCAL_INPUT_DATA="YES"
+        else
+            echo "  > the input dir is local and the job keys match, but local mode is disable by the inputdata resource!"
+        fi
     else
         echo "  > the input dir is local but the job keys do not match, the remote storage or input machine will be used!"
     fi

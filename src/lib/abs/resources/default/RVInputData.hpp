@@ -1,11 +1,9 @@
-#ifndef RVWorkDirH
-#define RVWorkDirH
+#ifndef RVInputDataH
+#define RVInputDataH
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
-//    Copyright (C) 2017 Petr Kulhanek, kulhanek@chemi.muni.cz
-//    Copyright (C) 2011-2012 Petr Kulhanek, kulhanek@chemi.muni.cz
-//    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
+//    Copyright (C) 2023 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
 //     This program is free software; you can redistribute it and/or modify
 //     it under the terms of the GNU General Public License as published by
@@ -28,10 +26,10 @@
 
 // -----------------------------------------------------------------------------
 
-class ABS_PACKAGE CRVWorkDir : public CResourceValue {
+class ABS_PACKAGE CRVInputData : public CResourceValue {
 public:
 // constructor -----------------------------------------------------------------
-        CRVWorkDir(void);
+        CRVInputData(void);
 
 // information methods ---------------------------------------------------------
     /// test value if it is in expected range
