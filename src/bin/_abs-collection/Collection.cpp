@@ -301,8 +301,7 @@ bool CCollection::Run(void)
         if( jobs.size() != 0 ) {
             // list jobs
             std::vector<CFileName>::iterator it = jobs.begin();
-            std::vector<CFileName>::iterator ie = jobs.end();
-            while( it != ie ){
+            while( it != jobs.end() ){ // vector can be reallocated by erase()
                 CFileName path = *it;
                 bool runtime_files = CJob::AreRuntimeFiles(path);
                 if( ! runtime_files ){
