@@ -51,21 +51,23 @@ echo
 echo "# Is the input directory local?"
 
 export INF_LOCAL_INPUT_DATA="NO"
-if [ -d "$INF_INPUT_DIR" ]; then
-    # compare keys
-    grep "$INF_JOB_KEY" "$INF_INPUT_DIR/${INF_WHOLE_NAME}.infkey" &> /dev/null
-    if [ $? -eq 0 ]; then
-        if [ "$INF_INPUT_DATA" == "local" ] || [ "$INF_INPUT_DATA" == "default" ]; then
+
+if [ "$INF_INPUT_DATA" == "storage" ]; then
+    echo "  > input data type: storage"
+    echo "  > the input dir is on the remote storage or input machine!"
+else
+    if [ -d "$INF_INPUT_DIR" ]; then
+        # compare keys
+        grep "$INF_JOB_KEY" "$INF_INPUT_DIR/${INF_WHOLE_NAME}.infkey" &> /dev/null
+        if [ $? -eq 0 ]; then
             echo "  > the input dir is local and the job keys match!"
             INF_LOCAL_INPUT_DATA="YES"
         else
-            echo "  > the input dir is local and the job keys match, but local mode is disable by the inputdata resource!"
+            echo "  > the input dir is local but the job keys do not match, the remote storage or input machine will be used!"
         fi
     else
-        echo "  > the input dir is local but the job keys do not match, the remote storage or input machine will be used!"
-    fi
-else
         echo "  > the input dir is on the remote storage or input machine!"
+    fi
 fi
 
 # ------------------------------------------------------------------------------
