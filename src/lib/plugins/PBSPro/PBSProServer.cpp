@@ -762,6 +762,13 @@ bool CPBSProServer::InitBatchResources(CResourceList* p_rl)
         str << ":mem=" << CResourceValue::GetSizeString(mem);
     }
 // ------------
+    rv_ptr = p_rl->FindResource("gpu_mem");
+    if( rv_ptr ){
+        // memory in kb
+        long long mem = rv_ptr->GetSize();
+        str << ":gpu_mem=" << CResourceValue::GetSizeString(mem);
+    }
+// ------------
     rv_ptr = p_rl->FindResource("workdir");
     CResourceValuePtr rvs_ptr = p_rl->FindResource("worksize");
     if( rv_ptr && rvs_ptr ){
