@@ -131,6 +131,8 @@ src/lib/abs/resources/default/RVAppMem.cpp
 src/lib/abs/resources/default/RVAppMem.hpp
 src/lib/abs/resources/default/RVAppMemPerNode.cpp
 src/lib/abs/resources/default/RVAppMemPerNode.hpp
+src/lib/abs/resources/default/RVGPUMem.cpp
+src/lib/abs/resources/default/RVGPUMem.hpp
 src/lib/abs/resources/default/RVInputData.cpp
 src/lib/abs/resources/default/RVInputData.hpp
 src/lib/abs/resources/default/RVMPISlotsPerNode.cpp
