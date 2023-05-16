@@ -21,7 +21,7 @@ INF_JOB_EMODS=$INF_GO_EXPORTED_MODULES_2
 if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi
 
 if [ -z "$AMS_ROOT" ]; then
-    source /software/ncbr/softmods/6.0/etc/boot/bashrc.ams
+    source /software/ncbr/softmods/8.0/etc/boot/bashrc.ams
     AMS_ALTERNATIVE_BOOT="YES"
 fi
 
@@ -33,10 +33,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ "$AMS_ALTERNATIVE_BOOT" == "YES" ]; then
-    echo " >>> NOTE: Infinity has been booted using an alternative approach,"
-    echo "           please report this to the site support: $AMS_SITE_SUPPORT"
-    echo "           (Include the whole output beggining by the pgo command!)"
-    echo ""
+    echo " >>> NOTE: Infinity has been booted using an alternative startup!"
     echo "           In the alternative mode, some functionality might be limited!"
     echo ""
 fi
