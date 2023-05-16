@@ -33,7 +33,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ "$AMS_ALTERNATIVE_BOOT" == "YES" ]; then
-    echo " >>> NOTE: Infinity has been booted using an alternative startup!"
+    echo ">>>> NOTE: Infinity has been booted using an alternative startup!"
     echo "           In the alternative mode, some functionality might be limited!"
     echo ""
 fi
