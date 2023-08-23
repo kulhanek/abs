@@ -67,7 +67,7 @@ while read INF_INPUT_MACHINE; do
     fi
     echo ""
     echo -n "# testing the input machine: '$INF_INPUT_MACHINE' ... "
-    ssh -x $INF_SSH_OPTIONS -o ConnectTimeout=10 "$INF_INPUT_MACHINE" echo &> /dev/null
+    ssh -x $INF_SSH_OPTIONS -o ConnectTimeout=60 "$INF_INPUT_MACHINE" echo &> /dev/null
     if [ $? -eq 0 ]; then
         echo "connection available"
     else
@@ -96,6 +96,9 @@ while read INF_INPUT_MACHINE; do
     echo "            See error messages above." >&2
     echo "            Trying the next input machine ..." >&2
     echo "" >&2
+
+    # put some small delay
+    sleep 60
 
 done < <( echo "$INF_INPUT_MACHINE_LIST" | tr ',' '\n' | uniq )
 

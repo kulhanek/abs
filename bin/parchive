@@ -12,6 +12,8 @@ function archive_runtime_files() {
 
     INF_FORMAT=$3
 
+    RET_STATUS=1
+
     if [ "$INF_LOCAL_INPUT_DATA" == "YES" ]; then
         echo "# Data transfer       : local mode ..."
 
@@ -19,45 +21,69 @@ function archive_runtime_files() {
         if [ $? -ne 0 ]; then exit 1; fi
 
         $ABS_ROOT/sbin/abs-update-infofile archive --format "$INF_FORMAT"
-
+        RET_STATUS=$?
     else   
         echo "# Data transfer       : remote mode ..."
 
-        if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
-            ssh $INF_INPUT_MACHINE \
-                "cd $INF_INPUT_DIR; \
-                if [ $? -ne 0 ]; then exit 1; fi; \
-                $ABS_ROOT/sbin/abs-update-infofile archive --format \"$INF_FORMAT\""
-        else
-            if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "NO" ]; then
-                if [ -z "$INF_SURROGATE_MACHINES" ]; then
-                    echo "" >&2
-                    echo " >>> ERROR: No surrogate machines defined!" >&2
-                    echo "" >&2
-                    exit 1
-                fi
-                while read INF_INPUT_MACHINE; do
-                    echo ""
-                    echo -n "Testing surrogate machine '$INF_INPUT_MACHINE' ... "
-                    ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" echo &> /dev/null
-                    if [ $? -eq 0 ]; then
-                        echo "success"
-                        ssh $INF_INPUT_MACHINE \
-                            "cd $INF_INPUT_DIR; \
-                            if [ $? -ne 0 ]; then exit 1; fi; \
-                            $ABS_ROOT/sbin/abs-update-infofile archive --format \"$INF_FORMAT\""
-                    else
-                        echo "failure"
-                    fi
-                done < <( echo "$INF_SURROGATE_MACHINES" | tr ',' '\n' )
-            else
+        # sanity checks
+        if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "NO" ]; then
+            if [ -z "$INF_SURROGATE_MACHINES" ]; then
                 echo "" >&2
-                echo " >>> ERROR: INF_INPUT_MACHINE_ENABLED_FOR_EXEC = '$INF_INPUT_MACHINE_ENABLED_FOR_EXEC' but YES/NO expected!" >&2
+                echo " >>> ERROR: No surrogate machines defined!" >&2
                 echo "" >&2
                 exit 1
             fi
         fi
+
+        # input machines
+        INF_INPUT_MACHINE_LIST=""
+
+        if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
+            echo "# input machine      : $INF_INPUT_MACHINE"
+            INF_INPUT_MACHINE_LIST="$INF_INPUT_MACHINE"
+        fi
+        if [ -n "$INF_SURROGATE_MACHINES" ]; then
+            echo "# surrogate machines : $INF_SURROGATE_MACHINES"
+            INF_INPUT_MACHINE_LIST="${INF_INPUT_MACHINE_LIST},${INF_SURROGATE_MACHINES}"
+        fi
+
+        while read INF_INPUT_MACHINE; do
+            echo ""
+            echo -n "Testing surrogate machine '$INF_INPUT_MACHINE' ... "
+            ssh -x $INF_SSH_OPTIONS  -o ConnectTimeout=60 "$INF_INPUT_MACHINE" echo &> /dev/null
+            if [ $? -eq 0 ]; then
+                echo "connection available"
+            else
+                echo "no connection available, trying the next one ..."
+                continue
+            fi
+            ssh $INF_INPUT_MACHINE \
+                "if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi; \
+                if [ -z \"\$AMS_ROOT\" ]; then \
+                    source \"$INF_BOOT_SCRIPT\"; \
+                fi; \
+                site activate $INF_SITE_ID; \
+                cd $INF_INPUT_DIR; \
+                if [ $? -ne 0 ]; then exit 1; fi; \
+                $ABS_ROOT/sbin/abs-update-infofile archive --format \"$INF_FORMAT\""
+            if [ $? -eq 0 ]; then
+                RET_STATUS=0
+                break
+            fi
+
+            echo "" >&2
+            echo " >>> ERROR: Unable to archive runtimefiles!" >&2
+            echo "            See error messages above." >&2
+            echo "            Trying the next input machine ..." >&2
+            echo "" >&2
+
+            # put some small delay
+            sleep 60
+
+        done < <( echo "$INF_SURROGATE_MACHINES" | tr ',' '\n' | uniq )
     fi
+
+    return $RET_STATUS
 }
 
 # ------------------------------------------------------------------------------
