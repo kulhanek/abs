@@ -59,7 +59,7 @@ cat << EOF
 site activate "$INF_SITE_ID"
 amsmodule add "$INF_AGENT_MODULE"
 
-INF_VNC_DISPLAY="`echo $INF_VNC_ID | tr \":\" \" \" | awk '{ printf("%d",$2); }'`"
+INF_VNC_DISPLAY="`echo $INF_VNC_ID | tr ':' ' ' | awk '{ printf("%d",$2); }'`"
 
 # terminate vnc display
 vncserver -kill ":$INF_VNC_DISPLAY"
@@ -226,7 +226,7 @@ case $INF_JOB_NAME in
         export INF_AGENT_MODULE
 
         # start VNC server
-        vncserver --new &> "${INF_WHOLE_NAME}.vncid" &
+        vncserver --new --fg &> "${INF_WHOLE_NAME}.vncid" &
 
         INF_AGENT_PID=$!
 
