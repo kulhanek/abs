@@ -2403,8 +2403,9 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
 
     bool result = true;
 
-    CSamllString bscript;
+    CSmallString bscript;
     if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",bscript) == false ){
+        // FIXME
         // hardcoded backup
         bscript = "/software/ncbr/softmods/8.0/etc/boot/bashrc.ncbr";
     }
