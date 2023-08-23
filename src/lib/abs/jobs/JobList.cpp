@@ -645,7 +645,7 @@ bool CJobList::SaveAllInfoFiles(void)
 
 //------------------------------------------------------------------------------
 
-bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool noterm)
+bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool noterm)
 {
     list<CJobPtr>::iterator it = begin();
     list<CJobPtr>::iterator ie = end();
@@ -690,33 +690,6 @@ bool CJobList::IsGoActionPossible(std::ostream& sout,bool force,bool proxy,bool 
                     it++;
                 } else {
                     if( noterm == false ){
-                        // interactive jobs
-                        if( p_job->GetJobName() == "gui" ){
-                            if( proxy == false ){
-                                // is the display local?
-                                string display = string(CShell::GetSystemVariable("DISPLAY"));
-                                vector<string> items;
-                                split(items,display,is_any_of(":"),boost::token_compress_on);
-                                if( (items.size() != 2) ){
-                                    sout << "<b><blue> WARNING: This is a GUI job, which requires an active DISPLAY but none or incorrect is provided '" << display << "'!</blue></b>" << endl;
-                                    sout << "<b><blue>          You can also try to initialize the VNC proxy via the --proxy option.</blue></b>" << endl;
-                                    sout << endl;
-                                    it = erase(it);
-                                    break;
-                                } else if( items[0].empty() == false ){
-                                    sout << "<b><blue> WARNING: This is a GUI job, which requires the local DISPLAY but '" << display << "' is set!</blue></b>" << endl;
-                                    sout << "<b><blue>          You can also try to initialize the VNC proxy via the --proxy option.</blue></b>" << endl;
-                                    sout << endl;
-                                    it = erase(it);
-                                    break;
-                                }
-                            } else {
-                                sout << "<b><blue> INFO: The VNC proxy wil be started for this GUI job.</blue></b>" << endl;
-                                sout << endl;
-                                p_job->ActivateGUIProxy();
-                            }
-                        }
-
                         if( p_job->IsTerminalReady() == false ){
                             sout << "<b><blue> WARNING: The job was started but the job terminal is not ready yet.</blue></b>" << endl;
                             sout << "<b><blue>          Wait for the job terminal ...</blue></b>" << endl;

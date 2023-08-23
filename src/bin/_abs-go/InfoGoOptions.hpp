@@ -60,7 +60,6 @@ class CInfoGoOptions : public CSimpleOptions {
         CSO_OPT(bool,Force)
         CSO_OPT(bool,NoWait)
         CSO_OPT(bool,NoTerminal)
-        CSO_OPT(bool,Proxy)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -94,15 +93,6 @@ class CInfoGoOptions : public CSimpleOptions {
                     "noterm",                      /* long option name */
                     NULL,                           /* parametr name */
                     "do not login to terminal")   /* option description */
-    //----------------------------------------------------------------------
-        CSO_MAP_OPT(bool,                           /* option type */
-                    Proxy,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    0,                           /* short option name */
-                    "proxy",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "start VNC proxy server for the GUI job")   /* option description */
     //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */

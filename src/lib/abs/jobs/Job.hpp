@@ -440,9 +440,6 @@ public:
     /// is job interactive terminal ready?
     bool IsTerminalReady(void);
 
-    /// activate proxy for GUI job
-    void ActivateGUIProxy(void);
-
     /// archive runtime files
     void ArchiveRuntimeFiles(const CSmallString& sformat);
 

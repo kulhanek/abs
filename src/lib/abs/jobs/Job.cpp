@@ -4244,13 +4244,6 @@ bool CJob::IsTerminalReady(void)
 
 //------------------------------------------------------------------------------
 
-void CJob::ActivateGUIProxy(void)
-{
-    SetItem("terminal","INF_GUI_PROXY","ssh-proxy");
-}
-
-//------------------------------------------------------------------------------
-
 CFileName CJob::GetJobInputPath(void)
 {
     CFileName pwd = CShell::GetSystemVariable("PWD");
