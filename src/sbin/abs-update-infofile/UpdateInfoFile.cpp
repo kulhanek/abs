@@ -124,12 +124,13 @@ bool CUpdateInfoFile::ArchiveRuntimeFiles(void)
     CVerboseStr     vout;
     vout.Attach(console);
 
+    vout << std::endl;
     if( jobs.GetNumberOfJobs() == 0 ){
-        vout << "No job runtime files to archive ..." << std::endl;
+        vout << "No job runtime files to archive!" << std::endl;
         return(true);
     }
 
-    vout << "Jobs for archiving (format: " << Options.GetOptFormat() << ") ..." << std::endl;
+    vout << "Jobs for archiving (format: " << Options.GetOptFormat() << "):" << std::endl;
     jobs.PrintInfosCompact(vout,false,false);
 
     // archive
