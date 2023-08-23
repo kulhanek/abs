@@ -33,7 +33,7 @@ case "$INF_GO_JOB_NAME" in
         if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -n "$INF_GO_SITE_ID" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
             ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
-                if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi; \
+                if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
                 if [ -z \"\$AMS_ROOT\" ]; then \
                     source \"$INF_GO_BOOT_SCRIPT\"; \
                     AMS_ALTERNATIVE_BOOT=\"YES\"; \

@@ -76,6 +76,9 @@ while read INF_INPUT_MACHINE; do
     fi
     ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" "
                 if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
+                if [ -z \"\$AMS_ROOT\" ]; then \
+                    source \"$INF_BOOT_SCRIPT\"; \
+                fi; \
                 site activate $INF_SITE_ID; \
                 amsmodule add abs:$INF_ABS_VERSION &> /dev/null; \
                 if [ -n \"$INF_EXPORTED_MODULES\" ]; then amsmodule add $INF_EXPORTED_MODULES &> /dev/null; fi; \
