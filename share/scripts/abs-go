@@ -53,11 +53,10 @@ case "$INF_GO_JOB_NAME" in
         return 0
         ;;
     gui )
-        echo ""
-        echo "    This is a GUI job."
-        echo "    Use the following commands to open the VNC viewer from any machine:"
-        echo "        \$ module add tigervnc"
-        echo "        \$ vncviewer $INF_GO_VNC_ID"
+        echo "This is a GUI job."
+        echo "Use the following commands to open the VNC viewer from any machine:"
+        echo " \$ module add tigervnc"
+        echo " \$ vncviewer $INF_GO_VNC_ID"
         echo ""
         ;;
     * )
