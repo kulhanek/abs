@@ -20,6 +20,7 @@
 # INF_GO_VNC_ID
 # INF_GO_WHOLE_NAME
 # INF_GO_SITE_ID
+# INF_GO_AMS_ROOT
 
 # global setup
 INF_SSH_OPTIONS=`$ABS_ROOT/sbin/abs-get-setup-item INF_SSH_OPTIONS`
@@ -29,9 +30,10 @@ export INF_SSH_OPTIONS
 # this is inline script
 case "$INF_GO_JOB_NAME" in
     cli )   
-        if [ -n "$INF_GO_SITE_ID" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
+        if [ -n "$INF_GO_AMS_ROOT" ] && [ -n "$INF_GO_SITE_ID" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
             ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
+                # FIXME
                 site activate $INF_GO_SITE_ID; \
                 amsmodule add $INF_GO_AGENT_MODULE; \
                 if [ \$? -ne 0 ]; then \

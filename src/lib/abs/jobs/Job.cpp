@@ -2403,6 +2403,7 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
 
     bool result = true;
 
+    ShellProcessor.SetVariable("INF_GO_AMS_ROOT",CShell::GetSystemVariable("AMS_ROOT"));
     ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
 
     CSmallString tmp;

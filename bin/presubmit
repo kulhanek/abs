@@ -39,9 +39,41 @@ if ! [[ $INF_ARG_RESOURCES == *"fixperms=none"* ]]; then
     INF_ARG_RESOURCES="$INF_ARG_RESOURCES fixperms=none"
 fi
 
+# sanity checks
+if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "NO" ]; then
+    if [ -z "$INF_SURROGATE_MACHINES" ]; then
+        echo "" >&2
+        echo " >>> ERROR: No surrogate machines defined!" >&2
+        echo "" >&2
+        exit 1
+    fi
+fi
+
+# input machines
+INF_INPUT_MACHINE_LIST=""
+
 if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
-    echo "# via the input machine: $INF_INPUT_MACHINE ..."
-    # submit new run
+    echo "# input machine      : $INF_INPUT_MACHINE"
+    INF_INPUT_MACHINE_LIST="$INF_INPUT_MACHINE"
+fi
+if [ -n "$INF_SURROGATE_MACHINES" ]; then
+    echo "# surrogate machines : $INF_SURROGATE_MACHINES"
+    INF_INPUT_MACHINE_LIST="$INF_INPUT_MACHINE_LIST `echo $INF_SURROGATE_MACHINES | tr ',' '\n'`"
+fi
+
+while read INF_INPUT_MACHINE; do
+    if [ -z "$INF_INPUT_MACHINE" ]; then
+        continue
+    fi
+    echo ""
+    echo -n "# testing the input machine: '$INF_INPUT_MACHINE' ... "
+    ssh -x $INF_SSH_OPTIONS -o ConnectTimeout=10 "$INF_INPUT_MACHINE" echo &> /dev/null
+    if [ $? -eq 0 ]; then
+        echo "connection available"
+    else
+        echo "no connection available, trying the next one ..."
+        continue
+    fi
     ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" "
                 if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
                 site activate $INF_SITE_ID; \
@@ -53,59 +85,22 @@ if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "YES" ]; then
                 export INF_EXTERNAL_FLAGS=\"$INF_EXTERNAL_FLAGS\";
                 psubmit -a -y -i -e -r -v \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" $INF_ARG_RESOURCES; "
 
-    if [ $? -ne 0 ]; then
-        echo "" >&2
-        echo " >>> ERROR: Unable to submit the next job run to the batch system!" >&2
-        echo "            See error messages above." >&2
-        echo "" >&2
-        exit 1
+    if [ $? -eq 0 ]; then
+        echo "# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        echo ""
+        exit 0
     fi
-else
-    if [ "$INF_INPUT_MACHINE_ENABLED_FOR_EXEC" == "NO" ]; then
-        if [ -z "$INF_SURROGATE_MACHINES" ]; then
-            echo "" >&2
-            echo " >>> ERROR: No surrogate machines defined!" >&2
-            echo "" >&2
-            exit 1
-        fi
-        while read INF_INPUT_MACHINE; do
-            echo ""
-            echo -n "# via the surrogate machine: '$INF_INPUT_MACHINE' ... "
-            ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" echo &> /dev/null
-            if [ $? -eq 0 ]; then
-                echo "connection available"
-                ssh -x $INF_SSH_OPTIONS "$INF_INPUT_MACHINE" "
-                            if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
-                            site activate $INF_SITE_ID; \
-                            amsmodule add abs:$INF_ABS_VERSION &> /dev/null; \
-                            if [ -n \"$INF_EXPORTED_MODULES\" ]; then amsmodule add $INF_EXPORTED_MODULES &> /dev/null; fi; \
-                            cd \"$INF_INPUT_DIR\"; \
-                            export INF_EXTERNAL_START_AFTER=$INF_JOB_ID;
-                            export INF_EXTERNAL_NAME_SUFFIX=\"$INF_EXTERNAL_NAME_SUFFIX\";
-                            export INF_EXTERNAL_FLAGS=\"$INF_EXTERNAL_FLAGS\";
-                            psubmit -a -y -i -e -r -v \"$INF_ARG_DESTINATION\" \"$INF_ARG_JOB\" $INF_ARG_RESOURCES; "
 
-                if [ $? -ne 0 ]; then
-                    echo "" >&2
-                    echo " >>> ERROR: Unable to submit the next job run to the batch system!" >&2
-                    echo "            See error messages above." >&2
-                    echo "" >&2
-                    exit 1
-                fi
-            else
-                echo "no connection available, trying the next one ..."
-            fi
-        done < <( echo "$INF_SURROGATE_MACHINES" | tr ',' '\n' )
-    else
-        echo "" >&2
-        echo " >>> ERROR: INF_INPUT_MACHINE_ENABLED_FOR_EXEC = '$INF_INPUT_MACHINE_ENABLED_FOR_EXEC' but YES/NO expected!" >&2
-        echo "" >&2
-        exit 1
-    fi
-fi
+    echo "" >&2
+    echo " >>> ERROR: Unable to submit the next job run to the batch system!" >&2
+    echo "            See error messages above." >&2
+    echo "            Trying the next input machine ..." >&2
+    echo "" >&2
+
+done < <( echo "$INF_INPUT_MACHINE_LIST" | tr ',' '\n' )
 
 echo "# <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo ""
 
-exit 0
+exit 1
 

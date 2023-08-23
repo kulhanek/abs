@@ -21,6 +21,7 @@ pgo(){
     unset INF_GO_VNC_ID
     unset INF_GO_WHOLE_NAME
     unset INF_GO_SITE_ID
+    unset INF_GO_AMS_ROOT
 
     eval "`_abs-go $*`"
     if [ "$AMS_EXIT_CODE" -eq 0 ]; then
@@ -37,6 +38,7 @@ pgo(){
     unset INF_GO_VNC_ID
     unset INF_GO_WHOLE_NAME
     unset INF_GO_SITE_ID
+    unset INF_GO_AMS_ROOT
 
     return "$AMS_EXIT_CODE"
 }
