@@ -33,7 +33,16 @@ case "$INF_GO_JOB_NAME" in
         if [ -n "$INF_GO_AMS_ROOT" ] && [ -n "$INF_GO_SITE_ID" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
             ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
-                # FIXME
+                if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi \
+                if [ -z \"\$AMS_ROOT\" ]; then \
+                    if [ -n \"$INF_GO_AMS_ROOT\" ]; then \
+                        source \"$INF_GO_AMS_ROOT\" \
+                    else \
+                        # hardcoded backup \
+                        source /software/ncbr/softmods/8.0/etc/boot/bashrc.ncbr \
+                    fi \
+                    AMS_ALTERNATIVE_BOOT=\"YES\" \
+                fi \
                 site activate $INF_GO_SITE_ID; \
                 amsmodule add $INF_GO_AGENT_MODULE; \
                 if [ \$? -ne 0 ]; then \
@@ -49,56 +58,18 @@ case "$INF_GO_JOB_NAME" in
         return 0
         ;;
     gui )
-        if [ -n "$INF_GO_AGENT_MODULE" ] && [ -n "$INF_GO_VNC_ID" ] && [ -n "$INF_GO_WHOLE_NAME" ] ; then
-            if [ "$INF_GO_GUI_PROXY" != "ssh-proxy" ]; then
-                amsmodule add "$INF_GO_AGENT_MODULE"
-                if [ $? -ne 0 ]; then
-                    echo "" >&2
-                    echo " >>> ERROR: Unable to activate a GUI agent module '$INF_GO_AGENT_MODULE'!" >&2
-                    echo "" >&2
-                    return 1
-                fi
-                vncviewer "$INF_GO_VNC_ID" -passwd "${INF_GO_WHOLE_NAME}.vncpsw"
-                return $?
-            else
-                echo ">>> INFO: Starting VNC proxy for the GUI job .... "
-                FREEPORT=0
-                set -o pipefail
-                for((PORT=1;PORT<=100;PORT++)); do
-                    netstat -lnpt 2> /dev/null | grep -e 0.0.0.0:$((5900+$PORT)) -e 127.0.0.1:$((5900+$PORT))  &> /dev/null
-                    if [ $? -ne 0 ]; then
-                        FREEPORT=$PORT;
-                        break;
-                    fi
-                done
-                if [ "$FREEPORT" -eq 0 ]; then
-                    echo "" >&2
-                    echo " >>> ERROR: No available ports in the range <5901; 6000>!" >&2
-                    echo "" >&2
-                    return 1
-                fi
-                INF_REMOTE_NODE="`echo $INF_GO_VNC_ID | cut -d ':' -f 1`"
-                INF_REMOTE_PORT="`echo $INF_GO_VNC_ID | cut -d ':' -f 2`"
-                echo ""
-                echo "    Procedure for your site:"
-                echo "        1) Download the password file and secure it:"
-                echo "           $ scp `hostname -f`:$PWD/${INF_GO_WHOLE_NAME}.vncpsw ."
-                echo "           $ chmod 600 ${INF_GO_WHOLE_NAME}.vncpsw"
-                echo "        2) Open the VNC viewer:"
-                echo "           $ module add tigervnc"
-                echo "           $ vncviewer `hostname -f`:$FREEPORT -passwd ${INF_GO_WHOLE_NAME}.vncpsw"
-                echo ""
-                echo "    To terminate this proxy, press Enter."
-                ssh -L "$((5900+$FREEPORT)):0.0.0.0:$((5900+$INF_REMOTE_PORT))" "$INF_REMOTE_NODE" read
-                echo "    The proxy was terminated!"
-                echo ""
-            fi
-        fi
+        echo ""
+        echo "    This is a GUI job."
+        echo "    Use the following commands to open the VNC viewer from any machine:"
+        echo "        \$ module add tigervnc"
+        echo "        \$ vncviewer $INF_GO_VNC_ID"
+        echo ""
         ;;
     * )
         # go to working directory
         if [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_WORK_DIR" ] && [ -n "$INF_GO_SITE_ID" ] ; then
             ssh -t -X $INF_SSH_OPTIONS $INF_GO_MAIN_NODE \
+                      INF_GO_AMS_ROOT="$INF_GO_AMS_ROOT" \
                       INF_GO_SITE_ID="$INF_GO_SITE_ID" \
                       INF_GO_WORK_DIR="$INF_GO_WORK_DIR" \
                       INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \
@@ -117,6 +88,7 @@ case "$INF_GO_JOB_NAME" in
                     echo "          Hostname     : $HOSTNAME"
                     echo ""
                     ssh -t -X $INF_SSH_OPTIONS $INF_GO_INPUT_MACHINE \
+                              INF_GO_AMS_ROOT="$INF_GO_AMS_ROOT" \
                               INF_GO_SITE_ID="$INF_GO_SITE_ID" \
                               INF_GO_WORK_DIR="$INF_GO_INPUT_DIR" \
                               INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \

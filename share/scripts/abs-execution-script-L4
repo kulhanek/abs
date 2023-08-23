@@ -59,6 +59,8 @@ cat << EOF
 site activate "$INF_SITE_ID"
 amsmodule add "$INF_AGENT_MODULE"
 
+INF_VNC_DISPLAY="`echo $INF_VNC_ID | tr \":\" \" \" | awk '{ printf("%d",$2); }'`"
+
 # terminate vnc display
 vncserver -kill ":$INF_VNC_DISPLAY"
 EOF
@@ -223,19 +225,8 @@ case $INF_JOB_NAME in
         INF_AGENT_MODULE="`amsmodule getactmod tigervnc 2>&1`"
         export INF_AGENT_MODULE
 
-        # generate password
-        touch "${INF_WHOLE_NAME}.vncpsw"
-        if [ $? -ne 0 ]; then
-            echo "" >&2
-            echo " >>> ERROR: Unable to create VNC password file '${INF_WHOLE_NAME}.vncpsw'!" >&2
-            echo "" >&2
-            exit 1
-        fi
-        chmod 600 "${INF_WHOLE_NAME}.vncpsw"
-        uuidgen | vncpasswd -f > "${INF_WHOLE_NAME}.vncpsw"
-
         # start VNC server
-        vncserver -fg -rfbauth "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw" &> "${INF_WHOLE_NAME}.vncid" &
+        vncserver --new &> "${INF_WHOLE_NAME}.vncid" &
 
         INF_AGENT_PID=$!
 
@@ -247,7 +238,7 @@ case $INF_JOB_NAME in
 
         echo "VNC PID:     $INF_AGENT_PID"
 
-        INF_VNC_ID="`grep \"^VNCID:\" \"${INF_WHOLE_NAME}.vncid\" | awk '{printf("%s",$2); }'`"
+        INF_VNC_ID="`grep \"VNCID:\" \"${INF_WHOLE_NAME}.vncid\" | awk '{printf("%s",$2); }'`"
         if [ -z "$INF_VNC_ID" ]; then
             echo "" >&2
             echo " >>> ERROR: Unable to get VNC ID from the vncid file '${INF_WHOLE_NAME}.vncid'!" >&2
@@ -256,16 +247,6 @@ case $INF_JOB_NAME in
             exit 1
         fi
         echo "VNC ID:      $INF_VNC_ID"
-
-        INF_VNC_DISPLAY="`grep \"^VNCDSP:\" \"${INF_WHOLE_NAME}.vncid\" | awk '{printf("%s",$2); }'`"
-        if [ -z "$INF_VNC_DISPLAY" ]; then
-            echo "" >&2
-            echo " >>> ERROR: Unable to get VNC DISPLAY from the vncid file '${INF_WHOLE_NAME}.vncid'!" >&2
-            kill $VNCSERVER_PID
-            echo "" >&2
-            exit 1
-        fi
-        echo "VNC DISPLAY: $INF_VNC_ID"
 
         # create empty stdout
         touch "${INF_WHOLE_NAME}.stdout"
@@ -297,7 +278,6 @@ case $INF_JOB_NAME in
         case $INF_DATAIN in
             copy-master|copy-shared)
                 inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.info"   "${INF_WHOLE_NAME}.info"
-                inf-retry-cmd inf-copy-to-inputdir "$INF_WORK_DIR/${INF_WHOLE_NAME}.vncpsw" "${INF_WHOLE_NAME}.vncpsw"
             ;;
         esac
 
