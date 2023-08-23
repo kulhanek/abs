@@ -2403,7 +2403,13 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
 
     bool result = true;
 
-    ShellProcessor.SetVariable("INF_GO_AMS_ROOT",CShell::GetSystemVariable("AMS_ROOT"));
+    CSamllString bscript;
+    if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",bscript) == false ){
+        // hardcoded backup
+        bscript = "/software/ncbr/softmods/8.0/etc/boot/bashrc.ncbr";
+    }
+
+    ShellProcessor.SetVariable("INF_GO_BOOT_SCRIPT",bscript);
     ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
 
     CSmallString tmp;

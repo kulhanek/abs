@@ -22,12 +22,7 @@ INF_JOB_EMODS=$INF_GO_EXPORTED_MODULES_2
 if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi
 
 if [ -z "$AMS_ROOT" ]; then
-    if [ -n "$INF_GO_AMS_ROOT" ]; then
-        source "$INF_GO_AMS_ROOT"
-    else
-        # hardcoded backup
-        source /software/ncbr/softmods/8.0/etc/boot/bashrc.ncbr
-    fi
+    source "$INF_GO_BOOT_SCRIPT"
     AMS_ALTERNATIVE_BOOT="YES"
 fi
 
