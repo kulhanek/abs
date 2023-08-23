@@ -2465,6 +2465,14 @@ bool CJob::PrepareGoInputDirEnv(void)
 {
     bool result = true;
 
+    CSmallString bscript;
+    if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",bscript) == false ){
+        // FIXME
+        // hardcoded backup
+        bscript = "/software/ncbr/softmods/8.0/etc/boot/bashrc.ncbr";
+    }
+
+    ShellProcessor.SetVariable("INF_GO_BOOT_SCRIPT",bscript);
     ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
 
     CSmallString tmp;
