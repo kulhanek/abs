@@ -4333,7 +4333,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     cmd << "mv ";
     cmd << "'" << whole_name << ".info' ";
     if( autorecovery ){
-        cmd << "'" << archive << ".info+'";
+        cmd << "'" << archive << ".info-'";
     } else {
         cmd << "'" << archive << ".info'";
     }
@@ -4344,7 +4344,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     cmd << "mv ";
     cmd << "'" << whole_name << ".stdout' ";
     if( autorecovery ){
-        cmd << "'" << archive << ".stdout+'";
+        cmd << "'" << archive << ".stdout-'";
     } else {
         cmd << "'" << archive << ".stdout'";
     }
@@ -4355,11 +4355,11 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     cmd << "mv ";
     cmd << "'" << whole_name << ".infout' ";
     if( autorecovery ){
-        cmd << "'" << archive << ".infout+'";
+        cmd << "'" << archive << ".infout-'";
     } else {
         cmd << "'" << archive << ".infout'";
     }
-    // FUJ
+    // FUJ - FIXME
     system(cmd);
 }
 
