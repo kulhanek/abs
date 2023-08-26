@@ -344,7 +344,6 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
             }
             if( line.find("PROBLEM") != string::npos ){
                 sout << "<b><blue>#                       WARNING: The 'storage/icycle.stat' file indicates that the previous job prematurely crashed ...</blue></b>" << endl;
-                sout << endl;
                 job.SetItem("basic/external","INF_EXTERNAL_FLAGS","-");
             }
             if( line.find("OK") != string::npos ){
