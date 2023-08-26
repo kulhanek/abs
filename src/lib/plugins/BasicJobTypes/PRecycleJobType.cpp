@@ -338,12 +338,13 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         while( getline(ifs,line) ){
             if( line.find("FAILED") != string::npos ){
                 sout << endl;
-                sout << "<b><red> ERROR: The 'storage/icycle.stat' file indicates FAILED status - this stage already failed, exiting ... !</red></b>" << endl;
+                sout << "<b><red> ERROR: The 'storage/icycle.stat' file indicates FAILED status." << endl;
+                sout <<         "        This stage already failed, exiting ... !</red></b>" << endl;
                 return(ERS_FAILED);
             }
             if( line.find("PROBLEM") != string::npos ){
+                sout << "<b><blue>#                       WARNING: The 'storage/icycle.stat' file indicates that the previous job prematurely crashed ...</blue></b>" << endl;
                 sout << endl;
-                sout << "<b><blue> WARNING: The 'storage/icycle.stat' file indicates that the previous job prematurely crashed, re-submitting ...</blue></b>" << endl;
                 job.SetItem("basic/external","INF_EXTERNAL_FLAGS","-");
             }
             if( line.find("OK") != string::npos ){
