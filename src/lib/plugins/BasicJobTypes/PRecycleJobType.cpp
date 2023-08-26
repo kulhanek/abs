@@ -322,6 +322,36 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         }
     }
 
+// process icycle.stat file
+    CFileName icycle_stat = storage / "icycle.stat";
+    if( CFileSystem::IsFile(icycle_stat) == true ){
+        ifstream ifs;
+        ifs.open(icycle_stat);
+        if( ! ifs ) {
+            ES_ERROR("unable to open the icycle.stat file");
+            sout << endl;
+            sout << "<b><red> ERROR: Unable to open the icycle.stat file (" << icycle_stat << ")!</red></b>" << endl;
+            return(ERS_FAILED);
+        }
+
+        string line;
+        while( getline(ifs,line) ){
+            if( line.find("FAILED") != string::npos ){
+                sout << endl;
+                sout << "<b><red> ERROR: The 'storage/icycle.stat' file indicates FAILED status - this stage already failed, exiting ... !</red></b>" << endl;
+                return(ERS_FAILED);
+            }
+            if( line.find("PROBLEM") != string::npos ){
+                sout << endl;
+                sout << "<b><blue> WARNING: The 'storage/icycle.stat' file indicates that the previous job prematurely crashed, re-submitting ...</blue></b>" << endl;
+                job.SetItem("basic/external","INF_EXTERNAL_FLAGS","-");
+            }
+            if( line.find("OK") != string::npos ){
+                break;  // everything seems to be OK
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------
     if( Cache.LoadCache() == false ){
         ES_ERROR("unable to load module cache");
