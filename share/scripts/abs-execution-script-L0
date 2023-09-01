@@ -67,6 +67,10 @@ if [[ (-f "$HOME/.k5login") && (`stat --format=%a "$HOME/.k5login"` != 644) ]]; 
     chmod 644 "$HOME/.k5login"
 fi
 
+# get info about Kerberos
+klist
+tokens
+
 echo ""
 echo "#-------------------------------------------------------------------------------"
 echo "# L0: Booting the AMS/ABS environments ..."
