@@ -4437,6 +4437,10 @@ bool CJob::SubmitJobFull(ostream& vout,vector<string>& args,
                          bool ignorertmf,bool allowallpath,bool expermode,
                          bool assumeyes, bool resubmitmode, bool verbose)
 {
+    if( args.size() < 2 ){
+        RUNTIME_ERROR("not enough of arguments");
+    }
+
     CJobPtr Job = JobList.CreateNewJob();
 
     // start job preparation

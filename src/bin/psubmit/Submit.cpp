@@ -131,6 +131,13 @@ bool CSubmit::Run(void)
     // setup retry setup mode
     BatchServers.SetServerInitRetryMode(Options.GetOptResubmitMode());
 
+    if( Options.GetNumberOfProgArgs() < 2 ){
+        vout << endl;
+        vout << " <b><red>ERROR: At least two arguments are expected!</red></b>" << endl;
+        ES_TRACE_ERROR("not enough of arguments");
+        return(false);
+    }
+
     // submit a single job
     if( Options.GetOptNumOfCopies() == 0 ){
         // single job
