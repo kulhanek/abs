@@ -26,14 +26,17 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <ResourceList.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <fstream>
 #include <string>
 #include <iomanip>
-#include <Cache.hpp>
+#include <ModuleController.hpp>
+#include <ModCache.hpp>
+#include <SiteController.hpp>
+#include <UserUtils.hpp>
+#include <ModUtils.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -112,19 +115,18 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
     CSmallString omodver;
 
     // is orca module loaded?
-    if( AMSGlobalConfig.IsModuleActive(omodule) == true ){
+    if( ModuleController.IsModuleActive(omodule) == true ){
         // get active module version
-        AMSGlobalConfig.GetActiveModuleVersion(omodule,omodver);
+        ModuleController.GetActiveModuleVersion(omodule,omodver);
     } else {
         // get default version of module
-        if( Cache.LoadCache(false) == false) {
-            ES_ERROR("unable to load AMS cache");
-            return(ERS_FAILED);
-        }
+        ModuleController.LoadBundles(EMBC_SMALL);
+        ModuleController.MergeBundles();
+
         CSmallString drch, dmode;
-        CXMLElement* p_ele = Cache.GetModule(omodule);
+        CXMLElement* p_ele = ModCache.GetModule(omodule);
         if( p_ele ){
-            Cache.GetModuleDefaults(p_ele,omodver,drch,dmode);
+            ModCache.GetModuleDefaults(p_ele,omodver,drch,dmode);
         }
     }
 

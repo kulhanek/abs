@@ -29,7 +29,6 @@
 #include <boost/format.hpp>
 #include <FileName.hpp>
 #include <iomanip>
-#include <Cache.hpp>
 #include <Utils.hpp>
 #include <ABSConfig.hpp>
 #include "STMServerJobTypeOptions.hpp"
@@ -303,7 +302,7 @@ bool CSTMServerJobType::WriteFileWithClients(const std::string& name,CJob& job,s
         ofs << endl;
         ofs << "[job]" << endl;
         CFileName jobdir = job.GetInputDir();
-        jobdir = jobdir / IClients[i].dir;
+        jobdir = jobdir / CFileName(IClients[i].dir);
         ofs << "path    " << jobdir << endl;
         if( ! same_name ){
             ofs << "jobname " << IClients[i].name << endl;

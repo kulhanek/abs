@@ -19,7 +19,7 @@ SET(LIBS_SHARED ON CACHE BOOL "Should the dynamic version of hipoly library be b
 # ==============================================================================
 
 # define project name ----------------------------
-SET(ABS_VERSION 3.0.x)
+SET(ABS_VERSION 4.x)
 
 # what languages we use --------------------------
 ENABLE_LANGUAGE(CXX)
@@ -72,12 +72,14 @@ LINK_DIRECTORIES(${W3TK_ROOT}/lib)
 SET(W3TK_LIB_NAME w3tk)
 
 # AMS -----------------------------------------
-SET(AMS_ROOT ${DEVELOPMENT_ROOT}/projects/ams/8.0)
+SET(AMS_ROOT ${DEVELOPMENT_ROOT}/projects/ams/9.0)
 INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams SYSTEM)
-INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/system SYSTEM)
-INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/soft SYSTEM)
-INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/cuda SYSTEM)
-INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/srv SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/base SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/host SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/host/components SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/user SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/site SYSTEM)
+INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams/mods SYSTEM)
 LINK_DIRECTORIES(${AMS_ROOT}/lib)
 SET(AMS_LIB_NAME ams)
 
@@ -137,8 +139,8 @@ ENDIF(NOT DEFINED COMPOSITE_PROJECT)
 # ==============================================================================
 
 IF(NOT DEFINED COMPOSITE_PROJECT)
-    SET(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -Werror -pedantic-errors -Wundef -Wno-long-long")
-    SET(CMAKE_CXX_FLAGS_RELEASE "-O2")
+    SET(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++11 -Wall -Werror -pedantic-errors -Wundef -Wno-long-long")
+    SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -std=c++11")
 
     #SET(CMAKE_BUILD_TYPE Release)
     SET(CMAKE_BUILD_TYPE Debug)

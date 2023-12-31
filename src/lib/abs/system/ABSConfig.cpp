@@ -21,7 +21,6 @@
 // =============================================================================
 
 #include <ABSConfig.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <XMLParser.hpp>
 #include <XMLPrinter.hpp>
 #include <ErrorSystem.hpp>
@@ -32,11 +31,12 @@
 #include <vector>
 #include <FileSystem.hpp>
 #include <Site.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <TicketChecker.hpp>
 #include <PluginDatabase.hpp>
 #include <XMLIterator.hpp>
 #include <fnmatch.h>
+#include <SiteController.hpp>
+#include <ModuleController.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -88,7 +88,7 @@ bool CABSConfig::LoadSystemConfig(void)
     CFileName      config_name;
 
     // load infinity config
-    config_name = GetABSRootDir() / "etc" / "sites" / AMSGlobalConfig.GetActiveSiteID() / "abs.xml";
+    config_name = GetABSRootDir() / "etc" / "sites" / SiteController.GetActiveSite() / "abs.xml";
 
     CXMLParser xml_parser;
     xml_parser.SetOutputXMLNode(&SystemConfig);
@@ -177,7 +177,7 @@ bool CABSConfig::RemoveUserConfig(void)
 const CSmallString CABSConfig::GetABSModuleVersion(void)
 {
     CSmallString version;
-    AMSGlobalConfig.GetActiveModuleVersion("abs",version);
+    ModuleController.GetActiveModuleVersion("abs",version);
     return( version );
 }
 
@@ -211,7 +211,7 @@ const CFileName CABSConfig::GetSystemSiteConfigDir(void)
     CFileName      config_name;
     CSmallString   ams_site;
 
-    ams_site = AMSGlobalConfig.GetActiveSiteID();
+    ams_site = SiteController.GetActiveSite();
     config_name = GetABSRootDir() / "etc" / "sites" / ams_site / "aliases.xml";
 
     return(config_name);
@@ -241,7 +241,7 @@ const CFileName CABSConfig::GetPluginsDir(void)
 
 const CFileName CABSConfig::GetUserSiteConfigDir(void)
 {
-    return( GetUserConfigDir(AMSGlobalConfig.GetActiveSiteID()) );
+    return( GetUserConfigDir(SiteController.GetActiveSite()) );
 }
 
 //------------------------------------------------------------------------------
@@ -425,7 +425,7 @@ bool CABSConfig::IsABSAvailable(std::ostream& sout)
     CFileName      config_name;
 
     // global abs config
-    config_name = GetABSRootDir() / "etc" / "sites" / AMSGlobalConfig.GetActiveSiteID() / "abs.xml";
+    config_name = GetABSRootDir() / "etc" / "sites" / SiteController.GetActiveSite() / "abs.xml";
 
     bool enabled = true;
 

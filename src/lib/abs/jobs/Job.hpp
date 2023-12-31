@@ -200,16 +200,25 @@ public:
     void PrintJobStatus(std::ostream& sout);
 
     /// print basic info about job
+    void PrintBasicV4(std::ostream& sout);
+
+    /// print basic info about job
     void PrintBasicV3(std::ostream& sout);
 
     /// print basic info about job
     void PrintBasicV2(std::ostream& sout);
 
     /// print resources
+    void PrintResourcesV4(std::ostream& sout);
+
+    /// print resources
     void PrintResourcesV3(std::ostream& sout);
 
     /// print resources
     void PrintResourcesV2(std::ostream& sout);
+
+    /// print executive part
+    bool PrintExecV4(std::ostream& sout);
 
     /// print executive part
     bool PrintExecV3(std::ostream& sout);
@@ -333,9 +342,6 @@ public:
 
     /// get site name
     const CSmallString GetSiteName(void);
-
-    /// get site id
-    const CSmallString GetSiteID(void);
 
     /// get abs module used to submit the job
     const CSmallString GetABSModule(void);
@@ -505,6 +511,9 @@ protected:
     bool GetJobFileConfigItem(const CSmallString& key,CSmallString& value);
 
     /// print information about job
+    void PrintJobInfoV4(std::ostream& sout);
+
+    /// print information about job
     void PrintJobInfoV3(std::ostream& sout);
 
     /// print information about job
@@ -512,6 +521,9 @@ protected:
 
     /// print information about job
     void PrintJobInfoV1(std::ostream& sout);
+
+    /// print information about job
+    void PrintJobInfoCompactV4(std::ostream& sout,bool includepath,bool includecomment);
 
     /// print information about job
     void PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includecomment);

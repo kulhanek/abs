@@ -47,13 +47,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <AMSGlobalConfig.hpp>
 #include <BatchServers.hpp>
 #include <ResourceList.hpp>
 #include <sys/types.h>
 #include <grp.h>
 #include <sstream>
 #include <Host.hpp>
+#include <UserUtils.hpp>
+#include <boost/format.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -64,6 +65,153 @@ using namespace boost::algorithm;
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================
+
+void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includecomment)
+{
+
+//    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change          Exit" << endl;
+//    sout << "# -- ------------ ------------ --------------- --------------- ----- ----- ----- -------------------- ----" << endl;
+
+    sout << "  ";
+    switch( GetJobStatus() ){
+        case EJS_NONE:
+            sout << "UN";
+            break;
+        case EJS_PREPARED:
+            sout << "<yellow>P</yellow> ";
+            break;
+        case EJS_SUBMITTED:
+            sout << "<purple>Q</purple> ";
+            break;
+        case EJS_BOOTING:
+            sout << "<green>B</green> ";
+            break;
+        case EJS_RUNNING:
+            sout << "<green>R</green> ";
+            break;
+        case EJS_FINISHED:
+            if( GetJobExitCode() == 0 ){
+                sout << "F ";
+            } else {
+                sout << "<red>FE</red>";
+            }
+            break;
+        case EJS_KILLED:
+            sout << "<red>KI</red>";
+            break;
+        case EJS_ERROR:
+            sout << "<red>ER</red>";
+            break;
+        case EJS_MOVED:
+            sout << "<cyan>M</cyan>";
+            break;
+        case EJS_INCONSISTENT:
+            sout << "<red>IN</red>";
+            break;
+    }
+    if( GetItem("submit/job","INF_JOB_ID",true) != NULL ){
+    CSmallString id = GetItem("submit/job","INF_JOB_ID");
+    CSmallString srv = GetItem("specific/resources","INF_SERVER_SHORT");
+    string stmp(id);
+    vector<string> items;
+    split(items,stmp,is_any_of("."));
+    if( items.size() >= 1 ){
+        id = items[0];
+    }
+    id << srv;
+    sout << " " << right << setw(12) << id;
+    } else {
+    sout << "             ";
+    }
+
+    CSmallString user = GetItem("specific/resources","INF_JOB_OWNER",true);
+    if( user.GetLength() > 12 ){
+        user = user.GetSubStringFromTo(0,11);
+    }
+    sout << " " << left << setw(12) << user;
+
+    CSmallString title = GetItem("basic/jobinput","INF_JOB_TITLE");
+    if( title.GetLength() > 15 ){
+        title = title.GetSubStringFromTo(0,14);
+    }
+    sout << " " << setw(15) << title;
+    CSmallString queue = GetItem("specific/resources","INF_QUEUE");
+    if( queue.GetLength() > 15 ){
+        queue = queue.GetSubStringFromTo(0,14);
+    }
+    sout << " " << setw(15) << left << queue;
+    sout << right;
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NCPUS");
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NGPUS");
+    sout << " " << setw(5) << GetItem("specific/resources","INF_NNODES");
+
+    CSmallTimeAndDate   last_change;
+    CSmallTimeAndDate   curr_time;
+    CSmallTime          from_last_change;
+
+    curr_time.GetActualTimeAndDate();
+    last_change = GetTimeOfLastChange();
+
+    sout << " " ;
+    switch( GetJobStatus() ){
+        case EJS_NONE:
+        case EJS_INCONSISTENT:
+        case EJS_ERROR:
+        case EJS_MOVED:
+            break;
+        case EJS_PREPARED:
+        case EJS_SUBMITTED:
+        case EJS_BOOTING:
+        case EJS_RUNNING:
+            from_last_change = curr_time - last_change;
+            sout << right << setw(25) << from_last_change.GetSTimeAndDay();
+            break;
+        case EJS_FINISHED:
+        case EJS_KILLED:
+            sout << right << setw(25) << last_change.GetSDateAndTime();
+            break;
+    }
+
+    sout << endl;
+
+    if( includepath ){
+        if( IsJobDirLocal() ){
+            sout << "                  <blue>> " << GetItem("basic/jobinput","INF_INPUT_DIR") << "</blue>" << endl;
+        } else {
+            sout << "                  <blue>> " << GetItem("basic/jobinput","INF_INPUT_MACHINE") << ":" << GetItem("basic/jobinput","INF_INPUT_DIR") << "</blue>" << endl;
+        }
+    }
+
+    if( includecomment ){
+        switch( GetJobStatus() ){
+            case EJS_NONE:
+            case EJS_PREPARED:
+            case EJS_FINISHED:
+            case EJS_KILLED:
+                // nothing to be here
+                break;
+
+            case EJS_ERROR:
+            case EJS_INCONSISTENT:
+                sout << "                  <red>" << GetJobBatchComment() << "</red>" << endl;
+                break;
+            case EJS_SUBMITTED:
+            case EJS_BOOTING:
+            case EJS_MOVED:
+                sout << "                  <purple>" << GetJobBatchComment() << "</purple>" << endl;
+                break;
+            case EJS_RUNNING:
+                sout << "                  <green>" << GetItem("start/workdir","INF_MAIN_NODE");
+                if( GetItem("specific/resources","INF_NNODES").ToInt() > 1 ){
+                    sout << ",+";
+                }
+                sout << "</green>" << endl;
+                break;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
 
 void CJob::PrintJobInfoCompactV2(std::ostream& sout,bool includepath,bool includecomment)
 {
@@ -295,6 +443,373 @@ void CJob::PrintJobInfoCompactV1(std::ostream& sout,bool includepath)
 
 //------------------------------------------------------------------------------
 
+void CJob::PrintJobInfoV3(std::ostream& sout)
+{
+    PrintBasicV3(sout);
+    PrintResourcesV3(sout);
+
+    if( HasSection("start") == true ){
+        PrintExecV3(sout);
+    }
+
+    CSmallTimeAndDate ctad;
+    ctad.GetActualTimeAndDate();
+
+    CSmallTimeAndDate stad;
+    if( HasSection("submit",stad) == true ){
+        sout << "Job was submitted on " << stad.GetSDateAndTime() << endl;
+    } else {
+        HasSection("basic",stad);
+        sout << "Job was prepared for submission on " << stad.GetSDateAndTime() << endl;
+        return;
+    }
+
+    bool inconsistent = false;
+
+    CSmallTimeAndDate btad;
+    if( HasSection("start",btad) == true ){
+        CSmallTime qtime;
+        qtime = btad - stad;
+        sout << "  and was queued for " << qtime.GetSTimeAndDay() << endl;
+        sout << "Job was started on " << btad.GetSDateAndTime() << endl;
+    } else {
+        if( GetJobBatchStatus() == EJS_SUBMITTED ){
+            CSmallTime qtime;
+            qtime = ctad - stad;
+            sout << "<purple>";
+            sout << "  and is queued for " << qtime.GetSTimeAndDay() << endl;
+            sout << "  >>> Comment: " << GetJobBatchComment() << endl;
+            sout << "</purple>";
+            return;
+        }
+        if( GetJobStatus() == EJS_INCONSISTENT ){
+            CSmallTime qtime;
+            qtime = ctad - stad;
+            sout << "  and is queued for " << qtime.GetSTimeAndDay() << endl;
+            inconsistent = true;
+        }
+    }
+
+    CSmallTimeAndDate etad;
+    if( HasSection("stop",etad) == true ){
+        CSmallTime qtime;
+        qtime = etad - btad;
+        sout << "  and was running for " << qtime.GetSTimeAndDay() << endl;
+        sout << "Job was finished on " << etad.GetSDateAndTime() << endl;
+        return;
+    } else {
+        if( GetJobStatus() == EJS_RUNNING  ){
+            CSmallTime qtime;
+            qtime = ctad - btad;
+            sout << "<green>";
+            sout << "  and is running for " << qtime.GetSTimeAndDay() << endl;
+            sout << "</green>";
+            return;
+        }
+        if( GetJobBatchStatus() == EJS_RUNNING  ){
+            sout << "<purple>Job was started but details are not known yet" << endl;
+            sout << "    >>> Comment: " << GetJobBatchComment() << endl;
+            sout << "</purple>";
+            return;
+        }
+        if( (GetJobStatus() == EJS_INCONSISTENT) && (inconsistent == false) ){
+            CSmallTime qtime;
+            qtime = ctad - btad;
+            sout << "  and is running for " << qtime.GetSTimeAndDay() << endl;
+        }
+    }
+
+    CSmallTimeAndDate ktad;
+    if( HasSection("kill",ktad) == true ){
+        CSmallTime qtime;
+        if( HasSection("start") == true ) {
+            qtime = ktad - btad;
+            sout << "  and was running for " << qtime.GetSTimeAndDay() << endl;
+        } else {
+            if( HasSection("submit") == true ) {
+                qtime = ktad - stad;
+                sout << "  and was queued for " << qtime.GetSTimeAndDay() << endl;
+            }
+        }
+        sout << "Job was killed on " << ktad.GetSDateAndTime() << endl;
+        return;
+    }
+
+    if( GetJobStatus() == EJS_INCONSISTENT ){
+        sout << "<red>>>> Job is in inconsistent state!"<< endl;
+        sout <<         "    Comment: " << GetJobBatchComment() << "</red>" << endl;
+    }
+
+    if( GetJobStatus() == EJS_ERROR){
+        sout << "<red>>>> Job is in error state!"<< endl;
+        sout <<         "    Comment: " << GetJobBatchComment() << "</red>" << endl;
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::PrintBasicV3(std::ostream& sout)
+{
+    CSmallString tmp,col;
+
+    sout << "Job name         : " << GetItem("basic/jobinput","INF_JOB_NAME") << endl;
+    if( GetItem("submit/job","INF_JOB_ID",true) != NULL ){
+    sout << "Job ID           : " << GetItem("submit/job","INF_JOB_ID") << endl;
+    }
+    sout << "Job title        : " << GetItem("basic/jobinput","INF_JOB_TITLE") << " (Job type: ";
+    sout << GetItem("basic/jobinput","INF_JOB_TYPE");
+    if( HasSection("basic/recycle") == true ){
+        sout << " ";
+        sout << format("%03d") % GetItem("basic/recycle","INF_RECYCLE_CURRENT",false).ToInt();
+        sout << "/";
+        sout << format("%03d") % GetItem("basic/recycle","INF_RECYCLE_STOP",false).ToInt();
+    }
+    sout << ")" << endl;
+
+    sout << "Job input dir    : " << GetItem("basic/jobinput","INF_INPUT_MACHINE");
+    sout << ":" << GetItem("basic/jobinput","INF_INPUT_DIR") << endl;
+
+    sout << "Job key          : " << GetItem("basic/jobinput","INF_JOB_KEY") << endl;
+
+    tmp = GetItem("basic/arguments","INF_OUTPUT_SUFFIX",true);
+    if( tmp != NULL ) {
+    sout << "Parametric job   : " << tmp << endl;
+    }
+
+    col = GetItem("basic/collection","INF_COLLECTION_NAME",true);
+    if( col == NULL ) col = "-none-";
+    tmp = GetItem("basic/jobinput","INF_JOB_PROJECT");
+    if( tmp == NULL ) tmp = "-none-";
+    sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
+
+    sout << "========================================================" << endl;
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::PrintResourcesV3(std::ostream& sout)
+{
+    CSmallString tmp,tmp1,tmp2;
+
+    tmp = GetItem("basic/arguments","INF_ARG_DESTINATION");
+    sout << "Req destination  : " << tmp << endl;
+
+    tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
+    if( tmp != NULL ){
+    PrintResourceTokens(sout,"Req resources    : ",tmp," ");
+    } else {
+    sout << "Req resources    : -none-" << endl;
+    }
+
+    sout << "-----------------------------------------------" << endl;
+
+    tmp = GetItem("specific/resources","INF_SERVER_SHORT");
+    sout << "Site spec        : " << GetSiteName() << "/" << GetABSModule() << "/" << GetServerName() << "|" << tmp << endl;
+    CSmallString server = GetServerName();
+
+    tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");
+    if( tmp != NULL ){
+    PrintResourceTokens(sout,"Default resources: ",tmp,", ");
+    } else {
+    sout << "Default resources: -none-" << endl;
+    }
+
+    tmp = GetItem("basic/jobinput","INF_JOB_PROJECT_RESOURCES",true);
+    if( tmp != NULL ){
+    PrintResourceTokens(sout,"Project resources: ",tmp,", ");
+    } else {
+    sout << "Project resources: -none-" << endl;
+    }
+
+    tmp = GetItem("specific/resources","INF_ALIAS");
+    if( tmp == NULL ){
+    sout << "Alias            : -none-" << endl;
+    }
+    else{
+    sout << "Alias            : " << tmp << endl;
+    tmp = GetItem("specific/resources","INF_ALIAS_RESOURCES");
+    PrintResourceTokens(sout,"Alias resources  : ",tmp,", ");
+    }
+
+    tmp = GetItem("specific/resources","INF_RESOURCES");
+    PrintResourceTokens(sout,"All resources    : ",tmp,", ");
+
+    tmp = GetItem("specific/resources","INF_QUEUE");
+    sout << "Requested queue  : " << tmp << endl;
+    CSmallString queue = tmp;
+
+    sout << "-----------------------------------------------" << endl;
+    sout << "NCPUs NGPUs NNodes Memory WorkSize     WallTime" << endl;
+    tmp = GetItem("specific/resources","INF_NCPUS");
+    sout << setw(5) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_NGPUS");
+    sout << setw(5) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_NNODES");
+    sout << setw(6) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_MEMORY");
+    sout << setw(6) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_WORK_SIZE");
+    sout << setw(8) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_WALLTIME");
+    CSmallTime wtime;
+    wtime.SetFromString(tmp);
+    sout << setw(12) << wtime.GetSTimeAndDay();
+    sout << endl;
+
+    sout << "-----------------------------------------------" << endl;
+    tmp = GetItem("basic/jobinput","INF_INPUT_DIR");
+    sout << "Input directory  : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_INPUT_PATH_FSTYPE");
+    sout << "File system type : " << tmp << endl;
+
+    sout << "Input storage    : " << GetItem("specific/resources","INF_STORAGE_MACHINE") << ":" << GetItem("specific/resources","INF_STORAGE_DIR") << endl;
+
+    sout << "-----------------------------------------------" << endl;
+
+    tmp = GetItem("specific/resources","INF_WORK_DIR_TYPE");
+    sout << "Work directory   : " << tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_WORK_SIZE");
+    sout << "Work dir size    : " << tmp << endl;
+
+    tmp1 = GetItem("specific/resources","INF_DATAIN");
+    tmp2 = GetItem("specific/resources","INF_DATAOUT");
+    sout << "Data IN/OUT      : " << tmp1 << "/" << tmp2 << endl;
+
+    tmp = GetItem("basic/jobinput","INF_EXCLUDED_FILES");
+    if( tmp == NULL ){
+    sout << "Excluded files   : -none-" << endl;
+    }
+    else{
+    sout << "Excluded files   : " << tmp << endl;
+    }
+
+    sout << "-----------------------------------------------" << endl;
+    sout << "Group namespaces : ";
+    sout << GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS") << " (input machine) | ";
+
+    // refactorization: INF_STORAGE_GROUPNS -> INF_STORAGE_MACHINE_GROUPNS
+    tmp = GetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS",true);
+    if( tmp == NULL ){
+        tmp = GetItem("specific/resources","INF_STORAGE_GROUPNS");
+    }
+    sout << tmp << " (storage machine) | ";
+    sout << GetItem("specific/resources","INF_BATCH_SERVER_GROUPNS") << " (batch server)" <<  endl;
+
+    // refactorization: INF_USTORAGEGROUP introduced
+    tmp = GetItem("specific/resources","INF_USTORAGEGROUP",true);
+    if( tmp != NULL ){
+        tmp1 = GetItem("specific/resources","INF_STORAGE_MACHINE_REALM");
+    sout << "Storage user grp : " <<  tmp << "[@" << tmp1 << "]" << endl;
+    }
+
+    // refactorization: INF_UGROUP -> INF_BATCH_UGROUP
+    tmp = GetItem("specific/resources","INF_UBATCHGROUP",true);
+    if( tmp == NULL ) tmp = "-default server group-";
+    sout << "Batch user group : " <<  tmp << endl;
+
+    tmp = GetItem("specific/resources","INF_UMASK");
+    sout << "User file mask   : " << tmp << " [" << CUserUtils::GetUMaskPermissions(CUserUtils::GetUMaskMode(tmp)) << "]" <<  endl;
+
+    tmp = GetItem("specific/resources","INF_FIXPERMS",true);
+    if( tmp != NULL ){
+    sout << "Fix permissions  : " << tmp << endl;
+    } else {
+    sout << "Fix permissions  : none" << endl;
+    }
+
+    sout << "-----------------------------------------------" << endl;
+
+    tmp = GetItem("basic/external","INF_EXTERNAL_START_AFTER");
+    if( tmp == NULL ){
+    sout << "Start after      : -not defined-" << endl;
+    }
+    else{
+    sout << "Start after      : " << tmp << endl;
+    }
+
+    tmp = GetItem("basic/modules","INF_EXPORTED_MODULES");
+    if( tmp == NULL ){
+    sout << "Exported modules : -none-" << endl;
+    }
+    else{
+    sout << "Exported modules : " << tmp << endl;
+    }
+
+    // moved jobs - optional section
+    bool result = true;
+    CSmallString    rqueue;
+    CSmallString    rsrv;
+    result &= GetItem("specific/resources","INF_REAL_QUEUE",rqueue,true);
+    result &= GetItem("specific/resources","INF_REAL_SERVER",rsrv,true);
+
+    if( result ){
+        if( ((rqueue != NULL) && (rqueue != queue)) ||
+            ((rsrv != NULL) && (rsrv != server))  ) {
+        sout << "-----------------------------------------------" << endl;
+        }
+
+        if( (rqueue != NULL) && (rqueue != queue) ){
+        sout << "> Real queue     : " << rqueue << endl;
+        }
+        if( (rsrv != NULL) && (rsrv != server) ){
+        sout << "> Real server    : " << rsrv << endl;
+        }
+    }
+
+    sout << "========================================================" << endl;
+}
+
+//------------------------------------------------------------------------------
+
+bool CJob::PrintExecV3(std::ostream& sout)
+{
+    CSmallString tmp;
+
+    tmp = GetItem("start/workdir","INF_MAIN_NODE");
+    sout << "Main node        : " << tmp << endl;
+
+    tmp = GetItem("start/workdir","INF_WORK_DIR");
+    sout << "Working directory: " << tmp << endl;
+
+    tmp = GetItem("terminal","INF_AGENT_MODULE",true);
+    if( tmp != NULL ){
+    sout << "Terminal agent   : " << tmp << endl;
+    }
+
+    tmp = GetItem("terminal","INF_VNC_ID",true);
+    if( tmp != NULL ){
+    sout << "VNC Server ID    : " << tmp << endl;
+    }
+
+    tmp = GetItem("stop/result","INF_JOB_EXIT_CODE",true);
+    if( tmp != NULL ){
+    sout << "Job exit code    : " << tmp << endl;
+    }
+    sout << "----------------------------------------" << endl;
+
+    ListNodes(sout);
+
+    if( (GetItem("specific/resources","INF_NGPUS").ToInt() > 0) &&
+        (GetElementByPath("start/gpus",false) != NULL) ){
+        sout << "----------------------------------------" << endl;
+
+        ListGPUNodes(sout);
+    }
+
+    sout << "========================================================" << endl;
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
 void CJob::PrintJobInfoV2(std::ostream& sout)
 {
     PrintBasicV2(sout);
@@ -420,7 +935,7 @@ void CJob::PrintJobInfoV1(std::ostream& sout)
     if( tmp == NULL ) tmp = "-none-";
     sout << "Job project      : " << tmp << " (Collection: " << col << ")" << endl;
 
-    sout << "Site ID          : " << GetSiteID() << endl;
+    //sout << "Site ID          : " << GetSiteID() << endl;
 
     sout << "========================================================" << endl;
 
@@ -667,7 +1182,7 @@ void CJob::PrintResourcesV2(std::ostream& sout)
         tmp = "-not specified-";
     sout << "User file mask   : " << tmp << endl;
     } else {
-    sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" << endl;
+    sout << "User file mask   : " << tmp << " [" << CUserUtils::GetUMaskPermissions(CUserUtils::GetUMaskMode(tmp)) << "]" << endl;
     }
 
     if( fs_type == "inconsistent" ) sout << "</blue>";

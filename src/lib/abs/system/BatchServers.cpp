@@ -23,7 +23,6 @@
 #include <BatchServers.hpp>
 #include <Job.hpp>
 #include <JobList.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <ABSConfig.hpp>
 #include <XMLElement.hpp>
 #include <iomanip>
@@ -34,6 +33,7 @@
 #include <NodeList.hpp>
 #include <QueueList.hpp>
 #include <Shell.hpp>
+#include <SiteController.hpp>
 #include <cctype>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -356,7 +356,7 @@ void CBatchServers::PrintServerOverview(std::ostream& vout)
     // init servers if not done already
     if( size() == 0 ) InitAll();
 
-    vout << "# Site name     : " << AMSGlobalConfig.GetActiveSiteName() << endl;
+    vout << "# Site name     : " << SiteController.GetActiveSite() << endl;
     CXMLElement* p_ele = ABSConfig.GetServerGroupConfig();
     if( p_ele ){
         p_ele = p_ele->GetFirstChildElement("server");

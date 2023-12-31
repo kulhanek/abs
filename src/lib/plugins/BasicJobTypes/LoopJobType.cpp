@@ -29,11 +29,11 @@
 #include <boost/format.hpp>
 #include <FileName.hpp>
 #include <iomanip>
-#include <Cache.hpp>
 #include <Utils.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <sys/stat.h>
+#include <UserUtils.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -274,7 +274,7 @@ bool CLoopJobType::CheckInputFile(CJob& job,std::ostream& sout)
 
     // fix access permissions
     CSmallString sumask = job.GetItem("specific/resources","INF_UMASK");
-    mode_t umask = CUser::GetUMaskMode(sumask);
+    mode_t umask = CUserUtils::GetUMaskMode(sumask);
 
     int mode = 0777;
     int fmode = (mode & (~ umask)) & 0777;
@@ -285,7 +285,7 @@ bool CLoopJobType::CheckInputFile(CJob& job,std::ostream& sout)
         if( job.GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
             sgroup << "@" << job.GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }
-        gid_t group = CUser::GetGroupID(sgroup,false);
+        gid_t group = CUserUtils::GetGroupID(sgroup,false);
 
         int ret = chown(storage,-1,group);
         if( ret != 0 ){

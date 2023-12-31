@@ -29,7 +29,6 @@
 #include <boost/format.hpp>
 #include <FileName.hpp>
 #include <iomanip>
-#include <Cache.hpp>
 #include <Utils.hpp>
 #include "ICollectionJobTypeOptions.hpp"
 #include <boost/algorithm/string/split.hpp>

@@ -26,7 +26,6 @@
 #include <QueueList.hpp>
 #include <AliasList.hpp>
 #include <NodeList.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <BatchServers.hpp>
 
 using namespace std;

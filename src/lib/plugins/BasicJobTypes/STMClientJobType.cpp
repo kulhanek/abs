@@ -29,7 +29,6 @@
 #include <boost/format.hpp>
 #include <FileName.hpp>
 #include <iomanip>
-#include <Cache.hpp>
 #include <Utils.hpp>
 #include <DirectoryEnum.hpp>
 #include "STMClientJobTypeOptions.hpp"
@@ -151,7 +150,7 @@ ERetStatus CSTMClientJobType::DetectJobType(CJob& job,bool& detected,std::ostrea
             CFileName file;
             while( denum.FindFile(file) ){
                 if( CFileSystem::IsFile(cwd/file) == false ) continue;
-                if( CFileSystem::CopyFile(cwd/file,cwd/storage/file,true) == true ){
+                if( CFileSystem::CopyFile(cwd/file,cwd/CFileName(storage)/file,true) == true ){
                     CFileSystem::RemoveFile(cwd/file,true);
                     count++;
                 }

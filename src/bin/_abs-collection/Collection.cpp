@@ -23,7 +23,6 @@
 #include <ErrorSystem.hpp>
 #include <SmallTimeAndDate.hpp>
 #include <ABSConfig.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <ShellProcessor.hpp>
 #include <DirectoryEnum.hpp>
 #include <FileSystem.hpp>

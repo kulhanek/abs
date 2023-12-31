@@ -26,14 +26,14 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <ResourceList.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <fstream>
 #include <string>
 #include <iomanip>
-#include <Cache.hpp>
+#include <ModuleController.hpp>
+#include <ModCache.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -115,19 +115,17 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     CSmallString gmodver;
 
     // is gaussian module loaded?
-    if( AMSGlobalConfig.IsModuleActive(gmodule) == true ){
+    if( ModuleController.IsModuleActive(gmodule) == true ){
         // get active module version
-        AMSGlobalConfig.GetActiveModuleVersion(gmodule,gmodver);
+        ModuleController.GetActiveModuleVersion(gmodule,gmodver);
     } else {
         // get default version of module
-        if( Cache.LoadCache(false) == false) {
-            ES_ERROR("unable to load AMS cache");
-            return(ERS_FAILED);
-        }
+        ModuleController.LoadBundles(EMBC_SMALL);
+        ModuleController.MergeBundles();
         CSmallString drch, dmode;
-        CXMLElement* p_ele = Cache.GetModule(gmodule);
+        CXMLElement* p_ele = ModCache.GetModule(gmodule);
         if( p_ele ){
-            Cache.GetModuleDefaults(p_ele,gmodver,drch,dmode);
+            ModCache.GetModuleDefaults(p_ele,gmodver,drch,dmode);
         }
     }
 

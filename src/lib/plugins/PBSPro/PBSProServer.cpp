@@ -34,7 +34,6 @@
 #include "PBSProModule.hpp"
 #include <CategoryUUID.hpp>
 #include <ABSConfig.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <PluginDatabase.hpp>
 #include <NodeList.hpp>
 #include <JobList.hpp>
@@ -43,6 +42,7 @@
 #include "PBSProNode.hpp"
 #include "PBSProJob.hpp"
 #include <XMLElement.hpp>
+#include <SiteController.hpp>
 
 using namespace std;
 using namespace boost;
@@ -877,7 +877,7 @@ bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
         variables << ",INF_BOOT_SCRIPT=" << item;
     }
 
-    variables << ",INF_SITE_ID=" << AMSGlobalConfig.GetActiveSiteID();
+    variables << ",INF_SITE_ID=" << SiteController.GetActiveSite();
     variables << ",INF_ABS_VERSION=" << ABSConfig.GetABSModuleVersion();
 
     if( job.GetExternalVariables() != NULL ){

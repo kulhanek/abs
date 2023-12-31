@@ -33,8 +33,9 @@
 #include <QueueList.hpp>
 #include <CategoryUUID.hpp>
 #include <list>
-#include <AMSGlobalConfig.hpp>
 #include <BatchServers.hpp>
+#include <SiteController.hpp>
+#include <Site.hpp>
 
 using namespace std;
 
@@ -140,7 +141,7 @@ int Init(int argc, char* argv[])
 bool Run(void)
 {
     // check if site is active
-    if( AMSGlobalConfig.GetActiveSiteID() == NULL ) {
+    if( SiteController.GetActiveSite() == NULL ) {
         ES_ERROR("no site is active");
         return(false);
     }
@@ -169,10 +170,11 @@ bool Run(void)
     QueueList.SortByName();
 
     // load site config
-    if( Site.LoadConfig() == false) {
-        ES_ERROR("unable to load site config");
-        return(false);
-    }
+    // FIXME
+//    if( Site.LoadConfig() == false) {
+//        ES_ERROR("unable to load site config");
+//        return(false);
+//    }
 
     if( AliasList.LoadConfig() == false ){
         ES_ERROR("unable to load aliases");
@@ -255,7 +257,8 @@ void MainMenu(void)
         case 'i': {
             CTerminalStr vout;
             vout.Attach(stdout);
-            Site.PrintShortSiteInfo(vout);
+            // FIXME
+            // Site.PrintShortSiteInfo(vout);
             PrintMainMenu();
             }
             break;

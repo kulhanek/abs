@@ -26,12 +26,15 @@
 #include <FileSystem.hpp>
 #include <PluginDatabase.hpp>
 #include <ErrorSystem.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <ResourceList.hpp>
 #include <fstream>
 #include <string>
 #include <iomanip>
-#include <Cache.hpp>
+#include <ModuleController.hpp>
+#include <ModCache.hpp>
+#include <SiteController.hpp>
+#include <UserUtils.hpp>
+#include <ModUtils.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -108,19 +111,18 @@ ERetStatus CAlphafoldJobType::DetectJobType(CJob& job,bool& detected,std::ostrea
     CSmallString amodver;
 
     // is alphafold module loaded?
-    if( AMSGlobalConfig.IsModuleActive(amodule) == true ){
+    if( ModuleController.IsModuleActive(amodule) == true ){
         // get active module version
-        AMSGlobalConfig.GetActiveModuleVersion(amodule,amodver);
+        ModuleController.GetActiveModuleVersion(amodule,amodver);
     } else {
         // get default version of module
-        if( Cache.LoadCache(false) == false) {
-            ES_ERROR("unable to load AMS cache");
-            return(ERS_FAILED);
-        }
+        ModuleController.LoadBundles(EMBC_SMALL);
+        ModuleController.MergeBundles();
+
         CSmallString drch, dmode;
-        CXMLElement* p_ele = Cache.GetModule(amodule);
+        CXMLElement* p_ele = ModCache.GetModule(amodule);
         if( p_ele ){
-            Cache.GetModuleDefaults(p_ele,amodver,drch,dmode);
+            ModCache.GetModuleDefaults(p_ele,amodver,drch,dmode);
         }
     }
 

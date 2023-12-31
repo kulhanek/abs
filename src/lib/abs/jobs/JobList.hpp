@@ -232,7 +232,6 @@ public:
 // section of private data -----------------------------------------------------
 private:
     CSmallString        CollectionSiteName;
-    CSmallString        CollectionSiteID;
     CSmallString        CollectionHost;
     CFileName           CollectionPath;
     CFileName           CollectionName;

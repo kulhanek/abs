@@ -35,11 +35,11 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <Shell.hpp>
-#include <AMSGlobalConfig.hpp>
 #include <ABSConfig.hpp>
 #include <boost/filesystem.hpp>
 #include <TerminalStr.hpp>
 #include <boost/format.hpp>
+#include <SiteController.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -1122,8 +1122,7 @@ bool CJobList::CreateCollection(const CSmallString& path,const CSmallString& nam
     coll_id.CreateUUID();
     CollectionID = coll_id.GetStringForm();
     CollectionLastChange.GetActualTimeAndDate();
-    CollectionSiteName = AMSGlobalConfig.GetActiveSiteName();
-    CollectionSiteID = AMSGlobalConfig.GetActiveSiteID();
+    CollectionSiteName = SiteController.GetActiveSite();
 
     return(true);
 }
@@ -1295,7 +1294,6 @@ bool CJobList::LoadCollectionHeader(CXMLElement* p_ele)
     //result &= p_ele->GetAttribute("path",CollectionPath);
     result &= p_ele->GetAttribute("id",CollectionID);
     result &= p_ele->GetAttribute("site",CollectionSiteName);
-    result &= p_ele->GetAttribute("siteid",CollectionSiteID);
 
     return(result);
 }
@@ -1372,7 +1370,6 @@ void CJobList::SaveCollectionHeader(CXMLElement* p_ele)
     p_ele->SetAttribute("path",CollectionPath);
     p_ele->SetAttribute("id",CollectionID);
     p_ele->SetAttribute("site",CollectionSiteName);
-    p_ele->SetAttribute("siteid",CollectionSiteID);
 }
 
 //------------------------------------------------------------------------------
@@ -1538,8 +1535,8 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
     sout << "# Collection name : " << CollectionName << endl;
     sout << "# Collection path : " << CollectionHost << ":" << CollectionPath << endl;
     sout << "# Collection site : " << CollectionSiteName;
-    if( AMSGlobalConfig.GetActiveSiteName() != CollectionSiteName ){
-        sout << " <red>(Active site: " << AMSGlobalConfig.GetActiveSiteName() << ")</red>";
+    if( SiteController.GetActiveSite() != CollectionSiteName ){
+        sout << " <red>(Active site: " << SiteController.GetActiveSite() << ")</red>";
     }
     sout << endl;
     sout << "# Collection ID   : " << CollectionID << endl;

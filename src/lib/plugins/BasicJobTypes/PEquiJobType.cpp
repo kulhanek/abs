@@ -29,9 +29,12 @@
 #include <boost/format.hpp>
 #include <FileName.hpp>
 #include <iomanip>
-#include <Cache.hpp>
 #include <Utils.hpp>
-#include <AMSGlobalConfig.hpp>
+#include <ModuleController.hpp>
+#include <ModCache.hpp>
+#include <SiteController.hpp>
+#include <UserUtils.hpp>
+#include <ModUtils.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -154,30 +157,28 @@ ERetStatus CPEquiJobType::DetectJobType(CJob& job,bool& detected,std::ostream& s
     }
 
     // -------------------------------------------------------------------------
-    if( Cache.LoadCache() == false ){
-        ES_ERROR("unable to load module cache");
-        return(ERS_FAILED);
-    }
+    ModuleController.LoadBundles(EMBC_SMALL);
+    ModuleController.MergeBundles();
 
     //--------------------------------------------------------------------------
     CSmallString md_module = GetInputFileKeyValue("MD_MODULE");
     sout << "# MD engine module       : " << md_module << endl;
 
     CSmallString mname,mver,march,mmode;
-    CUtils::ParseModuleName(md_module,mname,mver,march,mmode);
+    CModUtils::ParseModuleName(md_module,mname,mver,march,mmode);
 
-    CXMLElement* p_mod = Cache.GetModule(mname);
+    CXMLElement* p_mod = ModCache.GetModule(mname);
     if( p_mod == NULL ){
         sout << endl;
         sout << "<b><red> ERROR: The specified MD engine module (" << mname;
-        sout << ") is not available for the active site (" << AMSGlobalConfig.GetActiveSiteName() << ")!</red></b>" << endl;
+        sout << ") is not available for the active site (" << SiteController.GetActiveSite() << ")!</red></b>" << endl;
         return(ERS_FAILED);
     }
     if( mver != NULL ){
-        if( Cache.CheckModuleVersion(p_mod,mver) == false ){
+        if( ModCache.CheckModuleVersion(p_mod,mver) == false ){
             sout << endl;
             sout << "<b><red> ERROR: The specified MD engine module (" << mname << ":" << mver;
-            sout << ") is not available for the active site (" << AMSGlobalConfig.GetActiveSiteName() << ")!</red></b>" << endl;
+            sout << ") is not available for the active site (" << SiteController.GetActiveSite() << ")!</red></b>" << endl;
             return(ERS_FAILED);
         }
     }
@@ -212,7 +213,9 @@ bool CPEquiJobType::CheckInputFile(CJob& job,std::ostream& sout)
     //note: cache is already initialized
 
     // check if GPU resources are required by module
-    if( Cache.DoesItNeedGPU(mname) == false ) return(true);
+
+    // FIXME
+    // if( Cache.DoesItNeedGPU(mname) == false ) return(true);
 
     // the module needs GPU, did we requested GPUs?
     CSmallString sngpus = job.GetItem("specific/resources","INF_NGPUS");

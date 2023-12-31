@@ -49,7 +49,6 @@
 #include <sys/sysmacros.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <AMSGlobalConfig.hpp>
 #include <BatchServers.hpp>
 #include <ResourceList.hpp>
 #include <sys/types.h>
@@ -57,6 +56,10 @@
 #include <sstream>
 #include <Host.hpp>
 #include <NodeList.hpp>
+#include <UserUtils.hpp>
+#include <SiteController.hpp>
+#include <ModuleController.hpp>
+#include <HostGroup.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -154,7 +157,7 @@ bool CJob::SaveInfoFileWithPerms(void)
 
 // permissions
     CSmallString sumask = GetItem("specific/resources","INF_UMASK");
-    mode_t umask = CUser::GetUMaskMode(sumask);
+    mode_t umask = CUserUtils::GetUMaskMode(sumask);
 
     int mode = 0666;
     int fmode = (mode & (~ umask)) & 0777;
@@ -165,7 +168,7 @@ bool CJob::SaveInfoFileWithPerms(void)
         if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
             sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }
-        gid_t group = CUser::GetGroupID(sgroup,false);
+        gid_t group = CUserUtils::GetGroupID(sgroup,false);
         int ret = chown(name,-1,group);
         if( ret != 0 ){
             CSmallString warning;
@@ -206,14 +209,14 @@ void CJob::CreateHeader(void)
 
     CSmallString version;
 
-    version = "INFINITY_INFO_v_3_0";
+    version = "INFINITY_INFO_v_4_0";
 
     p_header->SetAttribute("version",version);
-    p_header->SetAttribute("site",AMSGlobalConfig.GetActiveSiteID());
+    p_header->SetAttribute("site",SiteController.GetActiveSite());
 
     CSmallString absmod,absver;
     absmod = "abs";
-    AMSGlobalConfig.GetActiveModuleVersion(absmod,absver);
+    ModuleController.GetActiveModuleVersion(absmod,absver);
     absmod << ":" << absver;
     p_header->SetAttribute("abs",absmod);
 }
@@ -226,7 +229,7 @@ void CJob::CreateHeaderFromBatchJob(const CSmallString& siteid, const CSmallStri
 
     CSmallString version;
 
-    version = "INFINITY_INFO_v_3_0";
+    version = "INFINITY_INFO_v_4_0";
 
     p_header->SetAttribute("version",version);
     p_header->SetAttribute("site",siteid);
@@ -443,7 +446,7 @@ ERetStatus CJob::JobInput(std::ostream& sout,bool allowallpaths,bool inputfromin
     }
 
     SetItem("basic/jobinput","INF_JOB_TITLE",title);
-    SetItem("basic/modules","INF_EXPORTED_MODULES",AMSGlobalConfig.GetExportedModules());
+    SetItem("basic/modules","INF_EXPORTED_MODULES",ModuleController.GetExportedModules());
 
     // unique job key
     SetItem("basic/jobinput","INF_JOB_KEY",CUtils::GenerateUUID());
@@ -523,7 +526,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
     SetItem("specific/resources","INF_SERVER_SHORT",ShortServerName);
     SetItem("specific/resources","INF_JOB_OWNER",User.GetName());
 
-    CSmallString batch_server_groupns = Host.GetGroupNS(BatchServerName);
+    CSmallString batch_server_groupns = HostGroup.GetGroupNS(BatchServerName);
     SetItem("specific/resources","INF_BATCH_SERVER_GROUPNS",batch_server_groupns);
 
     CSmallString input_machine_groupns          = GetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS");
@@ -740,9 +743,9 @@ bool CJob::InputDirectory(std::ostream& sout)
     }
 
 // determine input machine, storage machine and batch system group namespaces
-    CSmallString input_machine_groupns          = Host.GetGroupNS();
-    CSmallString storage_machine_groupns        = Host.GetGroupNS();
-    CSmallString storage_machine_group_realm    = Host.GetRealm();
+    CSmallString input_machine_groupns          = HostGroup.GetGroupNS();
+    CSmallString storage_machine_groupns        = HostGroup.GetGroupNS();
+    CSmallString storage_machine_group_realm    = HostGroup.GetRealm();
 
 // determine storage machine and storage path
     CSmallString storage_machine = input_machine;
@@ -760,8 +763,8 @@ bool CJob::InputDirectory(std::ostream& sout)
         }
         if( spath == "/" ) spath = ""; // remove root '/' character
         spath = spath + input_dir_raw.substr(dest.length(),string::npos);
-        storage_machine_groupns     = Host.GetGroupNS(smach);
-        storage_machine_group_realm = Host.GetRealm(smach);
+        storage_machine_groupns     = HostGroup.GetGroupNS(smach);
+        storage_machine_group_realm = HostGroup.GetRealm(smach);
 
         if( ABSConfig.GetSystemConfigItem("INF_USE_NFS4_STORAGES") == "YES" ){
             storage_machine = smach;
@@ -770,7 +773,7 @@ bool CJob::InputDirectory(std::ostream& sout)
     }
 
 // default umask is derived from the input directory permission
-    ResourceList.AddRawResource("umask",CUser::GetUMask(input_dir_umask));
+    ResourceList.AddRawResource("umask",CUserUtils::GetUMask(input_dir_umask));
 
 // determine storage group name - derived from the input directory group
     string gname;
@@ -788,13 +791,13 @@ bool CJob::InputDirectory(std::ostream& sout)
     }
 
     if( gname.find("@") != string::npos ){
-        SetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE",Host.GetRealm(storage_machine));
+        SetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE",HostGroup.GetRealm(storage_machine));
         string realm = gname.substr(gname.find("@")+1,string::npos);
-        if( CSmallString(realm) == Host.GetRealm(storage_machine) ) {
+        if( CSmallString(realm) == HostGroup.GetRealm(storage_machine) ) {
             ResourceList.AddRawResource("storagegroup",gname.substr(0,gname.find("@")));
         } else {
             sout << "<b><red> ERROR: Consistency check: Input directory group realm '" << realm
-                 << "' is not the same as the storage machine realm '" << Host.GetRealm(storage_machine) << "'!</red></b>" << endl;
+                 << "' is not the same as the storage machine realm '" << HostGroup.GetRealm(storage_machine) << "'!</red></b>" << endl;
             return(false);
         }
     } else {
@@ -909,7 +912,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollec
 
     if( ! siblings ) {
         CSmallString sumask = GetItem("specific/resources","INF_UMASK");
-        mode_t umask = CUser::GetUMaskMode(sumask);
+        mode_t umask = CUserUtils::GetUMaskMode(sumask);
 
         int mode;
         int fmode;
@@ -938,7 +941,7 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollec
             if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
                 sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
             }
-            gid_t sgrid = CUser::GetGroupID(sgroup,false);
+            gid_t sgrid = CUserUtils::GetGroupID(sgroup,false);
 
             ret = chown(job_script,-1,sgrid);
             if( ret != 0 ){
@@ -1045,11 +1048,11 @@ void CJob::FixJobPerms(void)
         if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
             sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }
-        groupid = CUser::GetGroupID(sgroup,false);
+        groupid = CUserUtils::GetGroupID(sgroup,false);
     }
 
     CSmallString sumask = GetItem("specific/resources","INF_UMASK");
-    mode_t umask = CUser::GetUMaskMode(sumask);
+    mode_t umask = CUserUtils::GetUMaskMode(sumask);
 
     string sfixperms(fixperms);
     vector<string> fixmodes;
@@ -2098,34 +2101,9 @@ const CSmallString CJob::GetSiteName(void)
         return("");
     }
 
-    CSmallString siteid,name;
-    p_rele->GetAttribute("site",siteid);
-
-    name = CUtils::GetSiteName(siteid);
-    if( name == NULL ){
-        name = "-unknown-";
-    }
-
+    CSmallString name;
+    p_rele->GetAttribute("site",name);
     return(name);
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CJob::GetSiteID(void)
-{
-    CXMLElement* p_rele = GetElementByPath("infinity",false);
-    if( p_rele == NULL ){
-//        CXMLPrinter xml_printer;
-//        xml_printer.SetPrintedXMLNode(this);
-//        xml_printer.Print(stdout);
-        ES_ERROR("infinity element was not found");
-        return("");
-    }
-
-    CSmallString siteid;
-    p_rele->GetAttribute("site",siteid);
-
-    return(siteid);
 }
 
 //------------------------------------------------------------------------------
@@ -2376,10 +2354,14 @@ void CJob::RestoreEnv(void)
     RestoreEnv(GetChildElementByPath("job_info/submit"));
 
     // get surrogate machines if any
-    Host.InitHostFile();
+
+    // FIXME
+    // Host.InitHostFile();
+
     CSmallString hostname = CShell::GetSystemVariable("HOSTNAME");
-    bool         personal = CShell::GetSystemVariable("AMS_PERSONAL") == "ON";
-    CXMLElement* p_ele = Host.FindGroup(hostname,personal);
+    // FIXME
+    // bool         personal = CShell::GetSystemVariable("AMS_PERSONAL") == "ON";
+    CXMLElement* p_ele = NULL; // FIXME = HostGroup.FindGroup(hostname); // ,personal);
     if( p_ele ){
         CSmallString surrogates;
         p_ele->GetAttribute("surrogates",surrogates);
@@ -2409,7 +2391,7 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
     }
 
     ShellProcessor.SetVariable("INF_GO_BOOT_SCRIPT",bscript);
-    ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
+    ShellProcessor.SetVariable("INF_GO_SITE",GetSiteName());
 
     CSmallString tmp;
     tmp = NULL;
@@ -2473,7 +2455,7 @@ bool CJob::PrepareGoInputDirEnv(void)
     }
 
     ShellProcessor.SetVariable("INF_GO_BOOT_SCRIPT",bscript);
-    ShellProcessor.SetVariable("INF_GO_SITE_ID",GetSiteID());
+    ShellProcessor.SetVariable("INF_GO_SITE",GetSiteName());
 
     CSmallString tmp;
     tmp = NULL;
@@ -2606,7 +2588,9 @@ const CSmallString CJob::GetLastError(void)
 void CJob::PrintJobInfo(std::ostream& sout)
 {
     CSmallString ver = GetInfoFileVersion();
-    if( ver == "INFINITY_INFO_v_3_0"){
+    if( ver == "INFINITY_INFO_v_4_0"){
+        PrintJobInfoV4(sout);
+    } else if( ver == "INFINITY_INFO_v_3_0"){
         PrintJobInfoV3(sout);
     }  else if( ver == "INFINITY_INFO_v_2_0"){
         PrintJobInfoV2(sout);
@@ -2622,7 +2606,9 @@ void CJob::PrintJobInfo(std::ostream& sout)
 void CJob::PrintJobInfoCompact(std::ostream& sout,bool includepath,bool includecomment)
 {
     CSmallString ver = GetInfoFileVersion();
-    if( ver == "INFINITY_INFO_v_3_0"){
+    if( ver == "INFINITY_INFO_v_4_0"){
+        PrintJobInfoCompactV4(sout,includepath,includecomment);
+    } else if( ver == "INFINITY_INFO_v_3_0"){
         PrintJobInfoCompactV3(sout,includepath,includecomment);
     }  else    if( ver == "INFINITY_INFO_v_2_0"){
         PrintJobInfoCompactV2(sout,includepath,includecomment);
@@ -2779,13 +2765,13 @@ void CJob::PrintJobInfoForCollection(std::ostream& sout,bool includepath,bool in
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintJobInfoV3(std::ostream& sout)
+void CJob::PrintJobInfoV4(std::ostream& sout)
 {
-    PrintBasicV3(sout);
-    PrintResourcesV3(sout);
+    PrintBasicV4(sout);
+    PrintResourcesV4(sout);
 
     if( HasSection("start") == true ){
-        PrintExecV3(sout);
+        PrintExecV4(sout);
     }
 
     CSmallTimeAndDate ctad;
@@ -2932,7 +2918,7 @@ void CJob::PrintJobStatus(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintBasicV3(std::ostream& sout)
+void CJob::PrintBasicV4(std::ostream& sout)
 {
     CSmallString tmp,col;
 
@@ -2971,7 +2957,7 @@ void CJob::PrintBasicV3(std::ostream& sout)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintResourcesV3(std::ostream& sout)
+void CJob::PrintResourcesV4(std::ostream& sout)
 {
     CSmallString tmp,tmp1,tmp2;
 
@@ -3099,7 +3085,7 @@ void CJob::PrintResourcesV3(std::ostream& sout)
     sout << "Batch user group : " <<  tmp << endl;
 
     tmp = GetItem("specific/resources","INF_UMASK");
-    sout << "User file mask   : " << tmp << " [" << CUser::GetUMaskPermissions(CUser::GetUMaskMode(tmp)) << "]" <<  endl;
+    sout << "User file mask   : " << tmp << " [" << CUserUtils::GetUMaskPermissions(CUserUtils::GetUMaskMode(tmp)) << "]" <<  endl;
 
     tmp = GetItem("specific/resources","INF_FIXPERMS",true);
     if( tmp != NULL ){
@@ -3203,7 +3189,7 @@ void CJob::PrintResourceTokens(std::ostream& sout,const CSmallString& title, con
 
 //------------------------------------------------------------------------------
 
-bool CJob::PrintExecV3(std::ostream& sout)
+bool CJob::PrintExecV4(std::ostream& sout)
 {
     CSmallString tmp;
 
@@ -3789,7 +3775,7 @@ bool CJob::SaveJobKey(void)
 
 // setup correct permissions
     CSmallString sumask = GetItem("specific/resources","INF_UMASK");
-    mode_t umask = CUser::GetUMaskMode(sumask);
+    mode_t umask = CUserUtils::GetUMaskMode(sumask);
 
     int mode = 0666;
     int fmode = (mode & (~ umask)) & 0777;
@@ -3800,7 +3786,7 @@ bool CJob::SaveJobKey(void)
         if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
             sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
         }
-        gid_t group = CUser::GetGroupID(sgroup,false);
+        gid_t group = CUserUtils::GetGroupID(sgroup,false);
 
         int ret = chown(keyname,-1,group);
         if( ret != 0 ){
@@ -3815,7 +3801,7 @@ bool CJob::SaveJobKey(void)
 
 //------------------------------------------------------------------------------
 
-void CJob::PrintJobInfoCompactV3(std::ostream& sout,bool includepath,bool includecomment)
+void CJob::PrintJobInfoCompactV4(std::ostream& sout,bool includepath,bool includecomment)
 {
 
 //    sout << "# ST    Job ID        User        Job Title         Queue      NCPUs NGPUs NNods Last change          Exit" << endl;
@@ -4526,14 +4512,14 @@ bool CJob::SubmitJobFull(ostream& vout,vector<string>& args,
     }
 
     vout << endl;
-    Job->PrintBasicV3(vout);
+    Job->PrintBasicV4(vout);
 
     // resources
     if( Job->DecodeResources(vout,expermode) == false ){
         ES_TRACE_ERROR("unable to decode resources");
         return(false);
     }
-    Job->PrintResourcesV3(vout);
+    Job->PrintResourcesV4(vout);
 
     // last job check
     if( Job->LastJobCheck(vout) == false ){
