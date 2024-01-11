@@ -25,6 +25,7 @@
 #include <ABSConfig.hpp>
 #include <BatchServers.hpp>
 #include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 
 using namespace std;
 
@@ -78,6 +79,9 @@ bool CInfo::Run(void)
 {
     SiteController.InitSiteControllerConfig();
 
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     if( Options.GetOptTerminalStatus() == false ){
 
         // init these subsystems only for full pinfo output, RT#201538
@@ -95,7 +99,9 @@ bool CInfo::Run(void)
             return(false);
         }
 
+        // init user
         // user must be initializaed before ABSConfig.IsUserTicketValid()
+        User.InitUserConfig();
         User.InitUser();
 
         // check if user has valid ticket

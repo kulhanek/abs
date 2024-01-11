@@ -28,6 +28,7 @@
 #include <NodeList.hpp>
 #include <BatchServers.hpp>
 #include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 
 using namespace std;
 
@@ -80,6 +81,9 @@ int CAliases::Init(int argc,char* argv[])
 bool CAliases::Run(void)
 {
     SiteController.InitSiteControllerConfig();
+
+// init AMS registry
+    AMSRegistry.LoadRegistry();
 
     vout << low;
     if( ABSConfig.IsABSAvailable(vout) == false ){
@@ -140,7 +144,9 @@ bool CAliases::AddAlias(void)
         return(false);
     }
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     vout << low;

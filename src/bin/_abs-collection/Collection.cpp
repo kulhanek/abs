@@ -28,9 +28,12 @@
 #include <FileSystem.hpp>
 #include <Shell.hpp>
 #include <Host.hpp>
+#include <HostGroup.hpp>
+#include <AMSRegistry.hpp>
 #include <iomanip>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <SiteController.hpp>
 
 using namespace std;
 
@@ -85,6 +88,11 @@ int CCollection::Init(int argc,char* argv[])
 
 bool CCollection::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
@@ -98,7 +106,9 @@ bool CCollection::Run(void)
         return(false);
     }
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket
@@ -107,8 +117,14 @@ bool CCollection::Run(void)
         return(false);
     }
 
-    Host.InitGlobalSetup();
-    Host.InitHostFile();
+// init host group
+    HostGroup.InitHostsConfig();
+    HostGroup.InitAllHostGroups();
+    HostGroup.InitHostGroup();
+
+// init host
+    Host.InitHostSubSystems(HostGroup.GetHostSubSystems());
+    Host.InitHost();
 
     if( AliasList.LoadConfig() == false ){
         ES_TRACE_ERROR("unable to load aliases");
@@ -191,10 +207,10 @@ bool CCollection::Run(void)
             }
         }
 
-        if( Jobs.GetCollectionSiteName() != AMSGlobalConfig.GetActiveSiteName() ){
+        if( Jobs.GetCollectionSite() != SiteController.GetActiveSite() ){
             vout << endl;
-            vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSiteName();
-            vout << " does not match with the active site '" << AMSGlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
+            vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSite();
+            vout << " does not match with the active site '" << SiteController.GetActiveSite() << "'!</red></b>" << endl;
             return(false);
         }
 
@@ -221,10 +237,10 @@ bool CCollection::Run(void)
         // print info
         Jobs.PrintCollectionInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
 
-        if( Jobs.GetCollectionSiteName() != AMSGlobalConfig.GetActiveSiteName() ){
+        if( Jobs.GetCollectionSite() != SiteController.GetActiveSite() ){
             vout << endl;
-            vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSiteName();
-            vout << " does not match with the active site '" << AMSGlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
+            vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSite();
+            vout << " does not match with the active site '" << SiteController.GetActiveSite() << "'!</red></b>" << endl;
             return(false);
         }
 
@@ -265,10 +281,10 @@ bool CCollection::Run(void)
             }
         }
 
-        if( Jobs.GetCollectionSiteName() != AMSGlobalConfig.GetActiveSiteName() ){
+        if( Jobs.GetCollectionSite() != SiteController.GetActiveSite() ){
             vout << endl;
-            vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSiteName();
-            vout << " does not match with the active site '" << AMSGlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
+            vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSite();
+            vout << " does not match with the active site '" << SiteController.GetActiveSite() << "'!</red></b>" << endl;
             return(false);
         }
 
@@ -399,10 +415,10 @@ bool CCollection::Run(void)
         // print info
         Jobs.PrintCollectionInfo(vout,Options.GetOptIncludePath(),Options.GetOptIncludeComment());
 
-        if( Jobs.GetCollectionSiteName() != AMSGlobalConfig.GetActiveSiteName() ){
+        if( Jobs.GetCollectionSite() != SiteController.GetActiveSite() ){
             vout << endl;
-            vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSiteName();
-            vout << " does not match with the active site '" << AMSGlobalConfig.GetActiveSiteName() << "'!</red></b>" << endl;
+            vout << "<b><red> ERROR: The collection site '" << Jobs.GetCollectionSite();
+            vout << " does not match with the active site '" << SiteController.GetActiveSite() << "'!</red></b>" << endl;
             return(false);
         }
 

@@ -26,6 +26,8 @@
 #include <ABSConfig.hpp>
 #include <ShellProcessor.hpp>
 #include <FileSystem.hpp>
+#include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 
 using namespace std;
 
@@ -81,6 +83,11 @@ int CSync::Init(int argc,char* argv[])
 
 bool CSync::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
@@ -94,7 +101,9 @@ bool CSync::Run(void)
         return(false);
     }
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket

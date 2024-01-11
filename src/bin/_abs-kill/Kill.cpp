@@ -24,6 +24,8 @@
 #include <SmallTimeAndDate.hpp>
 #include <ABSConfig.hpp>
 #include <ShellProcessor.hpp>
+#include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 
 using namespace std;
 
@@ -78,6 +80,11 @@ int CKill::Init(int argc,char* argv[])
 
 bool CKill::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
@@ -91,7 +98,9 @@ bool CKill::Run(void)
         return(false);
     }
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket

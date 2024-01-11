@@ -28,9 +28,11 @@
 #include <FileSystem.hpp>
 #include <BatchServers.hpp>
 #include <Host.hpp>
+#include <HostGroup.hpp>
 #include <vector>
 #include <sys/stat.h>
 #include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -94,6 +96,9 @@ bool CSubmit::Run(void)
 {
     SiteController.InitSiteControllerConfig();
 
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     vout << medium;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
@@ -108,7 +113,9 @@ bool CSubmit::Run(void)
         return(false);
     }
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket
@@ -118,8 +125,14 @@ bool CSubmit::Run(void)
         return(false);
     }
 
-    Host.InitGlobalSetup();
-    Host.InitHostFile();
+// init host group
+    HostGroup.InitHostsConfig();
+    HostGroup.InitAllHostGroups();
+    HostGroup.InitHostGroup();
+
+// init host
+    Host.InitHostSubSystems(HostGroup.GetHostSubSystems());
+    Host.InitHost();
 
     if( AliasList.LoadConfig() == false ){
         ES_TRACE_ERROR("unable to load aliases");

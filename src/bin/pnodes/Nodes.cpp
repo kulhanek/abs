@@ -28,6 +28,7 @@
 #include <CommonParser.hpp>
 #include <BatchServers.hpp>
 #include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -83,6 +84,9 @@ bool CNodes::Run(void)
 {
     SiteController.InitSiteControllerConfig();
 
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     vout << low;
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");
@@ -96,7 +100,9 @@ bool CNodes::Run(void)
         return(false);
     }
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket

@@ -1122,7 +1122,7 @@ bool CJobList::CreateCollection(const CSmallString& path,const CSmallString& nam
     coll_id.CreateUUID();
     CollectionID = coll_id.GetStringForm();
     CollectionLastChange.GetActualTimeAndDate();
-    CollectionSiteName = SiteController.GetActiveSite();
+    CollectionSite = SiteController.GetActiveSite();
 
     return(true);
 }
@@ -1205,9 +1205,9 @@ bool CJobList::LoadCollection(const CSmallString& path,const CSmallString& name,
     }
 
     // allow to check jobs status under different site
-//    if( CollectionSiteName != sitename ){
+//    if( CollectionSite != sitename ){
 //        CSmallString error;
-//        error << "loaded collection has different site name (" << CollectionSiteName << ") than requested one (" << sitename << ")";
+//        error << "loaded collection has different site name (" << CollectionSite << ") than requested one (" << sitename << ")";
 //        ES_TRACE_ERROR(error);
 //        return(false);
 //    }
@@ -1238,9 +1238,9 @@ const CSmallString& CJobList::GetCollectionID(void) const
 
 //------------------------------------------------------------------------------
 
-const CSmallString& CJobList::GetCollectionSiteName(void) const
+const CSmallString& CJobList::GetCollectionSite(void) const
 {
-    return(CollectionSiteName);
+    return(CollectionSite);
 }
 
 //------------------------------------------------------------------------------
@@ -1293,7 +1293,7 @@ bool CJobList::LoadCollectionHeader(CXMLElement* p_ele)
     // path is set in LoadCollection
     //result &= p_ele->GetAttribute("path",CollectionPath);
     result &= p_ele->GetAttribute("id",CollectionID);
-    result &= p_ele->GetAttribute("site",CollectionSiteName);
+    result &= p_ele->GetAttribute("site",CollectionSite);
 
     return(result);
 }
@@ -1369,7 +1369,7 @@ void CJobList::SaveCollectionHeader(CXMLElement* p_ele)
     p_ele->SetAttribute("host",CollectionHost);
     p_ele->SetAttribute("path",CollectionPath);
     p_ele->SetAttribute("id",CollectionID);
-    p_ele->SetAttribute("site",CollectionSiteName);
+    p_ele->SetAttribute("site",CollectionSite);
 }
 
 //------------------------------------------------------------------------------
@@ -1534,8 +1534,8 @@ void CJobList::PrintCollectionInfo(std::ostream& sout,bool includepath,bool incl
     sout << endl;
     sout << "# Collection name : " << CollectionName << endl;
     sout << "# Collection path : " << CollectionHost << ":" << CollectionPath << endl;
-    sout << "# Collection site : " << CollectionSiteName;
-    if( SiteController.GetActiveSite() != CollectionSiteName ){
+    sout << "# Collection site : " << CollectionSite;
+    if( SiteController.GetActiveSite() != CollectionSite ){
         sout << " <red>(Active site: " << SiteController.GetActiveSite() << ")</red>";
     }
     sout << endl;

@@ -27,6 +27,7 @@
 #include <QueueList.hpp>
 #include <SiteController.hpp>
 #include <BatchServers.hpp>
+#include <AMSRegistry.hpp>
 
 using namespace std;
 
@@ -81,6 +82,9 @@ bool CQueues::Run(void)
 {
     SiteController.InitSiteControllerConfig();
 
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
@@ -95,7 +99,9 @@ bool CQueues::Run(void)
         return(false);
     }
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket

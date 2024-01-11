@@ -26,6 +26,7 @@
 #include <BatchServers.hpp>
 #include <CommonParser.hpp>
 #include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -81,6 +82,9 @@ bool CQStat::Run(void)
 {
     SiteController.InitSiteControllerConfig();
 
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
@@ -95,7 +99,9 @@ bool CQStat::Run(void)
         return(false);
     }
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket

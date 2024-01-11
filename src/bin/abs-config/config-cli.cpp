@@ -36,6 +36,7 @@
 #include <BatchServers.hpp>
 #include <SiteController.hpp>
 #include <Site.hpp>
+#include <AMSRegistry.hpp>
 
 using namespace std;
 
@@ -140,11 +141,10 @@ int Init(int argc, char* argv[])
 
 bool Run(void)
 {
-    // check if site is active
-    if( SiteController.GetActiveSite() == NULL ) {
-        ES_ERROR("no site is active");
-        return(false);
-    }
+    SiteController.InitSiteControllerConfig();
+
+// init AMS registry
+    AMSRegistry.LoadRegistry();
 
     if( ABSConfig.LoadConfig() == false ){
         ES_ERROR("unable to load ABSConfig config");
@@ -153,7 +153,9 @@ bool Run(void)
 
     CTerminalStr vout;
 
+// init user
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket

@@ -81,7 +81,7 @@ public:
     const CSmallString& GetCollectionID(void) const;
 
     /// get collection site name
-    const CSmallString& GetCollectionSiteName(void) const;
+    const CSmallString& GetCollectionSite(void) const;
 
     /// save collection
     bool SaveCollection(void);
@@ -231,7 +231,7 @@ public:
 
 // section of private data -----------------------------------------------------
 private:
-    CSmallString        CollectionSiteName;
+    CSmallString        CollectionSite;
     CSmallString        CollectionHost;
     CFileName           CollectionPath;
     CFileName           CollectionName;
