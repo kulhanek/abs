@@ -436,13 +436,17 @@ bool CABSConfig::IsABSAvailable(std::ostream& sout)
     // load system setup ---------------------------
 
     if( CFileSystem::IsFile(config_name) == false ){
-        ES_TRACE_ERROR("no config file");
+        CSmallString error;
+        error << "no config file '" << config_name << "'";
+        ES_TRACE_ERROR(error);
         enabled = false;
     }
 
     if( enabled == true ){
         if( xml_parser.Parse(config_name) == false ){
-            ES_TRACE_ERROR("unable to parse system config");
+            CSmallString error;
+            error << "unable to parse system config '" << config_name << "'";
+            ES_TRACE_ERROR(error);
             enabled = false;
         }
     }
