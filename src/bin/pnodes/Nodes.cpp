@@ -27,6 +27,7 @@
 #include <QueueList.hpp>
 #include <CommonParser.hpp>
 #include <BatchServers.hpp>
+#include <SiteController.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
