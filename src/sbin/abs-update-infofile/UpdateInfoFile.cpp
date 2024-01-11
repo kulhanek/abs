@@ -23,6 +23,8 @@
 #include <ErrorSystem.hpp>
 #include <TerminalStr.hpp>
 #include <JobList.hpp>
+#include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -51,6 +53,11 @@ int CUpdateInfoFile::Init(int argc,char* argv[])
 
 bool CUpdateInfoFile::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     if( Options.GetArgAction() == "archive" ){
         return( ArchiveRuntimeFiles() );
     }
