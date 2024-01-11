@@ -62,7 +62,7 @@ function archive_runtime_files() {
                 if [ -z \"\$AMS_ROOT\" ]; then \
                     source \"$INF_BOOT_SCRIPT\"; \
                 fi; \
-                site activate $INF_SITE_ID; \
+                site activate $INF_AMS_SITE; \
                 cd $INF_INPUT_DIR; \
                 if [ $? -ne 0 ]; then exit 1; fi; \
                 $ABS_ROOT/sbin/abs-update-infofile archive --format \"$INF_FORMAT\""

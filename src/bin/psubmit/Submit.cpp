@@ -32,6 +32,7 @@
 #include <vector>
 #include <sys/stat.h>
 #include <SiteController.hpp>
+#include <ModuleController.hpp>
 #include <AMSRegistry.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -98,6 +99,7 @@ bool CSubmit::Run(void)
 
 // init AMS registry
     AMSRegistry.LoadRegistry();
+    ModuleController.InitModuleControllerConfig();
 
     vout << medium;
 

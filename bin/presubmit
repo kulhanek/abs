@@ -79,7 +79,7 @@ while read INF_INPUT_MACHINE; do
                 if [ -z \"\$AMS_ROOT\" ]; then \
                     source \"$INF_BOOT_SCRIPT\"; \
                 fi; \
-                site activate $INF_SITE_ID; \
+                site activate $INF_AMS_SITE; \
                 amsmodule add abs:$INF_ABS_VERSION &> /dev/null; \
                 if [ -n \"$INF_EXPORTED_MODULES\" ]; then amsmodule add $INF_EXPORTED_MODULES &> /dev/null; fi; \
                 cd \"$INF_INPUT_DIR\"; \

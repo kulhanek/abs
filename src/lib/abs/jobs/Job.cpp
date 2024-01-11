@@ -2374,7 +2374,7 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
     if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",bscript) == false ){
         // FIXME
         // hardcoded backup
-        bscript = "/software/ncbr/softmods/8.0/etc/boot/bashrc.ncbr";
+        bscript = "/software/ncbr/softmods/9.0/etc/boot/bashrc.ncbr";
     }
 
     ShellProcessor.SetVariable("INF_GO_BOOT_SCRIPT",bscript);
@@ -2438,7 +2438,7 @@ bool CJob::PrepareGoInputDirEnv(void)
     if( ABSConfig.GetSystemConfigItem("INF_BOOT_SCRIPT",bscript) == false ){
         // FIXME
         // hardcoded backup
-        bscript = "/software/ncbr/softmods/8.0/etc/boot/bashrc.ncbr";
+        bscript = "/software/ncbr/softmods/9.0/etc/boot/bashrc.ncbr";
     }
 
     ShellProcessor.SetVariable("INF_GO_BOOT_SCRIPT",bscript);

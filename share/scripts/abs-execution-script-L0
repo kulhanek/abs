@@ -43,9 +43,10 @@ echo "Job storage path     : $INF_STORAGE_DIR"
 echo "Job key              : $INF_JOB_KEY"
 echo "------------------------------------------------------"
 echo "Hostname             : `hostname -f`"
+echo "AMS Root             : $AMS_ROOT"
 echo "AMS boot script      : $INF_BOOT_SCRIPT"
 echo "Site support         : $AMS_SITE_SUPPORT"
-echo "Site ID              : $INF_SITE_ID"
+echo "Site ID              : $INF_AMS_SITE"
 echo "ABS module version   : $INF_ABS_VERSION"
 echo "ABS Root             : $ABS_ROOT"
 
@@ -102,13 +103,13 @@ export AMS_HOST_CACHE
 
 ams-host --nocache
 
-echo "# site activate $INF_SITE_ID"
+echo "# site activate $INF_AMS_SITE"
 
-site activate "$INF_SITE_ID"
+site activate "$INF_AMS_SITE"
 
 if [ $? -ne 0 ]; then
     echo "" >&2
-    echo " >>> ERROR: Unable to activate the site ($INF_SITE_ID)!" >&2
+    echo " >>> ERROR: Unable to activate the site ($INF_AMS_SITE)!" >&2
     echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
     exit 1

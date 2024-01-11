@@ -865,6 +865,7 @@ bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
     if( job.GetItem("specific/resources","INF_INPUT_DATA",true) != NULL ){
         variables << ",INF_INPUT_DATA=" << job.GetItem("specific/resources","INF_INPUT_DATA",true);
     }
+    variables << ",AMS_ROOT=" << CShell::GetSystemVariable("AMS_ROOT");
     variables << ",ABS_ROOT=" << CShell::GetSystemVariable("ABS_ROOT");
     if( job.GetItem("basic/collection","INF_COLLECTION_ID",true) != NULL ) {
         // optional info about job collection
@@ -877,7 +878,7 @@ bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
         variables << ",INF_BOOT_SCRIPT=" << item;
     }
 
-    variables << ",INF_SITE_ID=" << SiteController.GetActiveSite();
+    variables << ",INF_AMS_SITE=" << SiteController.GetActiveSite();
     variables << ",INF_ABS_VERSION=" << ABSConfig.GetABSModuleVersion();
 
     if( job.GetExternalVariables() != NULL ){

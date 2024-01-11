@@ -86,7 +86,7 @@ for((ID=1;ID<=$NIJOBS;ID++)); do
     echo "     Technical output : ${INF_TECH_OUTPUT}"
     echo "     === $INF_IJOB_MAIN_NODE:$INF_IJOB_WORK_DIR ==="
 
-    ssh -o "StrictHostKeyChecking=no" $INF_IJOB_MAIN_NODE "$ABS_ROOT/share/scripts/abs-execution-ijob \"$INF_BOOT_SCRIPT\" \"$INF_SITE_ID\" \"$AMS_SITE_SUPPORT\" \"$INF_EXPORTED_MODULES\" \"$INF_ABS_VERSION\" \"$INF_IJOB_WORK_DIR\" \"$INF_IJOB_NAME\"" &> ${INF_TECH_OUTPUT} &
+    ssh -o "StrictHostKeyChecking=no" $INF_IJOB_MAIN_NODE "$ABS_ROOT/share/scripts/abs-execution-ijob \"$INF_BOOT_SCRIPT\" \"$INF_AMS_SITE\" \"$AMS_SITE_SUPPORT\" \"$INF_EXPORTED_MODULES\" \"$INF_ABS_VERSION\" \"$INF_IJOB_WORK_DIR\" \"$INF_IJOB_NAME\"" &> ${INF_TECH_OUTPUT} &
 
     echo
 done

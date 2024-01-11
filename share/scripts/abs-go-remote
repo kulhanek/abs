@@ -12,9 +12,9 @@
 # (c) 2001-2004, Petr Kulhanek, kulhanek@chemi.muni.cz
 # ==============================================================================
 
-INF_SITE_ID=$INF_GO_SITE_ID
+INF_AMS_SITE=$INF_GO_SITE_ID
 INF_WORK_DIR=$INF_GO_WORK_DIR
-INF_SITE_EMODS=$INF_GO_EXPORTED_MODULES_1
+INF_AMS_SITE_EMODS=$INF_GO_EXPORTED_MODULES_1
 INF_JOB_EMODS=$INF_GO_EXPORTED_MODULES_2
 
 # activate bash profile
@@ -26,9 +26,9 @@ if [ -z "$AMS_ROOT" ]; then
     AMS_ALTERNATIVE_BOOT="YES"
 fi
 
-site activate $INF_SITE_ID 2> /dev/null
+site activate $INF_AMS_SITE 2> /dev/null
 if [ $? -ne 0 ]; then
-    echo " >>> ERROR: The site ($INF_SITE_ID) cannot be activated!" >&2
+    echo " >>> ERROR: The site ($INF_AMS_SITE) cannot be activated!" >&2
     echo >&2
     exit 1
 fi
@@ -45,8 +45,8 @@ if [ $? -ne 0 ]; then
     echo >&2
     exit 1
 fi
-if [ -n "$INF_SITE_EMODS" ]; then
-    amsmodule add `echo "$INF_SITE_EMODS" | tr "%" " "` &> /dev/null;
+if [ -n "$INF_AMS_SITE_EMODS" ]; then
+    amsmodule add `echo "$INF_AMS_SITE_EMODS" | tr "%" " "` &> /dev/null;
 fi
 if [ -n "$INF_JOB_EMODS" ]; then
     amsmodule add `echo "$INF_JOB_EMODS" | tr "%" " "` &> /dev/null;

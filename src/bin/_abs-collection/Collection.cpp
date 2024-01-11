@@ -34,6 +34,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <SiteController.hpp>
+#include <ModuleController.hpp>
 
 using namespace std;
 
@@ -92,6 +93,7 @@ bool CCollection::Run(void)
 
 // init AMS registry
     AMSRegistry.LoadRegistry();
+    ModuleController.InitModuleControllerConfig();
 
     vout << low;
 

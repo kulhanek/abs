@@ -41,7 +41,7 @@ function abs_write_kill_screen()
 cat << EOF
 
 # activate site and terminal agent module
-site activate "$INF_SITE_ID"
+site activate "$INF_AMS_SITE"
 amsmodule add "$INF_AGENT_MODULE"
 
 # terminate screen session
@@ -56,7 +56,7 @@ function abs_write_kill_tigervnc()
 cat << EOF
 
 # activate site and terminal agent module
-site activate "$INF_SITE_ID"
+site activate "$INF_AMS_SITE"
 amsmodule add "$INF_AGENT_MODULE"
 
 INF_VNC_DISPLAY="`echo $INF_VNC_ID | tr ':' ' ' | awk '{ printf("%d",$2); }'`"
