@@ -79,12 +79,6 @@ public:
     /// print defined node group names
     void PrintNodeGroupNames(std::ostream& sout);
 
-    /// find node
-    const CNodePtr FindNode(const CSmallString& name);
-
-    /// find node
-    const CNodePtr FindNode(const CSmallString& name,const CQueuePtr& p_queue);
-
     /// generate node groups
     void PrepareNodeGroups(void);
 

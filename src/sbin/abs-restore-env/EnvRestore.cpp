@@ -1,6 +1,7 @@
 // =============================================================================
 // ABS - Advanced Batch System
 // -----------------------------------------------------------------------------
+//    Copyright (C) 2023      Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2012      Petr Kulhanek, kulhanek@chemi.muni.cz
 //    Copyright (C) 2001-2008 Petr Kulhanek, kulhanek@chemi.muni.cz
 //
@@ -23,6 +24,8 @@
 #include <ErrorSystem.hpp>
 #include <ShellProcessor.hpp>
 #include <TerminalStr.hpp>
+#include <AMSRegistry.hpp>
+#include <HostGroup.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -50,7 +53,15 @@ int CEnvRestore::Init(int argc,char* argv[])
 //------------------------------------------------------------------------------
 
 bool CEnvRestore::Run(void)
-{
+{  
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
+// init host group
+    HostGroup.InitHostsConfig();
+    HostGroup.InitHostGroup();
+
+// init job environment
     if( Job.LoadInfoFile(Options.GetArgInfoFile()) == false ){
         ES_ERROR("unable to load info file");
         return(false);

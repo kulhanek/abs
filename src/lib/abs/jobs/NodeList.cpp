@@ -777,43 +777,6 @@ void CNodeList::KeepNodeGroups(const CSmallString& groups)
 
 }
 
-//------------------------------------------------------------------------------
-
-const CNodePtr CNodeList::FindNode(const CSmallString& name)
-{
-    list<CNodePtr>::iterator it = begin();
-    list<CNodePtr>::iterator et = end();
-
-    while( it != et ){
-        if( (*it)->GetName() == name ) return(*it);
-        it++;
-    }
-
-    return(CNodePtr());
-}
-
-//------------------------------------------------------------------------------
-
-const CNodePtr CNodeList::FindNode(const CSmallString& name,const CQueuePtr& p_queue)
-{
-    list<CNodePtr>::iterator it = begin();
-    list<CNodePtr>::iterator et = end();
-
-    while( it != et ){
-        CNodePtr p_node = *it;
-        if( p_node->GetName() == name ){
-            if( p_queue == NULL ) return(p_node);
-            // FIXME
-            //if( p_queue->GetRequiredProperty() == NULL ) return(p_node);
-            //if( p_node->HasProperty(string(p_queue->GetRequiredProperty())) == true ) return(p_node);
-            return(CNodePtr());
-        }
-        it++;
-    }
-
-    return(CNodePtr());
-}
-
 //==============================================================================
 //------------------------------------------------------------------------------
 //==============================================================================

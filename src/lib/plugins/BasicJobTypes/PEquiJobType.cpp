@@ -213,9 +213,7 @@ bool CPEquiJobType::CheckInputFile(CJob& job,std::ostream& sout)
     //note: cache is already initialized
 
     // check if GPU resources are required by module
-
-    // FIXME
-    // if( Cache.DoesItNeedGPU(mname) == false ) return(true);
+    if( ModCache.DoesItNeedGPU(mname) == false ) return(true);
 
     // the module needs GPU, did we requested GPUs?
     CSmallString sngpus = job.GetItem("specific/resources","INF_NGPUS");

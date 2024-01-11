@@ -80,6 +80,8 @@ int CNodes::Init(int argc,char* argv[])
 
 bool CNodes::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
     vout << low;
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");

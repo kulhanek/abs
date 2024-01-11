@@ -436,9 +436,7 @@ bool CPRecycleJobType::CheckInputFile(CJob& job,std::ostream& sout)
     //note: cache is already initialized
 
     // check if GPU resources are required by module
-    // FIXME
-    // if( ModCache.DoesItNeedGPU(mname) == true ){
-    if( true ) {
+    if( ModCache.DoesItNeedGPU(mname) == true ){
 
         // the module needs GPU, did we requested GPUs?
         CSmallString sngpus = job.GetItem("specific/resources","INF_NGPUS");
