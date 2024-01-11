@@ -98,6 +98,9 @@ public:
     /// save info file including permissions
     bool SaveInfoFileWithPerms(void);
 
+    /// save AMS registry including permissions
+    bool SaveAMSRegistryWithPerms(void);
+
     /// save info file
     bool SaveInfoFile(const CFileName& name);
 

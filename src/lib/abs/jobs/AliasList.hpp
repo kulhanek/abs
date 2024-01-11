@@ -37,9 +37,6 @@ public:
     /// load all aliases
     bool LoadConfig(void);
 
-    /// save user aliases
-    bool SaveUserConfig(void);
-
     /// load system aliases
     bool LoadSystemConfig(void);
 

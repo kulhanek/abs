@@ -66,9 +66,7 @@ bool CGetConfig::Run(void)
         return(false);
     }
     if( Options.GetOptUser() == true ){
-        if( ABSConfig.LoadUserConfig() == false ){
-            ES_WARNING("unable to load user config");
-            }
+        ABSConfig.LoadUserConfig();
     }
 
     CSmallString value;

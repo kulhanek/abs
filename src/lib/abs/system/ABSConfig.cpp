@@ -37,6 +37,7 @@
 #include <fnmatch.h>
 #include <SiteController.hpp>
 #include <ModuleController.hpp>
+#include <AMSRegistry.hpp>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -57,8 +58,10 @@ CABSConfig::CABSConfig(void)
     ABSRoot         = CShell::GetSystemVariable("ABS_ROOT");
     HostName        = CShell::GetSystemVariable("HOSTNAME");
 
-    TicketChecked = false;
-    ValidTicket = false;
+    TicketChecked   = false;
+    ValidTicket     = false;
+
+    UserConfig      = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -77,7 +80,7 @@ bool CABSConfig::LoadConfig(void)
 {
     bool result;
     result  = LoadSystemConfig();
-    result &= LoadUserConfig();
+    LoadUserConfig();
     return(result);
 }
 
@@ -100,7 +103,7 @@ bool CABSConfig::LoadSystemConfig(void)
     }
 
     // init plugin subsystem
-    PluginDatabase.SetPluginPath(GetPluginsDir());
+    PluginDatabase.SetPluginPath(GetPluginsLibDir());
     if( PluginDatabase.LoadPlugins(GetPluginsConfigDir()) == false ){
         ES_ERROR("unable to load plugins");
         return(false);
@@ -113,60 +116,20 @@ bool CABSConfig::LoadSystemConfig(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CABSConfig::LoadUserConfig(void)
+void CABSConfig::LoadUserConfig(void)
 {
-    CFileName      config_name;
-    config_name = GetUserSiteConfigDir() / "abs.xml";
-
-    // is file?
-    if( CFileSystem::IsFile(config_name) == false ){
-        CSmallString warning;
-        warning << "user config dir '" << config_name << "' does not exist";
-        ES_WARNING(warning);
-
-        UserConfig.GetChildElementByPath("infinity",true);
-        return(true);
-    }
-
-    CXMLParser xml_parser;
-    xml_parser.SetOutputXMLNode(&UserConfig);
-
-    // load system setup ---------------------------
-    if( xml_parser.Parse(config_name) == false ){
-        ES_ERROR("unable to load Infinity user config");
-        return(false);
-    }
-
-    UserConfig.GetChildElementByPath("torque",true);
-
-    return(true);
-}
-
-//------------------------------------------------------------------------------
-
-bool CABSConfig::SaveUserConfig(void)
-{
-    CFileName      config_name;
-    config_name =  GetUserSiteConfigDir() / "abs.xml";
-
-    CXMLPrinter xml_printer;
-    xml_printer.SetPrintedXMLNode(&UserConfig);
-
-    // load system setup ---------------------------
-    if( xml_printer.Print(config_name) == false ){
-        ES_ERROR("unable to save Infinity user config");
-        return(false);
-    }
-
-    return(true);
+    AMSRegistry.LoadRegistry();
+    UserConfig = AMSRegistry.GetABSConfiguration();
 }
 
 //------------------------------------------------------------------------------
 
 bool CABSConfig::RemoveUserConfig(void)
 {
-    UserConfig.RemoveAllChildNodes();
-    UserConfig.GetChildElementByPath("abs/config",true);
+    if( UserConfig != NULL ){
+        UserConfig->RemoveAllChildNodes();
+        UserConfig->RemoveAllAttributes();
+    }
     return(true);
 }
 
@@ -212,8 +175,17 @@ const CFileName CABSConfig::GetSystemSiteConfigDir(void)
     CSmallString   ams_site;
 
     ams_site = SiteController.GetActiveSite();
-    config_name = GetABSRootDir() / "etc" / "sites" / ams_site / "aliases.xml";
+    config_name = GetABSRootDir() / "etc" / "sites" / ams_site;
 
+    return(config_name);
+}
+
+//------------------------------------------------------------------------------
+
+const CFileName CABSConfig::GetSystemSiteAliasesFile(void)
+{
+    CFileName      config_name;
+    config_name = GetSystemSiteConfigDir() / "aliases.xml" ;
     return(config_name);
 }
 
@@ -228,7 +200,7 @@ const CFileName CABSConfig::GetPluginsConfigDir(void)
 
 //------------------------------------------------------------------------------
 
-const CFileName CABSConfig::GetPluginsDir(void)
+const CFileName CABSConfig::GetPluginsLibDir(void)
 {
     CFileName dir;
     dir = GetABSRootDir() / "lib";
@@ -320,21 +292,25 @@ bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
 bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
                                       CSmallString& item_value,bool& system)
 {
-    CXMLElement*    p_ele = UserConfig.GetChildElementByPath("abs/config");
-    CXMLIterator    I(p_ele);
-    CXMLElement*    p_sele;
+    if( UserConfig == NULL ){
+        ES_ERROR("userConfig is NULL");
+        return(false);
+    }
+
+    CXMLElement* p_sele = UserConfig->GetChildElementByPath("config/item");
 
     system = false;
     item_value = NULL;
 
-    while( (p_sele = I.GetNextChildElement("item")) != NULL ){
+    while( p_sele != NULL ){
         CSmallString    name;
         p_sele->GetAttribute("name",name);
         if( name == item_name ){
             p_sele->GetAttribute("value",item_value);
             system = false;
             return(true);
-            }
+        }
+        p_sele = p_sele->GetNextSiblingElement("item");
     }
 
     if( GetSystemConfigItem(item_name,item_value) == true ){
@@ -354,14 +330,24 @@ bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
 void CABSConfig::SetUserConfigItem(const CSmallString& item_name,
                                       const CSmallString& item_value)
 {
-    CXMLElement*    p_ele = UserConfig.GetChildElementByPath("abs/config",true);
-    CXMLIterator    I(p_ele);
-    CXMLElement*    p_sele;
+    if( UserConfig == NULL ){
+        ES_ERROR("userConfig is NULL");
+        return;
+    }
 
-    while( (p_sele = I.GetNextChildElement("item")) != NULL ){
+    CXMLElement* p_ele = UserConfig->GetChildElementByPath("config");
+    if( p_ele == NULL ){
+        ES_ERROR("p_ele is NULL");
+        return;
+    }
+
+    CXMLElement* p_sele = p_ele->GetChildElementByPath("item");
+
+    while( p_sele != NULL ){
         CSmallString    name;
         p_sele->GetAttribute("name",name);
         if( name == item_name ) break;
+        p_sele = p_sele->GetNextSiblingElement("item");
     }
 
     if( p_sele == NULL ){
@@ -377,16 +363,21 @@ void CABSConfig::SetUserConfigItem(const CSmallString& item_name,
 bool CABSConfig::GetSystemConfigItem(CXMLElement* p_root, const CSmallString& item_name,
                                         CSmallString& item_value)
 {
-    CXMLIterator    I(p_root);
-    CXMLElement*    p_sele;
+    if( p_root == NULL ){
+        ES_ERROR("p_root is NULL");
+        return(false);
+    }
 
-    while( (p_sele = I.GetNextChildElement("item")) != NULL ){
+    CXMLElement* p_sele = p_root->GetChildElementByPath("item");
+
+    while( p_sele != NULL ){
         CSmallString    name;
         p_sele->GetAttribute("name",name);
         if( name == item_name ){
             p_sele->GetAttribute("value",item_value);
             return(true);
-            }
+        }
+        p_sele = p_sele->GetNextSiblingElement("item");
     }
 
     CSmallString error;

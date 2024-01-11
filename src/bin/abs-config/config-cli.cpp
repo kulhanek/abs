@@ -268,11 +268,8 @@ void MainMenu(void)
         case 's': {
             bool result = true;
             ErrorSystem.RemoveAllErrors();
-            if( TorqueSetupChanged ){
-                result &= ABSConfig.SaveUserConfig();
-            }
-            if( AliasSetupChanged ){
-                result &= AliasList.SaveUserConfig();
+            if( TorqueSetupChanged || AliasSetupChanged ){
+                result &= AMSRegistry.SaveUserConfig();
             }
             if( result == true ) {
                 TorqueSetupChanged = false;
@@ -330,11 +327,8 @@ bool QuitProgram(void)
         if( strcmp(buffer,"yes") == 0 ) {
             bool result = true;
             ErrorSystem.RemoveAllErrors();
-            if( TorqueSetupChanged ){
-                result &= ABSConfig.SaveUserConfig();
-            }
-            if( AliasSetupChanged ){
-                result &= AliasList.SaveUserConfig();
+            if( TorqueSetupChanged || AliasSetupChanged ){
+                result &= AMSRegistry.SaveUserConfig();
             }
             if( result == true ) {
                 TorqueSetupChanged = false;

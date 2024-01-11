@@ -47,10 +47,7 @@ public:
 
 // user setup ------------------------------------------------------------------
     /// load user config
-    bool LoadUserConfig(void);
-
-    /// save user config
-    bool SaveUserConfig(void);
+    void LoadUserConfig(void);
 
     /// remove user config
     bool RemoveUserConfig(void);
@@ -66,11 +63,14 @@ public:
     /// return system site config
     const CFileName GetSystemSiteConfigDir(void);
 
+    /// return system site aliases config file
+    const CFileName GetSystemSiteAliasesFile(void);
+
     /// return path to plugins definition files
     const CFileName GetPluginsConfigDir(void);
 
     /// return path to plugins
-    const CFileName GetPluginsDir(void);
+    const CFileName GetPluginsLibDir(void);
 
     /// get hostname
     const CSmallString& GetHostName(void);
@@ -139,8 +139,7 @@ private:
     CSmallString    HostName;
 
     CXMLDocument    SystemConfig;
-    CXMLDocument    UserConfig;
-    CXMLDocument    DocuConfig;
+    CXMLElement*    UserConfig;
 
     bool            TicketChecked;
     bool            ValidTicket;

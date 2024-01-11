@@ -312,6 +312,12 @@ bool CSubmit::SubmitJobHeader(void)
         return(false);
     }
 
+    // save AMS registry
+    if( Job->SaveAMSRegistryWithPerms() == false ){
+        ES_ERROR("unable to save ams registry");
+        return(false);
+    }
+
     if( Job->SaveJobKey() == false ){
         ES_ERROR("unable to save job key file");
         return(false);
@@ -373,6 +379,12 @@ bool CSubmit::SubmitJobCopy(int i)
     // save job info
     if( Job->SaveInfoFileWithPerms() == false ){
         ES_ERROR("unable to save job info file");
+        return(false);
+    }
+
+    // save AMS registry
+    if( Job->SaveAMSRegistryWithPerms() == false ){
+        ES_ERROR("unable to save ams registry");
         return(false);
     }
 

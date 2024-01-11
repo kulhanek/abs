@@ -195,7 +195,7 @@ bool CAliases::AddAlias(void)
         return(false);
     }
 
-    if( AliasList.SaveUserConfig() == false ){
+    if( AMSRegistry.SaveUserConfig() == false ){
         ES_ERROR("unable to save updated aliases");
         return(false);
     }
@@ -222,7 +222,7 @@ bool CAliases::RemoveAlias(void)
 
     AliasList.RemoveAlias(Options.GetProgArg(1));
 
-    if( AliasList.SaveUserConfig() == false ){
+    if( AMSRegistry.SaveUserConfig() == false ){
         ES_ERROR("unable to save updated aliases");
         return(false);
     }

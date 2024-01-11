@@ -29,6 +29,7 @@
 #include <FileSystem.hpp>
 #include <ErrorSystem.hpp>
 #include <ABSConfig.hpp>
+#include <AMSRegistry.hpp>
 
 using namespace std;
 
@@ -68,9 +69,7 @@ bool CAliasList::LoadConfig(void)
 
 bool CAliasList::LoadSystemConfig(void)
 {
-    CFileName      config_name;
-
-    config_name = ABSConfig.GetSystemSiteConfigDir();
+    CFileName config_name = ABSConfig.GetSystemSiteAliasesFile();
 
     if( CFileSystem::IsFile(config_name) == false ){
         CSmallString warning;
@@ -100,63 +99,12 @@ bool CAliasList::LoadSystemConfig(void)
 
 bool CAliasList::LoadUserConfig(void)
 {
-    CFileName      config_name;
-    config_name = ABSConfig.GetUserSiteConfigDir() / "aliases.xml";
-
-    // is file?
-    if( CFileSystem::IsFile(config_name) == false ){
-        CSmallString warning;
-        warning << "user aliases file '" << config_name << "' does not exist";
-        ES_WARNING(warning);
-        return(true);
-    }
-
-    CXMLDocument    xml_doc;
-    CXMLParser      xml_parser;
-    xml_parser.SetOutputXMLNode(&xml_doc);
-
-    // load system setup ---------------------------
-    if( xml_parser.Parse(config_name) == false ){
-        ES_ERROR("unable to load user aliases");
-        return(false);
-    }
-
     // load aliases
-    CXMLElement* p_ele = xml_doc.GetFirstChildElement("aliases");
+    CXMLElement* p_ele = AMSRegistry.GetABSConfiguration();
+    p_ele = p_ele->GetFirstChildElement("aliases");
+    if( p_ele == NULL ) return(true); // no aliase
+
     return( LoadAliases(p_ele,false) );
-}
-
-//------------------------------------------------------------------------------
-
-bool CAliasList::SaveUserConfig(void)
-{
-    CFileName      config_name;
-    config_name = ABSConfig.GetUserSiteConfigDir() / "aliases.xml";
-
-    CXMLDocument    xml_doc;
-
-    // save aliases
-    CXMLElement* p_ele = xml_doc.CreateChildElement("aliases");
-    if( p_ele == NULL ){
-        ES_ERROR("unable to create aliases element");
-        return(false);
-    }
-
-    if( SaveUserAliases(p_ele) == false ){
-        ES_ERROR("unable to save aliases");
-        return(false);
-    }
-
-    CXMLPrinter xml_printer;
-    xml_printer.SetPrintedXMLNode(&xml_doc);
-
-    // load system setup ---------------------------
-    if( xml_printer.Print(config_name) == false ){
-        ES_ERROR("unable to save user aliases");
-        return(false);
-    }
-
-    return(true);
 }
 
 //------------------------------------------------------------------------------

@@ -60,6 +60,7 @@
 #include <SiteController.hpp>
 #include <ModuleController.hpp>
 #include <HostGroup.hpp>
+#include <AMSRegistry.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -192,6 +193,40 @@ bool CJob::SaveInfoFile(const CFileName& name)
         error << "unable to save the job info file '" << name << "'";
         ES_ERROR(error);
         return(false);
+    }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CJob::SaveAMSRegistryWithPerms(void)
+{
+    if( DoNotSave == true ) return(true);
+    CFileName name = GetInputDir() / GetFullJobName() + ".amsreg";
+    bool result = AMSRegistry.SaveRegistry(name);
+    if( result == false ) return(false);
+
+// permissions
+    CSmallString sumask = GetItem("specific/resources","INF_UMASK");
+    mode_t umask = CUserUtils::GetUMaskMode(sumask);
+
+    int mode = 0666;
+    int fmode = (mode & (~ umask)) & 0777;
+    chmod(name,fmode);
+
+    CSmallString sgroup = GetItem("specific/resources","INF_USTORAGEGROUP");
+    if( (sgroup != NULL) && (sgroup != "-disabled-") ){
+        if( GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE") != NULL ){
+            sgroup << "@" << GetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE");
+        }
+        gid_t group = CUserUtils::GetGroupID(sgroup,false);
+        int ret = chown(name,-1,group);
+        if( ret != 0 ){
+            CSmallString warning;
+            warning << "unable to set owner and group of file '" << name << "' (" << ret << ")";
+            ES_WARNING(warning);
+        }
     }
 
     return(true);
@@ -4529,6 +4564,12 @@ bool CJob::SubmitJobFull(ostream& vout,vector<string>& args,
     // save job info
     if( Job->SaveInfoFileWithPerms() == false ){
         ES_ERROR("unable to save job info file");
+        return(false);
+    }
+
+    // save AMS registry
+    if( Job->SaveAMSRegistryWithPerms() == false ){
+        ES_ERROR("unable to save ams registry");
         return(false);
     }
 
