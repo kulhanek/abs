@@ -27,6 +27,7 @@
 #include <AliasList.hpp>
 #include <NodeList.hpp>
 #include <BatchServers.hpp>
+#include <SiteController.hpp>
 
 using namespace std;
 
@@ -78,6 +79,8 @@ int CAliases::Init(int argc,char* argv[])
 
 bool CAliases::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
     vout << low;
     if( ABSConfig.IsABSAvailable(vout) == false ){
         ES_TRACE_ERROR("abs not configured or available");

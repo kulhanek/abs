@@ -25,6 +25,7 @@
 #include <ABSConfig.hpp>
 #include <CommonParser.hpp>
 #include <BatchServers.hpp>
+#include <SiteController.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -77,6 +78,8 @@ int CKillAll::Init(int argc,char* argv[])
 
 bool CKillAll::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){

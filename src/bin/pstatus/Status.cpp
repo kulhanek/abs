@@ -23,6 +23,7 @@
 #include <SmallTimeAndDate.hpp>
 #include <ABSConfig.hpp>
 #include <BatchServers.hpp>
+#include <SiteController.hpp>
 
 using namespace std;
 
@@ -74,6 +75,8 @@ int CStatus::Init(int argc,char* argv[])
 
 bool CStatus::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){

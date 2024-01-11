@@ -25,6 +25,7 @@
 #include <ABSConfig.hpp>
 #include <Shell.hpp>
 #include <BatchServers.hpp>
+#include <SiteController.hpp>
 
 using namespace std;
 
@@ -76,6 +77,8 @@ int CSanitize::Init(int argc,char* argv[])
 
 bool CSanitize::Run(void)
 {    
+    SiteController.InitSiteControllerConfig();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){

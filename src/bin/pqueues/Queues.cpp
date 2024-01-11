@@ -25,6 +25,7 @@
 #include <ABSConfig.hpp>
 #include <User.hpp>
 #include <QueueList.hpp>
+#include <SiteController.hpp>
 #include <BatchServers.hpp>
 
 using namespace std;
@@ -78,6 +79,8 @@ int CQueues::Init(int argc,char* argv[])
 
 bool CQueues::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){

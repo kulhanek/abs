@@ -25,6 +25,7 @@
 #include <ABSConfig.hpp>
 #include <BatchServers.hpp>
 #include <CommonParser.hpp>
+#include <SiteController.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace std;
@@ -78,6 +79,8 @@ int CQStat::Init(int argc,char* argv[])
 
 bool CQStat::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
     vout << low;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){

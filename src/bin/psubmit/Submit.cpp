@@ -30,6 +30,7 @@
 #include <Host.hpp>
 #include <vector>
 #include <sys/stat.h>
+#include <SiteController.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -91,6 +92,8 @@ int CSubmit::Init(int argc,char* argv[])
 
 bool CSubmit::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
     vout << medium;
 
     if( ABSConfig.IsABSAvailable(vout) == false ){
