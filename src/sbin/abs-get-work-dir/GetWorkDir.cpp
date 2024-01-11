@@ -26,6 +26,8 @@
 #include <ABSConfig.hpp>
 #include <XMLElement.hpp>
 #include <ErrorSystem.hpp>
+#include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -56,6 +58,11 @@ int CGetWorkDir::Init(int argc,char* argv[])
 
 bool CGetWorkDir::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     // load system and optionaly user configuration
     if( ABSConfig.LoadSystemConfig() == false ){
         ES_ERROR("unable to load system config");

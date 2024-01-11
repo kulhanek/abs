@@ -26,6 +26,8 @@
 #include <TerminalStr.hpp>
 #include <AMSRegistry.hpp>
 #include <HostGroup.hpp>
+#include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -54,6 +56,8 @@ int CEnvRestore::Init(int argc,char* argv[])
 
 bool CEnvRestore::Run(void)
 {  
+    SiteController.InitSiteControllerConfig();
+
 // init AMS registry
     AMSRegistry.LoadRegistry();
 

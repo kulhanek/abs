@@ -23,6 +23,8 @@
 #include <ErrorSystem.hpp>
 #include <TerminalStr.hpp>
 #include <ABSConfig.hpp>
+#include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -53,6 +55,11 @@ int CGetConfig::Init(int argc,char* argv[])
 
 bool CGetConfig::Run(void)
 {
+    SiteController.InitSiteControllerConfig();
+
+// init AMS registry
+    AMSRegistry.LoadRegistry();
+
     // load system and optionaly user configuration
     if( ABSConfig.LoadSystemConfig() == false ){
         ES_ERROR("unable to load system config");
