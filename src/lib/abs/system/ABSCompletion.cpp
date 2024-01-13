@@ -116,6 +116,10 @@ bool CABSCompletion::InitCompletion(void)
         Action = Words[1];
     }
 
+// init AMS registry
+    SiteController.InitSiteControllerConfig();
+    AMSRegistry.LoadRegistry();
+
     return(true);
 }
 
@@ -302,6 +306,7 @@ bool CABSCompletion::InitQueuesCache(const CSmallString& cname)
     }
 
     // user must be initializaed before ABSConfig.IsUserTicketValid()
+    User.InitUserConfig();
     User.InitUser();
 
     // check if user has valid ticket
