@@ -20,6 +20,7 @@
 # INF_GO_VNC_ID
 # INF_GO_WHOLE_NAME
 # INF_GO_SITE
+# INF_GO_UMASK
 # INF_GO_BOOT_SCRIPT
 
 # global setup
@@ -37,7 +38,7 @@ case "$INF_GO_JOB_NAME" in
                 if [ -z \"\$AMS_ROOT\" ]; then \
                     source \"$INF_GO_BOOT_SCRIPT\"; \
                 fi; \
-                site activate $INF_GO_SITE; \
+                site --job init; \
                 amsmodule add $INF_GO_AGENT_MODULE; \
                 if [ \$? -ne 0 ]; then \
                     echo \"\" >&2; \

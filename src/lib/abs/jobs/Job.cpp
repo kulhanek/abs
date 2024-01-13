@@ -2546,6 +2546,9 @@ bool CJob::PrepareGoWorkingDirEnv(bool noterm)
 
     CSmallString tmp;
     tmp = NULL;
+    result &= GetItem("specific/resources","INF_UMASK",tmp);
+    ShellProcessor.SetVariable("INF_GO_UMASK",tmp);
+    tmp = NULL;
     result &= GetItem("start/workdir","INF_MAIN_NODE",tmp);
     ShellProcessor.SetVariable("INF_GO_MAIN_NODE",tmp);
     tmp = NULL;
