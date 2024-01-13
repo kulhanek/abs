@@ -31,7 +31,8 @@ export INF_SSH_OPTIONS
 # this is inline script
 case "$INF_GO_JOB_NAME" in
     cli )   
-        if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -n "$INF_GO_SITE" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
+        if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -n "$INF_GO_SITE" ] && \
+           [ -n "$INF_GO_UMASK" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
             ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
                 if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
@@ -61,10 +62,12 @@ case "$INF_GO_JOB_NAME" in
         ;;
     * )
         # go to working directory
-        if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_WORK_DIR" ] && [ -n "$INF_GO_SITE" ] ; then
+        if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_WORK_DIR" ] && \
+           [ -n "$INF_GO_SITE" ] && [ -n "$INF_GO_UMASK" ] ; then
             ssh -t -X $INF_SSH_OPTIONS $INF_GO_MAIN_NODE \
                       INF_GO_BOOT_SCRIPT="$INF_GO_BOOT_SCRIPT" \
                       INF_GO_SITE="$INF_GO_SITE" \
+                      INF_GO_UMASK="$INF_GO_UMASK" \
                       INF_GO_WORK_DIR="$INF_GO_WORK_DIR" \
                       INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \
                       INF_GO_EXPORTED_MODULES_2="`echo $INF_GO_EXPORTED_MODULES | tr "|" "%"`" \
@@ -75,7 +78,7 @@ case "$INF_GO_JOB_NAME" in
         # go to input directory
         if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -z "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_INPUT_MACHINE" ] && [ -n "$INF_GO_INPUT_DIR" ]; then
             if ! [ -d "$INF_GO_INPUT_DIR" ]; then
-                if [ "$INF_GO_INPUT_MACHINE" != "$HOSTNAME" ]; then
+                if [ "$INF_GO_INPUT_MACHINE" != "$HOSTNAME" ] && [ -n "$INF_GO_SITE" ] ; then
                     echo ""
                     echo " WARNING: The job input directory is located on the remote computer."
                     echo "          Job input dir: $INF_GO_INPUT_MACHINE:$INF_GO_INPUT_DIR"
@@ -84,6 +87,7 @@ case "$INF_GO_JOB_NAME" in
                     ssh -t -X $INF_SSH_OPTIONS $INF_GO_INPUT_MACHINE \
                               INF_GO_BOOT_SCRIPT="$INF_GO_BOOT_SCRIPT" \
                               INF_GO_SITE="$INF_GO_SITE" \
+                              INF_GO_UMASK="$INF_GO_UMASK" \
                               INF_GO_WORK_DIR="$INF_GO_INPUT_DIR" \
                               INF_GO_EXPORTED_MODULES_1="`echo $AMS_EXPORTED_MODULES | tr "|" "%"`" \
                               INF_GO_EXPORTED_MODULES_2="" \
