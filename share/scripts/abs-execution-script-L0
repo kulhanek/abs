@@ -48,6 +48,7 @@ echo "AMS boot script      : $INF_BOOT_SCRIPT"
 echo "Site support         : $AMS_SITE_SUPPORT"
 echo "Site name            : $INF_AMS_SITE"
 echo "ABS module version   : $INF_ABS_VERSION"
+echo "Job UMask            : $INF_UMASK"
 
 # restore AMS registry ---------------------------------------------------------
 

@@ -877,6 +877,7 @@ bool CPBSProServer::SubmitJob(CJob& job,bool verbose)
     }
 
     variables << ",INF_AMS_SITE=" << SiteController.GetActiveSite();
+    variables << ",INF_UMASK=" << job.GetItem("specific/resources","INF_UMASK",true);
     variables << ",INF_ABS_VERSION=" << ABSConfig.GetABSModuleVersion();
 
     if( job.GetExternalVariables() != NULL ){
