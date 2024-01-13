@@ -20,7 +20,7 @@ pgo(){
     unset INF_GO_AGENT_MODULE
     unset INF_GO_VNC_ID
     unset INF_GO_WHOLE_NAME
-    unset INF_GO_SITE_ID
+    unset INF_GO_SITE
     unset INF_GO_AMS_ROOT
 
     eval "`_abs-go $*`"
@@ -37,7 +37,7 @@ pgo(){
     unset INF_GO_AGENT_MODULE
     unset INF_GO_VNC_ID
     unset INF_GO_WHOLE_NAME
-    unset INF_GO_SITE_ID
+    unset INF_GO_SITE
     unset INF_GO_AMS_ROOT
 
     return "$AMS_EXIT_CODE"
