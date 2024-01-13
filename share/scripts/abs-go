@@ -41,6 +41,7 @@ case "$INF_GO_JOB_NAME" in
                 if [ -z \"\$AMS_ROOT\" ]; then \
                     source \"$INF_GO_BOOT_SCRIPT\"; \
                 fi; \
+                echo \"# >>>>\"; \
                 site --job init; \
                 amsmodule add $INF_GO_AGENT_MODULE; \
                 if [ \$? -ne 0 ]; then \
