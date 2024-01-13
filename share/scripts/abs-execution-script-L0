@@ -118,8 +118,7 @@ echo "# ams-host"
 ams-host
 
 echo "# site info"
-site init
-site info
+site --job init
 
 echo "# amsmodule --system add abs:$INF_ABS_VERSION"
 
