@@ -159,7 +159,7 @@ bool CPBSProJob::Init(const CSmallString& srv_name,const CSmallString& short_srv
     }
 
 // -----------------
-    CreateHeaderFromBatchJob(BatchVariables["INF_AMS_SITE"],BatchVariables["INF_ABS_VERSION"]);
+    CreateHeaderFromBatchJob(BatchVariables["INF_AMS_SITE"],BatchVariables["INF_AMS_SITE"]);
 
 // -----------------
     DecodeBatchJobComment(p_job->attribs,BatchJobComment);
