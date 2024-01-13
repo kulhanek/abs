@@ -35,8 +35,8 @@ case "$INF_GO_JOB_NAME" in
            [ -n "$INF_GO_UMASK" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
             ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
-                INF_GO_SITE=\"$INF_GO_SITE\"; \
-                INF_GO_UMASK=\"$INF_GO_UMASK\"; \
+                export INF_GO_SITE=\"$INF_GO_SITE\"; \
+                export INF_GO_UMASK=\"$INF_GO_UMASK\"; \
                 if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
                 if [ -z \"\$AMS_ROOT\" ]; then \
                     source \"$INF_GO_BOOT_SCRIPT\"; \
