@@ -43,12 +43,22 @@ echo "Job storage path     : $INF_STORAGE_DIR"
 echo "Job key              : $INF_JOB_KEY"
 echo "------------------------------------------------------"
 echo "Hostname             : `hostname -f`"
-echo "AMS Root             : $AMS_ROOT"
 echo "AMS boot script      : $INF_BOOT_SCRIPT"
 echo "Site support         : $AMS_SITE_SUPPORT"
-echo "Site ID              : $INF_AMS_SITE"
+echo "Site name            : $INF_AMS_SITE"
 echo "ABS module version   : $INF_ABS_VERSION"
-echo "ABS Root             : $ABS_ROOT"
+
+# restore AMS registry ---------------------------------------------------------
+
+function _abs_job_cleanup()
+{
+    rm -f "$AMS_USER_CONFIG"    2> /dev/null
+    rm -f "$AMS_HOST_CACHE"     2> /dev/null
+}
+
+trap _abs_job_cleanup EXIT
+
+# ------------------------------------------------------------------------------
 
 echo ""
 echo "#-------------------------------------------------------------------------------"
@@ -82,38 +92,33 @@ id | tr ' ' '\n'
 echo "umask=`umask`"
 echo
 
-if ! [ -d "$ABS_ROOT" ]; then
-    echo "" >&2
-    echo " >>> ERROR: The ABS_ROOT directory does not exist!" >&2
-    echo "" >&2
-    exit 1
-fi
+# restore AMS registry ---------------------------------------------------------
+
+AMS_REGISTRY_CONFIG="/tmp/ams_registry.${USER}.${PBS_JOBID}"
+export AMS_REGISTRY_CONFIG
+
+base64 << EOF > "$AMS_REGISTRY_CONFIG"
+__AMSREGISTRY__
+EOF
 
 # boot AMS ---------------------------------------------------------------------
+
+# the file is new, thus, this ensure that the host cache is updated
+AMS_HOST_CACHE="/tmp/ams_cache.${USER}.${PBS_JOBID}"
+export AMS_HOST_CACHE
+
+# boot AMS and init site
 if [ -f "$INF_BOOT_SCRIPT" ]; then
     # boot AMS system
     source $INF_BOOT_SCRIPT
 fi
 
 # do not use the host chache as it can be outdated
-echo "# ams-host --nocache"
+echo "# ams-host"
+ams-host
 
-AMS_HOST_CACHE="/tmp/ams_cache.${USER}.${PBS_JOBID}"
-export AMS_HOST_CACHE
-
-ams-host --nocache
-
-echo "# site activate $INF_AMS_SITE"
-
-site activate "$INF_AMS_SITE"
-
-if [ $? -ne 0 ]; then
-    echo "" >&2
-    echo " >>> ERROR: Unable to activate the site ($INF_AMS_SITE)!" >&2
-    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
-    echo "" >&2
-    exit 1
-fi
+echo "# site info"
+site info
 
 echo "# amsmodule --system add abs:$INF_ABS_VERSION"
 
@@ -125,6 +130,7 @@ if [ $? -ne 0 ]; then
     echo " >>> ERROR: Unable to add the 'abs:$INF_ABS_VERSION' module!" >&2
     echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
+    rm -f "$AMS_HOST_CACHE" 2> /dev/null
     exit 1
 fi
 
@@ -138,6 +144,7 @@ if [ $? -ne 0 ]; then
     echo " >>> ERROR: Unable to add the 'abs-rsync' module!" >&2
     echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
+    rm -f "$AMS_HOST_CACHE" 2> /dev/null
     exit 1
 fi
 
@@ -146,6 +153,7 @@ if ! [ -e "$ABS_RSYNC" ]; then
     echo " >>> ERROR: '$ABS_RSYNC' is not executable!" >&2
     echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
+    rm -f "$AMS_HOST_CACHE" 2> /dev/null
     exit 1
 fi
 
@@ -158,6 +166,16 @@ $ABS_RSYNC --version
 unset PBS_SERVER
 
 # ==============================================================================
+
+# ABS_ROOT is set by the abs module, sanity check
+
+if ! [ -d "$ABS_ROOT" ]; then
+    echo "" >&2
+    echo " >>> ERROR: The ABS_ROOT directory does not exist!" >&2
+    echo "" >&2
+    rm -f "$AMS_HOST_CACHE" 2> /dev/null
+    exit 1
+fi
 
 # load ABS library
 source $ABS_ROOT/share/scripts/abs-execution-script-LL
@@ -182,10 +200,8 @@ source $ABS_ROOT/share/scripts/abs-execution-script-L6
 
 # =============================================================================
 
-# clean AMS host cache
-if [ -f "$AMS_HOST_CACHE" ]; then
-    rm -f "$AMS_HOST_CACHE"
-fi
+# do cleanup
+_abs_job_cleanup
 
 # current time
 _DATE=`date`

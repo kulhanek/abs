@@ -552,6 +552,9 @@ protected:
     void FixJobPermsParent(gid_t groupid,mode_t umask);
     void FixJobPermsParent(const CFileName& dir,gid_t groupid,mode_t umask,bool& setgroup,bool& setumask);
 
+    /// prepare job script with AMS registry
+    bool PrepareJobScript(void);
+
     bool                                DoNotSave;
 
     // job status --------------------------------------------------------------

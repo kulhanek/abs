@@ -361,7 +361,7 @@ bool CJob::CheckRuntimeFiles(std::ostream& sout,bool ignore)
 bool CJob::AreRuntimeFiles(const CFileName& dir)
 {
     bool            runtime_files = false;
-    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*.hwtopo";
+    CSmallString    filters = "*.info;*.stdout;*.infex;*.infout;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*.hwtopo;*.amsreg";
     char*           p_filter;
     char*           p_buffer = NULL;
 
@@ -931,17 +931,15 @@ bool CJob::ShouldSubmitJob(std::ostream& sout,bool assume_yes)
 
 bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollection)
 {   
+// ------------------------
+    if( PrepareJobScript() == false ){
+         ES_TRACE_ERROR("unable to preare job script");
+         return(false);
+    }
+
     CFileName job_script;
     job_script = GetFullJobName() + ".infex";
 
-    // copy execution script to job directory
-    CFileName infex_script;
-    infex_script = ABSConfig.GetABSRootDir() / "share" / "scripts" / "abs-execution-script-L0";
-
-    if( CFileSystem::CopyFile(infex_script,job_script,true) == false ){
-        ES_ERROR("unable to copy startup script to the job directory");
-        return(false);
-    }
 // ------------------------
     CFileName user_script   = GetItem("basic/jobinput","INF_JOB_NAME",true);
 
@@ -1064,6 +1062,118 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollec
             sout << "  > " << tmp << " -> added into the collection" << endl;
         }
     }
+
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+// https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
+
+typedef unsigned char uchar;
+
+std::string base64_encode(const std::string &in) {
+
+    std::string out;
+
+    int val = 0, valb = -6;
+    for (uchar c : in) {
+        val = (val << 8) + c;
+        valb += 8;
+        while (valb >= 0) {
+            out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[(val>>valb)&0x3F]);
+            valb -= 6;
+        }
+    }
+    if (valb>-6) out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[((val<<8)>>(valb+8))&0x3F]);
+    while (out.size()%4) out.push_back('=');
+    return out;
+}
+
+//------------------------------------------------------------------------------
+
+bool CJob::PrepareJobScript(void)
+{
+// infex template
+    CFileName infex_template_file;
+    infex_template_file = ABSConfig.GetABSRootDir() / "share" / "scripts" / "abs-execution-script-L0";
+
+    std::ifstream infex_template_fin;
+    infex_template_fin.open(infex_template_file);
+    if( ! infex_template_fin ){
+        CSmallString error;
+        error << "unable to open infex template '" << infex_template_file << "'";
+        ES_ERROR(error);
+        return(false);
+    }
+
+    std::ostringstream infex_template_sstr;
+    infex_template_sstr << infex_template_fin.rdbuf();
+
+    if( ! infex_template_fin ){
+        CSmallString error;
+        error << "unable to read infex template '" << infex_template_file << "'";
+        ES_ERROR(error);
+        return(false);
+    }
+    infex_template_fin.close();
+
+    std::string infex_template = infex_template_sstr.str();
+
+// AMS registry
+    CFileName ams_registry_file;
+    ams_registry_file = GetFullJobName() + ".amsreg";
+
+    std::ifstream ams_registry_fin;
+    ams_registry_fin.open(ams_registry_file);
+
+    if( ! ams_registry_fin ){
+        CSmallString error;
+        error << "unable to open AMS registry '" << ams_registry_file << "'";
+        ES_ERROR(error);
+        return(false);
+    }
+
+    std::ostringstream ams_registry_sstr;
+    ams_registry_sstr << ams_registry_fin.rdbuf();
+
+    if( ! ams_registry_fin ){
+        CSmallString error;
+        error << "unable to read AMS registry '" << ams_registry_file << "'";
+        ES_ERROR(error);
+        return(false);
+    }
+    ams_registry_fin.close();
+
+    std::string ams_registry = base64_encode(ams_registry_sstr.str());
+
+    // decode base64
+
+// substitute
+    infex_template.replace(infex_template.find("__AMSREGISTRY__"),sizeof("__AMSREGISTRY__"),ams_registry);
+
+// save
+    CFileName job_script_file;
+    job_script_file = GetFullJobName() + ".infex";
+
+    std::ofstream infex_script_fout;
+    infex_script_fout.open(job_script_file);
+
+    if( ! infex_script_fout ){
+        CSmallString error;
+        error << "unable to open the infex script '" << job_script_file << "'";
+        ES_ERROR(error);
+        return(false);
+    }
+
+    infex_script_fout << infex_template;
+    if( ! infex_script_fout ){
+        CSmallString error;
+        error << "unable to write the infex script '" << job_script_file << "'";
+        ES_ERROR(error);
+        return(false);
+    }
+    infex_script_fout.close();
 
     return(true);
 }
@@ -4305,7 +4415,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     }
 
     // delete non-important runtime files
-    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*.hwtopo
+    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*.hwtopo;*.amsreg
     CSmallString cmd;
     cmd << "rm -f ";
     cmd << "'" << whole_name << ".infex' ";
@@ -4317,7 +4427,8 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     cmd << "'" << whole_name << ".vncpsw' ";
     cmd << "'" << whole_name << ".kill' ";
     cmd << "'" << whole_name << ".hwtopo' ";
-    // FUJ
+    cmd << "'" << whole_name << ".amsreg' ";
+    // FUJ - FIXME
     system(cmd);
 
     // archive *.info *.stdout *.infout
@@ -4345,7 +4456,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     } else {
         cmd << "'" << archive << ".info'";
     }
-    // FUJ
+    // FUJ - FIXME
     system(cmd);
 
     cmd = NULL;
@@ -4356,7 +4467,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     } else {
         cmd << "'" << archive << ".stdout'";
     }
-    // FUJ
+    // FUJ - FIXME
     system(cmd);
 
     cmd = NULL;
@@ -4387,7 +4498,7 @@ void CJob::CleanRuntimeFiles(void)
     }
 
     // delete all runtime files
-    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*info;*stdout;*infout;*.hwtopo
+    // *.infex;*.nodes;*.gpus;*.mpinodes;*.infkey;*.vncid;*.vncpsw;*.kill;*info;*stdout;*infout;*.hwtopo;*.amsreg
     CSmallString cmd;
     cmd << "rm -f ";
     cmd << "'" << whole_name << ".infex' ";
@@ -4402,7 +4513,8 @@ void CJob::CleanRuntimeFiles(void)
     cmd << "'" << whole_name << ".stdout' ";
     cmd << "'" << whole_name << ".infout' ";
     cmd << "'" << whole_name << ".hwtopo' ";
-    // FUJ
+    cmd << "'" << whole_name << ".amsreg' ";
+    // FUJ - FIXME
     system(cmd);
 }
 
@@ -4561,15 +4673,16 @@ bool CJob::SubmitJobFull(ostream& vout,vector<string>& args,
         return(false);
     }
 
-    // save job info
-    if( Job->SaveInfoFileWithPerms() == false ){
-        ES_ERROR("unable to save job info file");
-        return(false);
-    }
-
+    // we need registry for the job submission
     // save AMS registry
     if( Job->SaveAMSRegistryWithPerms() == false ){
         ES_ERROR("unable to save ams registry");
+        return(false);
+    }
+
+    // save job info
+    if( Job->SaveInfoFileWithPerms() == false ){
+        ES_ERROR("unable to save job info file");
         return(false);
     }
 

@@ -292,27 +292,26 @@ bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
 bool CABSConfig::GetUserConfigItem(const CSmallString& item_name,
                                       CSmallString& item_value,bool& system)
 {
-    if( UserConfig == NULL ){
-        ES_ERROR("userConfig is NULL");
-        return(false);
-    }
+// try user first
+    if( UserConfig != NULL ){
+        CXMLElement* p_sele = UserConfig->GetChildElementByPath("config/item");
 
-    CXMLElement* p_sele = UserConfig->GetChildElementByPath("config/item");
+        system = false;
+        item_value = NULL;
 
-    system = false;
-    item_value = NULL;
-
-    while( p_sele != NULL ){
-        CSmallString    name;
-        p_sele->GetAttribute("name",name);
-        if( name == item_name ){
-            p_sele->GetAttribute("value",item_value);
-            system = false;
-            return(true);
+        while( p_sele != NULL ){
+            CSmallString    name;
+            p_sele->GetAttribute("name",name);
+            if( name == item_name ){
+                p_sele->GetAttribute("value",item_value);
+                system = false;
+                return(true);
+            }
+            p_sele = p_sele->GetNextSiblingElement("item");
         }
-        p_sele = p_sele->GetNextSiblingElement("item");
     }
 
+// try system next
     if( GetSystemConfigItem(item_name,item_value) == true ){
         system = true;
         return(true);

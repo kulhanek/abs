@@ -23,10 +23,10 @@ done
 echo ""
 echo "# List of job runtime files ..."
 echo "# --------------------------------------------------------------------"
-ls -l *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo  2> /dev/null
+ls -l *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo *.amsreg  2> /dev/null
 
 # do we have runtime files?
-NRTF=`ls -l *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo  2>/dev/null | wc -l`
+NRTF=`ls -l *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo *.amsreg  2>/dev/null | wc -l`
 if [ "$NRTF" -eq 0 ]; then
     echo ""
     echo ">>> INFO: No runtime files detected!"
@@ -38,7 +38,7 @@ if [ "$FORCE" == "NO" ]; then
     echo ""
     echo -n "Do you want to remove runtime files (YES/NO)? "
     read ANSW
-    if [ "$ANSW" != "YES" ]; then
+    if [ "$ANSW" != "YES" ] || [ "$ANSW" != "yes" ]; then
         echo ""
         echo ">>> INFO: No runtime files were deleted!"
         echo ""
@@ -47,7 +47,7 @@ if [ "$FORCE" == "NO" ]; then
 fi
 
 # clean runtime file
-rm -f *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo
+rm -f *.info *.infex *.infout *.stdout *.nodes *.mpinodes *.gpus *.infkey *.vncid *.vncpsw *.kill *.hwtopo *.amsreg
 
 echo ""
 echo ">>> INFO: Runtime files were deleted!"
