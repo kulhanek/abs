@@ -1150,7 +1150,9 @@ bool CJob::PrepareJobScript(void)
     // decode base64
 
 // substitute
-    infex_template.replace(infex_template.find("__AMSREGISTRY__"),sizeof("__AMSREGISTRY__"),ams_registry);
+    std::string key;
+    key = "__AMSREGISTRY__";
+    infex_template.replace(infex_template.find(key),key.size(),ams_registry);
 
 // save
     CFileName job_script_file;

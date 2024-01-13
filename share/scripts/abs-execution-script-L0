@@ -97,7 +97,7 @@ echo
 AMS_REGISTRY_CONFIG="/tmp/ams_registry.${USER}.${PBS_JOBID}"
 export AMS_REGISTRY_CONFIG
 
-base64 << EOF > "$AMS_REGISTRY_CONFIG"
+cat << EOF | base64 --decode > "$AMS_REGISTRY_CONFIG"
 __AMSREGISTRY__
 EOF
 
