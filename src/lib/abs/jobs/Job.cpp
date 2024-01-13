@@ -1146,13 +1146,23 @@ bool CJob::PrepareJobScript(void)
     ams_registry_fin.close();
 
     std::string ams_registry = base64_encode(ams_registry_sstr.str());
+    std::ostringstream ams_registry_wrapped_str;
+
+    int len = 0;
+    for(char c : ams_registry){
+        ams_registry_wrapped_str << c;
+        len++;
+        if( len % 80 == 0 ) ams_registry_wrapped_str << endl;
+    }
+
+    std::string ams_registry_wrapped = ams_registry_wrapped_str.str();
 
     // decode base64
 
 // substitute
     std::string key;
     key = "__AMSREGISTRY__";
-    infex_template.replace(infex_template.find(key),key.size(),ams_registry);
+    infex_template.replace(infex_template.find(key),key.size(),ams_registry_wrapped);
 
 // save
     CFileName job_script_file;
