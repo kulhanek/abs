@@ -1433,6 +1433,13 @@ ERetStatus CJob::ResubmitJob(bool verbose)
         return(ERS_FAILED);
     }
 
+    // we need registry for the job submission
+    // save AMS registry
+    if( SaveAMSRegistryWithPerms() == false ){
+        ES_ERROR("unable to save ams registry");
+        return(ERS_FAILED);
+    }
+
     // submit job
     tmpout.str("");
     if( SubmitJob(tmpout,false,verbose,true) == false ){
@@ -4667,16 +4674,17 @@ bool CJob::SubmitJobFull(ostream& vout,vector<string>& args,
         return(false);
     }
 
-    // in resubmit mode - ignore collections
-    if( Job->SubmitJob(vout,false,verbose,resubmitmode) == false ){
-        ES_TRACE_ERROR("unable to submit job");
-        return(false);
-    }
-
     // we need registry for the job submission
     // save AMS registry
     if( Job->SaveAMSRegistryWithPerms() == false ){
         ES_ERROR("unable to save ams registry");
+        return(false);
+    }
+
+
+    // in resubmit mode - ignore collections
+    if( Job->SubmitJob(vout,false,verbose,resubmitmode) == false ){
+        ES_TRACE_ERROR("unable to submit job");
         return(false);
     }
 
