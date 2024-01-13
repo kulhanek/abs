@@ -37,6 +37,8 @@
 #include <BatchServers.hpp>
 #include <PluginDatabase.hpp>
 #include <CategoryUUID.hpp>
+#include <SiteController.hpp>
+#include <AMSRegistry.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
