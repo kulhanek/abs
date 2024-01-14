@@ -477,11 +477,10 @@ const std::vector<std::string> CNode::GetStateList(void) const
 
 bool CNode::IsDown(void) const
 {
-    // offline nodes are down
-    if( State.FindSubString("offline") != -1 ) return(true);
-
     // consider power off nodes as up
-    if( (State.FindSubString("down") != -1) && (State.FindSubString("poweroff") != -1) ) {
+    if( (State.FindSubString("down") != -1) &&
+        (State.FindSubString("offline") != -1) &&
+        (State.FindSubString("poweroff") != -1) ) {
         return(false);
     }
 
@@ -498,8 +497,12 @@ bool CNode::IsDown(void) const
 
 bool CNode::IsPowerOff(void) const
 {
-    return( (State.FindSubString("poweroff") != -1) &&
-            (State.FindSubString("offline") == -1) );
+    if( (State.FindSubString("down") != -1) &&
+        (State.FindSubString("offline") != -1) &&
+        (State.FindSubString("poweroff") != -1) ) {
+        return(true);
+    }
+    return(false);
 }
 
 //==============================================================================

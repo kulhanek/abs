@@ -165,7 +165,6 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
     }
     if( power_status == "down" ){
         states.push_back("poweroff");
-        cerr << "poweroff" << endl;
     }
 
     // update state
