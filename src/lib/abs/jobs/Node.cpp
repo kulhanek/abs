@@ -69,6 +69,10 @@ const CSmallString CNode::GetShortServerName(void)
 
 char CNode::GetStateCode(void)
 {
+    if( IsPowerOff() == true ){
+        return('P');
+    }
+
     if( IsDown() == true ){
         return('D');
     }
@@ -196,14 +200,6 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     sout << " " << setw(5) << GetNiceSize(ScratchShared);
     sout << " " << setw(5) << GetNiceSize(ScratchSSD);
 
-    if( IsPowerOff() ){
-        sout << "</yellow>";
-    }
-
-    if( IsDown() ){
-        sout << "</red>";
-    }
-
     sout << right;
     sout << " ";
 
@@ -233,12 +229,21 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
             len++;
         }
     }
+
+    if( IsPowerOff() ){
+        sout << "</yellow>";
+    }
+
+    if( IsDown() ){
+        sout << "</red>";
+    }
+
     sout << endl;
-    if( Comment != NULL ){
+    if( (Comment != NULL) && (! ( IsPowerOff() && (Comment == "power off") ) ) ){
         if( IsDown() || IsPowerOff() ){
             sout << "<red>";
         }
-        sout << "               " << left << Comment << endl;
+        sout << "  " << left << Comment << endl;
         if( IsDown() || IsPowerOff() ){
             sout << "</red>";
         }
