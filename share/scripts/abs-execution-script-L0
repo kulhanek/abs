@@ -119,8 +119,8 @@ fi
 echo "# ams-host"
 ams-host
 
-echo "# site --job init"
-site --job init
+echo "# site --force init"
+site --force init
 
 echo "# amsmodule --system add abs:$INF_ABS_VERSION"
 

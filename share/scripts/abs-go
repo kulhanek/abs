@@ -34,17 +34,15 @@ case "$INF_GO_JOB_NAME" in
         if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -n "$INF_GO_SITE" ] && \
            [ -n "$INF_GO_UMASK" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
-            ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
-                export INF_GO_SITE=\"$INF_GO_SITE\"; \
-                export INF_GO_UMASK=\"$INF_GO_UMASK\"; \
-                echo \"# >>>>\"; \
+            LC_SSH_AMS_IGNORE_SITE_INIT=Y ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
                 if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
-                echo \"# >>>>\"; \
                 if [ -z \"\$AMS_ROOT\" ]; then \
                     source \"$INF_GO_BOOT_SCRIPT\"; \
                 fi; \
+                export INF_GO_SITE=\"$INF_GO_SITE\"; \
+                export INF_GO_UMASK=\"$INF_GO_UMASK\"; \
                 echo \"# >>>>\"; \
-                site --job init; \
+                site --force init; \
                 amsmodule add $INF_GO_AGENT_MODULE; \
                 if [ \$? -ne 0 ]; then \
                     echo \"\" >&2; \
@@ -69,7 +67,7 @@ case "$INF_GO_JOB_NAME" in
         # go to working directory
         if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_WORK_DIR" ] && \
            [ -n "$INF_GO_SITE" ] && [ -n "$INF_GO_UMASK" ] ; then
-            ssh -t -X $INF_SSH_OPTIONS $INF_GO_MAIN_NODE \
+            LC_SSH_AMS_IGNORE_SITE_INIT=Y ssh -t -X $INF_SSH_OPTIONS $INF_GO_MAIN_NODE \
                       INF_GO_BOOT_SCRIPT="$INF_GO_BOOT_SCRIPT" \
                       INF_GO_SITE="$INF_GO_SITE" \
                       INF_GO_UMASK="$INF_GO_UMASK" \
