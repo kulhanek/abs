@@ -137,8 +137,8 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
 
     sout << " ";
     CSmallString name = Name;
-    if( Name.GetLength() > 12 ){
-        name = name.GetSubStringFromTo(0,11);
+    if( Name.GetLength() > 25 ){
+        name = name.GetSubStringFromTo(0,24);
     }
     sout << setw(25) << name;
 
