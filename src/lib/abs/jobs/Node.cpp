@@ -124,6 +124,9 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     if( IsDown() ){
         sout << "<red>";
     }
+    if( IsPowerOff() ){
+        sout << "<yellow>";
+    }
 
     sout << left;
     sout << ShortServerName;
@@ -133,13 +136,13 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     if( Name.GetLength() > 12 ){
         name = name.GetSubStringFromTo(0,11);
     }
-    sout << setw(12) << name;
+    sout << setw(25) << name;
 
     sout << " " << GetStateCode();
 
     sout << right;
 // ------------------
-    if( ! IsDown() ){
+    if( ! (IsDown() || IsPowerOff())  ){
         if( AssignedCPUs == 0 ){
             sout << "<b><green>";
         } else if (NCPUs != AssignedCPUs){
@@ -152,7 +155,7 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
 // ------------------
     sout << "/" << setw(3) << NCPUs;
 // ------------------
-    if( ! IsDown() ){
+    if( ! (IsDown() || IsPowerOff()) ){
         if( AssignedCPUs == 0 ){
             sout << "</green></b>";
         } else if (NCPUs != AssignedCPUs){
@@ -162,7 +165,7 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
         }
     }
 // ------------------
-    if( ! IsDown() ){
+    if( ! (IsDown() || IsPowerOff()) ){
         if( (AssignedGPUs == 0) && (NGPUs > 0) ){
             sout << "<b><green>";
         } else if (NGPUs != AssignedGPUs){
@@ -175,7 +178,7 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
 // ------------------
     sout << "/" << setw(2) << NGPUs;
 // ------------------
-    if( ! IsDown() ){
+    if( ! (IsDown() || IsPowerOff())){
         if( (AssignedGPUs == 0) && (NGPUs > 0) ){
             sout << "</green></b>";
         } else if (NGPUs != AssignedGPUs){
@@ -192,6 +195,10 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     sout << " " << setw(5) << GetNiceSize(ScratchLocal);
     sout << " " << setw(5) << GetNiceSize(ScratchShared);
     sout << " " << setw(5) << GetNiceSize(ScratchSSD);
+
+    if( IsPowerOff() ){
+        sout << "</yellow>";
+    }
 
     if( IsDown() ){
         sout << "</red>";
@@ -228,11 +235,11 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     }
     sout << endl;
     if( Comment != NULL ){
-        if( IsDown() ){
+        if( IsDown() || IsPowerOff() ){
             sout << "<red>";
         }
         sout << "               " << left << Comment << endl;
-        if( IsDown() ){
+        if( IsDown() || IsPowerOff() ){
             sout << "</red>";
         }
     }
@@ -470,6 +477,14 @@ const std::vector<std::string> CNode::GetStateList(void) const
 
 bool CNode::IsDown(void) const
 {
+    // offline nodes are down
+    if( State.FindSubString("offline") != -1 ) return(true);
+
+    // consider power off nodes as up
+    if( (State.FindSubString("down") != -1) && (State.FindSubString("poweroff") != -1) ) {
+        return(false);
+    }
+
     return( (State.FindSubString("down") != -1) ||
             (State.FindSubString("maintenance") != -1) ||
             (State.FindSubString("reserved") != -1) ||
@@ -477,6 +492,14 @@ bool CNode::IsDown(void) const
             (State.FindSubString("xentest") != -1)  ||
             (State.FindSubString("offline") != -1) ||
             (State.FindSubString("state-unknown") != -1) );
+}
+
+//------------------------------------------------------------------------------
+
+bool CNode::IsPowerOff(void) const
+{
+    return( (State.FindSubString("poweroff") != -1) &&
+            (State.FindSubString("offline") == -1) );
 }
 
 //==============================================================================

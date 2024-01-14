@@ -158,6 +158,15 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
         states.push_back("maintenance");
     }
 
+    CSmallString power_status;
+    get_attribute(p_node->attribs,"resources_available","power_status",power_status);
+    if( power_status == "maintenance" ){
+        states.push_back("maintenance");
+    }
+    if( power_status == "down" ){
+        states.push_back("poweroff");
+    }
+
     // update state
     if( IsDown() == false ){
         if( (AssignedCPUs == 0) && (AssignedGPUs  == 0) ) {
@@ -168,6 +177,9 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
             states.push_back("partially-free");
         }
     }
+
+    states.sort();
+    states.unique();
 
     State = join(states, ",");
 

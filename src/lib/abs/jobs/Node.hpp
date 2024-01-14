@@ -111,8 +111,11 @@ public:
     /// get state list
     const std::vector<std::string> GetStateList(void) const;
 
-    /// get node type
+    /// is down?
     bool IsDown(void) const;
+
+    /// is power off?
+    bool IsPowerOff(void) const;
 
     /// get compressed status
     char GetStateCode(void);
