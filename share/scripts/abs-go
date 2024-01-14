@@ -35,18 +35,18 @@ case "$INF_GO_JOB_NAME" in
            [ -n "$INF_GO_UMASK" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
             LC_SSH_AMS_IGNORE_SITE_INIT=Y ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
-                if [ -f ~/.bash_profile ]; then source ~/.bash_profile; fi; \
                 if [ -z \"\$AMS_ROOT\" ]; then \
-                    source \"$INF_GO_BOOT_SCRIPT\"; \
+                    if [ -f \"$INF_GO_BOOT_SCRIPT\" ]; then \
+                        source \"$INF_GO_BOOT_SCRIPT\"; \
+                    fi; \
                 fi; \
                 export INF_GO_SITE=\"$INF_GO_SITE\"; \
                 export INF_GO_UMASK=\"$INF_GO_UMASK\"; \
-                echo \"# >>>>\"; \
                 site --force init; \
                 amsmodule add $INF_GO_AGENT_MODULE; \
                 if [ \$? -ne 0 ]; then \
                     echo \"\" >&2; \
-                    echo \" >>> ERROR: Unable to activate a CLI agent module '$INF_GO_AGENT_MODULE'!\" >&2; \
+                    echo \" >>> ERROR: Unable to activate the CLI agent module: '$INF_GO_AGENT_MODULE'!\" >&2; \
                     echo \"\" >&2; \
                     exit 1; \
                 fi; \
@@ -87,7 +87,7 @@ case "$INF_GO_JOB_NAME" in
                     echo "          Job input dir: $INF_GO_INPUT_MACHINE:$INF_GO_INPUT_DIR"
                     echo "          Hostname     : $HOSTNAME"
                     echo ""
-                    ssh -t -X $INF_SSH_OPTIONS $INF_GO_INPUT_MACHINE \
+                    LC_SSH_AMS_IGNORE_SITE_INIT=Y ssh -t -X $INF_SSH_OPTIONS $INF_GO_INPUT_MACHINE \
                               INF_GO_BOOT_SCRIPT="$INF_GO_BOOT_SCRIPT" \
                               INF_GO_SITE="$INF_GO_SITE" \
                               INF_GO_UMASK="$INF_GO_UMASK" \

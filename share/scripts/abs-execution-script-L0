@@ -109,10 +109,12 @@ EOF
 AMS_HOST_CACHE="/tmp/ams_cache.${USER}.${PBS_JOBID}"
 export AMS_HOST_CACHE
 
-# boot AMS and init site
-if [ -f "$INF_BOOT_SCRIPT" ]; then
-    # boot AMS system
-    source $INF_BOOT_SCRIPT
+# boot AMS if not already done
+if [ -z "$AMS_ROOT" ]; then
+    if [ -f "$INF_BOOT_SCRIPT" ]; then
+        # boot AMS system
+        source $INF_BOOT_SCRIPT
+    fi
 fi
 
 # do not use the host chache as it can be outdated

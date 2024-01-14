@@ -17,13 +17,13 @@ INF_AMS_SITE_EMODS=$INF_GO_EXPORTED_MODULES_1
 INF_JOB_EMODS=$INF_GO_EXPORTED_MODULES_2
 
 # activate bash profile
-if [ -f ~/.bash_profile ]; then . ~/.bash_profile; fi
-
 if [ -z "$AMS_ROOT" ]; then
-    source "$INF_GO_BOOT_SCRIPT"
+    if [ -f "$INF_GO_BOOT_SCRIPT" ]; then
+        source "$INF_GO_BOOT_SCRIPT"
+    fi
 fi
 
-site --job init
+site --force init
 if [ $? -ne 0 ]; then
     echo " >>> ERROR: The site ($INF_GO_SITE) cannot be activated!" >&2
     echo >&2
