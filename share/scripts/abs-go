@@ -35,11 +35,18 @@ case "$INF_GO_JOB_NAME" in
            [ -n "$INF_GO_UMASK" ] && [ -n "$INF_GO_AGENT_MODULE" ] && \
            [ -n "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_JOB_KEY" ]; then
             LC_SSH_AMS_IGNORE_SITE_INIT=Y ssh -t -X $INF_SSH_OPTIONS "$INF_GO_MAIN_NODE" " \
-                if [ -z \"\$AMS_ROOT\" ]; then \
+                if [ -z \"\$AMS_ROOT_V9\" ]; then \
                     if [ -f \"$INF_GO_BOOT_SCRIPT\" ]; then \
                         source \"$INF_GO_BOOT_SCRIPT\"; \
                     fi; \
                 fi; \
+                if [ -z \"\$AMS_ROOT_V9\" ]; then \
+                    echo \"\" >&2; \
+                    echo \" >>> ERROR: Advanced Module System (AMS) is not available!\" >&2; \
+                    echo \"            Please send contents of this output to the site support: $AMS_SITE_SUPPORT\" >&2; \
+                    echo \"\" >&2; \
+                    exit 1; \
+                fi
                 export INF_GO_SITE=\"$INF_GO_SITE\"; \
                 export INF_GO_UMASK=\"$INF_GO_UMASK\"; \
                 site --force init; \

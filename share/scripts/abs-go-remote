@@ -17,10 +17,18 @@ INF_AMS_SITE_EMODS=$INF_GO_EXPORTED_MODULES_1
 INF_JOB_EMODS=$INF_GO_EXPORTED_MODULES_2
 
 # activate bash profile
-if [ -z "$AMS_ROOT" ]; then
+if [ -z "$AMS_ROOT_V9" ]; then
     if [ -f "$INF_GO_BOOT_SCRIPT" ]; then
         source "$INF_GO_BOOT_SCRIPT"
     fi
+fi
+
+if [ -z "$AMS_ROOT_V9" ]; then
+    echo "" >&2
+    echo " >>> ERROR: Advanced Module System (AMS) is not available!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
 fi
 
 site --force init

@@ -110,11 +110,19 @@ AMS_HOST_CACHE="/tmp/ams_cache.${USER}.${PBS_JOBID}"
 export AMS_HOST_CACHE
 
 # boot AMS if not already done
-if [ -z "$AMS_ROOT" ]; then
+if [ -z "$AMS_ROOT_V9" ]; then
     if [ -f "$INF_BOOT_SCRIPT" ]; then
         # boot AMS system
         source $INF_BOOT_SCRIPT
     fi
+fi
+
+if [ -z "$AMS_ROOT_V9" ]; then
+    echo "" >&2
+    echo " >>> ERROR: Advanced Module System (AMS) is not available!" >&2
+    echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
+    echo "" >&2
+    exit 1
 fi
 
 # do not use the host chache as it can be outdated
@@ -134,7 +142,6 @@ if [ $? -ne 0 ]; then
     echo " >>> ERROR: Unable to add the 'abs:$INF_ABS_VERSION' module!" >&2
     echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
-    rm -f "$AMS_HOST_CACHE" 2> /dev/null
     exit 1
 fi
 
@@ -148,7 +155,6 @@ if [ $? -ne 0 ]; then
     echo " >>> ERROR: Unable to add the 'abs-rsync' module!" >&2
     echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
-    rm -f "$AMS_HOST_CACHE" 2> /dev/null
     exit 1
 fi
 
@@ -157,7 +163,6 @@ if ! [ -e "$ABS_RSYNC" ]; then
     echo " >>> ERROR: '$ABS_RSYNC' is not executable!" >&2
     echo "            Please send contents of this output to the site support: $AMS_SITE_SUPPORT" >&2
     echo "" >&2
-    rm -f "$AMS_HOST_CACHE" 2> /dev/null
     exit 1
 fi
 
@@ -177,7 +182,6 @@ if ! [ -d "$ABS_ROOT" ]; then
     echo "" >&2
     echo " >>> ERROR: The ABS_ROOT directory does not exist!" >&2
     echo "" >&2
-    rm -f "$AMS_HOST_CACHE" 2> /dev/null
     exit 1
 fi
 
