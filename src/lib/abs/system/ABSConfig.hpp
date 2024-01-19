@@ -26,6 +26,7 @@
 #include <XMLDocument.hpp>
 #include <FileName.hpp>
 #include <XMLDocument.hpp>
+#include <VerboseStr.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -40,14 +41,14 @@ public:
     ~CABSConfig(void);
 
     /// LoadConfig
-    bool LoadConfig(void);
+    bool LoadConfig(CVerboseStr& vout);
 
 // system setup ----------------------------------------------------------------
     bool LoadSystemConfig(void);
 
 // user setup ------------------------------------------------------------------
     /// load user config
-    void LoadUserConfig(void);
+    void LoadUserConfig(CVerboseStr& vout);
 
     /// remove user config
     bool RemoveUserConfig(void);

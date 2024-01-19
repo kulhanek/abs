@@ -22,6 +22,8 @@
 
 #include "IJobsOptions.hpp"
 #include <Job.hpp>
+#include <VerboseStr.hpp>
+#include <TerminalStr.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -44,6 +46,8 @@ public:
     private:
     CIJobsOptions   Options;
     CJob            Job;
+    CTerminalStr    Console;
+    CVerboseStr     vout;
 };
 
 // -----------------------------------------------------------------------------

@@ -23,6 +23,8 @@
 
 #include "GetWorkDirOptions.hpp"
 #include <ABSConfig.hpp>
+#include <VerboseStr.hpp>
+#include <TerminalStr.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -44,6 +46,8 @@ class CGetWorkDir{
 // section of private data -----------------------------------------------------
     private:
     CGetWorkDirOptions  Options;
+    CTerminalStr        Console;
+    CVerboseStr         vout;
 };
 
 // -----------------------------------------------------------------------------

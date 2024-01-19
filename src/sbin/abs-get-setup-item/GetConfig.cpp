@@ -47,6 +47,14 @@ int CGetConfig::Init(int argc,char* argv[])
 // encode program options, all check procedures are done inside of CABFIntOpts
     int result = Options.ParseCmdLine(argc,argv);
 
+// attach verbose stream to terminal stream and set desired verbosity level
+    vout.Attach(Console);
+    if( Options.GetOptVerbose() ) {
+        vout.Verbosity(CVerboseStr::high);
+    } else {
+        vout.Verbosity(CVerboseStr::medium);
+    }
+
 // should we exit or was it error?
     return(result);
 }
@@ -58,7 +66,7 @@ bool CGetConfig::Run(void)
     SiteController.InitSiteControllerConfig();
 
 // init AMS registry
-    AMSRegistry.LoadRegistry();
+    AMSRegistry.LoadRegistry(vout);
 
     // load system and optionaly user configuration
     if( ABSConfig.LoadSystemConfig() == false ){
@@ -66,7 +74,7 @@ bool CGetConfig::Run(void)
         return(false);
     }
     if( Options.GetOptUser() == true ){
-        ABSConfig.LoadUserConfig();
+        ABSConfig.LoadUserConfig(vout);
     }
 
     CSmallString value;

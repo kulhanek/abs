@@ -23,6 +23,8 @@
 
 #include "UpdateInfoFileOptions.hpp"
 #include <Job.hpp>
+#include <VerboseStr.hpp>
+#include <TerminalStr.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -45,6 +47,8 @@ public:
     private:
     CUpdateInfoFileOptions  Options;
     CJob                    Job;
+    CTerminalStr            Console;
+    CVerboseStr             vout;
 
     bool ArchiveRuntimeFiles(void);
     bool CleanRuntimeFiles(void);

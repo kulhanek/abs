@@ -76,11 +76,11 @@ CABSConfig::~CABSConfig(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-bool CABSConfig::LoadConfig(void)
+bool CABSConfig::LoadConfig(CVerboseStr& vout)
 {
     bool result;
     result  = LoadSystemConfig();
-    LoadUserConfig();
+    LoadUserConfig(vout);
     return(result);
 }
 
@@ -116,9 +116,9 @@ bool CABSConfig::LoadSystemConfig(void)
 //------------------------------------------------------------------------------
 //==============================================================================
 
-void CABSConfig::LoadUserConfig(void)
+void CABSConfig::LoadUserConfig(CVerboseStr& vout)
 {
-    AMSRegistry.LoadRegistry();
+    AMSRegistry.LoadRegistry(vout);
     UserConfig = AMSRegistry.GetABSConfiguration();
 }
 

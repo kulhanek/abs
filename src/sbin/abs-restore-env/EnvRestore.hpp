@@ -23,6 +23,8 @@
 
 #include "EnvRestoreOptions.hpp"
 #include <Job.hpp>
+#include <VerboseStr.hpp>
+#include <TerminalStr.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -45,6 +47,8 @@ public:
     private:
     CEnvRestoreOptions  Options;
     CJob                Job;
+    CTerminalStr        Console;
+    CVerboseStr         vout;
 };
 
 // -----------------------------------------------------------------------------

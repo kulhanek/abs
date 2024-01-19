@@ -40,8 +40,17 @@ CIJobs::CIJobs(void)
 
 int CIJobs::Init(int argc,char* argv[])
 {
-    // encode program options
+// encode program options
     int result = Options.ParseCmdLine(argc,argv);
+
+// attach verbose stream to terminal stream and set desired verbosity level
+    vout.Attach(Console);
+    if( Options.GetOptVerbose() ) {
+        vout.Verbosity(CVerboseStr::high);
+    } else {
+        vout.Verbosity(CVerboseStr::medium);
+    }
+
     return(result);
 }
 

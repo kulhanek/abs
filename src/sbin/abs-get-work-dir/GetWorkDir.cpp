@@ -50,6 +50,14 @@ int CGetWorkDir::Init(int argc,char* argv[])
 // encode program options
     int result = Options.ParseCmdLine(argc,argv);
 
+// attach verbose stream to terminal stream and set desired verbosity level
+    vout.Attach(Console);
+    if( Options.GetOptVerbose() ) {
+        vout.Verbosity(CVerboseStr::high);
+    } else {
+        vout.Verbosity(CVerboseStr::medium);
+    }
+
 // should we exit or was it error?
     return(result);
 }
@@ -61,7 +69,7 @@ bool CGetWorkDir::Run(void)
     SiteController.InitSiteControllerConfig();
 
 // init AMS registry
-    AMSRegistry.LoadRegistry();
+    AMSRegistry.LoadRegistry(vout);
 
     // load system and optionaly user configuration
     if( ABSConfig.LoadSystemConfig() == false ){

@@ -92,7 +92,7 @@ bool CCollection::Run(void)
     SiteController.InitSiteControllerConfig();
 
 // init AMS registry
-    AMSRegistry.LoadRegistry();
+    AMSRegistry.LoadRegistry(vout);
     ModuleController.InitModuleControllerConfig();
 
     vout << low;

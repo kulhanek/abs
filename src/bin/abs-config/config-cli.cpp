@@ -43,6 +43,8 @@ using namespace std;
 //------------------------------------------------------------------------------
 
 CConfigCliOpts Options;
+CTerminalStr    Console;
+CVerboseStr     vout;
 
 //------------------------------------------------------------------------------
 
@@ -100,6 +102,10 @@ int main(int argc, char* argv[])
 {
     int result = Init(argc,argv);
 
+    Console.Attach(stdout);
+    vout.Attach(Console);
+    vout.Verbosity(CVerboseStr::low);
+
     switch(result) {
     case SO_EXIT:
         return(0);
@@ -144,9 +150,9 @@ bool Run(void)
     SiteController.InitSiteControllerConfig();
 
 // init AMS registry
-    AMSRegistry.LoadRegistry();
+    AMSRegistry.LoadRegistry(vout);
 
-    if( ABSConfig.LoadConfig() == false ){
+    if( ABSConfig.LoadConfig(vout) == false ){
         ES_ERROR("unable to load ABSConfig config");
         return(false);
     }

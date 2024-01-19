@@ -83,7 +83,7 @@ bool CKill::Run(void)
     SiteController.InitSiteControllerConfig();
 
 // init AMS registry
-    AMSRegistry.LoadRegistry();
+    AMSRegistry.LoadRegistry(vout);
 
     vout << low;
 

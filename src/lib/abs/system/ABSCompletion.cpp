@@ -120,7 +120,8 @@ bool CABSCompletion::InitCompletion(void)
 
 // init AMS registry
     SiteController.InitSiteControllerConfig();
-    AMSRegistry.LoadRegistry();
+    CVerboseStr fake;
+    AMSRegistry.LoadRegistry(fake);
 
     return(true);
 }

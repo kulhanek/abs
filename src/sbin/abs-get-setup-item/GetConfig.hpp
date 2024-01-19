@@ -23,6 +23,8 @@
 
 #include "GetConfigOptions.hpp"
 #include <ABSConfig.hpp>
+#include <VerboseStr.hpp>
+#include <TerminalStr.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -43,7 +45,9 @@ class CGetConfig{
 
 // section of private data -----------------------------------------------------
     private:
-    CGetConfigOptions  Options;
+    CGetConfigOptions   Options;
+    CTerminalStr        Console;
+    CVerboseStr         vout;
 };
 
 // -----------------------------------------------------------------------------
