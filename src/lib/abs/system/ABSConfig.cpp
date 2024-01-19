@@ -456,6 +456,8 @@ bool CABSConfig::IsABSAvailable(std::ostream& sout)
         sout << endl;
         sout << "<b><blue> >>> INFO: The ABS (Advanced Batch System) is not configured for this site!</blue></b>" << endl;
         sout << endl;
+        TicketChecked = true;
+        ValidTicket = false;
     }
 
     return(enabled);
