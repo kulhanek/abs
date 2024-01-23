@@ -13,6 +13,13 @@ INCLUDE_DIRECTORIES(lib/abs/jobs/search/nodes SYSTEM)
 INCLUDE_DIRECTORIES(lib/abs/jobs/search/jobs SYSTEM)
 
 # include subdirectories -------------------------------------------------------
-ADD_SUBDIRECTORY(lib)
-ADD_SUBDIRECTORY(bin)
-ADD_SUBDIRECTORY(sbin)
+IF(ABS_CORE_ONLY)
+    ADD_SUBDIRECTORY(lib)
+ELSE(ABS_CORE_ONLY)
+    ADD_SUBDIRECTORY(lib)
+    ADD_SUBDIRECTORY(bin)
+    ADD_SUBDIRECTORY(sbin)
+ENDIF(ABS_CORE_ONLY)
+
+
+
