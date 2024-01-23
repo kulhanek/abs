@@ -61,14 +61,6 @@ INCLUDE_DIRECTORIES(${HIPOLY_ROOT}/src/lib/hipoly/xml SYSTEM)
 LINK_DIRECTORIES(${HIPOLY_ROOT}/lib)
 SET(HIPOLY_LIB_NAME hipoly)
 
-# W3TK -------------------------------------------
-SET(W3TK_ROOT ${DEVELOPMENT_ROOT}/projects/w3tk/1.0)
-INCLUDE_DIRECTORIES(${W3TK_ROOT}/src/lib/w3tk SYSTEM)
-INCLUDE_DIRECTORIES(${W3TK_ROOT}/src/lib/w3tk/fastcgi SYSTEM)
-INCLUDE_DIRECTORIES(${W3TK_ROOT}/src/lib/w3tk/template SYSTEM)
-LINK_DIRECTORIES(${W3TK_ROOT}/lib)
-SET(W3TK_LIB_NAME w3tk)
-
 # AMS -----------------------------------------
 SET(AMS_ROOT ${DEVELOPMENT_ROOT}/projects/ams/9.0)
 INCLUDE_DIRECTORIES(${AMS_ROOT}/src/lib/ams SYSTEM)
@@ -85,7 +77,6 @@ SET(AMS_LIB_NAME ams)
 SET(ABS_EXT_LIBS
         plusula
         ${AMS_LIB_NAME}
-        ${W3TK_LIB_NAME}
         ${HIPOLY_LIB_NAME}
         ${SYSTEM_LIBS}
         )
