@@ -74,18 +74,18 @@ struct CJobStatDatagram {
 private:
     char            Magic[4];               // magic word
     unsigned char   Control[4];             // control sum
-    char            Site[64];              // site name
-    char            User[64];              // user name
-    char            HostName[64];           // hostname
-    char            HostGroup[64];           // host group
-    char            BatchServer[64];           // batch server
-    char            Queue[64];           // queue
+    char            Site[128];              // site name
+    char            User[128];              // user name
+    char            HostName[128];          // hostname
+    char            HostGroup[128];         // host group
+    char            BatchServer[128];       // batch server
+    char            Queue[128];             // queue
     unsigned char   NCPUs[4];               // ncpus
-    unsigned char   CPUMem[4];       // ncpus on node
+    unsigned char   CPUMem[4];              // ncpus on node
     unsigned char   NGPUs[4];               // ngpus
-    unsigned char   GPUMem[4];       // ngpus on node
+    unsigned char   GPUMem[4];              // ngpus on node
     unsigned char   NumOfNodes[4];          // number of nodes
-    unsigned char   WallTime[4];                // time in seconds from 00:00:00 UTC, January 1, 1970
+    unsigned char   WallTime[4];            // time in seconds from 00:00:00 UTC, January 1, 1970
     unsigned char   Flags[4];               // 32 bit flags
     unsigned char   Time[4];                // time in seconds from 00:00:00 UTC, January 1, 1970
 };
