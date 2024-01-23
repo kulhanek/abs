@@ -87,6 +87,10 @@ src/bin/psubmit/SubmitOptions.cpp
 src/bin/psubmit/SubmitOptions.hpp
 src/bin/CMakeLists.txt
 src/lib/abs/GlobalObjects.cpp
+src/lib/abs/jobs/JobDatagramSender.cpp
+src/lib/abs/jobs/JobDatagramSender.hpp
+src/lib/abs/jobs/JobStat.cpp
+src/lib/abs/jobs/JobStat.hpp
 src/lib/abs/jobs/search/jobs/JobMask.tab.c
 src/lib/abs/jobs/search/jobs/JobMask.tab.h
 src/lib/abs/jobs/search/jobs/JobMask.yy.c

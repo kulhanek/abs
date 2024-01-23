@@ -63,6 +63,8 @@ SET(ABS_SRC
         jobs/NodeList.cpp
         jobs/Queue.cpp
         jobs/QueueList.cpp
+        jobs/JobStat.cpp
+        jobs/JobDatagramSender.cpp
         )
 
 # create shared library --------------------------------------------------------

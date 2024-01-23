@@ -103,11 +103,17 @@ public:
     /// get number of nodes
     int GetNumOfNodes(void) const;
 
-    /// get memory in kB
-    long long GetMemory(void) const;
+    /// get CPU memory in kB
+    long long GetCPUMemory(void) const;
 
     /// get memory in variable unit
-    const CSmallString GetMemoryString(void) const;
+    const CSmallString GetCPUMemoryString(void) const;
+
+    /// get GPU memory in kB
+    long long GetGPUMemory(void) const;
+
+    /// get memory in variable unit
+    const CSmallString GetGPUMemoryString(void) const;
 
     /// get worksize
     const CSmallString GetWorkSizeString(void) const;

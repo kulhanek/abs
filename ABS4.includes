@@ -8,3 +8,4 @@ src/lib/plugins/BasicJobTypes
 src/lib/abs/mboost
 src/lib/plugins/PBSPro/resources
 sbin
+src/lib/abs/jobs

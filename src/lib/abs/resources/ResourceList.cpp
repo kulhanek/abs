@@ -560,7 +560,7 @@ int CResourceList::GetNumOfNodes(void) const
 
 //------------------------------------------------------------------------------
 
-long long CResourceList::GetMemory(void) const
+long long CResourceList::GetCPUMemory(void) const
 {
     const CResourceValuePtr p_rv = FindResource("mem");
     if( p_rv == NULL ) return(0);
@@ -569,9 +569,27 @@ long long CResourceList::GetMemory(void) const
 
 //------------------------------------------------------------------------------
 
-const CSmallString CResourceList::GetMemoryString(void) const
+const CSmallString CResourceList::GetCPUMemoryString(void) const
 {
     const CResourceValuePtr p_rv = FindResource("mem");
+    if( p_rv == NULL ) return("n.a.");
+    return(p_rv->GetSizeString());
+}
+
+//------------------------------------------------------------------------------
+
+long long CResourceList::GetGPUMemory(void) const
+{
+    const CResourceValuePtr p_rv = FindResource("gpu_mem");
+    if( p_rv == NULL ) return(0);
+    return(p_rv->GetSize());
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallString CResourceList::GetGPUMemoryString(void) const
+{
+    const CResourceValuePtr p_rv = FindResource("gpu_mem");
     if( p_rv == NULL ) return("n.a.");
     return(p_rv->GetSizeString());
 }

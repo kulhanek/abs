@@ -61,6 +61,8 @@
 #include <ModuleController.hpp>
 #include <HostGroup.hpp>
 #include <AMSRegistry.hpp>
+#include <JobStat.hpp>
+#include <JobDatagramSender.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -663,12 +665,12 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
         }
     }
 
-
 // setup specific items derived from resources
     SetItem("specific/resources","INF_NCPUS",ResourceList.GetNumOfCPUs());
     SetItem("specific/resources","INF_NGPUS",ResourceList.GetNumOfGPUs());
     SetItem("specific/resources","INF_NNODES",ResourceList.GetNumOfNodes());
-    SetItem("specific/resources","INF_MEMORY",ResourceList.GetMemoryString());
+    SetItem("specific/resources","INF_CPU_MEMORY",ResourceList.GetCPUMemoryString());
+    SetItem("specific/resources","INF_GPU_MEMORY",ResourceList.GetGPUMemoryString());
     SetItem("specific/resources","INF_WALLTIME",ResourceList.GetWallTimeString());
     SetItem("specific/resources","INF_RESOURCES",ResourceList.ToString(false));
     SetItem("specific/resources","INF_MPI_SLOTS_PER_NODE",ResourceList.GetResourceValue("mpislotspernode"));
@@ -1012,6 +1014,8 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollec
             ES_TRACE_ERROR("unable to submit job");
             return(false);
         }
+        EmitJobSubmitAction(JFB_REGULAR);
+
         if( ! siblings ){
             sout << "Job was sucessfully submited to the batch server!" << endl;
             sout << "  > Job ID: " << low << GetJobID() << endl << medium;
@@ -1064,6 +1068,37 @@ bool CJob::SubmitJob(std::ostream& sout,bool siblings,bool verbose,bool nocollec
     }
 
     return(true);
+}
+
+//------------------------------------------------------------------------------
+
+void CJob::EmitJobSubmitAction(int flags)
+{
+    CJobDatagramSender jds;
+
+    jds.Datagram.SetSite(SiteController.GetActiveSite());
+    jds.Datagram.SetUser(User.GetName());
+    jds.Datagram.SetHostName(Host.GetHostName());
+    jds.Datagram.SetHostGroup(HostGroup.GetHostGroupNickName());
+    jds.Datagram.SetBatchServer(GetItem("specific/resources","INF_SERVER"));
+
+    jds.Datagram.SetQueue(GetItem("specific/resources","INF_QUEUE"));
+    jds.Datagram.SetNCPUs(GetItem("specific/resources","INF_NCPUS").ToInt());
+    jds.Datagram.SetCPUMem(CResourceValue::GetSize(GetItem("specific/resources","INF_CPU_MEMORY")));
+    jds.Datagram.SetNGPUs(GetItem("specific/resources","INF_NGPUS").ToInt());
+    jds.Datagram.SetGPUMem(CResourceValue::GetSize(GetItem("specific/resources","INF_GPU_MEMORY")));
+    jds.Datagram.SetNumOfNodes(GetItem("specific/resources","INF_NNODES").ToInt());
+    jds.Datagram.SetWallTime(GetItem("specific/resources","INF_WALLTIME").ToInt());
+
+    jds.Datagram.SetFlags(flags);
+
+    CSmallTimeAndDate dt;
+    dt.GetActualTimeAndDate();
+    jds.Datagram.SetTimeAndDate(dt);
+
+    jds.Datagram.Finish();
+
+    HostGroup.ExecuteStatAction("submit",&jds);
 }
 
 //------------------------------------------------------------------------------
@@ -3163,7 +3198,7 @@ void CJob::PrintResourcesV4(std::ostream& sout)
     CSmallString queue = tmp;
 
     sout << "-----------------------------------------------" << endl;
-    sout << "NCPUs NGPUs NNodes Memory WorkSize     WallTime" << endl;
+    sout << "NCPUs NGPUs NNodes CPUMem GPUMem WorkSize     WallTime" << endl;
     tmp = GetItem("specific/resources","INF_NCPUS");
     sout << setw(5) << tmp;
     sout << " ";
@@ -3173,7 +3208,10 @@ void CJob::PrintResourcesV4(std::ostream& sout)
     tmp = GetItem("specific/resources","INF_NNODES");
     sout << setw(6) << tmp;
     sout << " ";
-    tmp = GetItem("specific/resources","INF_MEMORY");
+    tmp = GetItem("specific/resources","INF_CPU_MEMORY");
+    sout << setw(6) << tmp;
+    sout << " ";
+    tmp = GetItem("specific/resources","INF_GPU_MEMORY");
     sout << setw(6) << tmp;
     sout << " ";
     tmp = GetItem("specific/resources","INF_WORK_SIZE");

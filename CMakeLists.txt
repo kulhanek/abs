@@ -10,9 +10,7 @@ PROJECT(ABS)
 # conditional setup ------------------------------------------------------------
 # ==============================================================================
 
-SET(BUILD_LEVEL "ALL" CACHE STRING "Determine build level (supported levels: ALL, CLIENT, SERVERS).")
-SET(LIBS_STATIC OFF CACHE BOOL "Should the static version of hipoly library be built?")
-SET(LIBS_SHARED ON CACHE BOOL "Should the dynamic version of hipoly library be built?")
+SET(ABS_CORE_ONLY   OFF     CACHE BOOL "Only ABS core library?")
 
 # ==============================================================================
 # project setup ----------------------------------------------------------------
@@ -150,10 +148,15 @@ ENDIF(NOT DEFINED COMPOSITE_PROJECT)
 # project subdirectories  ------------------------------------------------------
 # ==============================================================================
 
-ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(etc)
-ADD_SUBDIRECTORY(share)
-ADD_SUBDIRECTORY(bin)
+IF(ABS_CORE_ONLY)
+    ADD_SUBDIRECTORY(src)
+ELSE(ABS_CORE_ONLY)
+    ADD_SUBDIRECTORY(src)
+    ADD_SUBDIRECTORY(etc)
+    ADD_SUBDIRECTORY(share)
+    ADD_SUBDIRECTORY(bin)
+ENDIF(ABS_CORE_ONLY)
+
 
 
 

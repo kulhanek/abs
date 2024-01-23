@@ -35,6 +35,13 @@
 #include <FileName.hpp>
 #include <ResourceList.hpp>
 
+//------------------------------------------------------------------------------
+
+// regular job
+#define JFB_REGULAR         (1 << 0)
+
+
+
 // -----------------------------------------------------------------------------
 
 class CXMLElement;
@@ -556,6 +563,9 @@ protected:
     bool PrepareJobScript(void);
 
     bool                                DoNotSave;
+
+    // emit statistics
+    void EmitJobSubmitAction(int flags);
 
     // job status --------------------------------------------------------------
 public:
