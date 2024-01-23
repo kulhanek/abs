@@ -54,8 +54,12 @@ echo "Job UMask            : $INF_UMASK"
 
 function _abs_job_cleanup()
 {
-    rm -f "$AMS_USER_CONFIG"    2> /dev/null
-    rm -f "$AMS_HOST_CACHE"     2> /dev/null
+    if [ -f "$AMS_REGISTRY_CONFIG" ]; then
+        rm -f "$AMS_REGISTRY_CONFIG" 2> /dev/null
+    fi
+    if [ -f "$AMS_HOST_CACHE" ]; then
+        rm -f "$AMS_HOST_CACHE" 2> /dev/null
+    fi
 }
 
 trap _abs_job_cleanup EXIT
