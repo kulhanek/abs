@@ -217,7 +217,7 @@ void CJobStatDatagram::SetTimeAndDate(const CSmallTimeAndDate& dt)
 bool CJobStatDatagram::IsValid(void)
 {
     // magic header
-    if( strncmp(Magic,"AMS9",4) != 0 ) {
+    if( strncmp(Magic,"ABS4",4) != 0 ) {
         return(false);
     }
 
