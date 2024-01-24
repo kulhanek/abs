@@ -560,6 +560,7 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
     SetItem("specific/resources","INF_QUEUE",queue);
     SetItem("specific/resources","INF_SERVER",BatchServerName);
+    SetItem("specific/resources","INF_JOB_HOST_GROUP",HostGroup.GetHostGroupNickName(BatchServerName));
     SetItem("specific/resources","INF_SERVER_SHORT",ShortServerName);
     SetItem("specific/resources","INF_JOB_OWNER",User.GetName());
 
@@ -3162,9 +3163,12 @@ void CJob::PrintResourcesV4(std::ostream& sout)
 
     sout << "-----------------------------------------------" << endl;
 
-    tmp = GetItem("specific/resources","INF_SERVER_SHORT");
-    sout << "Site spec        : " << GetSiteName() << "/" << GetABSModule() << "/" << GetServerName() << "|" << tmp << endl;
     CSmallString server = GetServerName();
+
+    tmp = GetItem("specific/resources","INF_SERVER_SHORT");
+    sout << "Site spec        : " << GetSiteName() << "/" << GetABSModule() << "/" << server << "|" << tmp;
+    tmp = GetItem("specific/resources","INF_JOB_HOST_GROUP",true);
+    sout << "/[" << tmp << "]" << endl;
 
     tmp = GetItem("specific/resources","INF_DEFAULT_RESOURCES");    
     if( tmp != NULL ){

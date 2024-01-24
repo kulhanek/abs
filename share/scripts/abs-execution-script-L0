@@ -49,6 +49,7 @@ echo "Site support         : $AMS_SITE_SUPPORT"
 echo "Site name            : $INF_AMS_SITE"
 echo "ABS module version   : $INF_ABS_VERSION"
 echo "Job UMask            : $INF_UMASK"
+echo "Job host group       : $INF_JOB_HOST_GROUP"
 
 # restore AMS registry ---------------------------------------------------------
 
