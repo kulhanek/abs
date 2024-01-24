@@ -235,7 +235,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
         if( appmem != NULL ){
             perc = appmem.ToDouble()*100.0;
         }
-        CSmallString smem = job.GetItem("specific/resources","INF_MEMORY_CPU");
+        CSmallString smem = job.GetItem("specific/resources","INF_CPU_MEMORY");
         mem = CResourceValue::GetSize(smem); // in kb
         if( mem > 0 ){
             mem = mem * perc / 1024 / 100; // in MB
@@ -248,7 +248,7 @@ bool CGaussianJobType::CheckInputFile(CJob& job,std::ostream& sout)
     bool memory_changed = false;
 
     // check memory keyword
-    CSmallString smem = job.GetItem("specific/resources","INF_MEMORY_CPU");
+    CSmallString smem = job.GetItem("specific/resources","INF_CPU_MEMORY");
     if( smem != NULL ){
         long long umem = GetMemory(job,job_name); // in MB
 

@@ -223,7 +223,7 @@ bool COrcaJobType::CheckInputFile(CJob& job,std::ostream& sout)
         if( appmem != NULL ){
             perc = appmem.ToDouble()*100.0;
         }
-        CSmallString smem = job.GetItem("specific/resources","INF_MEMORY_CPU");
+        CSmallString smem = job.GetItem("specific/resources","INF_CPU_MEMORY");
         mem = CResourceValue::GetSize(smem); // in kb
         if( mem > 0 ){
             mem = mem * perc / ncpus / 1024 / 100; // in MB
