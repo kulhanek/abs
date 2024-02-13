@@ -966,13 +966,13 @@ set | grep CUDA     | sed -s 's/=/ /1'| awk '{ printf("%-30s",$1); for(i=2;i<=NF
 # ------------------------------------------------------------------------------
 
 # FIXME - compatibility mode - set them here so they are not visible in the above lists
-export AMS_NCPU=$AMS_NCPUS
-export AMS_NGPU=$AMS_NGPUS
-export AMS_NNODE=$AMS_NNODES
+export AMS_NCPU=$INF_NCPUS
+export AMS_NGPU=$INF_NGPUS
+export AMS_NNODE=$INF_NNODES
 
-export INF_NCPU=$AMS_NCPUS
-export INF_NGPU=$AMS_NGPUS
-export INF_NNODE=$AMS_NNODES
+export INF_NCPU=$INF_NCPUS
+export INF_NGPU=$INF_NGPUS
+export INF_NNODE=$INF_NNODES
 
 export INF_JOB_PATH=$INF_INPUT_DIR
 export INF_JOB_MACHINE=$INF_INPUT_MACHINE

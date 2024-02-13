@@ -103,7 +103,7 @@ if [ $? -ne 0 ] || [ "$AMS_EXIT_CODE" != "0" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# AMS/ABS co-operation
+# AMS/ABS co-operation, deprecated
 
 export AMS_NCPUS=$INF_NCPUS
 export AMS_NGPUS=$INF_NGPUS
