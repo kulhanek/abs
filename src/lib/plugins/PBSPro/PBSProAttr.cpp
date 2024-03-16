@@ -26,6 +26,7 @@
 #include <string>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
@@ -103,19 +104,45 @@ bool get_attribute(struct attrl* p_first,const char* p_name,const char* p_res,
     struct attrl* p_a = FindAttr(p_first,p_name,p_res,emit_error);
     if( p_a == NULL ) return(!emit_error);
 
-    // convert
-    CSmallString svalue(p_a->value);
-    if( svalue.IsInt() ) {
-        value = svalue.ToLInt();
-        return(true);
+    string          svalue(p_a->value);
+    long long       size;
+    string          munit;
+    stringstream    str(svalue);
+
+    str >> size >> munit;
+
+    to_lower(munit);
+
+    bool detected = false;
+
+    if( munit == "kb" ) {
+        detected = true;
+    }
+    if( munit == "mb" ) {
+        detected = true;
+        size = size * 1024;
+    }
+    if( munit == "gb" ) {
+        detected = true;
+        size = size * 1024 * 1024;
+    }
+    if( munit == "tb" ) {
+        detected = true;
+        size = size * 1024 * 1024 * 1024;
     }
 
-    CSmallString error;
-    error << "incompatible int type for attribute '" << p_name << "' (" << p_res;
-    error << ") got '" << svalue << "'" ;
-    ES_ERROR(error);
+    if( (detected == false) && (!munit.empty()) ){
+        CSmallString error;
+        error << "incompatible int type for attribute '" << p_name << "' (" << p_res;
+        error << ") got '" << svalue << "'" ;
+        ES_ERROR(error);
+        size = 0;
+    }
 
-    return(false);
+    // default unit kb
+    value = size;
+
+    return(true);
 }
 
 //------------------------------------------------------------------------------

@@ -57,7 +57,7 @@ CJobStatDatagram::CJobStatDatagram(void)
 void CJobStatDatagram::Finish(void)
 {
     // magic header
-    strncpy(Magic,"ABS4",4);
+    memcpy(Magic,"ABS4",4);
 
     // controll sum
     int control_sum = 0;

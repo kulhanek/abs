@@ -8,10 +8,13 @@ SET(ABS_SRC
         ABSModule.cpp
         GlobalObjects.cpp
 
-    # boost/1.65.1 -------------------------------
+    # boost/1.84.0 -------------------------------
         mboost/path.cpp
         mboost/operations.cpp
         mboost/error_code.cpp
+        mboost/exception.cpp
+        mboost/directory.cpp
+        mboost/unique_path.cpp
 
     # system -------------------------------------
         system/ABSConfig.cpp
