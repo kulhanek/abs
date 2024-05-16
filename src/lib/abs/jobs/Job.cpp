@@ -922,6 +922,7 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
         if( (input_dir_can.find(dest) == 0) && (fstype.find("autofs") == string::npos) && (src.find("systemd") == string::npos) ){
             len = dest.size();
             if( dest.size() > len ){
+                cout << dest.size() << " : " << tmpmntpoint << endl;
                 bestmntpoint = tmpmntpoint;
                 len = dest.size();
             }
