@@ -201,7 +201,7 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     }
 // ------------------
 
-    sout << " " << setw(5) << GetNiceSize(GPUMemory);
+    sout << " " << setw(6) << GetNiceSize(GPUMemory);
 
     sout << " " << setw(5) << GetNiceSize(ScratchLocal);
     sout << " " << setw(5) << GetNiceSize(ScratchShared);

@@ -650,17 +650,17 @@ bool CNodeList::IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel)
         case T_MEM:
             switch(p_sel->Operator){
                 case O_LT:
-                    return( p_node->GetCPUMemory() < CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetCPUMemory() < CResourceValue::GetSize(p_sel->SValue) );
                 case O_LE:
-                    return( p_node->GetCPUMemory() <= CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetCPUMemory() <= CResourceValue::GetSize(p_sel->SValue) );
                 case O_GT:
-                    return( p_node->GetCPUMemory() > CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetCPUMemory() > CResourceValue::GetSize(p_sel->SValue) );
                 case O_GE:
-                    return( p_node->GetCPUMemory() >= CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetCPUMemory() >= CResourceValue::GetSize(p_sel->SValue) );
                 case O_EQ:
-                    return( p_node->GetCPUMemory() == CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetCPUMemory() == CResourceValue::GetSize(p_sel->SValue) );
                 case O_NE:
-                    return( p_node->GetCPUMemory() != CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetCPUMemory() != CResourceValue::GetSize(p_sel->SValue) );
                 default:
                     ES_ERROR("<- unknown selection operator");
                     return(false);
@@ -668,17 +668,17 @@ bool CNodeList::IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel)
         case T_FREEMEM:
             switch(p_sel->Operator){
                 case O_LT:
-                    return( p_node->GetFreeCPUMemory() < CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetFreeCPUMemory() < CResourceValue::GetSize(p_sel->SValue) );
                 case O_LE:
-                    return( p_node->GetFreeCPUMemory() <= CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetFreeCPUMemory() <= CResourceValue::GetSize(p_sel->SValue) );
                 case O_GT:
-                    return( p_node->GetFreeCPUMemory() > CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetFreeCPUMemory() > CResourceValue::GetSize(p_sel->SValue) );
                 case O_GE:
-                    return( p_node->GetFreeCPUMemory() >= CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetFreeCPUMemory() >= CResourceValue::GetSize(p_sel->SValue) );
                 case O_EQ:
-                    return( p_node->GetFreeCPUMemory() == CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetFreeCPUMemory() == CResourceValue::GetSize(p_sel->SValue) );
                 case O_NE:
-                    return( p_node->GetFreeCPUMemory() != CResourceValue::GetSize(p_sel->IValue) );
+                    return( p_node->GetFreeCPUMemory() != CResourceValue::GetSize(p_sel->SValue) );
                 default:
                     ES_ERROR("<- unknown selection operator");
                     return(false);
@@ -686,17 +686,17 @@ bool CNodeList::IsNodeSelected(CNodePtr p_node,struct SSelection* p_sel)
     case T_GPUMEM:
         switch(p_sel->Operator){
             case O_LT:
-                return( p_node->GetGPUMemory() < CResourceValue::GetSize(p_sel->IValue) );
+                return( p_node->GetGPUMemory() < CResourceValue::GetSize(p_sel->SValue) );
             case O_LE:
-                return( p_node->GetGPUMemory() <= CResourceValue::GetSize(p_sel->IValue) );
+                return( p_node->GetGPUMemory() <= CResourceValue::GetSize(p_sel->SValue) );
             case O_GT:
-                return( p_node->GetGPUMemory() > CResourceValue::GetSize(p_sel->IValue) );
+                return( p_node->GetGPUMemory() > CResourceValue::GetSize(p_sel->SValue) );
             case O_GE:
-                return( p_node->GetGPUMemory() >= CResourceValue::GetSize(p_sel->IValue) );
+                return( p_node->GetGPUMemory() >= CResourceValue::GetSize(p_sel->SValue) );
             case O_EQ:
-                return( p_node->GetGPUMemory() == CResourceValue::GetSize(p_sel->IValue) );
+                return( p_node->GetGPUMemory() == CResourceValue::GetSize(p_sel->SValue) );
             case O_NE:
-                return( p_node->GetGPUMemory() != CResourceValue::GetSize(p_sel->IValue) );
+                return( p_node->GetGPUMemory() != CResourceValue::GetSize(p_sel->SValue) );
             default:
                 ES_ERROR("<- unknown selection operator");
                 return(false);
