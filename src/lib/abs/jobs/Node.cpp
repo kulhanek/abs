@@ -289,7 +289,7 @@ void CNode::PrintJobsInfo(std::ostream& sout,const std::string& jobid)
 
 void CNode::PrintQueuesInfo(std::ostream& sout)
 {
-    sout << "  <<- <b><green>";
+    sout << "  <<- <b><purple>";
 
     std::list<std::string> qlist;
     for(std::string chunk_queue : ChunkQueueList){
@@ -299,7 +299,7 @@ void CNode::PrintQueuesInfo(std::ostream& sout)
     qlist.sort();
 
     sout << join(qlist,", ");
-    sout << "</b></green>" << std::endl;
+    sout << "</b></purple>" << std::endl;
 }
 
 //------------------------------------------------------------------------------
