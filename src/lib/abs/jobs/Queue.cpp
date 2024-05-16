@@ -74,7 +74,7 @@ bool CQueue::IsEnabled(void) const
 
 bool CQueue::IsRouteQueue(void) const
 {
-    return( (RouteDestinations.size() != 0) && (GetType() == "Route") );
+    return( RouteDestinations.size() > 0 );
 }
 
 //------------------------------------------------------------------------------

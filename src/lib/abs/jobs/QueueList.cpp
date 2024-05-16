@@ -172,12 +172,12 @@ void CQueueList::PrintInfos(std::ostream& sout)
 
     while( it != et ){
         CQueuePtr p_queue = *it;
+        it++;
+        if( p_queue->IsOnlyRoutable() ) continue;
+        p_queue->PrintLineInfo(sout,false);
         if( p_queue->IsRouteQueue() ){
             PrintRouteDestinationInfos(p_queue,sout);
-        } else {
-            p_queue->PrintLineInfo(sout,false);
         }
-        it++;
     }
 
     sout << endl;
