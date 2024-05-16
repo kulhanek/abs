@@ -161,8 +161,8 @@ protected:
     std::vector<std::string>    PropList;
     std::vector<std::string>    AllPropList;
 
-    CSmallString                Queues;
-    std::vector<std::string>    QueueList;
+    CSmallString                ChunkQueues;
+    std::vector<std::string>    ChunkQueueList;
 
     CSmallString                NodeOwner;
     std::vector<std::string>    OwnerList;

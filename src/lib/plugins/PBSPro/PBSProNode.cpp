@@ -105,9 +105,9 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
     }
 
     // queue list
-    get_attribute(p_node->attribs,"resources_available","queue_list",Queues);
-    tmp = string(Queues);
-    if( ! tmp.empty() ) split(QueueList,tmp,is_any_of(","));
+    get_attribute(p_node->attribs,"resources_available","queue_list",ChunkQueues);
+    tmp = string(ChunkQueues);
+    if( ! tmp.empty() ) split(ChunkQueueList,tmp,is_any_of(","));
 
     // user list
     // queue list

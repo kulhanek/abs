@@ -30,6 +30,7 @@
 #include <JobList.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <QueueList.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -289,7 +290,15 @@ void CNode::PrintJobsInfo(std::ostream& sout,const std::string& jobid)
 void CNode::PrintQueuesInfo(std::ostream& sout)
 {
     sout << "  <<- <b><green>";
-    sout << join(QueueList,", ");
+
+    std::list<std::string> qlist;
+    for(std::string chunk_queue : ChunkQueueList){
+        QueueList.GetQueueFromChunkQueue(GetShortServerName(),chunk_queue,qlist);
+    }
+    qlist.unique();
+    qlist.sort();
+
+    sout << join(qlist,", ");
     sout << "</b></green>" << std::endl;
 }
 
@@ -434,8 +443,8 @@ bool CNode::IsInAnyQueueWithServer(const std::vector<std::string>& qlist)
 
 bool CNode::IsInQueueWithServer(const std::string& queue)
 {
-    vector<string>::iterator mit = QueueList.begin();
-    vector<string>::iterator mie = QueueList.end();
+    vector<string>::iterator mit = ChunkQueueList.begin();
+    vector<string>::iterator mie = ChunkQueueList.end();
 
     while( mit != mie ){
         std::string nqueue = *mit;

@@ -293,13 +293,13 @@ const CQueuePtr CQueueList::FindQueueByChunkName(const CSmallString& server,cons
 
 //------------------------------------------------------------------------------
 
-void CQueueList::GetQueueFromChunkQueue(const CSmallString& server,const CSmallString& chunk_queue,std::list<CSmallString>& qlist)
+void CQueueList::GetQueueFromChunkQueue(const CSmallString& server,const CSmallString& chunk_queue,std::list<std::string>& qlist)
 {
     CQueuePtr p_queue = FindQueueByChunkName(server,chunk_queue);
     if( p_queue == NULL ) return;
 
     if( p_queue->IsOnlyRoutable() == false ){
-        qlist.push_back(p_queue->GetName());
+        qlist.push_back(string(p_queue->GetName()));
     }
 
     std::list<CQueuePtr>::iterator it = begin();
@@ -313,7 +313,7 @@ void CQueueList::GetQueueFromChunkQueue(const CSmallString& server,const CSmallS
         if( p_rqueue->IsRouteDestination(p_queue->GetName()) ){
             CSmallString qname;
             qname << p_rqueue->GetName() << "(via " << p_queue->GetName() << ")";
-            qlist.push_back(qname);
+            qlist.push_back(string(qname));
         }
     }
 }

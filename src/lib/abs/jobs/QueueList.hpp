@@ -77,7 +77,7 @@ public:
     const CQueuePtr FindQueueByChunkName(const CSmallString& server,const CSmallString& name);
 
     //! get queue list for chunk
-    void GetQueueFromChunkQueue(const CSmallString& server,const CSmallString& chunk_queue,std::list<CSmallString>& qlist);
+    void GetQueueFromChunkQueue(const CSmallString& server,const CSmallString& chunk_queue,std::list<std::string>& qlist);
 
 // section of private data -----------------------------------------------------
 private:
