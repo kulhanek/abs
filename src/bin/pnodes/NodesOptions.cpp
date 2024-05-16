@@ -51,13 +51,6 @@ int CNodesOptions::CheckOptions(void)
             IsError = true;
             return(SO_OPTS_ERROR);
         }
-        if( IsOptTechnicalSet() ){
-            if( IsError == false ) fprintf(stderr,"\n");
-            fprintf(stderr,"%s: option --node is not compatible with --technical option\n",
-                    (const char*)GetProgramName());
-            IsError = true;
-            return(SO_OPTS_ERROR);
-        }
         if( IsOptDoNotGroupSet() ){
             if( IsError == false ) fprintf(stderr,"\n");
             fprintf(stderr,"%s: option --node is not compatible with --donotgroup option\n",

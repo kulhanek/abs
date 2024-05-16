@@ -297,15 +297,19 @@ void CNodeList::PrintNodeGroupNames(std::ostream& sout)
     sout << endl;
     sout << "# Node group name" << endl;
     sout << "# --------------------------------------" << endl;
-    CXMLElement* p_ele = ABSConfig.GetNodeGroupConfig();
-    if( p_ele != NULL ){
-        CXMLElement* p_gele = p_ele->GetFirstChildElement("group");
-        while( p_gele != NULL ){
-            CSmallString gname;
-            p_gele->GetAttribute("name",gname);
-            sout << gname << endl;
-            p_gele = p_gele->GetNextSiblingElement("group");
-        }
+//    CXMLElement* p_ele = ABSConfig.GetNodeGroupConfig();
+//    if( p_ele != NULL ){
+//        CXMLElement* p_gele = p_ele->GetFirstChildElement("group");
+//        while( p_gele != NULL ){
+//            CSmallString gname;
+//            p_gele->GetAttribute("name",gname);
+//            sout << gname << endl;
+//            p_gele = p_gele->GetNextSiblingElement("group");
+//        }
+//    }
+
+    for(CNodeGroupPtr grp : NodeGroups){
+        sout << grp->GroupName << endl;
     }
 }
 
