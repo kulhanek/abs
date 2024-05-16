@@ -38,6 +38,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <JobList.hpp>
 #include <PluginDatabase.hpp>
@@ -873,18 +874,8 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
 // determine FS type of input directory and group namespace,
 // storage name and storage directory
 
-    CSmallString buffer;
-    size_t       buflen = PATH_MAX;
-    buffer.SetLength(buflen);
-
-    int ret = readlink(input_dir_raw.c_str(),buffer.GetBuffer(),buflen);
-    if( ret == -1 ){
-        CSmallString error;
-        error << "readlink error for '" <<  input_dir_raw << "' (" << strerror(errno) << ")";
-        ES_ERROR(error);
-        return(false);
-    }
-    buffer[ret] = '\0';
+    boost::filesystem::path canonical_path = boost::filesystem::canonical(boost::filesystem::path(input_dir_raw));
+    string                  input_dir_can = canonical_path.string();
 
     struct stat job_dir_stat;
     if( stat(input_dir_raw.c_str(),&job_dir_stat) != 0 ){
@@ -914,7 +905,7 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
         string n1,n2,s1,n3,p1,opt;
         smntpoint >> n1 >> n2 >> s1 >> n3 >> p1 >> opt;
         // check the mount path
-        if( buffer.FindSubString(p1.c_str()) == 0 ){
+        if( input_dir_can.find(p1) == 0 ){
             len = p1.size();
             if( p1.size() > len ){
                 bestmntpoint = tmpmntpoint;
@@ -4674,7 +4665,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
     cmd << "'" << whole_name << ".hwtopo' ";
     cmd << "'" << whole_name << ".amsreg' ";
     // FUJ - FIXME
-    system(cmd);
+    std::system(cmd);
 
     // archive *.info *.stdout *.infout
     CFileName archive;
@@ -4702,7 +4693,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
         cmd << "'" << archive << ".info'";
     }
     // FUJ - FIXME
-    system(cmd);
+    std::system(cmd);
 
     cmd = NULL;
     cmd << "mv ";
@@ -4713,7 +4704,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
         cmd << "'" << archive << ".stdout'";
     }
     // FUJ - FIXME
-    system(cmd);
+    std::system(cmd);
 
     cmd = NULL;
     cmd << "mv ";
@@ -4724,7 +4715,7 @@ void CJob::ArchiveRuntimeFiles(const CSmallString& sformat)
         cmd << "'" << archive << ".infout'";
     }
     // FUJ - FIXME
-    system(cmd);
+    std::system(cmd);
 }
 
 //------------------------------------------------------------------------------
@@ -4760,7 +4751,7 @@ void CJob::CleanRuntimeFiles(void)
     cmd << "'" << whole_name << ".hwtopo' ";
     cmd << "'" << whole_name << ".amsreg' ";
     // FUJ - FIXME
-    system(cmd);
+    std::system(cmd);
 }
 
 //==============================================================================
@@ -4964,7 +4955,7 @@ bool CJob::ExecPresubmitHook(void)
     presubmit_hook =  pwd / presubmit_hook;
 
     // execute script
-    bool result = system(presubmit_hook) == 0;
+    bool result = std::system(presubmit_hook) == 0;
 
     // dissable execution flag for the executable
     fmode = (mode & ~0111 ) & 0777;
