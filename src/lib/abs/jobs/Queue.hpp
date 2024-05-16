@@ -68,23 +68,16 @@ public:
     //! is only routable?
     bool IsOnlyRoutable(void) const;
 
+// queue_type = Route
     //! is route queue
     bool IsRouteQueue(void) const;
 
-    //! get route destinations
-    const CSmallString GetRouteDestinations(void) const;
-
     //! is route destination
-    bool IsRouteDestination(void) const;
+    bool IsRouteDestination(const CSmallString& name);
 
-    //! get name of route queue
-    const CSmallString GetRouteQueueName(void) const;
-
-    //! get name of route queue
-    void SetRouteQueueName(const CSmallString& name);
-
+// --------------------------
     //! print line info about the queue
-    void PrintLineInfo(std::ostream& sout);
+    void PrintLineInfo(std::ostream& sout,bool route_queue);
 
     //! is queue allowed for the user
     bool IsAllowed(CUser& user) const;
@@ -114,8 +107,7 @@ protected:
 
     CSmallTime                  MaxWallTime;
     CSmallTime                  DefaultWallTime;
-    CSmallString                RouteDestinations;
-    CSmallString                RouteQueue;
+    std::vector<CSmallString>   RouteDestinations;
 
     CSmallString                ChunkQueue;
 

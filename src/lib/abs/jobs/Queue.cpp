@@ -23,6 +23,7 @@
 #include <ErrorSystem.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include <iomanip>
 
 //------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ bool CQueue::IsEnabled(void) const
 
 bool CQueue::IsRouteQueue(void) const
 {
-    return( RouteDestinations != NULL );
+    return( (RouteDestinations.size() != 0) && (GetType() == "Route") );
 }
 
 //------------------------------------------------------------------------------
@@ -85,30 +86,10 @@ bool CQueue::IsOnlyRoutable(void) const
 
 //------------------------------------------------------------------------------
 
-const CSmallString CQueue::GetRouteDestinations(void) const
+bool CQueue::IsRouteDestination(const CSmallString& name)
 {
-    return(RouteDestinations);
-}
-
-//------------------------------------------------------------------------------
-
-bool CQueue::IsRouteDestination(void) const
-{
-    return( RouteQueue != NULL );
-}
-
-//------------------------------------------------------------------------------
-
-const CSmallString CQueue::GetRouteQueueName(void) const
-{
-    return(RouteQueue);
-}
-
-//------------------------------------------------------------------------------
-
-void CQueue::SetRouteQueueName(const CSmallString& name)
-{
-    RouteQueue = name;
+    size_t n = std::count(RouteDestinations.begin(),RouteDestinations.end(),name);
+    return( n != 0 );
 }
 
 //------------------------------------------------------------------------------
@@ -163,26 +144,26 @@ bool CQueue::IsAllowed(CUser& user) const
 
 //------------------------------------------------------------------------------
 
-void CQueue::PrintLineInfo(std::ostream& sout)
+void CQueue::PrintLineInfo(std::ostream& sout,bool route_queue)
 {
     if( ! OnlyRoutable ){
         sout << "<b><green>";
     }
 
     sout << left;
-    if( RouteQueue == NULL ){
-        sout << setw(1) << ShortServerName;
-        sout << " ";
-    } else {
+    if( route_queue ){
         sout << "  ";
         sout << setw(1) << ShortServerName;
+    } else {
+        sout << setw(1) << ShortServerName;
+        sout << " ";
     }
 
     sout << left;
-    if( RouteQueue == NULL ){
-        sout << setw(20) << Name;
-    } else {
+    if( route_queue ){
         sout << " > " << setw(16) << Name;
+    } else {
+        sout << setw(20) << Name;
     }
 
     sout << right;

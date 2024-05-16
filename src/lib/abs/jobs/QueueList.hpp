@@ -73,6 +73,12 @@ public:
     //! find queue
     const CQueuePtr FindQueue(const CSmallString& server,const CSmallString& name);
 
+    //! find queue
+    const CQueuePtr FindQueueByChunkName(const CSmallString& server,const CSmallString& name);
+
+    //! get queue list for chunk
+    void GetQueueFromChunkQueue(const CSmallString& server,const CSmallString& chunk_queue,std::list<CSmallString>& qlist);
+
 // section of private data -----------------------------------------------------
 private:
     //! compare two queues by name
@@ -92,9 +98,6 @@ private:
 
     //! remove if only routable
     static bool RemoveIfOnlyRoutable(const CQueuePtr& p_queue);
-
-    //! map route queues
-    void MapRouteQueues(void);
 
     //! print route destinations
     void PrintRouteDestinationInfos(CQueuePtr& p_mqueue, std::ostream& sout);
