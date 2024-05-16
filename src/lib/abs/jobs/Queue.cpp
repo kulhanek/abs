@@ -88,6 +88,11 @@ bool CQueue::IsOnlyRoutable(void) const
 
 bool CQueue::IsRouteDestination(const CSmallString& name)
 {
+    for(CSmallString it : RouteDestinations){
+        cout << it;
+    }
+
+    cout << " | " << name << endl;
     size_t n = std::count(RouteDestinations.begin(),RouteDestinations.end(),name);
     return( n != 0 );
 }
