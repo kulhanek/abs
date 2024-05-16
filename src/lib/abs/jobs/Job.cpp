@@ -877,6 +877,9 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
     boost::filesystem::path canonical_path = boost::filesystem::canonical(boost::filesystem::path(input_dir_raw));
     string                  input_dir_can = canonical_path.string();
 
+    cout << input_dir_raw << endl;
+    cout << input_dir_can << endl;
+
     struct stat job_dir_stat;
     if( stat(input_dir_raw.c_str(),&job_dir_stat) != 0 ){
         ES_ERROR("unable to stat CWD");
