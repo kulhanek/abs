@@ -908,6 +908,7 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
         string n1,n2,s1,n3,p1,opt;
         smntpoint >> n1 >> n2 >> s1 >> n3 >> p1 >> opt;
         // check the mount path
+        cout << p1 << endl;
         if( input_dir_can.find(p1) == 0 ){
             len = p1.size();
             if( p1.size() > len ){
