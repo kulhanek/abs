@@ -921,7 +921,6 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
         // check the mount path
         if( (input_dir_can.find(dest) == 0) && (fstype.find("autofs") == string::npos) && (src.find("systemd") == string::npos) ){
             if( dest.size() > len ){
-                cout << dest.size() << " : " << tmpmntpoint << endl;
                 bestmntpoint = tmpmntpoint;
                 len = dest.size();
             }
@@ -930,14 +929,10 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
         getline(mountinfo,tmpmntpoint);
     }
 
-    cout << len << endl;
-
     if( len == 0 ){
         ES_ERROR("unable to find mount point");
         return(false);
     }
-
-    cout << bestmntpoint << endl;
 
 // parse mntpoint
     vector<string> items;
