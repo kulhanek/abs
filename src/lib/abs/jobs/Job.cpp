@@ -896,15 +896,34 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
     size_t      len = 0;
 
     while( mountinfo ){
-        stringstream smntpoint(tmpmntpoint);
-        string c1,c2,c3,c4,c5,c6,c7,c8,c9,c10;
-        smntpoint >> c1 >> c2 >> c3 >> c4 >> c5 >> c6 >> c7 >> c8 >> c9 >> c10;
+
+        vector<string> items;
+        split(items,tmpmntpoint,is_any_of(" "),boost::token_compress_on);
+        size_t p1 = 0;
+        size_t p2 = 0;
+        bool   nonopt = false;
+        vector<string>::iterator it = items.begin();
+        vector<string>::iterator ie = items.end();
+
+        string dest, fstype, src, opts;
+
+        while( it != ie ){
+            p1++;
+            if( nonopt ) p2++;
+            if( p1 == 5 ) dest = *it;
+            if( p2 == 1 ) fstype = *it;
+            if( p2 == 2 ) src = *it;
+            if( p2 == 3 ) opts = *it;
+            if( *it == "-" ) nonopt = true;
+            it++;
+        }
+
         // check the mount path
-        if( (input_dir_can.find(c5) == 0) && (c9.find("autofs") == string::npos) && (c10.find("systemd") == string::npos) ){
-            len = c5.size();
-            if( c5.size() > len ){
+        if( (input_dir_can.find(dest) == 0) && (fstype.find("autofs") == string::npos) && (src.find("systemd") == string::npos) ){
+            len = dest.size();
+            if( dest.size() > len ){
                 bestmntpoint = tmpmntpoint;
-                len = c5.size();
+                len = dest.size();
             }
         }
         tmpmntpoint = "";
@@ -916,6 +935,8 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
         return(false);
     }
 
+    cout << bestmntpoint << endl;
+
 // parse mntpoint
     vector<string> items;
     split(items,bestmntpoint,is_any_of(" "),boost::token_compress_on);
@@ -926,6 +947,8 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
     vector<string>::iterator ie = items.end();
 
     string dest, fstype, src, opts;
+
+    fstype = "sys";
 
     while( it != ie ){
         p1++;
