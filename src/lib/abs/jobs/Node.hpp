@@ -72,11 +72,14 @@ public:
     /// return number of free GPUs
     int GetNumOfFreeGPUs(void) const;
 
-    /// return total memory in kb
-    long long GetMemory(void) const;
+    /// return total CPU memory in kb
+    long long GetCPUMemory(void) const;
 
-    /// return free memory in kb
-    long long  GetFreeMemory(void) const;
+    /// return free CPU memory in kb
+    long long  GetFreeCPUMemory(void) const;
+
+    /// return total GPU memory in kb
+    long long GetGPUMemory(void) const;
 
     /// get property list
     const std::vector<std::string>& GetPropertyList(void) const;
@@ -132,11 +135,13 @@ protected:
     int                         NCPUs;
     int                         AssignedCPUs;
 
+    size_t                      CPUMemory;
+    size_t                      AssignedCPUMemory;
+
     int                         NGPUs;
     int                         AssignedGPUs;
 
-    size_t                      Memory;
-    size_t                      AssignedMemory;
+    size_t                      GPUMemory;
 
     size_t                      ScratchLocal;
     size_t                      ScratchShared;

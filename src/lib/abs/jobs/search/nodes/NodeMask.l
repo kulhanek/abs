@@ -36,6 +36,7 @@ string        [0-9a-zA-Z\/\#*?\[\].\-\+_]+[a-zA-Z0-9\/\#*?,.\[\]\-\+_]*
 "nfreegpus" { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return NFREEGPUS; }
 "mem"       { yynodelval.gValue.Position = LexPosition; LexPosition += 3; return MEM; }
 "freemem"   { yynodelval.gValue.Position = LexPosition; LexPosition += 7; return FREEMEM; }
+"gpu_mem"   { yynodelval.gValue.Position = LexPosition; LexPosition += 7; return GPUMEM; }
 "name"      { yynodelval.gValue.Position = LexPosition; LexPosition += 4; return NAME; }
 "props"     { yynodelval.gValue.Position = LexPosition; LexPosition += 5; return PROPS; }
 "st"        { yynodelval.gValue.Position = LexPosition; LexPosition += 2; return ST; }

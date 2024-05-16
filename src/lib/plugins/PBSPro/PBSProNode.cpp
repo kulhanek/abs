@@ -65,11 +65,13 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
     get_attribute(p_node->attribs,"resources_available","ncpus",NCPUs);
     get_attribute(p_node->attribs,"resources_assigned","ncpus",AssignedCPUs);
 
+    get_attribute(p_node->attribs,"resources_available","mem",CPUMemory);
+    get_attribute(p_node->attribs,"resources_assigned","mem",AssignedCPUMemory);
+
     get_attribute(p_node->attribs,"resources_available","ngpus",NGPUs);
     get_attribute(p_node->attribs,"resources_assigned","ngpus",AssignedGPUs);
 
-    get_attribute(p_node->attribs,"resources_available","mem",Memory);
-    get_attribute(p_node->attribs,"resources_assigned","mem",AssignedMemory);
+    get_attribute(p_node->attribs,"resources_available","gpu_mem",GPUMemory);
 
     get_attribute(p_node->attribs,"resources_available","scratch_local",ScratchLocal);
     get_attribute(p_node->attribs,"resources_available","scratch_shared",ScratchShared);

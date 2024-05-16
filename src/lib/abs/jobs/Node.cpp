@@ -46,10 +46,14 @@ CNode::CNode(void)
 {
     NCPUs = 0;
     AssignedCPUs = 0;
+
+    CPUMemory = 0;
+    AssignedCPUMemory = 0;
+
     NGPUs = 0;
     AssignedGPUs = 0;
-    Memory = 0;
-    AssignedMemory = 0;
+
+    GPUMemory = 0;
 
     ScratchLocal = 0;
     ScratchShared = 0;
@@ -168,6 +172,10 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
             sout << "</blue>";
         }
     }
+
+    sout << " " << setw(5) << GetNiceSize(CPUMemory-AssignedCPUMemory);
+    sout << "/" << setw(5) << GetNiceSize(CPUMemory);
+
 // ------------------
     if( ! (IsDown() || IsPowerOff()) ){
         if( (AssignedGPUs == 0) && (NGPUs > 0) ){
@@ -193,8 +201,7 @@ void CNode::PrintLineInfo(std::ostream& sout,const std::set<std::string>& gprops
     }
 // ------------------
 
-    sout << " " << setw(5) << GetNiceSize(Memory-AssignedMemory);
-    sout << "/" << setw(5) << GetNiceSize(Memory);
+    sout << " " << setw(5) << GetNiceSize(GPUMemory);
 
     sout << " " << setw(5) << GetNiceSize(ScratchLocal);
     sout << " " << setw(5) << GetNiceSize(ScratchShared);
@@ -321,16 +328,23 @@ int CNode::GetNumOfFreeGPUs(void) const
 
 //------------------------------------------------------------------------------
 
-long long CNode::GetMemory(void) const
+long long CNode::GetCPUMemory(void) const
 {
-    return(Memory);
+    return(CPUMemory);
 }
 
 //------------------------------------------------------------------------------
 
-long long CNode::GetFreeMemory(void) const
+long long CNode::GetFreeCPUMemory(void) const
 {
-    return(Memory-AssignedMemory);
+    return(CPUMemory-AssignedCPUMemory);
+}
+
+//------------------------------------------------------------------------------
+
+long long CNode::GetGPUMemory(void) const
+{
+    return(GPUMemory);
 }
 
 //------------------------------------------------------------------------------

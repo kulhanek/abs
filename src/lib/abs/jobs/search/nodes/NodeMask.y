@@ -26,7 +26,7 @@ ABS Node Mask Lexical Analyzer
 %token <sValue> STRING
 %token <sValue> ISIZE
 %token <iValue> INUMBER
-%token <gValue> NCPUS NFREECPUS NGPUS NFREEGPUS NAME PROPS MEM FREEMEM ST BS
+%token <gValue> NCPUS NFREECPUS NGPUS NFREEGPUS NAME PROPS MEM FREEMEM GPUMEM ST BS
 %token <gValue> LT LE GT GE NE EQ
 %token <gValue> NOT AND OR
 %token <gValue> RBRA LBRA
@@ -283,6 +283,10 @@ mselector:
         }
     | FREEMEM {
         enum SType selt = T_FREEMEM;
+        $$ = selt;
+        }
+    | GPUMEM {
+        enum SType selt = T_GPUMEM;
         $$ = selt;
         }
     ;

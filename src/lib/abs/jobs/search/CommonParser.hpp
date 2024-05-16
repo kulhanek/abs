@@ -63,6 +63,7 @@ enum SType {
     T_NFREEGPUS,
     T_MEM,
     T_FREEMEM,
+    T_GPUMEM,
     T_NAME,
     T_PROPS,
     T_STATE,
