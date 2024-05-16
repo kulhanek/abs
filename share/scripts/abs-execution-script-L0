@@ -86,8 +86,21 @@ if [[ (-f "$HOME/.k5login") && (`stat --format=%a "$HOME/.k5login"` != 644) ]]; 
 fi
 
 # get info about Kerberos
-klist
-tokens
+ABS_KLISTCMD=`type -P klist 2> /dev/null`
+if [ -n "$ABS_KLISTCMD" ]; then
+    $ABS_KLISTCMD
+else
+    echo ">>> INFO: the klist command not available ... skipping"
+fi
+unset ABS_KLISTCMD
+
+ABS_TOKENSCMD=`type -P tokens 2> /dev/null`
+if [ -n "$ABS_TOKENSCMD" ]; then
+    $ABS_TOKENSCMD
+else
+    echo ">>> INFO: the tokens command not available ... skipping"
+fi
+unset ABS_TOKENSCMD
 
 echo ""
 echo "#-------------------------------------------------------------------------------"
