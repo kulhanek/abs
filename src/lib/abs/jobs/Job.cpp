@@ -496,7 +496,7 @@ ERetStatus CJob::JobInput(std::ostream& sout,bool allowallpaths,bool inputfromin
 bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 {
     // input directory
-    if( InputDirectory(sout) == false ){
+    if( InputDirectoryV2(sout) == false ){
         ES_TRACE_ERROR("unable to setup resources for the input directory");
         return(false);
     }
@@ -700,8 +700,10 @@ bool CJob::DecodeResources(std::ostream& sout,bool expertmode)
 
 //------------------------------------------------------------------------------
 
-bool CJob::InputDirectory(std::ostream& sout)
+bool CJob::InputDirectoryV1(std::ostream& sout)
 {
+    // this version does not work properly for btrfs
+
     CSmallString input_machine = GetItem("basic/jobinput","INF_INPUT_MACHINE");
     CSmallString input_dir = GetItem("basic/jobinput","INF_INPUT_DIR");
     CSmallString cwd;
@@ -752,6 +754,183 @@ bool CJob::InputDirectory(std::ostream& sout)
 // parse mntpoint
     vector<string> items;
     split(items,mntpoint,is_any_of(" "),boost::token_compress_on);
+    size_t p1 = 0;
+    size_t p2 = 0;
+    bool   nonopt = false;
+    vector<string>::iterator it = items.begin();
+    vector<string>::iterator ie = items.end();
+
+    string dest, fstype, src, opts;
+
+    while( it != ie ){
+        p1++;
+        if( nonopt ) p2++;
+        if( p1 == 5 ) dest = *it;
+        if( p2 == 1 ) fstype = *it;
+        if( p2 == 2 ) src = *it;
+        if( p2 == 3 ) opts = *it;
+        if( *it == "-" ) nonopt = true;
+        it++;
+    }
+
+// fix fstype for nfs4
+    if( fstype == "nfs4" ){
+        if( opts.find("krb5") != string::npos ){
+            fstype = "nfs4:krb5";
+        } else {
+            fstype = "nfs4:sys";
+        }
+    }
+
+// determine input machine, storage machine and batch system group namespaces
+    CSmallString input_machine_groupns          = HostGroup.GetGroupNS();
+    CSmallString storage_machine_groupns        = HostGroup.GetGroupNS();
+    CSmallString storage_machine_group_realm    = HostGroup.GetRealm();
+
+// determine storage machine and storage path
+    CSmallString storage_machine = input_machine;
+    CSmallString storage_dir = input_dir;
+
+    if( (fstype == "nfs4:krb5") || (fstype == "nfs4:sys") ){
+        // determine server name and data directory
+        string smach = src.substr(0,src.find(":"));
+        string spath = src.substr(src.find(":")+1,string::npos);
+        if( input_dir_raw.find(dest) == string::npos ){
+            CSmallString error;
+            error << "mnt dest (" << dest << ") is not root of cwd (" << input_dir_raw << ")";
+            ES_ERROR(error);
+            return(false);
+        }
+        if( spath == "/" ) spath = ""; // remove root '/' character
+        spath = spath + input_dir_raw.substr(dest.length(),string::npos);
+        storage_machine_groupns     = HostGroup.GetGroupNS(smach);
+        storage_machine_group_realm = HostGroup.GetRealm(smach);
+
+        if( ABSConfig.GetSystemConfigItem("INF_USE_NFS4_STORAGES") == "YES" ){
+            storage_machine = smach;
+            storage_dir = spath;
+        }
+    }
+
+// default umask is derived from the input directory permission
+    ResourceList.AddRawResource("umask",CUserUtils::GetUMask(input_dir_umask));
+
+// determine storage group name - derived from the input directory group
+    string gname;
+    struct group* p_grp = getgrgid(input_dir_gid);
+    if( p_grp != NULL ){
+        gname = string(p_grp->gr_name);
+    }
+
+    if( gname.empty() ){
+        ES_WARNING("unable to determine the jobdir group");
+        sout << "<b><blue> WARNING: Unable to determine group name of the job input directory!" << endl;
+        sout <<          "          To continue, various file system checks will be disabled, which can lead" << endl;
+        sout <<          "          to data ownership inconsistency!</blue></b>" << endl;
+        gname = "-disabled-";
+    }
+
+    if( gname.find("@") != string::npos ){
+        SetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE",HostGroup.GetRealm(storage_machine));
+        string realm = gname.substr(gname.find("@")+1,string::npos);
+        if( CSmallString(realm) == HostGroup.GetRealm(storage_machine) ) {
+            ResourceList.AddRawResource("storagegroup",gname.substr(0,gname.find("@")));
+        } else {
+            sout << "<b><red> ERROR: Consistency check: Input directory group realm '" << realm
+                 << "' is not the same as the storage machine realm '" << HostGroup.GetRealm(storage_machine) << "'!</red></b>" << endl;
+            return(false);
+        }
+    } else {
+        SetItem("specific/resources","INF_STORAGE_MACHINE_REALM_FOR_INPUT_MACHINE","");
+        ResourceList.AddRawResource("storagegroup",gname);
+    }
+
+// input storage
+    SetItem("specific/resources","INF_INPUT_PATH_FSTYPE",fstype);
+    SetItem("specific/resources","INF_INPUT_MACHINE_GROUPNS",input_machine_groupns);
+
+    SetItem("specific/resources","INF_STORAGE_MACHINE",storage_machine);
+    SetItem("specific/resources","INF_STORAGE_DIR",storage_dir);
+    SetItem("specific/resources","INF_STORAGE_MACHINE_GROUPNS",storage_machine_groupns);
+    SetItem("specific/resources","INF_STORAGE_MACHINE_REALM",storage_machine_group_realm);
+
+// set backup values
+    SetItem("specific/resources","INF_BACKUP_USTORAGEGROUP",ResourceList.GetResourceValue("storagegroup"));
+    SetItem("specific/resources","INF_BACKUP_UMASK",ResourceList.GetResourceValue("umask"));
+    return(true);
+}
+
+//------------------------------------------------------------------------------
+
+bool CJob::InputDirectoryV2(std::ostream& sout)
+{
+    CSmallString input_machine = GetItem("basic/jobinput","INF_INPUT_MACHINE");
+    CSmallString input_dir = GetItem("basic/jobinput","INF_INPUT_DIR");
+    CSmallString cwd;
+    CFileSystem::GetCurrentDir(cwd);
+    string       input_dir_raw(cwd);     // use cwd instead of PWD
+
+// determine FS type of input directory and group namespace,
+// storage name and storage directory
+
+    CSmallString buffer;
+    size_t       buflen = PATH_MAX;
+    buffer.SetLength(buflen);
+
+    int ret = readlink(input_dir_raw.c_str(),buffer.GetBuffer(),buflen);
+    if( ret == -1 ){
+        ES_ERROR("too long pathname");
+        return(false);
+    }
+    buffer[ret] = '\0';
+
+    struct stat job_dir_stat;
+    if( stat(input_dir_raw.c_str(),&job_dir_stat) != 0 ){
+        ES_ERROR("unable to stat CWD");
+        return(false);
+    }
+
+    mode_t input_dir_umask = (job_dir_stat.st_mode ^ 0777) & 0777;
+    gid_t  input_dir_gid = job_dir_stat.st_gid;
+
+    unsigned int minid = minor(job_dir_stat.st_dev);
+    unsigned int majid = major(job_dir_stat.st_dev);
+    stringstream sdev;
+    sdev << majid << ":" << minid;
+
+// find mount point
+    ifstream mountinfo("/proc/self/mountinfo");
+    string   tmpmntpoint;
+
+    getline(mountinfo,tmpmntpoint);
+
+    string      bestmntpoint;
+    size_t      len = 0;
+
+    while( mountinfo ){
+        stringstream smntpoint(tmpmntpoint);
+        string n1,n2,s1,n3,p1,opt;
+        smntpoint >> n1 >> n2 >> s1 >> n3 >> p1 >> opt;
+        // check the mount path
+        if( buffer.FindSubString(p1.c_str()) == 0 ){
+            len = p1.size();
+            if( p1.size() > len ){
+                bestmntpoint = tmpmntpoint;
+                len = p1.size();
+            }
+        }
+        tmpmntpoint = "";
+        getline(mountinfo,tmpmntpoint);
+    }
+
+    if( len > 0 ){
+        ES_ERROR("unable to find mount point");
+        return(false);
+    }
+
+// parse mntpoint
+    vector<string> items;
+    split(items,bestmntpoint,is_any_of(" "),boost::token_compress_on);
     size_t p1 = 0;
     size_t p2 = 0;
     bool   nonopt = false;

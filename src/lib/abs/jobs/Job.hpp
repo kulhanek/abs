@@ -548,7 +548,8 @@ protected:
     void PrintResourceTokens(std::ostream& sout,const CSmallString& title,const CSmallString& res_list,const CSmallString& delim);
 
     /// prepare data about input directory - called by DecodeResources
-    bool InputDirectory(std::ostream& sout);
+    bool InputDirectoryV1(std::ostream& sout);
+    bool InputDirectoryV2(std::ostream& sout);
 
     /// job permissions
     void FixJobPerms(void);
