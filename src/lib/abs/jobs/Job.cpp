@@ -879,7 +879,9 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
 
     int ret = readlink(input_dir_raw.c_str(),buffer.GetBuffer(),buflen);
     if( ret == -1 ){
-        ES_ERROR("too long pathname");
+        CSmallString error;
+        error << "readlink error for '" <<  input_dir_raw << "' (" << strerror(errno) << ")";
+        ES_ERROR(error);
         return(false);
     }
     buffer[ret] = '\0';
