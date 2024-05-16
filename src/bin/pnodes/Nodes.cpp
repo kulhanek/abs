@@ -129,15 +129,15 @@ bool CNodes::Run(void)
         if( term ) vout << "#" << endl;
     }
 
-    if( Options.GetOptTechnical() ){
-        vout << endl;
-        BatchServers.PrintNodes(vout);
+    if( Options.IsOptNodeSet() && Options.GetOptTechnical() ){
+        // only single node info
+        BatchServers.PrintNode(vout,Options.GetOptNode());
         return(true);
     }
 
-    if( Options.IsOptNodeSet() ){
-        // only single node info
-        BatchServers.PrintNode(vout,Options.GetOptNode());
+    if( Options.GetOptTechnical() ){
+        vout << endl;
+        BatchServers.PrintNodes(vout);
         return(true);
     }
 
@@ -146,17 +146,20 @@ bool CNodes::Run(void)
     vout << endl;
     vout << low;
 
-    if( Options.GetOptPrintGroups() == true ){
-        NodeList.PrintNodeGroupNames(vout);
-        return(true);
-    }
-
     std::string jobid;   // epty if not set
     if( Options.IsOptJobSet() == false ){
-        // all nodes
-        if( BatchServers.GetNodes() == false ){
-            ES_ERROR("unable to load nodes");
-            return(false);
+        if( Options.IsOptNodeSet() ){
+            // all nodes
+            if( BatchServers.GetNode(NodeList,Options.GetOptNode()) == false ){
+                ES_ERROR("unable to load node");
+                return(false);
+            }
+        } else {
+            // all nodes
+            if( BatchServers.GetNodes() == false ){
+                ES_ERROR("unable to load nodes");
+                return(false);
+            }
         }
     } else {
         // only nodes from the job
@@ -229,6 +232,11 @@ bool CNodes::Run(void)
     }
 
     NodeList.FinalizeNodeGroups();
+
+    if( Options.GetOptPrintGroups() == true ){
+        NodeList.PrintNodeGroupNames(vout);
+        return(true);
+    }
 
     if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
         // list individual nodes
