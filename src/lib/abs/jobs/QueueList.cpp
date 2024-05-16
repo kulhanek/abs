@@ -199,7 +199,7 @@ void CQueueList::PrintRouteDestinationInfos(CQueuePtr& p_mqueue, std::ostream& s
         CQueuePtr p_queue = *it;
         it++;
         if( p_queue->GetShortServerName() != p_mqueue->GetShortServerName() ) continue;
-        if( p_queue->IsRouteDestination(p_mqueue->GetName())){
+        if( p_mqueue->IsRouteDestination(p_queue->GetName()) ){
             p_queue->PrintLineInfo(sout,true);
         }
     }
