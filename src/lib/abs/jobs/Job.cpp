@@ -897,14 +897,14 @@ bool CJob::InputDirectoryV2(std::ostream& sout)
 
     while( mountinfo ){
         stringstream smntpoint(tmpmntpoint);
-        string n1,n2,s1,n3,p1,opt;
-        smntpoint >> n1 >> n2 >> s1 >> n3 >> p1 >> opt;
+        string c1,c2,c3,c4,c5,c6,c7,c8,c9,c10;
+        smntpoint >> c1 >> c2 >> c3 >> c4 >> c5 >> c6 >> c7 >> c8 >> c9 >> c10;
         // check the mount path
-        if( input_dir_can.find(p1) == 0 ){
-            len = p1.size();
-            if( p1.size() > len ){
+        if( (input_dir_can.find(c5) == 0) && (c9.find("autofs") == string::npos) && (c10.find("systemd") == string::npos) ){
+            len = c5.size();
+            if( c5.size() > len ){
                 bestmntpoint = tmpmntpoint;
-                len = p1.size();
+                len = c5.size();
             }
         }
         tmpmntpoint = "";
