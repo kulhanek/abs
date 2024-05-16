@@ -232,7 +232,7 @@ bool CNodes::Run(void)
 
     if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
         // list individual nodes
-        NodeList.PrintInfos(vout,Options.GetOptPrintJobs(),jobid);
+        NodeList.PrintInfos(vout,Options.GetOptPrintJobs(),Options.GetOptPrintQueues(),jobid);
 
         // print final stats
         NodeList.PrintStatistics(vout);

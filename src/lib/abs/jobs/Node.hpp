@@ -51,6 +51,9 @@ public:
     /// print jobs on the node
     void PrintJobsInfo(std::ostream& sout,const std::string& jobid);
 
+    /// print queues associated with the node
+    void PrintQueuesInfo(std::ostream& sout);
+
     /// get node name
     const CSmallString& GetName(void) const;
 

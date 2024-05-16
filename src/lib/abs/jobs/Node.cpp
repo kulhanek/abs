@@ -286,6 +286,15 @@ void CNode::PrintJobsInfo(std::ostream& sout,const std::string& jobid)
 
 //------------------------------------------------------------------------------
 
+void CNode::PrintQueuesInfo(std::ostream& sout)
+{
+    sout << "  <- <b><green>";
+    sout << join(QueueList,",");
+    sout << "</b></green>" << std::endl;
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallString& CNode::GetName(void) const
 {
     return(Name);

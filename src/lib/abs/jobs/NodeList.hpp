@@ -62,7 +62,7 @@ public:
 
 // information methods ---------------------------------------------------------
     /// print info about all queues
-    void PrintInfos(std::ostream& sout,bool include_jobs,const std::string& jobid);
+    void PrintInfos(std::ostream& sout,bool include_jobs,bool include_queues,const std::string& jobid);
 
     /// print overal statistics
     void PrintStatistics(std::ostream& sout);

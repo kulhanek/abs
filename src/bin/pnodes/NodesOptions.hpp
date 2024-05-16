@@ -41,7 +41,7 @@ class CNodesOptions : public CSimpleOptions {
         "\n"
         "<b>Search expressions:</b>\n"
         "<i>Search tokens:</i>        name, props, st (state code), bs (short name of batch server),\n"
-               "                      ncpus, nfreecpus, ngpus, nfreegpus, mem, freemem\n"
+               "                      ncpus, nfreecpus, ngpus, nfreegpus, mem, freemem, gpu_mem\n"
         "<i>Comparison operators:</i> == (equal), != (not equal), <<, <<=, >, >=\n"
         "<i>Logical operators:</i>    ! (logical not), && (logical and), || (logical or)\n"
         "<i>Braces:</i>               ( )\n"
@@ -49,7 +49,7 @@ class CNodesOptions : public CSimpleOptions {
         "On the right side, it can be:\n"
         "   = an integer number for <u>ncpus</u>, <u>nfreecpus</u>, <u>ngpus</u>, <u>nfreegpus</u> tokens\n"
         "   = a string for <u>name</u>, <u>props</u>, <u>st</u>, <u>bs</u>\n"
-        "   = a size for <u>mem</u>, and <u>freemem</u> tokens\n"
+        "   = a size for <u>mem</u>, <u>freemem</u>, and <u>gpu_mem</u> tokens\n"
         "     Size can be in kb, mb, gb, or tb (the unit must be specified).\n"
         "String comparison can use a shell wildcard pattern and can employ  == or != comparison operators only."
     CSO_PROG_DESC_END
@@ -73,6 +73,7 @@ class CNodesOptions : public CSimpleOptions {
         CSO_OPT(bool,PrintHosts)
         CSO_OPT(bool,PrintStat)
         CSO_OPT(bool,PrintJobs)
+        CSO_OPT(bool,PrintQueues)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -105,7 +106,7 @@ class CNodesOptions : public CSimpleOptions {
                     'n',                           /* short option name */
                     "node",                      /* long option name */
                     "NAME",                           /* parametr name */
-                    "name of node")   /* option description */
+                    "name of node to print technical report")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(CSmallString,                           /* option type */
                     Search,                        /* option name */
@@ -186,7 +187,16 @@ class CNodesOptions : public CSimpleOptions {
                     0,                           /* short option name */
                     "jobs",                      /* long option name */
                     NULL,                           /* parametr name */
-                    "print jobs with assigned slots on each node")   /* option description */
+                    "print jobs with assigned slots on each node")   /* option description */\
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                    PrintQueues,                        /* option name */
+                    false,                          /* default value */
+                    false,                          /* is option mandatory */
+                    0,                           /* short option name */
+                    "queues",                      /* long option name */
+                    NULL,                           /* parametr name */
+                    "print queues associated with each node")   /* option description */
             //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
