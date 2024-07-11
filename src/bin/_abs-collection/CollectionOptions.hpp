@@ -52,7 +52,7 @@ class CCollectionOptions : public CSimpleOptions {
         "   <b><cyan>open</cyan></b>        open existing collection <u>collname</u> if collection does not exist it is created\n"
         "   <b><cyan>close</cyan></b>       close <u>collname</u> collection\n"
         "   <b><cyan>prepare</cyan></b> destination job [resources]\n"
-        "               perapre all <u>job</u> and add them to <u>collname</u> collection\n"
+        "               prepare all <u>job</u> and add them to <u>collname</u> collection\n"
         "   <b><cyan>addjob</cyan></b> path\n"
         "               add job with <u>path</u> to <u>collname</u> collection\n"
         "   <b><cyan>adddir</cyan></b> path\n"
@@ -61,7 +61,7 @@ class CCollectionOptions : public CSimpleOptions {
         "               remove job with <u>jobcid</u> from <u>collname</u>\n"
         "   <b><cyan>submit</cyan></b>      submit all jobs in the collection <u>collname</u>\n"
         "   <b><cyan>kill</cyan></b>        kill all jobs in the collection <u>collname</u>\n"
-        "   <b><cyan>celan</cyan></b>       clean all jobs in the collection <u>collname</u>\n"
+        "   <b><cyan>clean</cyan></b>       clean all jobs in the collection <u>collname</u>\n"
     CSO_PROG_ARGS_LONG_DESC_END
 
     CSO_PROG_VERS_BEGIN
@@ -75,6 +75,7 @@ class CCollectionOptions : public CSimpleOptions {
         CSO_OPT(bool,Compact)
         CSO_OPT(bool,IncludePath)
         CSO_OPT(bool,IncludeComment)
+        CSO_OPT(CSmallString,ExcludePath)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -118,32 +119,41 @@ class CCollectionOptions : public CSimpleOptions {
                 NULL,                           /* parametr name */
                 "print job comment in compact mode")   /* option description */
     //----------------------------------------------------------------------
+        CSO_MAP_OPT(CSmallString,                           /* option type */
+                ExcludePath,                        /* option name */
+                "",                          /* default value */
+                false,                          /* is option mandatory */
+                'x',                           /* short option name */
+                "exclude",                      /* long option name */
+                "PATTERN",                           /* parametr name */
+                "exclude directories that satisfy the pattern from the prepare action")   /* option description */
+    //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Verbose,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'v',                           /* short option name */
-                    "verbose",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "increase output verbosity")   /* option description */
+                Verbose,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'v',                           /* short option name */
+                "verbose",                      /* long option name */
+                NULL,                           /* parametr name */
+                "increase output verbosity")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Version,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    '\0',                           /* short option name */
-                    "version",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "output version information and exit")   /* option description */
+                Version,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                '\0',                           /* short option name */
+                "version",                      /* long option name */
+                NULL,                           /* parametr name */
+                "output version information and exit")   /* option description */
         //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
-                    Help,                        /* option name */
-                    false,                          /* default value */
-                    false,                          /* is option mandatory */
-                    'h',                           /* short option name */
-                    "help",                      /* long option name */
-                    NULL,                           /* parametr name */
-                    "display this help and exit")   /* option description */
+                Help,                        /* option name */
+                false,                          /* default value */
+                false,                          /* is option mandatory */
+                'h',                           /* short option name */
+                "help",                      /* long option name */
+                NULL,                           /* parametr name */
+                "display this help and exit")   /* option description */
     CSO_MAP_END
 
 // final operation with options ------------------------------------------------

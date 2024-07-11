@@ -35,6 +35,7 @@
 #include <sys/stat.h>
 #include <SiteController.hpp>
 #include <ModuleController.hpp>
+#include <fnmatch.h>
 
 using namespace std;
 
@@ -786,6 +787,9 @@ void CCollection::FindJobs(std::vector<CFileName>& jobs,const CFileName& cwd,con
     CFileName file;
     while( dir.FindFile(file) ){
         if( (file == "..") || (file == ".") ) continue;
+        if( Options.GetOptExcludePath() != NULL ){
+            if( fnmatch(Options.GetOptExcludePath(),file,FNM_PATHNAME) == 0 ) continue;
+        }
         CFileName fdir;
         if( root != NULL ){
             fdir = root / file;
