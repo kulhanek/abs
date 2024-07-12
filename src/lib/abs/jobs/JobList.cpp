@@ -1989,14 +1989,17 @@ void CJobList::PrintStatistics(std::ostream& sout)
 
     CSmallTimeAndDate wtime_b,wtime_e;
 
+    bool first =true;
     while( it != ie ){
         CJobPtr p_job = *it;
 
         CSmallTimeAndDate bpt = p_job->GetBeginWallTime();
-        if( wtime_b > bpt ) wtime_b = bpt;
+        if( (wtime_b > bpt) || first ) wtime_b = bpt;
 
         CSmallTimeAndDate ept = p_job->GetEndWallTime();
-        if( wtime_e < ept ) wtime_e = ept;
+        if( (wtime_e < ept) || first ) wtime_e = ept;
+
+        first = false;
 
         if( p_job->GetJobStatus() == EJS_PREPARED ){
             pre++;
@@ -2104,7 +2107,7 @@ void CJobList::PrintStatistics(std::ostream& sout)
     sout << "Last job change     = " << wtime_e.GetSDateAndTime() << endl;
     CSmallTime dur;
     dur = wtime_e - wtime_b;
-    sout << "Total set duration  = " << dur.GetSTimeAndDay() << " (" << dur.GetSTimeFull() << ")" << endl;
+    sout << "Walltime duration   = " << dur.GetSTimeAndDay() << " (" << dur.GetSTimeFull() << ")" << endl;
 }
 
 //------------------------------------------------------------------------------

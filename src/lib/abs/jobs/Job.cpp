@@ -2600,10 +2600,10 @@ const CSmallTimeAndDate CJob::GetBeginWallTime(void)
 {
     CSmallTimeAndDate td;
 
-    if( HasSection("basic",td) ){
+    if( HasSection("submit",td) ){
         return(td);
     }
-    if( HasSection("submit",td) ){
+    if( HasSection("basic",td) ){
         return(td);
     }
 
@@ -2617,13 +2617,10 @@ const CSmallTimeAndDate CJob::GetEndWallTime(void)
 {
     CSmallTimeAndDate td;
 
-    if( HasSection("start",td) ){
+    if( HasSection("kill",td) ){
         return(td);
     }
     if( HasSection("stop",td) ){
-        return(td);
-    }
-    if( HasSection("kill",td) ){
         return(td);
     }
     td.GetActualTimeAndDate();
