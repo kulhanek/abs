@@ -138,7 +138,8 @@ echo "# Input machine: $INF_INPUT_MACHINE"
 ssh-keygen -F "$INF_INPUT_MACHINE"
 if [[ $? -ne 0 ]]; then
     echo "# >>> connecting to "$INF_INPUT_MACHINE" ..."
-    ssh -x "$INF_SSH_OPTIONS" "$INF_INPUT_MACHINE" hostname -f
+    # -o StrictHostKeyChecking=no
+    ssh -x "$INF_INPUT_MACHINE" hostname -f
     if [[ $? -ne 0 ]]; then
         echo "# >>> removing the old one and trying again ..."
         ssh-keygen -R "$INF_INPUT_MACHINE"
@@ -152,7 +153,8 @@ echo "# Storage machine: $INF_STORAGE_MACHINE"
 ssh-keygen -F "$INF_STORAGE_MACHINE"
 if [[ $? -ne 0 ]]; then
     echo "# >>> connecting to "$INF_STORAGE_MACHINE" ..."
-    ssh -x "$INF_SSH_OPTIONS" "$INF_STORAGE_MACHINE" hostname -f
+    # no -o StrictHostKeyChecking=no
+    ssh -x "$INF_STORAGE_MACHINE" hostname -f
     if [[ $? -ne 0 ]]; then
         echo "# >>> removing the old one and trying again ..."
         ssh-keygen -R "$INF_STORAGE_MACHINE"
