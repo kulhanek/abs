@@ -2098,15 +2098,17 @@ void CJobList::PrintStatistics(std::ostream& sout)
         art = rtime / run_stat;
     }
     sout << " "        << right << setw(17) << art.GetSTimeAndDay() << endl;
+
+    sout << endl;
+    sout << "First job change    = " << wtime_b.GetSDateAndTime() << endl;
+    sout << "Last job change     = " << wtime_e.GetSDateAndTime() << endl;
+
+    CSmallTime dur;
+    dur = wtime_e - wtime_b;
+
     sout << endl;
     sout << "Total CPU time      = " << ctime.GetSTimeAndDay() << " (" << ctime.GetSTimeFull() << ")" << endl;
     sout << "Total GPU time      = " << gtime.GetSTimeAndDay() << " (" << gtime.GetSTimeFull() << ")" << endl;
-    sout << endl;
-
-    sout << "First job change    = " << wtime_b.GetSDateAndTime() << endl;
-    sout << "Last job change     = " << wtime_e.GetSDateAndTime() << endl;
-    CSmallTime dur;
-    dur = wtime_e - wtime_b;
     sout << "Walltime duration   = " << dur.GetSTimeAndDay() << " (" << dur.GetSTimeFull() << ")" << endl;
 }
 
