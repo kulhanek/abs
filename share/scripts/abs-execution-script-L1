@@ -127,6 +127,29 @@ else
     echo ""
 fi
 
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L1.1: Check for SSH keys of the input and storage machines ..."
+echo "# ------------------------------------------------------------------------------"
+
+echo ""
+echo "# Input machine: $INF_INPUT_MACHINE"
+
+ssh-keygen -F "$INF_INPUT_MACHINE"
+if [[ $? -ne 0 ]]; then
+    echo "# >>> connecting to "$INF_INPUT_MACHINE" ..."
+    ssh -x "$INF_SSH_OPTIONS" "$INF_INPUT_MACHINE" hostname -f
+fi
+
+echo ""
+echo "# Storage machine: $INF_STORAGE_MACHINE"
+
+ssh-keygen -F "$INF_STORAGE_MACHINE"
+if [[ $? -ne 0 ]]; then
+    echo "# >>> connecting to "$INF_STORAGE_MACHINE" ..."
+    ssh -x "$INF_SSH_OPTIONS" "$INF_STORAGE_MACHINE" hostname -f
+fi
+
 
 
 
