@@ -43,6 +43,39 @@ echo "# Current directory   : `pwd`"
 echo "# Input directory     : $INF_INPUT_MACHINE:$INF_INPUT_DIR"
 echo "# Storage directory   : $INF_STORAGE_MACHINE:$INF_STORAGE_DIR"
 
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L1.1: Check for SSH keys of the input and storage machines ..."
+echo "# ------------------------------------------------------------------------------"
+
+echo ""
+echo "# Input machine: $INF_INPUT_MACHINE"
+echo "# >>> connecting to "$INF_INPUT_MACHINE" ..."
+# no -o StrictHostKeyChecking=no here
+ssh -x "$INF_INPUT_MACHINE" hostname -f
+if [[ $? -ne 0 ]]; then
+    echo "# >>> removing the old one and trying again ..."
+    ssh-keygen -R "$INF_INPUT_MACHINE"
+    ssh -x "$INF_SSH_OPTIONS" "$INF_INPUT_MACHINE" hostname -f
+fi
+
+if [[ "$INF_STORAGE_MACHINE" != "$INF_INPUT_MACHINE" ]]; then
+    echo ""
+    echo "# Storage machine: $INF_STORAGE_MACHINE"
+    echo "# >>> connecting to "$INF_STORAGE_MACHINE" ..."
+    # no -o StrictHostKeyChecking=no here
+    ssh -x "$INF_STORAGE_MACHINE" hostname -f
+    if [[ $? -ne 0 ]]; then
+        echo "# >>> removing the old one and trying again ..."
+        ssh-keygen -R "$INF_STORAGE_MACHINE"
+        ssh -x "$INF_SSH_OPTIONS" "$INF_STORAGE_MACHINE" hostname -f
+    fi
+fi
+
+echo ""
+echo "# ------------------------------------------------------------------------------"
+echo "# L1.2: Restore data from info file ..."
+echo "# ------------------------------------------------------------------------------"
 
 # the full name of the job service files
 export INF_WHOLE_NAME="${INF_JOB_NAME}${INF_JOB_NAME_SUFFIX}"
@@ -127,30 +160,7 @@ else
     echo ""
 fi
 
-echo ""
-echo "# ------------------------------------------------------------------------------"
-echo "# L1.1: Check for SSH keys of the input and storage machines ..."
-echo "# ------------------------------------------------------------------------------"
 
-echo ""
-echo "# Input machine: $INF_INPUT_MACHINE"
-echo "# >>> connecting to "$INF_INPUT_MACHINE" ..."
-ssh -x "$INF_INPUT_MACHINE" hostname -f
-if [[ $? -ne 0 ]]; then
-    echo "# >>> removing the old one and trying again ..."
-    ssh-keygen -R "$INF_INPUT_MACHINE"
-    ssh -x "$INF_SSH_OPTIONS" "$INF_INPUT_MACHINE" hostname -f
-fi
-
-echo ""
-echo "# Storage machine: $INF_STORAGE_MACHINE"
-    echo "# >>> connecting to "$INF_STORAGE_MACHINE" ..."
-ssh -x "$INF_STORAGE_MACHINE" hostname -f
-if [[ $? -ne 0 ]]; then
-    echo "# >>> removing the old one and trying again ..."
-    ssh-keygen -R "$INF_STORAGE_MACHINE"
-    ssh -x "$INF_SSH_OPTIONS" "$INF_STORAGE_MACHINE" hostname -f
-fi
 
 
 
