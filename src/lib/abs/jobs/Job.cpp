@@ -2596,6 +2596,42 @@ const CSmallTime CJob::GetRunningTime(void)
 
 //------------------------------------------------------------------------------
 
+const CSmallTimeAndDate CJob::GetBeginWallTime(void)
+{
+    CSmallTimeAndDate td;
+
+    if( HasSection("basic",td) ){
+        return(td);
+    }
+    if( HasSection("submit",td) ){
+        return(td);
+    }
+
+    td.GetActualTimeAndDate();
+    return(td);
+}
+
+//------------------------------------------------------------------------------
+
+const CSmallTimeAndDate CJob::GetEndWallTime(void)
+{
+    CSmallTimeAndDate td;
+
+    if( HasSection("start",td) ){
+        return(td);
+    }
+    if( HasSection("stop",td) ){
+        return(td);
+    }
+    if( HasSection("kill",td) ){
+        return(td);
+    }
+    td.GetActualTimeAndDate();
+    return(td);
+}
+
+//------------------------------------------------------------------------------
+
 const CSmallTimeAndDate CJob::GetTimeOfLastChange(void)
 {
     CSmallTimeAndDate btad;

@@ -1985,10 +1985,18 @@ void CJobList::PrintStatistics(std::ostream& sout)
 
     CSmallTime qtime,qtimel,qtimeh;
     CSmallTime rtime,rtimel,rtimeh;
-    CSmallTime ctime;
+    CSmallTime ctime,gtime;
+
+    CSmallTimeAndDate wtime_b,wtime_e;
 
     while( it != ie ){
         CJobPtr p_job = *it;
+
+        CSmallTimeAndDate bpt = p_job->GetBeginWallTime();
+        if( wtime_b > bpt ) wtime_b = bpt;
+
+        CSmallTimeAndDate ept = p_job->GetEndWallTime();
+        if( wtime_e < ept ) wtime_e = ept;
 
         if( p_job->GetJobStatus() == EJS_PREPARED ){
             pre++;
@@ -2029,6 +2037,7 @@ void CJobList::PrintStatistics(std::ostream& sout)
             rtime += qt;
 
             ctime += qt*p_job->GetNumOfCPUs();
+            gtime += qt*p_job->GetNumOfGPUs();
 
             if( run_stat == 1 ){
                 rtimel = qt;
@@ -2087,7 +2096,15 @@ void CJobList::PrintStatistics(std::ostream& sout)
     }
     sout << " "        << right << setw(17) << art.GetSTimeAndDay() << endl;
     sout << endl;
-    sout << "Total CPU time = " << ctime.GetSTimeAndDay() << " (" << ctime.GetSTimeFull() << ")" << endl;
+    sout << "Total CPU time      = " << ctime.GetSTimeAndDay() << " (" << ctime.GetSTimeFull() << ")" << endl;
+    sout << "Total GPU time      = " << gtime.GetSTimeAndDay() << " (" << gtime.GetSTimeFull() << ")" << endl;
+    sout << endl;
+
+    sout << "First job change    = " << wtime_b.GetSDateAndTime() << endl;
+    sout << "Last job change     = " << wtime_e.GetSDateAndTime() << endl;
+    CSmallTime dur;
+    dur = wtime_e - wtime_b;
+    sout << "Total set duration  = " << dur.GetSTimeAndDay() << " (" << dur.GetSTimeFull() << ")" << endl;
 }
 
 //------------------------------------------------------------------------------

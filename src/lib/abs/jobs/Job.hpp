@@ -374,6 +374,12 @@ public:
     /// get time of last change
     const CSmallTimeAndDate GetTimeOfLastChange(void);
 
+    /// get beggining of the job or now
+    const CSmallTimeAndDate GetBeginWallTime(void);
+
+    /// get end of the job or now
+    const CSmallTimeAndDate GetEndWallTime(void);
+
     /// get VNodes - populate Nodes with exec vnodes of the job
     bool GetVNodes(void);
 
