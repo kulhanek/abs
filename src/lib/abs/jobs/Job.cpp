@@ -3374,7 +3374,10 @@ void CJob::PrintResourcesV4(std::ostream& sout)
     cmd << "psubmit" << " ";
     cmd << GetItem("basic/arguments","INF_ARG_DESTINATION") << " ";
     cmd << GetItem("basic/jobinput","INF_JOB_NAME") << " ";
-    cmd << GetItem("basic/arguments","INF_ARG_RESOURCES");
+    tmp = GetItem("basic/arguments","INF_ARG_RESOURCES");
+    tmp.Substitute(',',' ');
+    cmd << tmp;
+
     sout << "Command line spec: " << cmd << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_DESTINATION");
