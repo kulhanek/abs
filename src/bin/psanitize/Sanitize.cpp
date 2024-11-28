@@ -27,6 +27,7 @@
 #include <BatchServers.hpp>
 #include <SiteController.hpp>
 #include <AMSRegistry.hpp>
+#include <ModuleController.hpp>
 
 using namespace std;
 
