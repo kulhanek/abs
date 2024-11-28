@@ -3369,7 +3369,13 @@ void CJob::PrintBasicV4(std::ostream& sout)
 
 void CJob::PrintResourcesV4(std::ostream& sout)
 {
-    CSmallString tmp,tmp1,tmp2;
+    CSmallString tmp,tmp1,tmp2,cmd;
+
+    cmd << "psubmit" << " ";
+    cmd << GetItem("basic/arguments","INF_ARG_DESTINATION") << " ";
+    cmd << GetItem("basic/jobinput","INF_JOB_NAME") << " ";
+    cmd << GetItem("basic/arguments","INF_ARG_RESOURCES");
+    sout << "Command line spec: " << cmd << endl;
 
     tmp = GetItem("basic/arguments","INF_ARG_DESTINATION");
     sout << "Req destination  : " << tmp << endl;
