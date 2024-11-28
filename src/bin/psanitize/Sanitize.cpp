@@ -82,6 +82,7 @@ bool CSanitize::Run(void)
 
 // init AMS registry
     AMSRegistry.LoadRegistry(vout);
+    ModuleController.InitModuleControllerConfig();
 
     vout << low;
 
