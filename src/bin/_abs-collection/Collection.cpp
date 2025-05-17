@@ -503,7 +503,7 @@ bool CCollection::Run(void)
 // -------------------------------------------------------------------
 // kill
 // -------------------------------------------------------------------
-    } else if( action == "kill" ) {
+    } else if( (action == "kill") || (action == "kill-force") ) {
         if( Jobs.LoadCollection(Options.GetProgArg(0),false) == false ){
             vout << endl;
             vout << "<b><red> ERROR: Unable to load collection '" << Jobs.GetCollectionName() << "'!</red></b>" << endl;
@@ -547,9 +547,11 @@ bool CCollection::Run(void)
 
         vout << "Queued and running jobs will be killed!" << endl;
 
+        bool force = (action == "kill-force");
+
         // kill jobs
         Jobs.LoadAllInfoFiles();
-        Jobs.KillAllJobsWithInfo(vout,true);
+        Jobs.KillAllJobsWithInfo(vout,force);
         Jobs.SaveAllInfoFiles();
 
         vout << endl;

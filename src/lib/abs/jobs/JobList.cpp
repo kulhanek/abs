@@ -512,8 +512,23 @@ bool CJobList::KillAllJobsWithInfo(std::ostream& sout,bool force)
     sout << "#    Job ID        Status                                       " << endl;
     sout << "# ------------ -------------------------------------------------" << endl;
 
-    list<CJobPtr>::iterator it = begin();
-    list<CJobPtr>::iterator ie = end();
+    list<CJobPtr>::iterator sit = begin();
+    list<CJobPtr>::iterator sie = end();
+
+    list<CJobPtr> jobs;
+
+    while( sit != sie ){
+        CJobPtr p_job = *sit;
+        if( (p_job->GetJobInfoStatus() == EJS_PREPARED) || (p_job->GetJobInfoStatus() == EJS_SUBMITTED) ){
+            jobs.push_front(p_job);
+        } else {
+            jobs.push_back(p_job);
+        }
+        sit++;
+    }
+
+    list<CJobPtr>::iterator it = jobs.begin();
+    list<CJobPtr>::iterator ie = jobs.end();
 
     bool result = true;
 
@@ -548,7 +563,7 @@ bool CJobList::KillAllJobsWithInfo(std::ostream& sout,bool force)
                 sout << "no info file loaded - skipped" << endl;
             }
         } else {
-            bool lok = p_job->KillJob();
+            bool lok = p_job->KillJob(force);
             if( lok ){
                 sout << "killed" << endl;
             } else {
@@ -559,7 +574,7 @@ bool CJobList::KillAllJobsWithInfo(std::ostream& sout,bool force)
         it++;
     }
 
-    return(true);
+    return(result);
 }
 
 //------------------------------------------------------------------------------

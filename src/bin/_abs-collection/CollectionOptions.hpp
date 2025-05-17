@@ -61,6 +61,7 @@ class CCollectionOptions : public CSimpleOptions {
         "               remove job with <u>jobcid</u> from <u>collname</u>\n"
         "   <b><cyan>submit</cyan></b>      submit all jobs in the collection <u>collname</u>\n"
         "   <b><cyan>kill</cyan></b>        kill all jobs in the collection <u>collname</u>\n"
+        "   <b><cyan>kill-force</cyan></b>  kill forcidly all jobs in the collection <u>collname</u>\n"
         "   <b><cyan>clean</cyan></b>       clean all jobs in the collection <u>collname</u>\n"
     CSO_PROG_ARGS_LONG_DESC_END
 

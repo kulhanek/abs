@@ -873,11 +873,15 @@ if [ "$INF_MPI_NCPUS" == "$INF_NCPUS" ]; then
             export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
             export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by core -map-by core -bind-to core"
             export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by core -map-by core -bind-to core"
+            export INF_OPENMPI4_SPEC="-display-allocation -display-map -rank-by core -map-by core -bind-to core"
+            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by core -map-by core -bind-to core"
             ;;
         raw)
             export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
             export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by slot -map-by slot -bind-to none"
             export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by slot -map-by slot -bind-to none"
+            export INF_OPENMPI4_SPEC="-display-allocation -display-map -rank-by slot -map-by slot -bind-to none"
+            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by slot -map-by slot -bind-to none"
             ;;
     esac
 else
@@ -887,6 +891,8 @@ else
             export INF_OPENMPI1_SPEC="--not-supported-by-infinity"
             export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by slot -map-by socket -bind-to core"
             export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by slot -map-by socket -bind-to core"
+            export INF_OPENMPI4_SPEC="-display-allocation -display-map -rank-by slot -map-by socket -bind-to core"
+            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by slot -map-by package -bind-to core"
             ;;          
         *)
             echo "" >&2
@@ -917,6 +923,8 @@ echo "INF_EXEC_TYPE          = $INF_EXEC_TYPE"
 echo "INF_OPENMPI1_SPEC      = $INF_OPENMPI1_SPEC"
 echo "INF_OPENMPI2_SPEC      = $INF_OPENMPI2_SPEC"
 echo "INF_OPENMPI3_SPEC      = $INF_OPENMPI3_SPEC"
+echo "INF_OPENMPI4_SPEC      = $INF_OPENMPI4_SPEC"
+echo "INF_OPENMPI5_SPEC      = $INF_OPENMPI5_SPEC"
 
 echo ""
 echo "# ------------------------------------------------------------------------------"

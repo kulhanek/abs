@@ -87,6 +87,7 @@ int CCollectionOptions::CheckArguments(void)
         (GetProgArg(1) == "close") ||
         (GetProgArg(1) == "submit") ||
         (GetProgArg(1) == "kill")  ||
+        (GetProgArg(1) == "kill-force")  ||
         (GetProgArg(1) == "clean")) ){
         if( IsVerbose() ) {
             if( IsError == false ) fprintf(stderr,"\n");
