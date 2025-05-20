@@ -517,6 +517,8 @@ bool CJobList::KillAllJobsWithInfo(std::ostream& sout,bool force)
 
     list<CJobPtr> jobs;
 
+    // resort the jobs such the prepared and submitted (queued) jobs are killed first
+    // then kill running jobs
     while( sit != sie ){
         CJobPtr p_job = *sit;
         if( (p_job->GetJobInfoStatus() == EJS_PREPARED) || (p_job->GetJobInfoStatus() == EJS_SUBMITTED) ){

@@ -874,14 +874,14 @@ if [ "$INF_MPI_NCPUS" == "$INF_NCPUS" ]; then
             export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by core -map-by core -bind-to core"
             export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by core -map-by core -bind-to core"
             export INF_OPENMPI4_SPEC="-display-allocation -display-map -rank-by core -map-by core -bind-to core"
-            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by core -map-by core -bind-to core"
+            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by span -map-by core -bind-to core"
             ;;
         raw)
             export INF_OPENMPI1_SPEC="-report-bindings -bind-to-core"
             export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by slot -map-by slot -bind-to none"
             export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by slot -map-by slot -bind-to none"
             export INF_OPENMPI4_SPEC="-display-allocation -display-map -rank-by slot -map-by slot -bind-to none"
-            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by slot -map-by slot -bind-to none"
+            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by span -map-by package -bind-to none"
             ;;
     esac
 else
@@ -892,7 +892,7 @@ else
             export INF_OPENMPI2_SPEC="-display-allocation -display-map -rank-by slot -map-by socket -bind-to core"
             export INF_OPENMPI3_SPEC="-display-allocation -display-map -rank-by slot -map-by socket -bind-to core"
             export INF_OPENMPI4_SPEC="-display-allocation -display-map -rank-by slot -map-by socket -bind-to core"
-            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by slot -map-by package -bind-to core"
+            export INF_OPENMPI5_SPEC="-display allocation,map -rank-by span -map-by core -bind-to core"
             ;;          
         *)
             echo "" >&2
