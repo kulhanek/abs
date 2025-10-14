@@ -313,7 +313,7 @@ const CSmallString& CNode::GetName(void) const
 
 const CSmallString& CNode::GetHost(void) const
 {
-    return(MOM);
+    return(Host);
 }
 
 //------------------------------------------------------------------------------
