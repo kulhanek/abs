@@ -61,6 +61,7 @@ bool CPBSProNode::Init(const CSmallString& srv_name,const CSmallString& short_sr
 
     // all attributes are optional
     get_attribute(p_node->attribs,"Mom",NULL,MOM);
+    get_attribute(p_node->attribs,"resources_available","host",Host);
 
     get_attribute(p_node->attribs,"resources_available","ncpus",NCPUs);
     get_attribute(p_node->attribs,"resources_assigned","ncpus",AssignedCPUs);

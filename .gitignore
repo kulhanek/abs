@@ -13,3 +13,4 @@ Makefile
 src/lib/abs/ABSMainHeaderConfig.hpp
 gui.vncpsw
 ABS4.creator.user
+.qtc_clangd/

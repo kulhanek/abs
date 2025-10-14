@@ -132,6 +132,7 @@ protected:
     CSmallString                ShortServerName;
 
     CSmallString                Name;
+    CSmallString                Host;
     CSmallString                MOM;
     CSmallString                Comment;
 
