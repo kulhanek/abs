@@ -278,6 +278,18 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
                 break;
             }
         }
+        {
+            CFileName test_file_form;
+            test_file_form = storage / name_format + ".rst.nc";
+            stringstream test_file_str;
+            test_file_str << format(test_file_form) % i;
+            CFileName test_file = test_file_str.str().c_str();
+            if( CFileSystem::IsFile(test_file) == true ){
+                current = i;
+                last_found = test_file;
+                break;
+            }
+        }
     }
     if( current == 0 ){
         current = 1;
@@ -313,6 +325,19 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         {
             CFileName test_file_form;
             test_file_form = name_format + ".rst7";
+            stringstream test_file_str;
+            test_file_str << format(test_file_form) % i;
+            CFileName test_file = test_file_str.str().c_str();
+            if( test_file == crd_name ){
+                sout << endl;
+                sout << "<b><red> ERROR: The name of initial coordinates (" << crd_name;
+                sout << ") collides with the name of precycle run restart file (" << test_file << ")!</red></b>" << endl;
+                return(ERS_FAILED);
+            }
+        }
+        {
+            CFileName test_file_form;
+            test_file_form = name_format + ".rst.nc";
             stringstream test_file_str;
             test_file_str << format(test_file_form) % i;
             CFileName test_file = test_file_str.str().c_str();
