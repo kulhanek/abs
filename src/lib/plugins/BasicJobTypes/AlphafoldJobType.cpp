@@ -120,7 +120,7 @@ ERetStatus CAlphafoldJobType::DetectJobType(CJob& job,bool& detected,std::ostrea
         ModuleController.MergeBundles();
 
         CSmallString drch, dmode;
-        CXMLElement* p_ele = ModCache.GetModule(amodule);
+        CXMLElement* p_ele = ModCache.GetModule(amodule,false,true);
         if( p_ele ){
             ModCache.GetModuleDefaults(p_ele,amodver,drch,dmode);
         }

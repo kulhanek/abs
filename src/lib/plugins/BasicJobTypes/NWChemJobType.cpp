@@ -122,7 +122,7 @@ ERetStatus CNWChemJobType::DetectJobType(CJob& job,bool& detected,std::ostream& 
         ModuleController.MergeBundles();
 
         CSmallString drch, dmode;
-        CXMLElement* p_ele = ModCache.GetModule(nmodule);
+        CXMLElement* p_ele = ModCache.GetModule(nmodule,false,true);
         if( p_ele ){
             ModCache.GetModuleDefaults(p_ele,nmodver,drch,dmode);
         }

@@ -123,7 +123,7 @@ ERetStatus CGaussianJobType::DetectJobType(CJob& job,bool& detected,std::ostream
         ModuleController.LoadBundles(EMBC_SMALL);
         ModuleController.MergeBundles();
         CSmallString drch, dmode;
-        CXMLElement* p_ele = ModCache.GetModule(gmodule);
+        CXMLElement* p_ele = ModCache.GetModule(gmodule,false,true);
         if( p_ele ){
             ModCache.GetModuleDefaults(p_ele,gmodver,drch,dmode);
         }

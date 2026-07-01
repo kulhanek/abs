@@ -124,7 +124,7 @@ ERetStatus COrcaJobType::DetectJobType(CJob& job,bool& detected,std::ostream& so
         ModuleController.MergeBundles();
 
         CSmallString drch, dmode;
-        CXMLElement* p_ele = ModCache.GetModule(omodule);
+        CXMLElement* p_ele = ModCache.GetModule(omodule,false,true);
         if( p_ele ){
             ModCache.GetModuleDefaults(p_ele,omodver,drch,dmode);
         }

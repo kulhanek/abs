@@ -391,7 +391,7 @@ ERetStatus CPRecycleJobType::DetectJobType(CJob& job,bool& detected,std::ostream
     CSmallString mname,mver,march,mmode;
     CModUtils::ParseModuleName(md_module,mname,mver,march,mmode);
 
-    CXMLElement* p_mod = ModCache.GetModule(mname);
+    CXMLElement* p_mod = ModCache.GetModule(mname,false,true);
     if( p_mod == NULL ){
         sout << endl;
         sout << "<b><red> ERROR: The specified MD engine module (" << mname;
