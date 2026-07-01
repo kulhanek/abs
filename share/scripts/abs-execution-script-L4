@@ -150,8 +150,10 @@ case $INF_JOB_NAME in
 
         # disable termcap capabilities
         export SCREENCAP=""
+        export LANG=en_US.UTF-8
+        export LC_ALL=en_US.UTF-8
         # start screen terminal and detach from it
-        screen -D -m -S "T$INF_JOB_KEY" -c $ABS_ROOT/share/scripts/screenrc &
+        screen -D -U -m -S "T$INF_JOB_KEY" -c $ABS_ROOT/share/scripts/screenrc &
         INF_AGENT_PID=$!
 
         echo "Screen session: T$INF_JOB_KEY"

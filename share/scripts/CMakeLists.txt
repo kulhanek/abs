@@ -18,9 +18,16 @@ INSTALL(FILES
             abs-go-remote
             abs-kill
             abs-sync
-            screenrc
        DESTINATION
             share/scripts
         PERMISSIONS
             OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        )
+
+INSTALL(FILES
+            screenrc
+       DESTINATION
+            share/scripts
+        PERMISSIONS
+            OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
         )
