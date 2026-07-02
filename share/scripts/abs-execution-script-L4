@@ -228,6 +228,12 @@ case $INF_JOB_NAME in
         INF_AGENT_MODULE="`amsmodule getactmod tigervnc 2>&1`"
         export INF_AGENT_MODULE
 
+        # fake XDG
+        if [ -z "$XDG_RUNTIME_DIR" ]; then
+            export XDG_RUNTIME_DIR="$INF_TMP_DIR/xdg$$/XDG_RUNTIME_DIR"
+            mkdir -p "$XDG_RUNTIME_DIR"
+        fi
+
         # start VNC server
         vncserver --new --fg &> "${INF_WHOLE_NAME}.vncid" &
 
