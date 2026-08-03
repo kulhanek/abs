@@ -799,7 +799,7 @@ void CCollection::FindJobs(std::vector<CFileName>& jobs,const CFileName& cwd,con
             fdir = file;
         }
         if( CFileSystem::IsSymLink(cwd / fdir) ){
-            continue; // do not follow symbolik links
+            continue; // do not follow symbolic links
         }
         if( CFileSystem::IsDirectory(cwd / fdir) ){
             if( CFileSystem::IsFile(cwd / fdir / job) ){
