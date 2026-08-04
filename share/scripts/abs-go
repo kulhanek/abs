@@ -87,6 +87,8 @@ case "$INF_GO_JOB_NAME" in
 
         # go to input directory
         if [ -n "$INF_GO_BOOT_SCRIPT" ] && [ -z "$INF_GO_MAIN_NODE" ] && [ -n "$INF_GO_INPUT_MACHINE" ] && [ -n "$INF_GO_INPUT_DIR" ]; then
+            # try first to triger automount, RT#1526432
+            cd "$INF_GO_INPUT_DIR" &> /dev/null
             if ! [ -d "$INF_GO_INPUT_DIR" ]; then
                 if [ "$INF_GO_INPUT_MACHINE" != "$HOSTNAME" ] && [ -n "$INF_GO_SITE" ] ; then
                     echo ""
