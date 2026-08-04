@@ -32,7 +32,7 @@ if [ $? -ne 0 ]; then INF_RETRY_COUNT="3"; fi
 export INF_RETRY_COUNT
 
 INF_RETRY_TIME=`$ABS_ROOT/sbin/abs-get-setup-item INF_RETRY_TIME`
-if [ $? -ne 0 ]; then INF_RETRY_TIME="600"; fi
+if [ $? -ne 0 ]; then INF_RETRY_TIME="300"; fi
 export INF_RETRY_TIME
 
 echo "# Temporary directory : $TMPDIR"

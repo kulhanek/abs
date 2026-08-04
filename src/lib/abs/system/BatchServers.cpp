@@ -86,7 +86,7 @@ bool CBatchServers::InitAll(void)
     if( rc < 0 ) rc = 0;
     if( RetrySeverInit == false ) rc = 0; // no retry init
 
-    int rt = 600;
+    int rt = 300;
     if( srt != NULL ){
         rt = srt.ToInt();
     }
@@ -185,7 +185,7 @@ bool CBatchServers::Init(const CSmallString& srv)
     if( rc < 0 ) rc = 0;
     if( RetrySeverInit == false ) rc = 0; // no retry init
 
-    int rt = 600;
+    int rt = 300;
     if( srt != NULL ){
         rt = srt.ToInt();
     }
