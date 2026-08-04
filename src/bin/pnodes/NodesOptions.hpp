@@ -74,6 +74,7 @@ class CNodesOptions : public CSimpleOptions {
         CSO_OPT(bool,PrintStat)
         CSO_OPT(bool,PrintJobs)
         CSO_OPT(bool,PrintQueues)
+        CSO_OPT(bool,RetryMode)
         CSO_OPT(bool,Help)
         CSO_OPT(bool,Version)
         CSO_OPT(bool,Verbose)
@@ -197,7 +198,16 @@ class CNodesOptions : public CSimpleOptions {
                     "queues",                      /* long option name */
                     NULL,                           /* parametr name */
                     "print queues associated with each node")   /* option description */
-            //----------------------------------------------------------------------
+        //----------------------------------------------------------------------
+        CSO_MAP_OPT(bool,                           /* option type */
+                    RetryMode,                        /* option name */
+                    false,                          /* default value */
+                    false,                          /* is option mandatory */
+                    0,                           /* short option name */
+                    "retrymode",                      /* long option name */
+                    NULL,                           /* parametr name */
+                    "activate retry mode for contacting batch servers")   /* option description */
+        //----------------------------------------------------------------------
         CSO_MAP_OPT(bool,                           /* option type */
                     Verbose,                        /* option name */
                     false,                          /* default value */

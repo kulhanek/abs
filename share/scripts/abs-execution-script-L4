@@ -184,7 +184,7 @@ case $INF_JOB_NAME in
         screen -S "T$INF_JOB_KEY" -p 0 -X caption always
 
         # update info file
-        $ABS_ROOT/sbin/abs-update-infofile --agent "$INF_AGENT_MODULE" cliready
+        $ABS_ROOT/sbin/abs-update-infofile --agent "$INF_AGENT_MODULE" cliready --retrymode
         if [ $? -ne 0 ]; then
             echo "" >&2
             echo " >>> ERROR: Unable to update job status in the job info file!" >&2
@@ -274,7 +274,7 @@ case $INF_JOB_NAME in
         abs_write_kill_footer   >> "${INF_WHOLE_NAME}.kill"
 
         # update info file
-        $ABS_ROOT/sbin/abs-update-infofile --agent "$INF_AGENT_MODULE" --vncid "$INF_VNC_ID" guiready
+        $ABS_ROOT/sbin/abs-update-infofile --agent "$INF_AGENT_MODULE" --vncid "$INF_VNC_ID" guiready --retrymode
 
         if [ $? -ne 0 ]; then
             echo "" >&2

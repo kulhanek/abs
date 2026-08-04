@@ -499,7 +499,7 @@ fi
 echo ""
 echo "# Write the job start and update the info file in the input directory ..."
 
-$ABS_ROOT/sbin/abs-update-infofile start
+$ABS_ROOT/sbin/abs-update-infofile start --retrymode
 if [ $? -ne 0 ]; then
     echo "" >&2
     echo " >>> ERROR: Unable to update job status in the job info file!" >&2
@@ -796,20 +796,15 @@ echo "# ------------------------------------------------------------------------
 
 echo ""
 echo "# Summary of execution nodes with assigned slots ..."
-echo "# pnodes -j "$INF_JOB_ID" --jobs"
+echo "# pnodes --retrymode -j "$INF_JOB_ID" --jobs"
 
-pnodes -j "$INF_JOB_ID" --jobs
+# Bug Fixes: RT#687751, RT#1522045
 
-if [ $? -ne 0 ]; then
-    # RT#687751
-    echo ">>> WARNING: Trying again after 60s ...."
-    sleep 60
-    pnodes -j "$INF_JOB_ID" --jobs --verbose
-fi
+pnodes --retrymode -j "$INF_JOB_ID" --jobs
 
 echo ""
 echo "# Maximum of available resources  ..."
-echo "# pnodes -j "$INF_JOB_ID" --stat"
+echo "# pnodes --retrymode -j "$INF_JOB_ID" --stat"
 
 INF_MAX_NCPUS=0
 INF_MAX_NGPUS=0
@@ -818,14 +813,7 @@ INF_MAX_NGPUS=0
 INF_NODE_TMP="/tmp/${USER}.$$.nodeinfo"
 
 # node stat
-pnodes -j "$INF_JOB_ID" --stat > $INF_NODE_TMP
-
-if [ $? -ne 0 ]; then
-    # RT#687751
-    echo ">>> WARNING: Trying again after 60s ...."
-    sleep 60
-    pnodes -j "$INF_JOB_ID" --stat --verbose > $INF_NODE_TMP
-fi
+pnodes --retrymode -j "$INF_JOB_ID" --stat > $INF_NODE_TMP
 
 cat $INF_NODE_TMP
 

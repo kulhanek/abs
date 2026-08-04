@@ -25,6 +25,7 @@
 #include <JobList.hpp>
 #include <SiteController.hpp>
 #include <AMSRegistry.hpp>
+#include <BatchServers.hpp>
 
 //------------------------------------------------------------------------------
 
@@ -73,6 +74,8 @@ bool CUpdateInfoFile::Run(void)
     if( Options.GetArgAction() == "clean" ){
         return( CleanRuntimeFiles() );
     }
+
+    BatchServers.SetServerInitRetryMode(Options.GetOptRetryMode());
 
     CSmallString info_file_name;
 

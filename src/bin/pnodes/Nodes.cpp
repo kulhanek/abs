@@ -112,6 +112,8 @@ bool CNodes::Run(void)
         return(false);
     }
 
+    BatchServers.SetServerInitRetryMode(Options.GetOptRetryMode());
+
     bool term = false;
     if( (Options.GetOptPrintNames() == false) && (Options.GetOptPrintHosts() == false) && (Options.GetOptPrintStat() == false) ){
         if( Options.IsOptJobSet() == false ){
